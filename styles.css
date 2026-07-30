@@ -1,193 +1,298 @@
 :root {
-  --bg-color: #0f172a;
-  --panel-bg: #1e293b;
-  --accent: #38bdf8;
-  --text: #f8fafc;
-  --hp-color: #ef4444;
-  --xp-color: #10b981;
+  --bg-dark: #0b1120;
+  --panel-bg: #131c31;
+  --card-bg: #182238;
+  --accent-green: #10b981;
+  --accent-red: #ef4444;
+  --accent-blue: #3b82f6;
+  --accent-purple: #8b5cf6;
+  --text-white: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #243049;
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text);
-  margin: 0;
-  padding: 0;
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  padding-bottom: 40px;
 }
 
-/* NAVEGACIÓN */
-.navbar {
-  background: var(--panel-bg);
-  padding: 1rem 2rem;
+/* HEADER PRINCIPAL */
+.top-header {
+  background-color: #0d1527;
+  padding: 12px 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid #334155;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.logo {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--accent);
-}
-
-.nav-btn {
-  background: transparent;
-  color: var(--text);
-  border: 1px solid #334155;
-  padding: 8px 16px;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-left: 8px;
-  font-size: 0.95rem;
-}
-
-.nav-btn.active {
-  background: var(--accent);
-  color: #000000;
-  font-weight: bold;
-}
-
-/* CONTENEDOR PRINCIPAL */
-.main-container {
-  padding: 20px;
-  max-width: 1100px;
-  margin: 0 auto;
-}
-
-.tab-content {
-  display: none;
-}
-
-.active-tab {
-  display: block;
-}
-
-/* TARJETAS RPG */
-.card-grid {
+.header-brand {
   display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin-top: 15px;
-}
-
-.character-card {
-  background: var(--panel-bg);
-  padding: 20px;
-  border-radius: 12px;
-  width: 280px;
-  border: 1px solid #334155;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-
-.avatar {
-  font-size: 3rem;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-.character-card h3 {
-  margin: 0 0 4px 0;
-  text-align: center;
-}
-
-.clan-tag {
-  color: #94a3b8;
-  font-size: 0.85rem;
-  text-align: center;
-  margin-bottom: 15px;
-}
-
-.stat {
-  margin-bottom: 10px;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.progress-bar {
-  background: #0f172a;
-  height: 12px;
-  border-radius: 6px;
-  overflow: hidden;
-  margin-top: 4px;
-  border: 1px solid #334155;
-}
-
-.fill.hp {
-  background: var(--hp-color);
-  height: 100%;
-}
-
-.fill.xp {
-  background: var(--xp-color);
-  height: 100%;
-}
-
-/* HOJA DEL OBSERVADOR (ESTILO FORMAL) */
-.observador-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  gap: 12px;
 }
 
-.observador-sheet {
-  background: #ffffff;
-  color: #000000;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-}
-
-.sheet-header {
-  text-align: center;
-  border-bottom: 2px solid #000;
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-
-.sheet-header h2 {
-  margin: 0;
-  font-size: 1.2rem;
+.logo-badge {
+  background-color: #f59e0b;
   color: #000;
-}
-
-.info-table, .report-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 50%;
   font-size: 0.9rem;
 }
 
-.info-table td, .report-table th, .report-table td {
-  border: 1px solid #666;
+.brand-info h1 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.badge-sub {
+  background-color: #d97706;
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.brand-info p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-select, .btn-tool {
+  background-color: var(--card-bg);
+  color: var(--text-white);
+  border: 1px solid var(--border-color);
   padding: 8px 12px;
-  color: #000;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
-.report-table th {
-  background-color: #f1f5f9;
+.green-btn {
+  background-color: var(--accent-green);
+  color: #fff;
+  font-weight: 600;
+  border: none;
 }
 
-.btn-print {
-  background: #10b981;
+/* TOOLBAR */
+.toolbar {
+  display: flex;
+  justify-content: center;
+  padding: 10px 0;
+  background-color: #0b1120;
+}
+
+.tools-center {
+  display: flex;
+  gap: 8px;
+}
+
+.tool-chip {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid var(--border-color);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.purple-chip {
+  background-color: var(--accent-purple);
+  border: none;
+}
+
+/* MAIN CONTENT */
+.main-content {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* MÉTRICAS SUPERIORES */
+.metrics-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.metric-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  padding: 12px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.metric-card .icon { font-size: 1.5rem; }
+.metric-card .title { font-size: 0.65rem; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px; }
+.metric-card .value { font-size: 0.95rem; font-weight: 800; color: #38bdf8; }
+
+/* BÚSQUEDA Y BARRAS */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 0;
+  background-color: var(--card-bg);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 6px 14px;
+  width: 350px;
+}
+
+.search-box input {
+  background: transparent;
+  border: none;
+  color: var(--text-white);
+  outline: none;
+  margin-left: 8px;
+  width: 100%;
+  font-size: 0.85rem;
+}
+
+.sort-and-add {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 0.85rem;
+}
+
+.select-sort {
+  background-color: var(--bg-dark);
+  color: var(--text-white);
+  border: 1px solid var(--border-color);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.btn-add-student {
+  background-color: var(--accent-green);
   color: white;
   border: none;
-  padding: 10px 18px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-weight: 700;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 0.95rem;
 }
 
-.btn-print:hover {
-  background: #059669;
+/* GRILLA DE ESTUDIANTES */
+.students-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
 }
 
-.print-only {
-  display: none;
+.student-card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
+
+.card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  margin-bottom: 10px;
+}
+
+.badge-level {
+  background-color: #d97706;
+  color: black;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.card-stats {
+  font-weight: 700;
+}
+
+.pts-positive { color: var(--accent-green); }
+.pts-alert { color: var(--accent-red); margin-left: 6px; }
+
+.card-body {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.avatar-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: #1e293b;
+  border: 2px solid #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: #38bdf8;
+}
+
+.student-info h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.student-info p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.btn-action {
+  flex: 1;
+  padding: 6px 0;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+}
+
+.btn-merito { background-color: #059669; }
+.btn-falta { background-color: #dc2626; }
+.btn-ficha { background-color: #2563eb; }
+.btn-action:hover { opacity: 0.9; }
