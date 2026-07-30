@@ -34,9 +34,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Canvas Confetti & SheetJS Excel Library -->
+    <!-- Canvas Confetti, SheetJS Excel & html2pdf PDF Library -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
         body {
@@ -76,35 +77,35 @@
             background: #475569;
         }
 
-        /* ESTILOS EXCLUSIVOS PARA IMPRESIÓN OFICIAL DEL OBSERVADOR */
-        @media print {
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-            }
-            header, main, .no-print, button, input, select {
-                display: none !important;
-            }
-            #print-area {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                color: #000;
-                background: #fff;
-                padding: 20px;
-            }
-            .print-border {
-                border: 1px solid #000 !important;
-            }
+        /* ESTILOS PARA LA PLANTILLA DE GENERACIÓN DEL PDF */
+        #pdf-template {
+            font-family: Arial, sans-serif;
+            color: #000;
+            background: #fff;
+            padding: 30px;
+        }
+        .pdf-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+        .pdf-table th, .pdf-table td {
+            border: 1px solid #333;
+            padding: 8px;
+            font-size: 11px;
+            text-align: left;
+        }
+        .pdf-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
         }
     </style>
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
     <!-- HEADER / BARRA DE NAVEGACIÓN -->
-    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg no-print">
+    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             
             <!-- BRANDING -->
@@ -216,7 +217,7 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6 no-print">
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
         <!-- DASHBOARD DE MÉTRICAS -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -297,9 +298,9 @@
         </div>
     </main>
 
-    <!-- MODAL PRINCIPAL: HISTORIAL Y OBSERVADOR DETALLADO DEL ESTUDIANTE -->
-    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
-        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
+    <!-- MODAL PRINCIPAL: OBSERVADOR COMPLETO Y FICHA DEL ESTUDIANTE -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[92vh] flex flex-col">
             <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -314,15 +315,15 @@
                     </div>
                     <div>
                         <h3 id="history-student-name" class="font-display font-black text-base text-white leading-tight">Nombre Estudiante</h3>
-                        <p id="history-student-subtitle" class="text-xs text-slate-400">Observador del Estudiante — Colegio Alfonso López Michelsen</p>
+                        <p id="history-student-subtitle" class="text-xs text-slate-400">Observador Pedagógico — Colegio Alfonso López Michelsen</p>
                     </div>
                 </div>
 
-                <!-- ACCIONES FICHA (EXCEL E IMPRESIÓN OFICIAL) -->
+                <!-- ACCIONES DE EXPORTACIÓN Y PDF -->
                 <div class="flex gap-2">
-                    <button onclick="printStudentObservador()" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 border border-blue-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Imprimir Observador Oficial en PDF o Papel">
-                        <i class="fa-solid fa-print text-blue-200"></i>
-                        <span>Imprimir Ficha</span>
+                    <button onclick="downloadStudentPDF()" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 border border-rose-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Descargar Observador Completo en PDF">
+                        <i class="fa-solid fa-file-pdf text-rose-200"></i>
+                        <span>Descargar PDF</span>
                     </button>
                     <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar Ficha a Excel">
                         <i class="fa-solid fa-file-excel text-emerald-300"></i>
@@ -331,14 +332,14 @@
                 </div>
             </div>
 
-            <!-- ESTADÍSTICAS DEL ALUMNO -->
-            <div class="grid grid-cols-3 gap-3 my-4">
+            <!-- MÉTRICAS ACUMULADAS DEL ALUMNO -->
+            <div class="grid grid-cols-3 gap-3 my-3">
                 <div class="bg-slate-900/80 p-2.5 rounded-xl border border-emerald-500/20 text-center">
-                    <p class="text-[10px] text-slate-400">Méritos Acumulados</p>
+                    <p class="text-[10px] text-slate-400">Puntos Reconocimiento</p>
                     <p id="history-stat-positive" class="font-display font-bold text-emerald-400 text-sm">0 pts</p>
                 </div>
                 <div class="bg-slate-900/80 p-2.5 rounded-xl border border-red-500/20 text-center">
-                    <p class="text-[10px] text-slate-400">Observaciones Registradas</p>
+                    <p class="text-[10px] text-slate-400">Situaciones / Faltas</p>
                     <p id="history-stat-negative" class="font-display font-bold text-red-400 text-sm">0</p>
                 </div>
                 <div class="bg-slate-900/80 p-2.5 rounded-xl border border-amber-500/20 text-center">
@@ -347,18 +348,18 @@
                 </div>
             </div>
 
-            <!-- FORMULARIO DE NUEVA ANOTACIÓN CONVIVENCIAL -->
-            <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3 mb-4 space-y-3">
+            <!-- ESTRUCTURA DEL OBSERVADOR: NUEVA ANOTACIÓN CONVIVENCIAL -->
+            <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 mb-3 space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-feather-pointed"></i> Nueva Anotación al Observador
+                        <i class="fa-solid fa-pen-nib"></i> Registrar Anotación en Observador
                     </span>
                     <span class="text-[10px] text-slate-400 font-semibold" id="obs-current-date"></span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Situación Convivencial</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Falta / Situación</label>
                         <select id="obs-type-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
                             <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve)</option>
                             <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave)</option>
@@ -367,7 +368,7 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilar de Convivencia (Character Counts)</label>
                         <select id="obs-pillar-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
                             <option value="Responsabilidad">🐘 Responsabilidad</option>
                             <option value="Respeto">🦁 Respeto</option>
@@ -380,25 +381,25 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descripción de los Hechos</label>
-                    <textarea id="obs-detail-input" rows="2" placeholder="Describe detalladamente lo sucedido..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descripción Detallada de los Hechos</label>
+                    <textarea id="obs-detail-input" rows="2" placeholder="Escribe la descripción de la falta o situación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descargo / Versión del Estudiante</label>
-                        <textarea id="obs-descargo-input" rows="1" placeholder="Palabras o descargos del estudiante..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descargo del Estudiante (Debido Proceso)</label>
+                        <textarea id="obs-descargo-input" rows="1" placeholder="Versión o descargos del alumno..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Compromisos y Acuerdos</label>
-                        <textarea id="obs-compromiso-input" rows="1" placeholder="Compromiso pedagógico o de reparación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Compromisos y Estrategias Pedagógicas</label>
+                        <textarea id="obs-compromiso-input" rows="1" placeholder="Compromiso acordado de mejora o reparación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
                     </div>
                 </div>
 
                 <div class="flex items-center justify-between pt-1">
                     <div class="flex items-center gap-3 text-[11px] text-slate-300">
                         <label class="flex items-center gap-1 cursor-pointer">
-                            <input type="checkbox" id="obs-firmado-docente" checked class="rounded accent-emerald-500"> Firma Docente
+                            <input type="checkbox" id="obs-firmado-docente" checked class="rounded accent-emerald-500"> Registro Docente
                         </label>
                         <label class="flex items-center gap-1 cursor-pointer">
                             <input type="checkbox" id="obs-firmado-estudiante" checked class="rounded accent-emerald-500"> Firma Estudiante
@@ -406,56 +407,21 @@
                     </div>
                     <button onclick="saveFullObservadorEntry()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
                         <i class="fa-solid fa-floppy-disk"></i>
-                        <span>Guardar Anotación</span>
+                        <span>Guardar en Observador</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CONTENEDOR DE HISTORIAL EN PANTALLA -->
+            <!-- LISTA CRONOLÓGICA DE SITUACIONES REGISTRADAS -->
             <div class="flex-grow overflow-y-auto space-y-2 pr-1" id="history-entries-container"></div>
         </div>
     </div>
 
-    <!-- ÁREA OCULTA EXCLUSIVA PARA IMPRESIÓN LIMPIA Y FORMAL EN PAPEL/PDF -->
-    <div id="print-area" class="hidden">
-        <div class="text-center pb-4 mb-4 border-b-2 border-black">
-            <h1 class="text-xl font-bold uppercase tracking-wide">Colegio Alfonso López Michelsen I.E.D.</h1>
-            <h2 class="text-sm font-semibold uppercase">Hoja de Vida y Observador Convivencial del Estudiante</h2>
-            <p class="text-xs">"Una Vida para la Excelencia" — Localidad de Bosa</p>
-        </div>
+    <!-- CONTENEDOR TEMPORAL PARA GENERACIÓN Y DESCARGA DEL PDF -->
+    <div id="pdf-export-container" class="hidden"></div>
 
-        <div class="grid grid-cols-2 gap-4 mb-6 text-xs print-border p-3 rounded">
-            <div>
-                <p><strong>Estudiante:</strong> <span id="print-student-name"></span></p>
-                <p><strong>Grado / Curso:</strong> <span id="print-student-course"></span></p>
-            </div>
-            <div class="text-right">
-                <p><strong>Fecha de Impresión:</strong> <span id="print-date"></span></p>
-                <p><strong>Estado Convivencial:</strong> Nivel <span id="print-student-level">1</span></p>
-            </div>
-        </div>
-
-        <h3 class="text-sm font-bold uppercase mb-2 border-b border-black pb-1">Historial de Anotaciones y Seguimiento Pedagógico</h3>
-        
-        <div id="print-entries-list" class="space-y-4 text-xs">
-            <!-- Se llena dinámicamente con estilo de formato impreso -->
-        </div>
-
-        <div class="mt-16 pt-8 grid grid-cols-3 gap-6 text-center text-xs border-t border-black">
-            <div>
-                <p class="border-t border-black pt-1">Firma Docente / Director de Grupo</p>
-            </div>
-            <div>
-                <p class="border-t border-black pt-1">Firma Estudiante</p>
-            </div>
-            <div>
-                <p class="border-t border-black pt-1">Firma Acudiente / Padre de Familia</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- RESTO DE MODALES (GENERADOR EQUIPOS, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
-    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <!-- RESTO DE MODALES DE SOPORTE (EQUIPOS, REGISTRO RÁPIDO, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
+    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
             <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -508,8 +474,8 @@
         </div>
     </div>
 
-    <!-- MODAL REGISTRO RÁPIDO DE MÉRITOS/FALTAS (DESDE BOTONES EN TARJETA) -->
-    <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <!-- MODAL REGISTRO RÁPIDO -->
+    <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeAwardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -586,7 +552,7 @@
     </div>
 
     <!-- MODAL DRIVE SETTINGS -->
-    <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -621,7 +587,7 @@
     </div>
 
     <!-- MODAL GESTIÓN CURSOS -->
-    <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -644,7 +610,7 @@
     </div>
 
     <!-- MODAL NUEVO ESTUDIANTE -->
-    <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -659,7 +625,7 @@
     </div>
 
     <!-- MODAL CONFIRMACIÓN -->
-    <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -678,7 +644,7 @@
     </div>
 
     <!-- MODAL RULETA -->
-    <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -694,7 +660,7 @@
     </div>
 
     <!-- MODAL DADO -->
-    <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeDiceModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -710,7 +676,7 @@
     </div>
 
     <!-- MODAL CRONÓMETRO -->
-    <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+    <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeTimerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -927,8 +893,8 @@
         function exportCurrentClassExcel() {
             const students = dbState.classes[currentClassKey] || [];
             const summaryRows = students.map((s, idx) => {
-                const obsCount = (s.history || []).filter(h => h.type === 'negative' || h.type?.includes('Situación')).length;
-                const positiveCount = (s.history || []).filter(h => h.type === 'positive' || h.type?.includes('Reconocimiento')).length;
+                const obsCount = (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                const positiveCount = (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length;
                 return {
                     "N°": idx + 1,
                     "ID Estudiante": s.id,
@@ -995,8 +961,8 @@
                     "Grado": cKey,
                     "Nivel RPG": s.level || 1,
                     "Puntos XP": s.xp || 0,
-                    "Méritos": (s.history || []).filter(h => h.type === 'positive' || h.type?.includes('Reconocimiento')).length,
-                    "Observaciones": (s.history || []).filter(h => h.type === 'negative' || h.type?.includes('Situación')).length
+                    "Méritos": (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length,
+                    "Observaciones": (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length
                 }));
                 const ws = XLSX.utils.json_to_sheet(rows);
                 XLSX.utils.book_append_sheet(wb, ws, `Curso ${cKey}`);
@@ -1350,9 +1316,9 @@
                             </div>
                             <span class="text-[10px] text-slate-400">${h.timestamp}</span>
                         </div>
-                        <p class="text-xs text-white leading-relaxed"><strong>Hechos:</strong> ${h.note}</p>
+                        <p class="text-xs text-white leading-relaxed"><strong>Descripción de Hechos:</strong> ${h.note}</p>
                         ${h.descargo ? `<p class="text-xs text-slate-300 bg-slate-950/60 p-2 rounded-xl"><strong>Descargo del Estudiante:</strong> ${h.descargo}</p>` : ''}
-                        ${h.compromiso ? `<p class="text-xs text-emerald-300 bg-slate-950/60 p-2 rounded-xl"><strong>Compromisos / Acuerdos:</strong> ${h.compromiso}</p>` : ''}
+                        ${h.compromiso ? `<p class="text-xs text-emerald-300 bg-slate-950/60 p-2 rounded-xl"><strong>Compromisos y Estrategias:</strong> ${h.compromiso}</p>` : ''}
                     </div>
                 `;
             }).join('');
@@ -1370,7 +1336,7 @@
             const compromiso = document.getElementById('obs-compromiso-input').value.trim();
 
             if (!note) {
-                alertModal("Campo Requerido", "Debes escribir al menos la descripción de los hechos.");
+                alertModal("Campo Requerido", "Debes ingresar al menos la descripción de la falta o hecho.");
                 return;
             }
 
@@ -1412,7 +1378,6 @@
 
             saveDatabase();
             
-            // Limpiar campos
             document.getElementById('obs-detail-input').value = '';
             document.getElementById('obs-descargo-input').value = '';
             document.getElementById('obs-compromiso-input').value = '';
@@ -1465,37 +1430,97 @@
             document.getElementById('entry-note-input').value = '';
         }
 
-        // IMPRESIÓN OFICIAL DE LA FICHA DEL OBSERVADOR
-        function printStudentObservador() {
+        // GENERADOR DE DOCUMENTO PDF OFICIAL
+        function downloadStudentPDF() {
             if (!selectedStudentId) return;
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
             if (!student) return;
 
-            document.getElementById('print-student-name').innerText = student.name;
-            document.getElementById('print-student-course').innerText = currentClassKey;
-            document.getElementById('print-date').innerText = new Date().toLocaleDateString('es-CO');
-            document.getElementById('print-student-level').innerText = student.level || 1;
-
-            const entriesContainer = document.getElementById('print-entries-list');
             const entries = student.history || [];
-
+            
+            let rowsHtml = '';
             if (entries.length === 0) {
-                entriesContainer.innerHTML = `<p class="italic text-slate-600">El estudiante no registra anotaciones convivenciales ni disciplinarias en el observador a la fecha.</p>`;
+                rowsHtml = `<tr><td colspan="5" style="text-align:center;">El estudiante no registra anotaciones convivenciales en el observador a la fecha.</td></tr>`;
             } else {
-                entriesContainer.innerHTML = entries.map(h => `
-                    <div class="print-border p-3 rounded mb-3">
-                        <div class="flex justify-between font-bold border-b border-gray-400 pb-1 mb-1">
-                            <span>${h.situationType || 'Anotación Convivencial'} (${h.valueTag || 'General'})</span>
-                            <span>Fecha: ${h.timestamp}</span>
-                        </div>
-                        <p class="mb-1"><strong>Descripción de los hechos:</strong> ${h.note}</p>
-                        ${h.descargo ? `<p class="mb-1"><strong>Descargo del Estudiante:</strong> ${h.descargo}</p>` : ''}
-                        ${h.compromiso ? `<p class="mb-1"><strong>Compromisos y Acuerdos:</strong> ${h.compromiso}</p>` : ''}
-                    </div>
+                rowsHtml = entries.map((h, idx) => `
+                    <tr>
+                        <td style="text-align:center;">${idx + 1}</td>
+                        <td>${h.timestamp}</td>
+                        <td><strong>${h.situationType || 'Situación Convivencial'}</strong><br><small>${h.valueTag || 'General'}</small></td>
+                        <td>
+                            <strong>Hechos:</strong> ${h.note}<br>
+                            ${h.descargo ? `<strong>Descargo:</strong> ${h.descargo}<br>` : ''}
+                            ${h.compromiso ? `<strong>Compromisos:</strong> ${h.compromiso}` : ''}
+                        </td>
+                        <td style="text-align:center;">${h.firmadoEstudiante ? 'Registrado' : 'Pendiente'}</td>
+                    </tr>
                 `).join('');
             }
 
-            window.print();
+            const template = `
+                <div id="pdf-template">
+                    <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 15px;">
+                        <h2 style="margin: 0; font-size: 16px; font-weight: bold;">COLEGIO ALFONSO LÓPEZ MICHELSEN I.E.D.</h2>
+                        <h3 style="margin: 3px 0; font-size: 13px; font-weight: bold;">HOJA DE VIDA Y OBSERVADOR PEDAGÓGICO DEL ESTUDIANTE</h3>
+                        <p style="margin: 0; font-size: 10px; font-style: italic;">"Una Vida para la Excelencia" — Secretaría de Educación del Distrito</p>
+                    </div>
+
+                    <table class="pdf-table">
+                        <tr>
+                            <td><strong>Estudiante:</strong> ${student.name}</td>
+                            <td><strong>Grado:</strong> ${currentClassKey}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Nivel Convivencial:</strong> Nivel ${student.level || 1}</td>
+                            <td><strong>Fecha de Informe:</strong> ${new Date().toLocaleDateString('es-CO')}</td>
+                        </tr>
+                    </table>
+
+                    <h4 style="font-size: 12px; margin-top: 15px; margin-bottom: 5px; font-weight: bold;">REGISTRO DE SITUACIONES Y SEGUIMIENTO PEDAGÓGICO</h4>
+                    <table class="pdf-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">N°</th>
+                                <th style="width: 18%;">Fecha / Hora</th>
+                                <th style="width: 25%;">Clasificación / Pilar</th>
+                                <th style="width: 42%;">Detalle de Hechos, Descargos y Acuerdos</th>
+                                <th style="width: 10%;">Verificación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml}
+                        </tbody>
+                    </table>
+
+                    <div style="margin-top: 50px; display: flex; justify-content: space-between; text-align: center; font-size: 10px;">
+                        <div style="width: 30%; border-top: 1px solid #000; pt: 5px;">
+                            Docente / Lic. Germán Velandia
+                        </div>
+                        <div style="width: 30%; border-top: 1px solid #000; pt: 5px;">
+                            Firma del Estudiante
+                        </div>
+                        <div style="width: 30%; border-top: 1px solid #000; pt: 5px;">
+                            Firma Acudiente
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const container = document.getElementById('pdf-export-container');
+            container.innerHTML = template;
+
+            const element = document.getElementById('pdf-template');
+            const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
+            
+            const opt = {
+                margin:       10,
+                filename:     `Observador_${cleanName}_Grado_${currentClassKey}.pdf`,
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2 },
+                jsPDF:        { unit: 'mm', format: 'letter', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
         }
 
         function exportSingleStudentExcel() {
@@ -1545,7 +1570,7 @@
             XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
         }
 
-        // GENERADOR DE EQUIPOS / CLANES
+        // GENERADOR DE EQUIPOS
         function openTeamsGeneratorModal() {
             document.getElementById('teams-modal').classList.remove('hidden');
         }
