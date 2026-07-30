@@ -3,112 +3,123 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Plataforma Digital - FantasyClass & Observador</title>
-
-  <!-- Vinculación de los estilos visuales con rutas directas -->
+  <title>FantasyClass Convivencial</title>
   <link rel="stylesheet" href="./styles.css">
   <link rel="stylesheet" href="./print.css" media="print">
 </head>
 <body>
 
-  <!-- NAVEGACIÓN PRINCIPAL -->
-  <header class="navbar no-print">
-    <div class="logo">⚔️ Plataforma Digital + Observador</div>
-    <nav>
-      <button class="nav-btn active" onclick="cambiarPestaña('rpg')">🎮 Panel RPG</button>
-      <button class="nav-btn" onclick="cambiarPestaña('observador')">📋 Observador & Asistencia</button>
-    </nav>
+  <!-- BARRA SUPERIOR INSTITUCIONAL -->
+  <header class="top-header no-print">
+    <div class="header-brand">
+      <div class="logo-badge">ALM</div>
+      <div class="brand-info">
+        <h1>FantasyClass Convivencial <span class="badge-sub">ALM</span></h1>
+        <p>Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</p>
+      </div>
+    </div>
+
+    <div class="header-controls">
+      <button class="btn-tool dark-btn">☁️ Sync Drive</button>
+      <select id="selectPeriodo" class="header-select">
+        <option value="P1">Periodo 1</option>
+        <option value="P2">Periodo 2</option>
+        <option value="P3">Periodo 3</option>
+        <option value="P4">Periodo 4</option>
+      </select>
+
+      <select id="selectGrado" class="header-select">
+        <option value="801">Grado 801 (32 Est.)</option>
+        <option value="802">Grado 802 (30 Est.)</option>
+        <option value="1001">Grado 1001 (35 Est.)</option>
+      </select>
+
+      <button class="btn-tool dark-btn" onclick="abrirGrupos()">👥 Grupos</button>
+      <button class="btn-tool green-btn" onclick="exportarExcel()">📊 Exportar Excel ▾</button>
+    </div>
   </header>
 
-  <main class="main-container">
+  <!-- BARRA DE HERRAMIENTAS RÁPIDAS -->
+  <div class="toolbar no-print">
+    <div class="tools-center">
+      <button class="tool-chip" onclick="lanzarDado()">🎲 Dado</button>
+      <button class="tool-chip" onclick="abrirTemporizador()">⏱️ Tiempo</button>
+      <button class="tool-chip purple-chip" onclick="lanzarRuleta()">🔄 Ruleta</button>
+    </div>
+  </div>
 
-    <!-- SECCIÓN 1: PANEL RPG Y GAMIFICACIÓN -->
-    <section id="sec-rpg" class="tab-content active-tab">
-      <h2>Panel Gamificado de Clanes</h2>
-      <div class="card-grid">
-        <!-- Tarjeta de Ejemplo de Personaje -->
-        <div class="character-card">
-          <div class="avatar">🧙‍♂️</div>
-          <h3>Estudiante / Héroe</h3>
-          <p class="clan-tag">Clan: Los Sabios</p>
-          <div class="stat">
-            <span>❤️ HP (Vida)</span>
-            <div class="progress-bar"><div class="fill hp" style="width: 100%;"></div></div>
-          </div>
-          <div class="stat">
-            <span>⭐ XP (Nivel 1)</span>
-            <div class="progress-bar"><div class="fill xp" style="width: 40%;"></div></div>
-          </div>
+  <main class="main-content">
+
+    <!-- SECCIÓN DE MÉTRICAS / VALORES CONVIVENCIALES -->
+    <div class="metrics-bar no-print">
+      <div class="metric-card">
+        <span class="icon">🦏</span>
+        <div>
+          <div class="title">RESPONSABILIDAD</div>
+          <div class="value" id="val-responsabilidad">6 pts</div>
         </div>
       </div>
-    </section>
-
-    <!-- SECCIÓN 2: OBSERVADOR Y ASISTENCIA -->
-    <section id="sec-observador" class="tab-content">
-      <div class="observador-header no-print">
-        <h2>Ficha del Observador del Estudiante</h2>
-        <button class="btn-print" onclick="window.print()">🖨️ Imprimir Ficha / Guardar PDF</button>
-      </div>
-
-      <!-- FORMATO IMPRESO INSTITUCIONAL -->
-      <div class="observador-sheet">
-        <div class="sheet-header">
-          <h2>INSTITUCIÓN EDUCATIVA - OBSERVADOR DEL ESTUDIANTE</h2>
-          <p><strong>Año Lectivo:</strong> 2026 | <strong>Curso:</strong> 1001</p>
-        </div>
-
-        <table class="info-table">
-          <tr>
-            <td><strong>Estudiante:</strong> Juan Pérez</td>
-            <td><strong>Documento:</strong> 10203040</td>
-          </tr>
-          <tr>
-            <td><strong>Acudiente:</strong> María Pérez</td>
-            <td><strong>Teléfono:</strong> 3001234567</td>
-          </tr>
-        </table>
-
-        <h3>Control de Asistencia</h3>
-        <div class="asistencia-summary">
-          <span><strong>Asistencias (A):</strong> 18</span> | 
-          <span><strong>Faltas Justificadas (FJ):</strong> 1</span> | 
-          <span><strong>Tardanzas (T):</strong> 1</span>
-        </div>
-
-        <h3>Anotaciones de Proceso y Seguimiento</h3>
-        <table class="report-table">
-          <thead>
-            <tr>
-              <th>Fecha</th>
-              <th>Tipo</th>
-              <th>Anotación / Descripción</th>
-              <th>Compromisos</th>
-              <th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="lista-anotaciones">
-            <tr>
-              <td>15/02/2026</td>
-              <td>🟢 Fortaleza</td>
-              <td>Excelente desempeño colaborativo en su clan. Se otorgan +50 XP.</td>
-              <td>Mantener la constancia en clase.</td>
-              <td>Registrado</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- FIRMAS INSTITUCIONALES (SOLO VISIBLES AL IMPRIMIR) -->
-        <div class="signatures print-only">
-          <div class="sig-box">Docente / Director</div>
-          <div class="sig-box">Estudiante</div>
-          <div class="sig-box">Acudiente</div>
+      <div class="metric-card">
+        <span class="icon">🦊</span>
+        <div>
+          <div class="title">RESPETO</div>
+          <div class="value" id="val-respeto">15 pts</div>
         </div>
       </div>
-    </section>
+      <div class="metric-card">
+        <span class="icon">🐪</span>
+        <div>
+          <div class="title">CONFIANZA</div>
+          <div class="value" id="val-confianza">0 pts</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <span class="icon">❤️</span>
+        <div>
+          <div class="title">EMPATÍA</div>
+          <div class="value" id="val-empatia">0 pts</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <span class="icon">⚖️</span>
+        <div>
+          <div class="title">JUSTICIA</div>
+          <div class="value" id="val-justicia">0 pts</div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <span class="icon">🛡️</span>
+        <div>
+          <div class="title">CIUDADANÍA</div>
+          <div class="value" id="val-ciudadania">0 pts</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BÚSQUEDA Y ACCIONES -->
+    <div class="action-bar no-print">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="inputBuscar" placeholder="Buscar estudiante por nombre..." oninput="filtrarEstudiantes()">
+      </div>
+
+      <div class="sort-and-add">
+        <label>Ordenar:</label>
+        <select id="selectOrden" class="select-sort" onchange="ordenarEstudiantes()">
+          <option value="nombreAZ">Nombre (A-Z)</option>
+          <option value="puntosDesc">Puntos (Mayor a Menor)</option>
+        </select>
+        <button class="btn-add-student" onclick="abrirModalAgregar()">+ Añadir Estudiante</button>
+      </div>
+    </div>
+
+    <!-- GRILLA DE ESTUDIANTES -->
+    <div class="students-grid" id="gridEstudiantes">
+      <!-- Las tarjetas se generan dinámicamente desde JavaScript -->
+    </div>
 
   </main>
 
-  <!-- Vinculación del código JavaScript con carga diferida -->
   <script src="./app.js" defer></script>
 </body>
 </html>
