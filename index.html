@@ -75,12 +75,36 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
+
+        /* ESTILOS EXCLUSIVOS PARA IMPRESIÓN OFICIAL DEL OBSERVADOR */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            header, main, .no-print, button, input, select {
+                display: none !important;
+            }
+            #print-area {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                color: #000;
+                background: #fff;
+                padding: 20px;
+            }
+            .print-border {
+                border: 1px solid #000 !important;
+            }
+        }
     </style>
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
     <!-- HEADER / BARRA DE NAVEGACIÓN -->
-    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
+    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg no-print">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             
             <!-- BRANDING -->
@@ -102,7 +126,6 @@
             <!-- CONTROLES Y MENÚS DESPLEGABLES -->
             <div class="flex items-center flex-wrap justify-center gap-2">
                 
-                <!-- SELECTORES DIRECTOS (PERIODO Y CURSO) -->
                 <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-2.5 py-1.5">
                     <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-1.5"></i>
                     <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
@@ -117,11 +140,10 @@
                 <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-2.5 py-1.5">
                     <i class="fa-solid fa-users text-colegio-gold text-xs mr-1.5"></i>
                     <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer">
-                        <!-- Generado dinámicamente -->
                     </select>
                 </div>
 
-                <!-- MENÚ DESPLEGABLE 1: HERRAMIENTAS DE AULA -->
+                <!-- MENÚ HERRAMIENTAS DE AULA -->
                 <div class="relative inline-block text-left">
                     <button onclick="toggleMenu(event, 'menu-herramientas')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
                         <i class="fa-solid fa-toolbox text-amber-400"></i>
@@ -148,7 +170,7 @@
                     </div>
                 </div>
 
-                <!-- MENÚ DESPLEGABLE 2: GESTIÓN DE GRUPOS -->
+                <!-- MENÚ GESTIÓN -->
                 <div class="relative inline-block text-left">
                     <button onclick="toggleMenu(event, 'menu-gestion')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
                         <i class="fa-solid fa-layer-group text-indigo-400"></i>
@@ -167,7 +189,7 @@
                     </div>
                 </div>
 
-                <!-- MENÚ DESPLEGABLE 3: REPORTES & SINCRONIZACIÓN -->
+                <!-- MENÚ REPORTES -->
                 <div class="relative inline-block text-left">
                     <button onclick="toggleMenu(event, 'menu-reportes')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-cloud-arrow-up text-emerald-300"></i>
@@ -194,9 +216,9 @@
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6 no-print">
 
-        <!-- DASHBOARD DE MÉTRICAS (6 PILARES) -->
+        <!-- DASHBOARD DE MÉTRICAS -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
                 <div class="text-xl">🐘</div>
@@ -247,7 +269,7 @@
             </div>
         </div>
 
-        <!-- BARRA DE BÚSQUEDA Y ACCIÓN -->
+        <!-- BÚSQUEDA Y ACCIÓN -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="relative w-full sm:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -270,14 +292,170 @@
             </div>
         </div>
 
-        <!-- GRILLA DE TARJETAS DE ESTUDIANTES -->
+        <!-- GRILLA DE ESTUDIANTES -->
         <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <!-- Inyectado dinámicamente -->
         </div>
     </main>
 
-    <!-- MODAL GENERADOR DE EQUIPOS / GRUPOS DE TRABAJO -->
-    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL PRINCIPAL: HISTORIAL Y OBSERVADOR DETALLADO DEL ESTUDIANTE -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
+            <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- CABECERA DE LA FICHA -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
+                        <div id="history-student-avatar" class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-xl">
+                            A
+                        </div>
+                    </div>
+                    <div>
+                        <h3 id="history-student-name" class="font-display font-black text-base text-white leading-tight">Nombre Estudiante</h3>
+                        <p id="history-student-subtitle" class="text-xs text-slate-400">Observador del Estudiante — Colegio Alfonso López Michelsen</p>
+                    </div>
+                </div>
+
+                <!-- ACCIONES FICHA (EXCEL E IMPRESIÓN OFICIAL) -->
+                <div class="flex gap-2">
+                    <button onclick="printStudentObservador()" class="px-3 py-1.5 bg-blue-700 hover:bg-blue-600 border border-blue-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Imprimir Observador Oficial en PDF o Papel">
+                        <i class="fa-solid fa-print text-blue-200"></i>
+                        <span>Imprimir Ficha</span>
+                    </button>
+                    <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar Ficha a Excel">
+                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                        <span>Excel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ESTADÍSTICAS DEL ALUMNO -->
+            <div class="grid grid-cols-3 gap-3 my-4">
+                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-emerald-500/20 text-center">
+                    <p class="text-[10px] text-slate-400">Méritos Acumulados</p>
+                    <p id="history-stat-positive" class="font-display font-bold text-emerald-400 text-sm">0 pts</p>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-red-500/20 text-center">
+                    <p class="text-[10px] text-slate-400">Observaciones Registradas</p>
+                    <p id="history-stat-negative" class="font-display font-bold text-red-400 text-sm">0</p>
+                </div>
+                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-amber-500/20 text-center">
+                    <p class="text-[10px] text-slate-400">Nivel RPG Convivencial</p>
+                    <p id="history-stat-level" class="font-display font-bold text-amber-300 text-sm">Nivel 1</p>
+                </div>
+            </div>
+
+            <!-- FORMULARIO DE NUEVA ANOTACIÓN CONVIVENCIAL -->
+            <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3 mb-4 space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-feather-pointed"></i> Nueva Anotación al Observador
+                    </span>
+                    <span class="text-[10px] text-slate-400 font-semibold" id="obs-current-date"></span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Situación Convivencial</label>
+                        <select id="obs-type-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
+                            <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve)</option>
+                            <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave)</option>
+                            <option value="Situación Tipo III (Falta Gravísima)">Situación Tipo III (Falta Gravísima)</option>
+                            <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Convivencial</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
+                        <select id="obs-pillar-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
+                            <option value="Responsabilidad">🐘 Responsabilidad</option>
+                            <option value="Respeto">🦁 Respeto</option>
+                            <option value="Confianza">🐪 Confianza</option>
+                            <option value="Empatía">❤️ Empatía</option>
+                            <option value="Justicia">⚖️ Justicia</option>
+                            <option value="Ciudadanía">🛡️ Ciudadanía</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descripción de los Hechos</label>
+                    <textarea id="obs-detail-input" rows="2" placeholder="Describe detalladamente lo sucedido..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descargo / Versión del Estudiante</label>
+                        <textarea id="obs-descargo-input" rows="1" placeholder="Palabras o descargos del estudiante..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Compromisos y Acuerdos</label>
+                        <textarea id="obs-compromiso-input" rows="1" placeholder="Compromiso pedagógico o de reparación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                    <div class="flex items-center gap-3 text-[11px] text-slate-300">
+                        <label class="flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" id="obs-firmado-docente" checked class="rounded accent-emerald-500"> Firma Docente
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer">
+                            <input type="checkbox" id="obs-firmado-estudiante" checked class="rounded accent-emerald-500"> Firma Estudiante
+                        </label>
+                    </div>
+                    <button onclick="saveFullObservadorEntry()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk"></i>
+                        <span>Guardar Anotación</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DE HISTORIAL EN PANTALLA -->
+            <div class="flex-grow overflow-y-auto space-y-2 pr-1" id="history-entries-container"></div>
+        </div>
+    </div>
+
+    <!-- ÁREA OCULTA EXCLUSIVA PARA IMPRESIÓN LIMPIA Y FORMAL EN PAPEL/PDF -->
+    <div id="print-area" class="hidden">
+        <div class="text-center pb-4 mb-4 border-b-2 border-black">
+            <h1 class="text-xl font-bold uppercase tracking-wide">Colegio Alfonso López Michelsen I.E.D.</h1>
+            <h2 class="text-sm font-semibold uppercase">Hoja de Vida y Observador Convivencial del Estudiante</h2>
+            <p class="text-xs">"Una Vida para la Excelencia" — Localidad de Bosa</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4 mb-6 text-xs print-border p-3 rounded">
+            <div>
+                <p><strong>Estudiante:</strong> <span id="print-student-name"></span></p>
+                <p><strong>Grado / Curso:</strong> <span id="print-student-course"></span></p>
+            </div>
+            <div class="text-right">
+                <p><strong>Fecha de Impresión:</strong> <span id="print-date"></span></p>
+                <p><strong>Estado Convivencial:</strong> Nivel <span id="print-student-level">1</span></p>
+            </div>
+        </div>
+
+        <h3 class="text-sm font-bold uppercase mb-2 border-b border-black pb-1">Historial de Anotaciones y Seguimiento Pedagógico</h3>
+        
+        <div id="print-entries-list" class="space-y-4 text-xs">
+            <!-- Se llena dinámicamente con estilo de formato impreso -->
+        </div>
+
+        <div class="mt-16 pt-8 grid grid-cols-3 gap-6 text-center text-xs border-t border-black">
+            <div>
+                <p class="border-t border-black pt-1">Firma Docente / Director de Grupo</p>
+            </div>
+            <div>
+                <p class="border-t border-black pt-1">Firma Estudiante</p>
+            </div>
+            <div>
+                <p class="border-t border-black pt-1">Firma Acudiente / Padre de Familia</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESTO DE MODALES (GENERADOR EQUIPOS, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
+    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
             <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -293,7 +471,6 @@
                 </div>
             </div>
 
-            <!-- MODO DE GENERACIÓN -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900 p-3 rounded-2xl border border-white/10 mb-4 text-xs">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Criterio de División</label>
@@ -314,12 +491,10 @@
                 </div>
             </div>
 
-            <!-- CONTENEDOR DE RESULTADOS -->
             <div id="teams-results-container" class="flex-grow overflow-y-auto space-y-3 pr-1 min-h-[200px] border border-white/10 rounded-2xl p-3 bg-slate-950/50">
                 <p class="text-center text-xs text-slate-500 py-10">Haz clic en "Generar Equipos" para organizar al curso automáticamente.</p>
             </div>
 
-            <!-- ACCIONES DE EXPORTACIÓN DE EQUIPOS -->
             <div class="flex gap-2 mt-4 pt-3 border-t border-white/10">
                 <button onclick="copyTeamsToClipboard()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-copy text-amber-400"></i>
@@ -333,8 +508,8 @@
         </div>
     </div>
 
-    <!-- MODALES ADICIONALES (MÉRITOS, HISTORIAL, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
-    <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL REGISTRO RÁPIDO DE MÉRITOS/FALTAS (DESDE BOTONES EN TARJETA) -->
+    <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeAwardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -345,7 +520,7 @@
                     <i class="fa-solid fa-pen-to-square text-lg"></i>
                 </div>
                 <div>
-                    <h3 class="font-display font-extrabold text-base text-white">Registro Convivencial</h3>
+                    <h3 class="font-display font-extrabold text-base text-white">Registro Convivencial Rápido</h3>
                     <p id="modal-student-name" class="text-xs text-amber-300 font-bold">Estudiante</p>
                 </div>
             </div>
@@ -410,59 +585,8 @@
         </div>
     </div>
 
-    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
-            <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
-                        <div id="history-student-avatar" class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-xl">
-                            A
-                        </div>
-                    </div>
-                    <div>
-                        <h3 id="history-student-name" class="font-display font-black text-base text-white leading-tight">Nombre Estudiante</h3>
-                        <p id="history-student-subtitle" class="text-xs text-slate-400">Ficha del Observador Convivencial</p>
-                    </div>
-                </div>
-
-                <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar esta Ficha Individual a Excel (.xlsx)">
-                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                    <span>Exportar Ficha (.xlsx)</span>
-                </button>
-            </div>
-
-            <div class="grid grid-cols-3 gap-3 my-4">
-                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-emerald-500/20 text-center">
-                    <p class="text-[10px] text-slate-400">Puntos Mérito</p>
-                    <p id="history-stat-positive" class="font-display font-bold text-emerald-400 text-sm">0 pts</p>
-                </div>
-                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-red-500/20 text-center">
-                    <p class="text-[10px] text-slate-400">Observaciones</p>
-                    <p id="history-stat-negative" class="font-display font-bold text-red-400 text-sm">0</p>
-                </div>
-                <div class="bg-slate-900/80 p-2.5 rounded-xl border border-amber-500/20 text-center">
-                    <p class="text-[10px] text-slate-400">Nivel RPG</p>
-                    <p id="history-stat-level" class="font-display font-bold text-amber-300 text-sm">Nivel 1</p>
-                </div>
-            </div>
-
-            <div class="mb-3 flex gap-2">
-                <input type="text" id="direct-teacher-note" placeholder="Añadir nota rápida pedagógica..." class="flex-grow bg-slate-900 border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold">
-                <button onclick="addDirectTeacherNote()" class="px-3 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Añadir</span>
-                </button>
-            </div>
-
-            <div class="flex-grow overflow-y-auto space-y-2 pr-1" id="history-entries-container"></div>
-        </div>
-    </div>
-
-    <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL DRIVE SETTINGS -->
+    <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -476,15 +600,6 @@
                     <h3 class="font-display font-extrabold text-base text-white">Conexión con Google Drive mediante Formularios</h3>
                     <p class="text-xs text-emerald-300 font-bold">Guarda automáticamente cada falta/mérito en Drive</p>
                 </div>
-            </div>
-
-            <div class="bg-slate-900 p-3 rounded-2xl border border-white/10 text-xs space-y-3 mb-4">
-                <p class="font-bold text-amber-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Instrucciones de Vinculación:</p>
-                <ol class="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px]">
-                    <li>Crea un Formulario de Google en tu Drive.</li>
-                    <li>Vincúlalo con una Hoja de Cálculo en Google Sheets.</li>
-                    <li>Pega la URL del formulario o Webhook abajo.</li>
-                </ol>
             </div>
 
             <div class="space-y-3 mb-5">
@@ -505,7 +620,8 @@
         </div>
     </div>
 
-    <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL GESTIÓN CURSOS -->
+    <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -527,7 +643,8 @@
         </div>
     </div>
 
-    <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL NUEVO ESTUDIANTE -->
+    <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -541,7 +658,8 @@
         </div>
     </div>
 
-    <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL CONFIRMACIÓN -->
+    <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
                 <i class="fa-solid fa-triangle-exclamation"></i>
@@ -559,7 +677,8 @@
         </div>
     </div>
 
-    <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL RULETA -->
+    <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -574,7 +693,8 @@
         </div>
     </div>
 
-    <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL DADO -->
+    <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeDiceModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -589,7 +709,8 @@
         </div>
     </div>
 
-    <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <!-- MODAL CRONÓMETRO -->
+    <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden no-print">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeTimerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
@@ -637,9 +758,9 @@
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
         let confirmCallback = null;
-        let generatedTeamsData = []; // Guarda los grupos actuales para exportar
+        let generatedTeamsData = [];
 
-        // AUDIO WEB CONTEXT
+        // AUDIO CONTEXT
         let audioCtx = null;
 
         function playTickSound() {
@@ -678,7 +799,6 @@
             } catch(e) {}
         }
 
-        // CONTROL MENÚS DESPLEGABLES
         function toggleMenu(event, menuId) {
             event.stopPropagation();
             const targetMenu = document.getElementById(menuId);
@@ -807,8 +927,8 @@
         function exportCurrentClassExcel() {
             const students = dbState.classes[currentClassKey] || [];
             const summaryRows = students.map((s, idx) => {
-                const obsCount = (s.history || []).filter(h => h.type === 'negative').length;
-                const positiveCount = (s.history || []).filter(h => h.type === 'positive').length;
+                const obsCount = (s.history || []).filter(h => h.type === 'negative' || h.type?.includes('Situación')).length;
+                const positiveCount = (s.history || []).filter(h => h.type === 'positive' || h.type?.includes('Reconocimiento')).length;
                 return {
                     "N°": idx + 1,
                     "ID Estudiante": s.id,
@@ -843,10 +963,12 @@
                             "Nombre Estudiante": s.name,
                             "Fecha y Hora": h.timestamp || '',
                             "Periodo": h.period || 'P1',
-                            "Tipo Evento": h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
+                            "Tipo Evento": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
                             "Pilar Character Counts": h.valueTag || 'Convivencia',
                             "Puntos": h.magnitude || 1,
-                            "Anotación Observador": h.note || ''
+                            "Detalle Hechos": h.note || '',
+                            "Descargo Estudiante": h.descargo || '',
+                            "Compromisos": h.compromiso || ''
                         });
                     });
                 }
@@ -873,59 +995,14 @@
                     "Grado": cKey,
                     "Nivel RPG": s.level || 1,
                     "Puntos XP": s.xp || 0,
-                    "Méritos": (s.history || []).filter(h => h.type === 'positive').length,
-                    "Observaciones": (s.history || []).filter(h => h.type === 'negative').length
+                    "Méritos": (s.history || []).filter(h => h.type === 'positive' || h.type?.includes('Reconocimiento')).length,
+                    "Observaciones": (s.history || []).filter(h => h.type === 'negative' || h.type?.includes('Situación')).length
                 }));
                 const ws = XLSX.utils.json_to_sheet(rows);
                 XLSX.utils.book_append_sheet(wb, ws, `Curso ${cKey}`);
             });
 
             XLSX.writeFile(wb, `FantasyClass_Master_TodosLosCursos_ALM.xlsx`);
-        }
-
-        function exportSingleStudentExcel() {
-            if (!selectedStudentId) return;
-            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-            if (!student) return;
-
-            const studentHistory = student.history || [];
-            const historyRows = studentHistory.map(h => ({
-                "Fecha y Hora": h.timestamp || '',
-                "Periodo Lectivo": h.period || 'P1',
-                "Tipo de Registro": h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
-                "Pilar Valor": h.valueTag || 'Convivencia',
-                "Puntos Impacto": h.magnitude || 1,
-                "Detalle / Nota Pedagógica": h.note || ''
-            }));
-
-            if (historyRows.length === 0) {
-                historyRows.push({
-                    "Fecha y Hora": "N/A",
-                    "Periodo Lectivo": currentPeriod,
-                    "Tipo de Registro": "Sin anotaciones",
-                    "Pilar Valor": "N/A",
-                    "Puntos Impacto": 0,
-                    "Detalle / Nota Pedagógica": "Sin eventos convivenciales registrados en el observador."
-                });
-            }
-
-            const wb = XLSX.utils.book_new();
-            const summaryData = [{
-                "Nombre Estudiante": student.name,
-                "Grado": currentClassKey,
-                "Nivel RPG": student.level || 1,
-                "Puntos XP": student.xp || 0,
-                "Total Registros": studentHistory.length
-            }];
-            
-            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-            const wsStudent = XLSX.utils.json_to_sheet(historyRows);
-
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Ficha Estudiante");
-            XLSX.utils.book_append_sheet(wb, wsStudent, "Historial Observador");
-
-            const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
-            XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
         }
 
         function openAddStudentModal() {
@@ -1074,7 +1151,8 @@
             let badges = { Responsabilidad: 0, Respeto: 0, Confianza: 0, Empatía: 0, Justicia: 0, Ciudadanía: 0 };
 
             filteredHistory.forEach(h => {
-                if (h.type === 'positive') {
+                const isPositive = h.type === 'positive' || (h.situationType && h.situationType.includes('Reconocimiento'));
+                if (isPositive) {
                     xp += (h.magnitude || 1);
                     if (h.valueTag && badges[h.valueTag] !== undefined) {
                         badges[h.valueTag] += (h.magnitude || 1);
@@ -1120,15 +1198,15 @@
                 filtered.sort((a, b) => (b.xp || 0) - (a.xp || 0));
             } else if (sortBy === 'obs') {
                 filtered.sort((a, b) => {
-                    const obsA = (a.history || []).filter(h => h.type === 'negative').length;
-                    const obsB = (b.history || []).filter(h => h.type === 'negative').length;
+                    const obsA = (a.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                    const obsB = (b.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
                     return obsB - obsA;
                 });
             }
 
             filtered.forEach(student => {
                 const periodStats = calculateStudentStatsForPeriod(student);
-                const obsCount = periodStats.history.filter(h => h.type === 'negative').length;
+                const obsCount = periodStats.history.filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
 
                 const card = document.createElement('div');
                 card.className = "glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group";
@@ -1231,10 +1309,12 @@
 
             document.getElementById('history-student-name').innerText = student.name;
             document.getElementById('history-student-avatar').innerText = student.name.charAt(0);
+            document.getElementById('obs-current-date').innerText = new Date().toLocaleDateString('es-CO');
             
             const stats = calculateStudentStatsForPeriod(student);
             document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
-            document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h => h.type === 'negative').length}`;
+            const obsCount = stats.history.filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+            document.getElementById('history-stat-negative').innerText = `${obsCount}`;
             document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
 
             renderHistoryList(student);
@@ -1251,24 +1331,94 @@
 
             const entries = student.history || [];
             if (entries.length === 0) {
-                container.innerHTML = `<p class="text-center text-xs text-slate-500 py-6">Sin registros en el observador todavía.</p>`;
+                container.innerHTML = `<p class="text-center text-xs text-slate-500 py-6">Sin anotaciones en el observador todavía.</p>`;
                 return;
             }
 
-            container.innerHTML = entries.map(h => `
-                <div class="p-3 rounded-2xl bg-slate-900 border ${h.type === 'positive' ? 'border-emerald-500/30' : 'border-red-500/30'} flex justify-between items-start gap-2">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold ${h.type === 'positive' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}">
-                                ${h.type === 'positive' ? `+${h.magnitude || 1} XP` : 'OBSERVACIÓN'}
-                            </span>
-                            <span class="text-[10px] text-amber-300 font-bold">${h.valueTag || 'Convivencia'}</span>
-                            <span class="text-[9px] text-slate-500">${h.timestamp}</span>
+            container.innerHTML = entries.map(h => {
+                const isPositive = h.type === 'positive' || (h.situationType && h.situationType.includes('Reconocimiento'));
+                const badgeColor = isPositive ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border-rose-500/30';
+                
+                return `
+                    <div class="p-3.5 rounded-2xl bg-slate-900 border ${badgeColor} space-y-1.5">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded-md text-[9px] font-extrabold border ${badgeColor}">
+                                    ${h.situationType || (isPositive ? '+1 XP' : 'OBSERVACIÓN')}
+                                </span>
+                                <span class="text-[11px] text-amber-300 font-bold">${h.valueTag || 'Convivencia'}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">${h.timestamp}</span>
                         </div>
-                        <p class="text-xs text-white">${h.note}</p>
+                        <p class="text-xs text-white leading-relaxed"><strong>Hechos:</strong> ${h.note}</p>
+                        ${h.descargo ? `<p class="text-xs text-slate-300 bg-slate-950/60 p-2 rounded-xl"><strong>Descargo del Estudiante:</strong> ${h.descargo}</p>` : ''}
+                        ${h.compromiso ? `<p class="text-xs text-emerald-300 bg-slate-950/60 p-2 rounded-xl"><strong>Compromisos / Acuerdos:</strong> ${h.compromiso}</p>` : ''}
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+        }
+
+        function saveFullObservadorEntry() {
+            if (!selectedStudentId) return;
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
+            if (!student) return;
+
+            const situationType = document.getElementById('obs-type-select').value;
+            const valueTag = document.getElementById('obs-pillar-select').value;
+            const note = document.getElementById('obs-detail-input').value.trim();
+            const descargo = document.getElementById('obs-descargo-input').value.trim();
+            const compromiso = document.getElementById('obs-compromiso-input').value.trim();
+
+            if (!note) {
+                alertModal("Campo Requerido", "Debes escribir al menos la descripción de los hechos.");
+                return;
+            }
+
+            if (!student.history) student.history = [];
+
+            const isPositive = situationType.includes('Reconocimiento');
+
+            const newEntry = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('es-CO'),
+                period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
+                type: isPositive ? 'positive' : 'negative',
+                situationType: situationType,
+                valueTag: valueTag,
+                magnitude: isPositive ? 2 : 1,
+                note: note,
+                descargo: descargo,
+                compromiso: compromiso,
+                firmadoDocente: document.getElementById('obs-firmado-docente').checked,
+                firmadoEstudiante: document.getElementById('obs-firmado-estudiante').checked
+            };
+
+            student.history.unshift(newEntry);
+
+            if (isPositive) {
+                student.xp = (student.xp || 0) + 2;
+                student.level = Math.floor(student.xp / 20) + 1;
+                try { confetti({ particleCount: 40, spread: 50 }); } catch(e){}
+            }
+
+            postToGoogleDriveSheet({
+                curso: currentClassKey,
+                estudiante: student.name,
+                tipo: situationType,
+                pilar: valueTag,
+                puntos: isPositive ? 2 : 1,
+                nota: `${note} | Descargo: ${descargo} | Compromiso: ${compromiso}`
+            });
+
+            saveDatabase();
+            
+            // Limpiar campos
+            document.getElementById('obs-detail-input').value = '';
+            document.getElementById('obs-descargo-input').value = '';
+            document.getElementById('obs-compromiso-input').value = '';
+
+            renderHistoryList(student);
+            renderStudentGrid();
         }
 
         function saveStudentEntry() {
@@ -1276,7 +1426,7 @@
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
             if (!student) return;
 
-            const note = document.getElementById('entry-note-input').value.trim() || 'Registro de convivencia';
+            const note = document.getElementById('entry-note-input').value.trim() || 'Registro convivencial rápido';
             const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
 
             if (!student.history) student.history = [];
@@ -1286,6 +1436,7 @@
                 timestamp: new Date().toLocaleString('es-CO'),
                 period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
                 type: activeEntryType,
+                situationType: activeEntryType === 'positive' ? 'Reconocimiento / Mérito' : 'Situación Tipo I (Falta Leve)',
                 valueTag: selectedValueTag,
                 magnitude: magnitude,
                 note: note
@@ -1296,7 +1447,7 @@
             if (activeEntryType === 'positive') {
                 student.xp = (student.xp || 0) + magnitude;
                 student.level = Math.floor(student.xp / 20) + 1;
-                try { confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } }); } catch(e){}
+                try { confetti({ particleCount: 40, spread: 50 }); } catch(e){}
             }
 
             postToGoogleDriveSheet({
@@ -1314,40 +1465,84 @@
             document.getElementById('entry-note-input').value = '';
         }
 
-        function addDirectTeacherNote() {
-            const input = document.getElementById('direct-teacher-note');
-            const noteText = input.value.trim();
-            if (!noteText || !selectedStudentId) return;
-
+        // IMPRESIÓN OFICIAL DE LA FICHA DEL OBSERVADOR
+        function printStudentObservador() {
+            if (!selectedStudentId) return;
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
             if (!student) return;
 
-            if (!student.history) student.history = [];
-            const newEntry = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('es-CO'),
-                period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
-                type: 'positive',
-                valueTag: 'Seguimiento',
-                magnitude: 1,
-                note: noteText
-            };
+            document.getElementById('print-student-name').innerText = student.name;
+            document.getElementById('print-student-course').innerText = currentClassKey;
+            document.getElementById('print-date').innerText = new Date().toLocaleDateString('es-CO');
+            document.getElementById('print-student-level').innerText = student.level || 1;
 
-            student.history.unshift(newEntry);
+            const entriesContainer = document.getElementById('print-entries-list');
+            const entries = student.history || [];
 
-            postToGoogleDriveSheet({
-                curso: currentClassKey,
-                estudiante: student.name,
-                tipo: 'Anotación Pedagógica',
-                pilar: 'Seguimiento',
-                puntos: 1,
-                nota: noteText
-            });
+            if (entries.length === 0) {
+                entriesContainer.innerHTML = `<p class="italic text-slate-600">El estudiante no registra anotaciones convivenciales ni disciplinarias en el observador a la fecha.</p>`;
+            } else {
+                entriesContainer.innerHTML = entries.map(h => `
+                    <div class="print-border p-3 rounded mb-3">
+                        <div class="flex justify-between font-bold border-b border-gray-400 pb-1 mb-1">
+                            <span>${h.situationType || 'Anotación Convivencial'} (${h.valueTag || 'General'})</span>
+                            <span>Fecha: ${h.timestamp}</span>
+                        </div>
+                        <p class="mb-1"><strong>Descripción de los hechos:</strong> ${h.note}</p>
+                        ${h.descargo ? `<p class="mb-1"><strong>Descargo del Estudiante:</strong> ${h.descargo}</p>` : ''}
+                        ${h.compromiso ? `<p class="mb-1"><strong>Compromisos y Acuerdos:</strong> ${h.compromiso}</p>` : ''}
+                    </div>
+                `).join('');
+            }
 
-            saveDatabase();
-            renderHistoryList(student);
-            renderStudentGrid();
-            input.value = '';
+            window.print();
+        }
+
+        function exportSingleStudentExcel() {
+            if (!selectedStudentId) return;
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
+            if (!student) return;
+
+            const studentHistory = student.history || [];
+            const historyRows = studentHistory.map(h => ({
+                "Fecha y Hora": h.timestamp || '',
+                "Periodo Lectivo": h.period || 'P1',
+                "Tipo de Situación": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
+                "Pilar Valor": h.valueTag || 'Convivencia',
+                "Puntos Impacto": h.magnitude || 1,
+                "Descripción de los Hechos": h.note || '',
+                "Descargo del Estudiante": h.descargo || '',
+                "Compromisos y Acuerdos": h.compromiso || ''
+            }));
+
+            if (historyRows.length === 0) {
+                historyRows.push({
+                    "Fecha y Hora": "N/A",
+                    "Periodo Lectivo": currentPeriod,
+                    "Tipo de Situación": "Sin anotaciones",
+                    "Pilar Valor": "N/A",
+                    "Puntos Impacto": 0,
+                    "Descripción de los Hechos": "Sin eventos registrados en el observador."
+                });
+            }
+
+            const wb = XLSX.utils.book_new();
+            const summaryData = [{
+                "Nombre Estudiante": student.name,
+                "Grado": currentClassKey,
+                "Nivel RPG": student.level || 1,
+                "Puntos XP": student.xp || 0,
+                "Total Registros": studentHistory.length
+            }];
+            
+            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+            const wsStudent = XLSX.utils.json_to_sheet(historyRows);
+
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Ficha Estudiante");
+            XLSX.utils.book_append_sheet(wb, wsStudent, "Historial Observador");
+
+            const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
+            XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
         }
 
         // GENERADOR DE EQUIPOS / CLANES
@@ -1366,7 +1561,6 @@
                 return;
             }
 
-            // Algoritmo Fisher-Yates para mezcla aleatoria
             for (let i = students.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [students[i], students[j]] = [students[j], students[i]];
@@ -1378,13 +1572,11 @@
             let teams = [];
 
             if (mode === 'size') {
-                // Por tamaño fijo de estudiante por grupo
                 const size = Math.max(1, val);
                 for (let i = 0; i < students.length; i += size) {
                     teams.push(students.slice(i, i + size));
                 }
             } else {
-                // Por número total de grupos
                 const numTeams = Math.max(1, Math.min(val, students.length));
                 teams = Array.from({ length: numTeams }, () => []);
                 students.forEach((student, idx) => {
@@ -1452,7 +1644,7 @@
             XLSX.writeFile(wb, `Grupos_Trabajo_Grado_${currentClassKey}.xlsx`);
         }
 
-        // RULETA CON EFECTOS DE SONIDO Y DESACELERACIÓN
+        // RULETA
         function openWheelModal() { document.getElementById('wheel-modal').classList.remove('hidden'); }
         function closeWheelModal() { document.getElementById('wheel-modal').classList.add('hidden'); }
         
@@ -1492,7 +1684,7 @@
             step();
         }
 
-        // FUNCIONES DE DADO
+        // DADO
         function openDiceModal() { document.getElementById('dice-modal').classList.remove('hidden'); }
         function closeDiceModal() { document.getElementById('dice-modal').classList.add('hidden'); }
         function rollDice() {
@@ -1506,7 +1698,7 @@
             }, 80);
         }
 
-        // FUNCIONES DE CRONÓMETRO
+        // CRONÓMETRO
         let timerSeconds = 300;
         let timerInterval = null;
         function openTimerModal() { document.getElementById('timer-modal').classList.remove('hidden'); }
