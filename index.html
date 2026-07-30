@@ -565,7 +565,7 @@
     <!-- CONTENEDOR TEMPORAL PARA PDF -->
     <div id="pdf-export-container" class="hidden"></div>
 
-    <!-- RESTO DE MODALES (MASIVO, DRIVE, GRUPOS, EQUIPOS, DADO, RULETA, CRONÓMETRO) -->
+    <!-- RESTO DE MODALES DE SOPORTE -->
     <div id="bulk-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeBulkModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -1236,7 +1236,6 @@
             document.getElementById('history-stat-negative').innerText = `${obsCount}`;
             document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
 
-            // Cargar datos personales
             const pData = student.personalData || {};
             document.getElementById('info-doc-input').value = pData.doc || '';
             document.getElementById('info-dob-input').value = pData.dob || '';
