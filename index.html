@@ -79,7 +79,7 @@
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
-    <!-- HEADER / BARRA DE NAVEGACIÓN CON MENÚS DESPLEGABLES -->
+    <!-- HEADER / BARRA DE NAVEGACIÓN -->
     <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             
@@ -99,7 +99,7 @@
                 </div>
             </div>
 
-            <!-- CONTROLES AGRUPADOS EN MENÚS DESPLEGABLES -->
+            <!-- CONTROLES Y MENÚS DESPLEGABLES -->
             <div class="flex items-center flex-wrap justify-center gap-2">
                 
                 <!-- SELECTORES DIRECTOS (PERIODO Y CURSO) -->
@@ -128,7 +128,11 @@
                         <span>Herramientas</span>
                         <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
                     </button>
-                    <div id="menu-herramientas" class="dropdown-menu hidden absolute right-0 mt-2 w-48 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                    <div id="menu-herramientas" class="dropdown-menu hidden absolute right-0 mt-2 w-56 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                        <button onclick="openTeamsGeneratorModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-sky-300 font-bold">
+                            <i class="fa-solid fa-users-viewfinder text-sky-400"></i>
+                            <span>Armar Equipos / Clanes</span>
+                        </button>
                         <button onclick="openWheelModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-purple-300 font-bold">
                             <i class="fa-solid fa-arrows-spin text-purple-400"></i>
                             <span>Ruleta con Sonido</span>
@@ -272,8 +276,64 @@
         </div>
     </main>
 
+    <!-- MODAL GENERADOR DE EQUIPOS / GRUPOS DE TRABAJO -->
+    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
+            <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
 
-    <!-- MODAL 1: REGISTRAR MÉRITO O FALTA -->
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                    <i class="fa-solid fa-users-viewfinder text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-base text-white">Generador de Equipos de Trabajo</h3>
+                    <p class="text-xs text-sky-300 font-bold">Divide dinámicamente a los estudiantes del grado actual</p>
+                </div>
+            </div>
+
+            <!-- MODO DE GENERACIÓN -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900 p-3 rounded-2xl border border-white/10 mb-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Criterio de División</label>
+                    <select id="team-mode-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-white font-bold focus:outline-none">
+                        <option value="size">Por nº de estudiantes por grupo</option>
+                        <option value="count">Por nº total de grupos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cantidad / Valor</label>
+                    <input type="number" id="team-value-input" min="1" max="50" value="4" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-center text-amber-300 font-bold focus:outline-none">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="generateTeams()" class="w-full py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-extrabold rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <span>Generar Equipos</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CONTENEDOR DE RESULTADOS -->
+            <div id="teams-results-container" class="flex-grow overflow-y-auto space-y-3 pr-1 min-h-[200px] border border-white/10 rounded-2xl p-3 bg-slate-950/50">
+                <p class="text-center text-xs text-slate-500 py-10">Haz clic en "Generar Equipos" para organizar al curso automáticamente.</p>
+            </div>
+
+            <!-- ACCIONES DE EXPORTACIÓN DE EQUIPOS -->
+            <div class="flex gap-2 mt-4 pt-3 border-t border-white/10">
+                <button onclick="copyTeamsToClipboard()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-copy text-amber-400"></i>
+                    <span>Copiar Texto</span>
+                </button>
+                <button onclick="exportTeamsExcel()" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                    <span>Exportar a Excel (.xlsx)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES ADICIONALES (MÉRITOS, HISTORIAL, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
     <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeAwardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -350,7 +410,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: HISTORIAL Y OBSERVADOR DEL ESTUDIANTE -->
     <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
             <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -403,7 +462,6 @@
         </div>
     </div>
 
-    <!-- MODAL 3: GOOGLE DRIVE / FORMS SETTINGS -->
     <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -447,7 +505,6 @@
         </div>
     </div>
 
-    <!-- MODAL 4: GESTIÓN DE GRUPOS Y CURSOS -->
     <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -466,13 +523,10 @@
                 </button>
             </div>
 
-            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container">
-                <!-- Inyectado dinámicamente -->
-            </div>
+            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container"></div>
         </div>
     </div>
 
-    <!-- MODAL 5: AÑADIR NUEVO ESTUDIANTE -->
     <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -487,7 +541,6 @@
         </div>
     </div>
 
-    <!-- MODAL 6: CONFIRMACIÓN Y ALERTAS -->
     <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
@@ -506,7 +559,6 @@
         </div>
     </div>
 
-    <!-- MODAL 7: RULETA CON EFECTOS DE SONIDO -->
     <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -522,7 +574,6 @@
         </div>
     </div>
 
-    <!-- MODAL 8: DADO VIRTUAL -->
     <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeDiceModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -538,7 +589,6 @@
         </div>
     </div>
 
-    <!-- MODAL 9: CRONÓMETRO DE CLASE -->
     <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeTimerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -587,8 +637,9 @@
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
         let confirmCallback = null;
+        let generatedTeamsData = []; // Guarda los grupos actuales para exportar
 
-        // CONTEXTO DE AUDIO WEB (EFECTOS DE SONIDO SINTETIZADOS)
+        // AUDIO WEB CONTEXT
         let audioCtx = null;
 
         function playTickSound() {
@@ -627,7 +678,7 @@
             } catch(e) {}
         }
 
-        // CONTROL DE MENÚS DESPLEGABLES
+        // CONTROL MENÚS DESPLEGABLES
         function toggleMenu(event, menuId) {
             event.stopPropagation();
             const targetMenu = document.getElementById(menuId);
@@ -1299,6 +1350,108 @@
             input.value = '';
         }
 
+        // GENERADOR DE EQUIPOS / CLANES
+        function openTeamsGeneratorModal() {
+            document.getElementById('teams-modal').classList.remove('hidden');
+        }
+
+        function closeTeamsModal() {
+            document.getElementById('teams-modal').classList.add('hidden');
+        }
+
+        function generateTeams() {
+            const students = [...(dbState.classes[currentClassKey] || [])];
+            if (students.length === 0) {
+                alertModal("Sin estudiantes", "No hay estudiantes registrados en este curso.");
+                return;
+            }
+
+            // Algoritmo Fisher-Yates para mezcla aleatoria
+            for (let i = students.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [students[i], students[j]] = [students[j], students[i]];
+            }
+
+            const mode = document.getElementById('team-mode-select').value;
+            const val = parseInt(document.getElementById('team-value-input').value) || 2;
+            
+            let teams = [];
+
+            if (mode === 'size') {
+                // Por tamaño fijo de estudiante por grupo
+                const size = Math.max(1, val);
+                for (let i = 0; i < students.length; i += size) {
+                    teams.push(students.slice(i, i + size));
+                }
+            } else {
+                // Por número total de grupos
+                const numTeams = Math.max(1, Math.min(val, students.length));
+                teams = Array.from({ length: numTeams }, () => []);
+                students.forEach((student, idx) => {
+                    teams[idx % numTeams].push(student);
+                });
+            }
+
+            generatedTeamsData = teams;
+            renderTeamsResults(teams);
+            playVictorySound();
+            try { confetti({ particleCount: 50, spread: 60 }); } catch(e){}
+        }
+
+        function renderTeamsResults(teams) {
+            const container = document.getElementById('teams-results-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            teams.forEach((team, idx) => {
+                const teamCard = document.createElement('div');
+                teamCard.className = "bg-slate-900 border border-white/10 p-3 rounded-xl";
+                
+                const membersHtml = team.map(s => `<span class="inline-block bg-slate-800 border border-white/10 px-2 py-1 rounded-lg text-xs text-slate-200 mr-1.5 mb-1.5 font-semibold">👤 ${s.name}</span>`).join('');
+                
+                teamCard.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-display font-black text-amber-300 text-xs">EQUIPO / CLAN ${idx + 1} (${team.length} Integrantes)</span>
+                    </div>
+                    <div class="flex flex-wrap">${membersHtml}</div>
+                `;
+                container.appendChild(teamCard);
+            });
+        }
+
+        function copyTeamsToClipboard() {
+            if (!generatedTeamsData || generatedTeamsData.length === 0) return;
+            let text = `EQUIPOS DE TRABAJO - GRADO ${currentClassKey}\n\n`;
+            generatedTeamsData.forEach((team, idx) => {
+                text += `*GRUPO ${idx + 1}:*\n`;
+                team.forEach(s => { text += `  - ${s.name}\n`; });
+                text += `\n`;
+            });
+
+            navigator.clipboard.writeText(text).then(() => {
+                alertModal("Copiado", "La lista de grupos ha sido copiada al portapapeles.");
+            });
+        }
+
+        function exportTeamsExcel() {
+            if (!generatedTeamsData || generatedTeamsData.length === 0) return;
+            const rows = [];
+            generatedTeamsData.forEach((team, idx) => {
+                team.forEach(s => {
+                    rows.push({
+                        "Grado": currentClassKey,
+                        "Grupo / Clan": `Grupo ${idx + 1}`,
+                        "Nombre Estudiante": s.name
+                    });
+                });
+            });
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(rows);
+            XLSX.utils.book_append_sheet(wb, ws, `Grupos Grado ${currentClassKey}`);
+            XLSX.writeFile(wb, `Grupos_Trabajo_Grado_${currentClassKey}.xlsx`);
+        }
+
         // RULETA CON EFECTOS DE SONIDO Y DESACELERACIÓN
         function openWheelModal() { document.getElementById('wheel-modal').classList.remove('hidden'); }
         function closeWheelModal() { document.getElementById('wheel-modal').classList.add('hidden'); }
@@ -1316,7 +1469,7 @@
 
             const display = document.getElementById('wheel-display');
             let counter = 0;
-            let speed = 50; // milisegundos iniciales
+            let speed = 50;
             const totalSteps = 28 + Math.floor(Math.random() * 10);
 
             function step() {
@@ -1326,7 +1479,7 @@
                 counter++;
 
                 if (counter < totalSteps) {
-                    if (counter > totalSteps - 10) speed += 30; // Desaceleración progresiva
+                    if (counter > totalSteps - 10) speed += 30;
                     setTimeout(step, speed);
                 } else {
                     playVictorySound();
