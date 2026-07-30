@@ -77,7 +77,6 @@
             background: #475569;
         }
 
-        /* ESTILOS PARA LA PLANTILLA DE GENERACIÓN DEL PDF */
         #pdf-template {
             font-family: Arial, sans-serif;
             color: #000;
@@ -102,7 +101,7 @@
         }
     </style>
 </head>
-<body class="pb-12 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
+<body class="pb-24 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
     <!-- HEADER / BARRA DE NAVEGACIÓN -->
     <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
@@ -270,11 +269,18 @@
             </div>
         </div>
 
-        <!-- BÚSQUEDA Y ACCIÓN -->
+        <!-- BÚSQUEDA, SELECCIÓN Y ORDENAMIENTO -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="relative w-full sm:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" id="student-search-input" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante por nombre..." class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold transition">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <button onclick="toggleSelectAllStudents()" id="btn-select-all" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
+                    <i class="fa-regular fa-square-check text-amber-400"></i>
+                    <span>Seleccionar Todos</span>
+                </button>
+
+                <div class="relative w-full sm:w-72">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="student-search-input" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante..." class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold transition">
+                </div>
             </div>
 
             <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
@@ -298,14 +304,89 @@
         </div>
     </main>
 
-    <!-- MODAL PRINCIPAL: OBSERVADOR COMPLETO Y FICHA DEL ESTUDIANTE -->
+    <!-- BARRA FLOTANTE INFERIOR PARA ACCIONES MASIVAS -->
+    <div id="bulk-actions-bar" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 bg-slate-900/95 backdrop-blur-md border border-amber-500/50 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-4 hidden transition-all">
+        <div class="text-xs font-bold text-white">
+            <span id="selected-count-badge" class="bg-amber-500 text-black px-2 py-0.5 rounded-full font-black mr-1">0</span> Seleccionados
+        </div>
+        <div class="h-4 w-px bg-white/20"></div>
+        <div class="flex items-center gap-2">
+            <button onclick="openBulkModal('positive')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1">
+                <i class="fa-solid fa-plus text-[10px]"></i> Mérito Masivo
+            </button>
+            <button onclick="openBulkModal('negative')" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1">
+                <i class="fa-solid fa-minus text-[10px]"></i> Falta Masiva
+            </button>
+            <button onclick="clearSelectedStudents()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white font-bold text-xs rounded-xl transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL PARA APLICACIÓN DE ACCIÓN MASIVA -->
+    <div id="bulk-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
+            <button onclick="closeBulkModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-users-gear text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-base text-white">Registro Convivencial Masivo</h3>
+                    <p class="text-xs text-amber-300 font-bold">Se aplicará a <span id="bulk-modal-count">0</span> estudiantes seleccionados</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Clasificación / Tipo de Situación</label>
+                    <select id="bulk-type-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
+                        <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Grupal (+XP)</option>
+                        <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve Grupal)</option>
+                        <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave Grupal)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
+                    <select id="bulk-pillar-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
+                        <option value="Responsabilidad">🐘 Responsabilidad</option>
+                        <option value="Respeto">🦁 Respeto</option>
+                        <option value="Confianza">🐪 Confianza</option>
+                        <option value="Empatía">❤️ Empatía</option>
+                        <option value="Justicia">⚖️ Justicia</option>
+                        <option value="Ciudadanía">🛡️ Ciudadanía</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Detalle / Nota Pedagógica Grupal</label>
+                    <textarea id="bulk-note-input" rows="2" placeholder="Escribe el motivo del mérito o la falta grupal..." class="w-full bg-slate-900 border border-white/10 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
+                </div>
+
+                <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-white/10">
+                    <span class="text-xs font-bold text-slate-300">Puntos a aplicar por estudiante:</span>
+                    <input type="number" id="bulk-magnitude-input" min="1" max="10" value="1" class="w-16 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-xs text-center font-bold text-amber-300">
+                </div>
+            </div>
+
+            <button onclick="confirmApplyBulkAction()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Aplicar a Todos los Seleccionados</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL PRINCIPAL: OBSERVADOR Y FICHA INDIVIDUAL -->
     <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-3xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[92vh] flex flex-col">
             <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
 
-            <!-- CABECERA DE LA FICHA -->
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-white/10 gap-3">
                 <div class="flex items-center gap-4">
                     <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
@@ -319,7 +400,6 @@
                     </div>
                 </div>
 
-                <!-- ACCIONES DE EXPORTACIÓN Y PDF -->
                 <div class="flex gap-2">
                     <button onclick="downloadStudentPDF()" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 border border-rose-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Descargar Observador Completo en PDF">
                         <i class="fa-solid fa-file-pdf text-rose-200"></i>
@@ -332,7 +412,6 @@
                 </div>
             </div>
 
-            <!-- MÉTRICAS ACUMULADAS DEL ALUMNO -->
             <div class="grid grid-cols-3 gap-3 my-3">
                 <div class="bg-slate-900/80 p-2.5 rounded-xl border border-emerald-500/20 text-center">
                     <p class="text-[10px] text-slate-400">Puntos Reconocimiento</p>
@@ -348,7 +427,6 @@
                 </div>
             </div>
 
-            <!-- ESTRUCTURA DEL OBSERVADOR: NUEVA ANOTACIÓN CONVIVENCIAL -->
             <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 mb-3 space-y-3">
                 <div class="flex items-center justify-between">
                     <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
@@ -412,15 +490,14 @@
                 </div>
             </div>
 
-            <!-- LISTA CRONOLÓGICA DE SITUACIONES REGISTRADAS -->
             <div class="flex-grow overflow-y-auto space-y-2 pr-1" id="history-entries-container"></div>
         </div>
     </div>
 
-    <!-- CONTENEDOR TEMPORAL PARA GENERACIÓN Y DESCARGA DEL PDF -->
+    <!-- CONTENEDOR TEMPORAL PARA PDF -->
     <div id="pdf-export-container" class="hidden"></div>
 
-    <!-- RESTO DE MODALES DE SOPORTE (EQUIPOS, REGISTRO RÁPIDO, DRIVE, GRUPOS, NUEVO ESTUDIANTE, CONFIRMACIÓN, RULETA, DADO, CRONÓMETRO) -->
+    <!-- RESTO DE MODALES DE SOPORTE -->
     <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
             <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -720,6 +797,7 @@
         let currentClassKey = "801";
         let currentPeriod = "P1";
         let selectedStudentId = null;
+        let selectedStudentIdsSet = new Set();
         let activeEntryType = 'positive';
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
@@ -888,6 +966,120 @@
                 nota: "Sincronización inicial exitosa desde FantasyClass ALM"
             });
             alertModal("Prueba enviada", "Se ha enviado una fila de prueba a tu hoja de Google Drive.");
+        }
+
+        // CONTROL DE SELECCIÓN MÚLTIPLE Y ACCIONES MASIVAS
+        function toggleSelectStudent(studentId) {
+            if (selectedStudentIdsSet.has(studentId)) {
+                selectedStudentIdsSet.delete(studentId);
+            } else {
+                selectedStudentIdsSet.add(studentId);
+            }
+            updateBulkActionBar();
+        }
+
+        function toggleSelectAllStudents() {
+            const currentStudents = dbState.classes[currentClassKey] || [];
+            if (selectedStudentIdsSet.size === currentStudents.length) {
+                selectedStudentIdsSet.clear();
+            } else {
+                currentStudents.forEach(s => selectedStudentIdsSet.add(s.id));
+            }
+            renderStudentGrid();
+            updateBulkActionBar();
+        }
+
+        function clearSelectedStudents() {
+            selectedStudentIdsSet.clear();
+            renderStudentGrid();
+            updateBulkActionBar();
+        }
+
+        function updateBulkActionBar() {
+            const bar = document.getElementById('bulk-actions-bar');
+            const countBadge = document.getElementById('selected-count-badge');
+            
+            if (selectedStudentIdsSet.size > 0) {
+                countBadge.innerText = selectedStudentIdsSet.size;
+                bar.classList.remove('hidden');
+            } else {
+                bar.classList.add('hidden');
+            }
+        }
+
+        function openBulkModal(type) {
+            if (selectedStudentIdsSet.size === 0) return;
+            document.getElementById('bulk-modal-count').innerText = selectedStudentIdsSet.size;
+            
+            const selectType = document.getElementById('bulk-type-select');
+            if (type === 'positive') {
+                selectType.value = "Reconocimiento / Mérito";
+            } else {
+                selectType.value = "Situación Tipo I (Falta Leve)";
+            }
+
+            document.getElementById('bulk-modal').classList.remove('hidden');
+        }
+
+        function closeBulkModal() {
+            document.getElementById('bulk-modal').classList.add('hidden');
+        }
+
+        function confirmApplyBulkAction() {
+            const count = selectedStudentIdsSet.size;
+            if (count === 0) return;
+
+            const situationType = document.getElementById('bulk-type-select').value;
+            const valueTag = document.getElementById('bulk-pillar-select').value;
+            const note = document.getElementById('bulk-note-input').value.trim() || 'Acción convivencial masiva de grupo';
+            const magnitude = parseInt(document.getElementById('bulk-magnitude-input').value) || 1;
+            const isPositive = situationType.includes('Reconocimiento');
+
+            const currentStudents = dbState.classes[currentClassKey] || [];
+
+            currentStudents.forEach(student => {
+                if (selectedStudentIdsSet.has(student.id)) {
+                    if (!student.history) student.history = [];
+                    
+                    const newEntry = {
+                        id: Date.now() + Math.random(),
+                        timestamp: new Date().toLocaleString('es-CO'),
+                        period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
+                        type: isPositive ? 'positive' : 'negative',
+                        situationType: situationType,
+                        valueTag: valueTag,
+                        magnitude: magnitude,
+                        note: `[Masivo] ${note}`,
+                        firmadoDocente: true,
+                        firmadoEstudiante: true
+                    };
+
+                    student.history.unshift(newEntry);
+
+                    if (isPositive) {
+                        student.xp = (student.xp || 0) + magnitude;
+                        student.level = Math.floor(student.xp / 20) + 1;
+                    }
+
+                    postToGoogleDriveSheet({
+                        curso: currentClassKey,
+                        estudiante: student.name,
+                        tipo: situationType,
+                        pilar: valueTag,
+                        puntos: magnitude,
+                        nota: `[Registro Masivo] ${note}`
+                    });
+                }
+            });
+
+            saveDatabase();
+            if (isPositive) playVictorySound();
+            
+            document.getElementById('bulk-note-input').value = '';
+            closeBulkModal();
+            clearSelectedStudents();
+            renderStudentGrid();
+            alertModal("Acción Masiva Completada", `Se aplicó la anotación a ${count} estudiantes correctamente.`);
         }
 
         function exportCurrentClassExcel() {
@@ -1173,16 +1365,20 @@
             filtered.forEach(student => {
                 const periodStats = calculateStudentStatsForPeriod(student);
                 const obsCount = periodStats.history.filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                const isChecked = selectedStudentIdsSet.has(student.id);
 
                 const card = document.createElement('div');
-                card.className = "glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group";
+                card.className = `glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group ${isChecked ? 'ring-2 ring-amber-400 bg-slate-900/95' : ''}`;
 
                 card.innerHTML = `
                     <div>
                         <div class="flex items-center justify-between mb-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40">
-                                NIVEL ${periodStats.level}
-                            </span>
+                            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-300">
+                                <input type="checkbox" onchange="toggleSelectStudent('${student.id}')" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500 cursor-pointer">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40">
+                                    NIVEL ${periodStats.level}
+                                </span>
+                            </label>
                             <div class="flex items-center gap-1.5 text-xs">
                                 <span class="text-emerald-400 font-bold"><i class="fa-solid fa-plus text-[10px]"></i> ${periodStats.xp} pts</span>
                                 <span class="text-slate-500">|</span>
@@ -1229,6 +1425,8 @@
 
         function switchClass(newClassKey) {
             currentClassKey = newClassKey;
+            selectedStudentIdsSet.clear();
+            updateBulkActionBar();
             document.getElementById('class-select').value = newClassKey;
             renderStudentGrid();
         }
@@ -1430,7 +1628,6 @@
             document.getElementById('entry-note-input').value = '';
         }
 
-        // GENERADOR DE DOCUMENTO PDF OFICIAL
         function downloadStudentPDF() {
             if (!selectedStudentId) return;
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
