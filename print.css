@@ -1,0 +1,38 @@
+@media print {
+  .no-print, .navbar, .btn-print, #sec-rpg {
+    display: none !important;
+  }
+
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0;
+    padding: 0;
+  }
+
+  .main-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .observador-sheet {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .print-only {
+    display: flex !important;
+    justify-content: space-between;
+    margin-top: 60px;
+  }
+
+  .sig-box {
+    border-top: 1px solid #000;
+    width: 30%;
+    text-align: center;
+    padding-top: 5px;
+    font-size: 0.9rem;
+  }
+}
