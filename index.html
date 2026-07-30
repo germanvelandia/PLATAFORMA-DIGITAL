@@ -77,11 +77,11 @@
         }
     </style>
 </head>
-<body class="pb-12 text-slate-100 flex flex-col min-h-screen">
+<body class="pb-12 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
-    <!-- HEADER / BARRA DE NAVEGACIÓN -->
+    <!-- HEADER / BARRA DE NAVEGACIÓN CON MENÚS DESPLEGABLES -->
     <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
             
             <!-- BRANDING -->
             <div class="flex items-center gap-3">
@@ -99,20 +99,14 @@
                 </div>
             </div>
 
-            <!-- CONTROLES Y HERRAMIENTAS -->
+            <!-- CONTROLES AGRUPADOS EN MENÚS DESPLEGABLES -->
             <div class="flex items-center flex-wrap justify-center gap-2">
                 
-                <!-- Google Sync Badge -->
-                <button onclick="openDriveSettingsModal()" id="drive-status-badge" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 transition" title="Configurar conexión directa con Google Drive / Forms / Sheets">
-                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-1.5"></i>
-                    <span id="drive-status-text">Google Forms/Drive Sync</span>
-                </button>
-
-                <!-- Selector de Periodo -->
-                <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-1.5">
-                    <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-2"></i>
+                <!-- SELECTORES DIRECTOS (PERIODO Y CURSO) -->
+                <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-2.5 py-1.5">
+                    <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-1.5"></i>
                     <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
-                        <option value="ALL" class="bg-slate-900 text-white">Todo el Año Lectivo</option>
+                        <option value="ALL" class="bg-slate-900 text-white">Todo el Año</option>
                         <option value="P1" selected class="bg-slate-900 text-white">Periodo 1</option>
                         <option value="P2" class="bg-slate-900 text-white">Periodo 2</option>
                         <option value="P3" class="bg-slate-900 text-white">Periodo 3</option>
@@ -120,54 +114,78 @@
                     </select>
                 </div>
 
-                <!-- Selector de Curso -->
-                <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5">
-                    <i class="fa-solid fa-users text-colegio-gold text-xs mr-2"></i>
+                <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-2.5 py-1.5">
+                    <i class="fa-solid fa-users text-colegio-gold text-xs mr-1.5"></i>
                     <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer">
                         <!-- Generado dinámicamente -->
                     </select>
                 </div>
 
-                <!-- Botón Gestión de Grupos -->
-                <button onclick="openManageGroupsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Añadir o eliminar grupos">
-                    <i class="fa-solid fa-layer-group text-indigo-400"></i>
-                    <span class="hidden sm:inline">Grupos</span>
-                </button>
-
-                <!-- Menú Exportar Excel -->
+                <!-- MENÚ DESPLEGABLE 1: HERRAMIENTAS DE AULA -->
                 <div class="relative inline-block text-left">
-                    <button onclick="toggleExportMenu()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                        <span>Exportar Excel</span>
+                    <button onclick="toggleMenu(event, 'menu-herramientas')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-toolbox text-amber-400"></i>
+                        <span>Herramientas</span>
                         <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
                     </button>
-                    <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                    <div id="menu-herramientas" class="dropdown-menu hidden absolute right-0 mt-2 w-48 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                        <button onclick="openWheelModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-purple-300 font-bold">
+                            <i class="fa-solid fa-arrows-spin text-purple-400"></i>
+                            <span>Ruleta con Sonido</span>
+                        </button>
+                        <button onclick="openDiceModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-rose-300 font-bold">
+                            <i class="fa-solid fa-dice text-rose-400"></i>
+                            <span>Dado Virtual</span>
+                        </button>
+                        <button onclick="openTimerModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold">
+                            <i class="fa-solid fa-stopwatch text-amber-400"></i>
+                            <span>Cronómetro</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MENÚ DESPLEGABLE 2: GESTIÓN DE GRUPOS -->
+                <div class="relative inline-block text-left">
+                    <button onclick="toggleMenu(event, 'menu-gestion')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
+                        <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                        <span>Gestión</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                    </button>
+                    <div id="menu-gestion" class="dropdown-menu hidden absolute right-0 mt-2 w-52 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                        <button onclick="openManageGroupsModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-indigo-300 font-bold">
+                            <i class="fa-solid fa-folder-plus text-indigo-400"></i>
+                            <span>Crear / Eliminar Cursos</span>
+                        </button>
+                        <button onclick="openAddStudentModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-emerald-300 font-bold">
+                            <i class="fa-solid fa-user-plus text-emerald-400"></i>
+                            <span>Añadir Estudiante</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- MENÚ DESPLEGABLE 3: REPORTES & SINCRONIZACIÓN -->
+                <div class="relative inline-block text-left">
+                    <button onclick="toggleMenu(event, 'menu-reportes')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-cloud-arrow-up text-emerald-300"></i>
+                        <span id="drive-status-text">Reportes / Drive</span>
+                        <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
+                    </button>
+                    <div id="menu-reportes" class="dropdown-menu hidden absolute right-0 mt-2 w-60 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
+                        <button onclick="openDriveSettingsModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-emerald-300 font-bold border-b border-white/10">
+                            <i class="fa-solid fa-link text-emerald-400"></i>
+                            <span>Conectar Google Drive / Forms</span>
+                        </button>
                         <button onclick="exportCurrentClassExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-slate-200">
                             <i class="fa-solid fa-file-export text-emerald-400"></i>
                             <span>Exportar Curso Actual (.xlsx)</span>
                         </button>
-                        <button onclick="exportAllClassesMasterExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold border-t border-white/10">
+                        <button onclick="exportAllClassesMasterExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold">
                             <i class="fa-solid fa-database text-amber-400"></i>
                             <span>Master Todos los Cursos (.xlsx)</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Botones de Herramientas Rápida -->
-                <button onclick="openDiceModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Tirar Dado Virtual">
-                    <i class="fa-solid fa-dice text-rose-400"></i>
-                    <span class="hidden sm:inline">Dado</span>
-                </button>
-
-                <button onclick="openTimerModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Cronómetro de Clase">
-                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
-                    <span class="hidden sm:inline">Tiempo</span>
-                </button>
-
-                <button onclick="openWheelModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md" title="Girar Ruleta de Alumnos">
-                    <i class="fa-solid fa-arrows-spin text-xs"></i>
-                    <span>Ruleta</span>
-                </button>
             </div>
         </div>
     </header>
@@ -488,18 +506,18 @@
         </div>
     </div>
 
-    <!-- MODAL 7: RULETA DE SELECCIÓN ALEATORIA -->
+    <!-- MODAL 7: RULETA CON EFECTOS DE SONIDO -->
     <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="font-display font-extrabold text-base text-white mb-4">Ruleta de Selección Aleatoria</h3>
-            <div id="wheel-display" class="w-full h-32 bg-slate-900 border border-amber-500/40 rounded-2xl flex items-center justify-center font-display font-black text-xl text-amber-300 p-4 mb-4">
+            <div id="wheel-display" class="w-full h-32 bg-slate-900 border border-amber-500/40 rounded-2xl flex items-center justify-center font-display font-black text-xl text-amber-300 p-4 mb-4 shadow-inner">
                 ¡Presiona Girar!
             </div>
-            <button onclick="spinStudentWheel()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition">
-                <i class="fa-solid fa-arrows-spin mr-2"></i> Girar Ruleta
+            <button id="spin-wheel-btn" onclick="spinStudentWheel()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-arrows-spin"></i> Girar Ruleta (Con Sonido)
             </button>
         </div>
     </div>
@@ -569,6 +587,63 @@
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
         let confirmCallback = null;
+
+        // CONTEXTO DE AUDIO WEB (EFECTOS DE SONIDO SINTETIZADOS)
+        let audioCtx = null;
+
+        function playTickSound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.04);
+            } catch(e) {}
+        }
+
+        function playVictorySound() {
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (idx * 0.12));
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + (idx * 0.12));
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + (idx * 0.12) + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + (idx * 0.12));
+                    osc.stop(audioCtx.currentTime + (idx * 0.12) + 0.3);
+                });
+            } catch(e) {}
+        }
+
+        // CONTROL DE MENÚS DESPLEGABLES
+        function toggleMenu(event, menuId) {
+            event.stopPropagation();
+            const targetMenu = document.getElementById(menuId);
+            const allMenus = document.querySelectorAll('.dropdown-menu');
+            
+            allMenus.forEach(menu => {
+                if (menu !== targetMenu) menu.classList.add('hidden');
+            });
+
+            if (targetMenu) targetMenu.classList.toggle('hidden');
+        }
+
+        function closeAllDropdowns(event) {
+            const allMenus = document.querySelectorAll('.dropdown-menu');
+            allMenus.forEach(menu => menu.classList.add('hidden'));
+        }
 
         function initDatabase() {
             const stored = localStorage.getItem('fantasyclass_alm_db');
@@ -659,7 +734,7 @@
             if (url) {
                 badgeText.innerText = "Google Drive Activo";
             } else {
-                badgeText.innerText = "Google Drive Sync";
+                badgeText.innerText = "Reportes / Drive";
             }
             closeDriveModal();
         }
@@ -734,7 +809,6 @@
             XLSX.utils.book_append_sheet(wb, wsHistory, "Bitácora Detallada Alumnos");
 
             XLSX.writeFile(wb, `FantasyClass_Reporte_Grado_${currentClassKey}_ALM.xlsx`);
-            toggleExportMenu();
         }
 
         function exportAllClassesMasterExcel() {
@@ -756,7 +830,6 @@
             });
 
             XLSX.writeFile(wb, `FantasyClass_Master_TodosLosCursos_ALM.xlsx`);
-            toggleExportMenu();
         }
 
         function exportSingleStudentExcel() {
@@ -802,11 +875,6 @@
 
             const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
             XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
-        }
-
-        function toggleExportMenu() {
-            const menu = document.getElementById('export-dropdown');
-            menu.classList.toggle('hidden');
         }
 
         function openAddStudentModal() {
@@ -1231,26 +1299,44 @@
             input.value = '';
         }
 
-        // FUNCIONES DE RULETA
+        // RULETA CON EFECTOS DE SONIDO Y DESACELERACIÓN
         function openWheelModal() { document.getElementById('wheel-modal').classList.remove('hidden'); }
         function closeWheelModal() { document.getElementById('wheel-modal').classList.add('hidden'); }
+        
         function spinStudentWheel() {
             const students = dbState.classes[currentClassKey] || [];
             if (students.length === 0) {
                 document.getElementById('wheel-display').innerText = "Sin estudiantes";
                 return;
             }
+
+            const btn = document.getElementById('spin-wheel-btn');
+            btn.disabled = true;
+            btn.classList.add('opacity-50');
+
             const display = document.getElementById('wheel-display');
-            let count = 0;
-            const interval = setInterval(() => {
+            let counter = 0;
+            let speed = 50; // milisegundos iniciales
+            const totalSteps = 28 + Math.floor(Math.random() * 10);
+
+            function step() {
                 const randomStudent = students[Math.floor(Math.random() * students.length)];
                 display.innerText = randomStudent.name;
-                count++;
-                if (count > 20) {
-                    clearInterval(interval);
-                    try { confetti({ particleCount: 50, spread: 60 }); } catch(e){}
+                playTickSound();
+                counter++;
+
+                if (counter < totalSteps) {
+                    if (counter > totalSteps - 10) speed += 30; // Desaceleración progresiva
+                    setTimeout(step, speed);
+                } else {
+                    playVictorySound();
+                    try { confetti({ particleCount: 70, spread: 70, origin: { y: 0.6 } }); } catch(e){}
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50');
                 }
-            }, 100);
+            }
+
+            step();
         }
 
         // FUNCIONES DE DADO
@@ -1261,6 +1347,7 @@
             let count = 0;
             const interval = setInterval(() => {
                 display.innerText = Math.floor(Math.random() * 6) + 1;
+                playTickSound();
                 count++;
                 if (count > 10) clearInterval(interval);
             }, 80);
@@ -1297,6 +1384,7 @@
                         clearInterval(timerInterval);
                         timerInterval = null;
                         document.getElementById('timer-toggle-btn').innerText = "Iniciar";
+                        playVictorySound();
                     }
                 }, 1000);
             }
