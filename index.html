@@ -1085,5 +1085,188 @@ window.openManageGroupsModal = openGroupsModal;
   console.log('[patchMenusAssignActions] Parche aplicado: Clases->Grados y Herramientas->Grupos');
 })();
 </script>
+  <!-- Parche: Años/Institución y nombre de la app (modal de ajustes) -->
+<!-- Inserta modal y comportamiento para editar nombre de app y datos institucionales -->
+<div id="institution-settings-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('institution-settings-modal')">
+  <div class="modal" style="max-width:640px">
+    <button class="close-btn" onclick="hideModal('institution-settings-modal')">✕</button>
+    <h3>Ajustes institucionales</h3>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <label style="font-weight:700">Nombre de la aplicación</label>
+      <input id="inst-app-name" placeholder="Ej. FantasyClass Convivencial" style="width:100%;padding:8px;border-radius:8px">
+
+      <label style="font-weight:700">Subtítulo / Nombre de la institución</label>
+      <input id="inst-subtitle" placeholder="Ej. Colegio Alfonso López Michelsen" style="width:100%;padding:8px;border-radius:8px">
+
+      <label style="font-weight:700">Texto corto / Logo (2-4 caracteres)</label>
+      <input id="inst-logo-text" placeholder="Ej. ALM" style="width:160px;padding:8px;border-radius:8px">
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div class="btn" onclick="loadInstitutionDefaults()">Restaurar por defecto</div>
+      <div class="btn" onclick="saveInstitutionSettings()">Guardar</div>
+      <div class="btn" onclick="hideModal('institution-settings-modal')">Cancelar</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function institutionSettingsPatch(){
+  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : (typeof STORAGE_KEY === 'undefined' && typeof STORAGE_KEY === 'string' ? STORAGE_KEY : 'fantasyclass_alm_db');
+
+  // helper: unified save (use existing saveDB if there)
+  function persistDB(){
+    if(typeof saveDB === 'function') {
+      try { saveDB(); return; } catch(e){ console.warn('saveDB() falló, usando localStorage directo', e); }
+    }
+    // fallback: write db if present, else nothing
+    if(typeof db === 'object') localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+  }
+
+  function toast(msg, type='info', t=2500){
+    if(typeof showToast === 'function') { showToast(msg, type, t); return; }
+    if (window.console) console.log('[toast]', type, msg);
+    else alert(msg);
+  }
+
+  // create a button inside the "Herramientas" panel to open the modal (if not present)
+  function ensureSettingsButton(){
+    const toolsMenu = document.getElementById('menu-tools');
+    if(!toolsMenu) return;
+    const panel = toolsMenu.querySelector('.menu-panel');
+    if(!panel) return;
+    // find existing "Ajustes" by text
+    const existing = Array.from(panel.querySelectorAll('button')).find(b => /ajust/i.test(b.textContent));
+    if(existing) {
+      existing.addEventListener('click', openInstitutionModal);
+      return;
+    }
+    const btn = document.createElement('button');
+    btn.innerHTML = '<i class="fa-solid fa-cog"></i> Ajustes';
+    btn.style.display = 'flex';
+    btn.style.alignItems = 'center';
+    btn.style.gap = '8px';
+    btn.addEventListener('click', openInstitutionModal);
+    panel.appendChild(btn);
+  }
+
+  // show modal and populate fields
+  window.openInstitutionModal = function(){
+    // load current settings from db if available
+    try {
+      if(typeof db === 'object' && db.institution){
+        const inst = db.institution;
+        document.getElementById('inst-app-name').value = inst.appName || '';
+        document.getElementById('inst-subtitle').value = inst.subtitle || '';
+        document.getElementById('inst-logo-text').value = inst.logoText || '';
+      } else {
+        // try reading localStorage directly
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          try{
+            const parsed = JSON.parse(raw);
+            if(parsed && parsed.institution){
+              document.getElementById('inst-app-name').value = parsed.institution.appName || '';
+              document.getElementById('inst-subtitle').value = parsed.institution.subtitle || '';
+              document.getElementById('inst-logo-text').value = parsed.institution.logoText || '';
+            } else {
+              document.getElementById('inst-app-name').value = '';
+              document.getElementById('inst-subtitle').value = '';
+              document.getElementById('inst-logo-text').value = '';
+            }
+          }catch(e){ console.warn(e); }
+        }
+      }
+    } catch(e) { console.warn(e); }
+    showModal('institution-settings-modal');
+  };
+
+  // load default values (from current DOM as fallback)
+  window.loadInstitutionDefaults = function(){
+    // set default values reading the header DOM if possible
+    try {
+      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
+      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
+      const logoEl = document.querySelector('.brand .logo');
+      document.getElementById('inst-app-name').value = titleEl ? titleEl.innerText.trim() : (document.title || '');
+      document.getElementById('inst-subtitle').value = subtitleEl ? subtitleEl.innerText.trim() : '';
+      document.getElementById('inst-logo-text').value = logoEl ? logoEl.innerText.trim() : '';
+      toast('Valores restaurados desde la cabecera', 'info');
+    } catch(e){ console.warn(e); }
+  };
+
+  // save settings into db and update DOM
+  window.saveInstitutionSettings = function(){
+    const appName = (document.getElementById('inst-app-name').value || '').trim();
+    const subtitle = (document.getElementById('inst-subtitle').value || '').trim();
+    const logoText = (document.getElementById('inst-logo-text').value || '').trim();
+
+    if(typeof db !== 'object') db = { classes: {}, groups: {}, characters: [], googleScriptUrl: '' };
+    db.institution = db.institution || {};
+    db.institution.appName = appName;
+    db.institution.subtitle = subtitle;
+    db.institution.logoText = logoText;
+
+    try { persistDB(); } catch(e){ console.warn(e); }
+
+    // Update DOM: document.title, header title, subtitle, logo
+    try {
+      if(appName) document.title = appName;
+      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
+      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
+      const logoEl = document.querySelector('.brand .logo');
+      if(titleEl && appName) titleEl.innerText = appName;
+      if(subtitleEl) subtitleEl.innerText = subtitle || subtitleEl.innerText;
+      if(logoEl && logoText) logoEl.innerText = logoText;
+    } catch(e){ console.warn('Error actualizando DOM:', e); }
+
+    hideModal('institution-settings-modal');
+    toast('Ajustes guardados', 'success');
+  };
+
+  // On load: update header from stored db.institution automatically
+  function applyStoredInstitution(){
+    try {
+      if(typeof db === 'object' && db.institution){
+        const inst = db.institution;
+        if(inst.appName) document.title = inst.appName;
+        const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
+        const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
+        const logoEl = document.querySelector('.brand .logo');
+        if(titleEl && inst.appName) titleEl.innerText = inst.appName;
+        if(subtitleEl && inst.subtitle !== undefined) subtitleEl.innerText = inst.subtitle;
+        if(logoEl && inst.logoText !== undefined) logoEl.innerText = inst.logoText;
+      } else {
+        // also check localStorage raw
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(raw){
+          try{
+            const parsed = JSON.parse(raw);
+            if(parsed && parsed.institution){
+              const inst = parsed.institution;
+              if(inst.appName) document.title = inst.appName;
+              const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
+              const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
+              const logoEl = document.querySelector('.brand .logo');
+              if(titleEl && inst.appName) titleEl.innerText = inst.appName;
+              if(subtitleEl && inst.subtitle !== undefined) subtitleEl.innerText = inst.subtitle;
+              if(logoEl && inst.logoText !== undefined) logoEl.innerText = inst.logoText;
+            }
+          }catch(e){}
+        }
+      }
+    } catch(e){ console.warn(e); }
+  }
+
+  // Ensure the "Ajustes" button exists in tools menu (non-destructive)
+  try { ensureSettingsButton(); } catch(e){ console.warn('No se pudo crear boton ajustes:', e); }
+
+  // Apply stored on load
+  applyStoredInstitution();
+
+})();
+</script>
+<!-- /Parche ajustes institucionales -->
 </body>
 </html>
