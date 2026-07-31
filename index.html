@@ -7,7 +7,7 @@
 
 <!-- Tailwind optional -->
 <script src="https://cdn.tailwindcss.com"></script>
-<script>tailwind.config={theme:{extend:{colors:{colegio:{blue:'#1e3a8a',red:'#dc2626',gold:'#f59e0b'},},fontFamily:{sans:['Inter','sans-serif']}}}}</script>
+<script>tailwind.config={theme:{extend:{colors:{colegio:{blue:'#1e3a8a',red:'#dc2626',gold:'#f59e0b'}},fontFamily:{sans:['Inter','sans-serif']}}}}</script>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -81,6 +81,9 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .toast.err{background:linear-gradient(90deg,var(--accent-red),#c0392b)}
 
 @media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}.icon-grid{grid-template-columns:repeat(4,64px)}.groups-area{flex-direction:column}}
+/* Small utility classes used by injected UIs */
+.member-highlight{ box-shadow: 0 8px 24px rgba(0,0,0,0.6); border:2px solid rgba(99,102,241,0.2); transform:scale(1.01); }
+.small{font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -88,28 +91,29 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 <header>
   <div class="container header-row">
     <div class="brand">
-      <div class="logo">ALM</div>
+      <div class="logo" id="header-logo">ALM</div>
       <div>
-        <div style="font-weight:900">FantasyClass Convivencial</div>
-        <div style="font-size:12px;color:var(--muted)">Aprendiendo Jugando</div>
+        <div style="font-weight:900" id="header-title">FantasyClass Convivencial</div>
+        <div style="font-size:12px;color:var(--muted)" id="header-subtitle">Aprendiendo Jugando</div>
       </div>
     </div>
 
     <div style="display:flex;gap:8px;align-items:center">
-      <!-- Organized top menu (click-to-toggle) -->
       <div id="menu-tools" class="menu">
         <div class="menu-button" onclick="toggleMenu('menu-tools')">Herramientas ▾</div>
         <div class="menu-panel">
           <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i> Cronómetro</button>
           <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i> Ruleta</button>
           <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i> Dado</button>
+          <button id="tools-settings-btn"><i class="fa-solid fa-cog"></i> Ajustes</button>
+          <button id="tools-groups-btn"><i class="fa-solid fa-users"></i> Grupos</button>
         </div>
       </div>
 
       <div id="menu-classes" class="menu">
         <div class="menu-button" onclick="toggleMenu('menu-classes')">Clases ▾</div>
         <div class="menu-panel">
-          <button onclick="openGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grados</button>
+          <button id="classes-grades-btn"><i class="fa-solid fa-layer-group"></i> Grados</button>
           <button onclick="openDeleteGradePrompt()"><i class="fa-solid fa-trash-can"></i> Borrar grado</button>
         </div>
       </div>
@@ -123,7 +127,6 @@ main{max-width:1200px;margin:18px auto;padding:18px}
         </div>
       </div>
 
-      <!-- Period and class selectors -->
       <div style="display:flex;gap:8px;align-items:center;margin-left:8px">
         <div class="menu-button">
           <i class="fa-solid fa-calendar-days"></i>
@@ -174,7 +177,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 <!-- Toast container -->
 <div id="toast-container"></div>
 
-<!-- Modals (kept original + new ones) -->
+<!-- Modals (kept original + cleaned ones) -->
 
 <!-- Quick action modal -->
 <div id="quick-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('quick-modal')">
@@ -205,11 +208,13 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Ficha modal (white) -->
+<!-- Ficha modal (white) - content will be enhanced by consolidated script -->
 <div id="ficha-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('ficha-modal')">
   <div class="modal white">
     <button class="close-btn" onclick="hideModal('ficha-modal')">✕</button>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+
+    <!-- preserved minimal header - enhanced UI injected by script -->
+    <div id="ficha-initial-header" style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
       <div id="history-student-avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
       <div style="flex:1">
         <div id="history-student-name" style="font-weight:900;color:#111"></div>
@@ -248,25 +253,15 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Groups modal -->
+<!-- Groups modal (manage) -->
 <div id="manage-groups-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('manage-groups-modal')">
   <div class="modal" style="max-width:1100px">
     <button class="close-btn" onclick="hideModal('manage-groups-modal')">✕</button>
     <h3>Gestión de Cursos y Grupos</h3>
 
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <input id="new-grade-input" placeholder="Nuevo grado (ej. 805)" style="flex:1;padding:8px;border-radius:8px">
-      <div class="btn" onclick="createGrade()">Crear Grado</div>
-      <input id="new-subgroup-input" placeholder="Nuevo grupo (ej. Grupo A)" style="padding:8px;border-radius:8px">
-      <div class="btn" onclick="createGroupInCurrentGrade()">Crear Grupo</div>
-    </div>
-
-    <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
-      <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:8px">
-      <input id="dist-size" type="number" min="1" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:8px">
-      <div class="btn" onclick="distributeGroupsByNumber()">Distribuir por nº</div>
-      <div class="btn" onclick="distributeGroupsBySize()">Distribuir por tamaño</div>
-      <div style="margin-left:auto;color:var(--muted)">Grado actual: <strong id="manage-current-grade-label"></strong></div>
+    <!-- Group manager UI will be injected/augmented by consolidated script -->
+    <div id="groups-manager-body" style="margin-top:10px">
+      <!-- Top control area (injected) -->
     </div>
 
     <div id="groups-list-container" style="margin-top:12px;max-height:240px;overflow:auto"></div>
@@ -295,7 +290,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Timer, Roulette, Dice modals (unchanged logic) -->
+<!-- Timer, Roulette, Dice modals (same as original) -->
 <div id="timer-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('timer-modal')">
   <div class="modal">
     <button class="close-btn" onclick="hideModal('timer-modal')">✕</button>
@@ -309,7 +304,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
       <div class="btn" onclick="setTimerMinutes(10)">10m</div>
     </div>
     <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-      <input id="timer-manual-input" placeholder="mm:ss o minutos" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
+      <input id="timer-manual" placeholder="mm:ss o minutos" style="padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
       <div class="btn" onclick="applyManualTimer()">Set</div>
     </div>
   </div>
@@ -362,14 +357,39 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
+<!-- Institution settings modal -->
+<div id="institution-settings-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('institution-settings-modal')">
+  <div class="modal" style="max-width:640px">
+    <button class="close-btn" onclick="hideModal('institution-settings-modal')">✕</button>
+    <h3>Ajustes institucionales</h3>
+
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <label style="font-weight:700">Nombre de la aplicación</label>
+      <input id="inst-app-name" placeholder="Ej. FantasyClass Convivencial" style="width:100%;padding:8px;border-radius:8px">
+
+      <label style="font-weight:700">Subtítulo / Nombre de la institución</label>
+      <input id="inst-subtitle" placeholder="Ej. Colegio Alfonso López Michelsen" style="width:100%;padding:8px;border-radius:8px">
+
+      <label style="font-weight:700">Texto corto / Logo (2-4 caracteres)</label>
+      <input id="inst-logo-text" placeholder="Ej. ALM" style="width:160px;padding:8px;border-radius:8px">
+    </div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div class="btn" onclick="loadInstitutionDefaults()">Restaurar por defecto</div>
+      <div class="btn" onclick="saveInstitutionSettings()">Guardar</div>
+      <div class="btn" onclick="hideModal('institution-settings-modal')">Cancelar</div>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ================= STATE & PERSISTENCE ================= */
-const STORAGE_KEY = 'fantasyclass_alm_db'; // keep your original key
+const STORAGE_KEY = 'fantasyclass_alm_db';
+const HP_MAX = 5;
 const DEFAULT_ROSTERS = {
   "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba"],
   "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia"]
 };
-const HP_MAX = 5;
 
 let db = { classes: {}, groups: {}, characters: [], googleScriptUrl: '' };
 let currentClass = null;
@@ -404,9 +424,9 @@ function loadDB(){
     }
     if(!db.groups[k]) db.groups[k] = {};
   });
-  if(!currentClass) currentClass = Object.keys(db.classes)[0];
+  currentClass = currentClass || Object.keys(db.classes)[0] || null;
 }
-function saveDB(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }
+function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('saveDB error', e); } }
 
 /* ---------- INIT ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
@@ -415,6 +435,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderStudentGrid();
   buildFichaIcons();
   renderCharactersList();
+  ensureHeaderEditButton(); // place header edit
+  wireToolsPanelButtons();
 });
 
 /* ========== MENU TOGGLE ========== */
@@ -430,7 +452,6 @@ document.addEventListener('click', (e) => { if(!e.target.closest('.menu')) docum
 function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
 function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
 
-/* confirm wrapper (keeps original confirm-modal) */
 let confirmCb = null;
 function showConfirm(title, message, cb){
   document.getElementById('confirm-title').innerText = title;
@@ -451,7 +472,7 @@ function populateClassSelect(){
   else currentClass = sel.value || Object.keys(db.classes)[0] || null;
   document.getElementById('manage-current-grade-label') && (document.getElementById('manage-current-grade-label').innerText = currentClass || '-');
 }
-function switchClass(v){ if(!db.classes[v]) return showToast('Grado no encontrado','warn'); currentClass = v; populateClassSelect(); renderStudentGrid(); renderGroups(); }
+function switchClass(v){ if(!db.classes[v]) return showToast('Grado no encontrado','warn'); currentClass = v; populateClassSelect(); renderStudentGrid(); renderGroupsColumns(); }
 
 /* ========== STUDENTS RENDER ========== */
 function renderStudentGrid(){
@@ -506,7 +527,7 @@ function promptDeleteStudent(id){
   showConfirm('Eliminar estudiante', `Eliminar "${s.name}"?`, ()=>{
     db.classes[currentClass] = (db.classes[currentClass]||[]).filter(x=>x.id!==id);
     if(db.groups[currentClass]) Object.keys(db.groups[currentClass]).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id));
-    saveDB(); renderStudentGrid(); renderGroups(); showToast('Estudiante eliminado','success');
+    saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Estudiante eliminado','success');
   });
 }
 
@@ -516,7 +537,7 @@ function assignQuick(id){
   setTimeout(()=> showToast('Arrastra al estudiante desde "Sin asignar" al grupo', 'info', 3000), 400);
 }
 
-/* ========== FICHA / HISTORY ========== */
+/* ========== FICHA / HISTORY (original core, kept) ========== */
 let activeStudentId = null;
 let selectedPilar = '';
 function openFicha(id){
@@ -578,9 +599,7 @@ const DEFAULT_ICONS = [
   {key:'Mal comportamiento', icon:'😡', type:'negative'}
 ];
 function buildFichaIcons(){
-  const grid = document.getElementById('ficha-icons'); if(!grid) return;
-  // legacy name: ficha-icons or ficha-icon-grid depending which modal; support both
-  const target = document.getElementById('ficha-icons') || document.getElementById('ficha-icon-grid');
+  const target = document.getElementById('ficha-icon-grid');
   if(!target) return;
   target.innerHTML = '';
   const custom = (db.characters || []).map(c => ({ key: c.name, icon: c.emoji, type: c.type }));
@@ -622,115 +641,8 @@ function applyQuick(isPositive){
   showToast('Acción aplicada','success');
 }
 
-/* ========== GROUPS / SUBGROUPS ========== */
-function openGroupsModal(){ populateClassSelect(); renderGroups(); showModal('groups-modal'); }
-function createGrade(){ const name=(document.getElementById('new-grade').value||'').trim(); if(!name) return showToast('Escribe nombre','warn'); if(db.classes[name]) return showToast('El grado ya existe','warn'); db.classes[name]=[]; db.groups[name] = {}; saveDB(); populateClassSelect(); renderGroups(); document.getElementById('new-grade').value=''; showToast('Grado creado','success'); }
-function createGroupInCurrentGrade(){ const g = (document.getElementById('new-subgroup-input').value||'').trim(); if(!g) return showToast('Escribe nombre del grupo','warn'); db.groups[currentClass] = db.groups[currentClass] || {}; if(db.groups[currentClass][g]) return showToast('Grupo existe','warn'); db.groups[currentClass][g] = []; saveDB(); renderGroups(); document.getElementById('new-subgroup-input').value=''; showToast('Grupo creado','success'); }
-
-function renderGroups(){
-  const area = document.getElementById('groups-area'); if(!area) return; area.innerHTML = '';
-  document.getElementById('groups-grade-label') && (document.getElementById('groups-grade-label').innerText = currentClass || '-');
-  const all = db.classes[currentClass] || [];
-  const groups = db.groups[currentClass] || {};
-  const assigned = new Set();
-  Object.keys(groups).forEach(g => (groups[g]||[]).forEach(id => assigned.add(id)));
-  const unassigned = all.filter(s=>!assigned.has(s.id));
-
-  function makeCol(title, key, members){
-    const col = document.createElement('div'); col.className='group-col';
-    const head = document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
-    head.innerHTML = `<strong>${title}</strong>`;
-    if(key !== '__unassigned'){
-      const btns = document.createElement('div');
-      btns.innerHTML = `<button class="btn" onclick="exportSubgroup('${currentClass}','${key}')">Export</button> <button class="btn red" onclick="promptDeleteGroup('${currentClass}','${key}')">Eliminar</button>`;
-      head.appendChild(btns);
-    }
-    col.appendChild(head);
-    const list = document.createElement('div'); list.style.minHeight='40px';
-    list.ondragover = e => e.preventDefault();
-    list.ondrop = e => { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, key); };
-    members.forEach(m => {
-      const item = document.createElement('div'); item.className='member'; item.draggable=true; item.innerText = m.name;
-      item.ondragstart = ev => ev.dataTransfer.setData('text/plain', m.id);
-      const ar = document.createElement('div'); ar.style.display='flex'; ar.style.gap='6px'; ar.style.marginTop='6px';
-      const bf = document.createElement('div'); bf.className='btn ghost'; bf.style.padding='4px'; bf.innerText='Ficha'; bf.onclick = ()=> openFicha(m.id);
-      const bd = document.createElement('div'); bd.className='btn red'; bd.style.padding='4px'; bd.innerText='Eliminar'; bd.onclick = ()=> promptDeleteStudent(m.id);
-      ar.appendChild(bf); ar.appendChild(bd); item.appendChild(ar);
-      list.appendChild(item);
-    });
-    col.appendChild(list);
-    return col;
-  }
-
-  area.appendChild(makeCol('Sin asignar','__unassigned', unassigned));
-  Object.keys(groups).forEach(g => {
-    const members = (groups[g]||[]).map(id => (db.classes[currentClass]||[]).find(s=>s.id===id)).filter(Boolean);
-    area.appendChild(makeCol(g, g, members));
-  });
-
-  renderGroupsListOverview();
-  renderGroupsColumns();
-}
-
-/* Move student */
-function moveToGroup(studentId, groupKey){
-  if(!db.groups[currentClass]) db.groups[currentClass] = {};
-  Object.keys(db.groups[currentClass]).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(id => id !== studentId));
-  if(groupKey !== '__unassigned'){
-    db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || [];
-    if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId);
-  }
-  saveDB();
-  renderGroups();
-  renderStudentGrid();
-  showToast('Asignación actualizada','success');
-}
-
-/* Distribution */
-function distributeGroupsByNumber(){ const n = parseInt(document.getElementById('dist-num').value); if(!n || n<1) return showToast('Número inválido','warn'); const ids = (db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass] = db.groups[currentClass] || {}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; for(let i=0;i<ids.length;i++){ const g=`Grupo ${ (i % n)+1}`; db.groups[currentClass][g].push(ids[i]); } saveDB(); renderGroups(); showToast('Distribuido por número','success'); }
-function distributeGroupsBySize(){ const size = parseInt(document.getElementById('dist-size').value); if(!size||size<1) return showToast('Tamaño inválido','warn'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]=db.groups[currentClass]||{}; Object.keys(db.groups[currentClass]||{}).forEach(k=>{ if(k.startsWith('Grupo ')) delete db.groups[currentClass][k]; }); let idx=0,g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]=ids.slice(idx,idx+size); idx+=size; g++; } saveDB(); renderGroups(); showToast('Distribuido por tamaño','success'); }
-
-/* Delete group prompt */
-function promptDeleteGroup(grade, groupName){
-  showConfirm('Eliminar grupo', `Eliminar grupo "${groupName}" en ${grade}?`, ()=>{
-    if(db.groups && db.groups[grade]){ delete db.groups[grade][groupName]; saveDB(); renderGroups(); showToast('Grupo eliminado','success'); }
-  });
-}
-
-/* Delete grade prompt (menu entry) */
-function openDeleteGradePrompt(){
-  const grades = Object.keys(db.classes || {});
-  const choice = prompt('Escribe el grado a eliminar (ej. 805). Grados actuales: ' + grades.join(', '));
-  if(!choice) return;
-  if(!db.classes[choice]) return showToast('Grado no encontrado','err');
-  showConfirm('Eliminar grado', `Eliminar grado ${choice} con todos sus datos?`, ()=>{
-    delete db.classes[choice]; if(db.groups[choice]) delete db.groups[choice];
-    if(currentClass === choice) currentClass = Object.keys(db.classes)[0] || null;
-    saveDB(); populateClassSelect(); renderStudentGrid(); renderGroups();
-    showToast('Grado eliminado: ' + choice,'success');
-  });
-}
-
-/* Groups list overview (in modal) */
-function renderGroupsListOverview(){
-  const container = document.getElementById('groups-list-container'); if(!container) return; container.innerHTML = '';
-  const grades = Object.keys(db.classes || {}).sort();
-  grades.forEach(gk => {
-    const students = db.classes[gk] || [];
-    const wrap = document.createElement('div'); wrap.style.marginBottom='10px';
-    const header = document.createElement('div'); header.style.display='flex'; header.style.justifyContent='space-between'; header.style.alignItems='center';
-    header.innerHTML = `<div style="font-weight:800;cursor:pointer" onclick="switchClass('${gk}')">Grado ${gk} <span style="color:var(--muted)">(${students.length})</span></div>`;
-    const actions = document.createElement('div'); actions.style.display='flex'; actions.style.gap='6px';
-    const expBtn = document.createElement('div'); expBtn.className='btn'; expBtn.innerText='Export'; expBtn.onclick = ()=> exportCurrentClassExcel(gk);
-    const delBtn = document.createElement('div'); delBtn.className='btn red'; delBtn.innerText='Eliminar grado'; delBtn.onclick = ()=> { showConfirm('Eliminar grado','Eliminar grado '+gk+'?', ()=>{ delete db.classes[gk]; if(db.groups[gk]) delete db.groups[gk]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGroups(); showToast('Grado eliminado','success'); }); };
-    actions.appendChild(expBtn); actions.appendChild(delBtn);
-    header.appendChild(actions);
-    wrap.appendChild(header);
-    container.appendChild(wrap);
-  });
-}
-
-/* Render groups columns area (drag & drop) */
+/* ========== GROUPS / SUBGROUPS (consolidated manager) ========== */
+function openGroupsModal(){ populateClassSelect(); renderGroupsColumns(); showModal('manage-groups-modal'); }
 function renderGroupsColumns(){
   const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML = '';
   if(!currentClass) return;
@@ -767,6 +679,46 @@ function renderGroupsColumns(){
     const members = (groups[g]||[]).map(id => (db.classes[currentClass]||[]).find(s=>s.id===id)).filter(Boolean);
     area.appendChild(makeCol(g,g,members));
   });
+}
+
+/* Move student */
+function moveToGroup(studentId, groupKey){
+  if(!db.groups[currentClass]) db.groups[currentClass] = {};
+  Object.keys(db.groups[currentClass]).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(id => id !== studentId));
+  if(groupKey !== '__unassigned'){
+    db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || [];
+    if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId);
+  }
+  saveDB();
+  renderGroupsColumns();
+  renderStudentGrid();
+  showToast('Asignación actualizada','success');
+}
+
+/* Distribution helpers used by injected UI (see later) */
+function distributeGroupsByNumber(){
+  const n = parseInt(prompt('Número de grupos:'));
+  if(!n || n<1) return showToast('Número inválido','warn');
+  const grade = currentClass;
+  const ids = (db.classes[grade]||[]).map(s=>s.id);
+  if(!ids.length) return showToast('No hay estudiantes','warn');
+  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[grade] = db.groups[grade] || {};
+  for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
+  for(let i=0;i<ids.length;i++){ const g=`Grupo ${ (i % n)+1}`; db.groups[grade][g].push(ids[i]); }
+  saveDB(); renderGroupsColumns(); showToast('Distribuido por número','success');
+}
+function distributeGroupsBySize(){
+  const size = parseInt(prompt('Tamaño por grupo:'));
+  if(!size || size<1) return showToast('Tamaño inválido','warn');
+  const grade = currentClass;
+  const ids=(db.classes[grade]||[]).map(s=>s.id);
+  if(!ids.length) return showToast('No hay estudiantes','warn');
+  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[grade] = db.groups[grade] || {};
+  Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
+  let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx,idx+size); idx+=size; g++; }
+  saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño','success');
 }
 
 /* ========== EXPORTS (XLSX) ========== */
@@ -829,7 +781,7 @@ function renderCharactersList(){
   });
 }
 
-/* ========== RANDOM UTILS / AVATAR ========== */
+/* ========== Random utils / avatar ========== */
 function avatarGradient(name){
   const idx = (name && name.charCodeAt(0)) ? name.charCodeAt(0) % 10 : 0;
   const palettes = [['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
@@ -837,7 +789,7 @@ function avatarGradient(name){
   return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
 }
 
-/* ========== ROULETTE / TIMER / DICE (kept logic, toasts used) ========== */
+/* ========== ROULETTE / TIMER / DICE ========== */
 const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
 function playTick(freq=800,dur=0.02,vol=0.06){ try{ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }catch(e){} }
 function playWin(){ try{ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }catch(e){} }
@@ -875,2346 +827,167 @@ function updateMetrics(){
   Object.keys(totals).forEach(k => { const el = document.getElementById(`badge-${k}`); if(el) el.innerText = `${totals[k]} pts`; });
 }
 
-/* ========== UTILS ========== */
-function hideModalAndCleanup(id){
-  hideModal(id);
-  if(id==='roulette-modal') stopRoulette();
-  if(id==='timer-modal' && timerInterval){ clearInterval(timerInterval); timerInterval=null; }
+/* ========== INSTITUTION SETTINGS (consolidated) ========== */
+function ensureHeaderEditButton(){
+  const brand = document.querySelector('.brand');
+  if(!brand) return;
+  if(brand.querySelector('.header-edit-btn')) return;
+
+  const btn = document.createElement('button');
+  btn.className = 'header-edit-btn';
+  btn.title = 'Editar nombre de la aplicación y datos institucionales';
+  btn.setAttribute('aria-label', 'Editar datos institucionales');
+  btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
+  btn.style.marginLeft='8px';
+  btn.style.background='transparent';
+  btn.style.border='1px solid rgba(255,255,255,0.06)';
+  btn.style.color='inherit';
+  btn.style.padding='6px 8px';
+  btn.style.borderRadius='8px';
+  btn.style.cursor='pointer';
+  btn.onclick = ()=> openInstitutionModal();
+
+  const textualBlock = brand.querySelector('div:nth-child(2)');
+  if(textualBlock) textualBlock.appendChild(btn);
+  else brand.appendChild(btn);
+}
+function openInstitutionModal(){
+  try {
+    if(typeof db === 'object' && db.institution){
+      const inst = db.institution;
+      document.getElementById('inst-app-name').value = inst.appName || '';
+      document.getElementById('inst-subtitle').value = inst.subtitle || '';
+      document.getElementById('inst-logo-text').value = inst.logoText || '';
+    } else {
+      document.getElementById('inst-app-name').value = document.title || '';
+      document.getElementById('inst-subtitle').value = '';
+      document.getElementById('inst-logo-text').value = document.querySelector('.brand .logo')?.innerText || '';
+    }
+  } catch(e){}
+  showModal('institution-settings-modal');
+}
+function loadInstitutionDefaults(){
+  try {
+    const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child');
+    const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child');
+    const logoEl = document.querySelector('.brand .logo');
+    document.getElementById('inst-app-name').value = titleEl ? titleEl.innerText.trim() : (document.title || '');
+    document.getElementById('inst-subtitle').value = subtitleEl ? subtitleEl.innerText.trim() : '';
+    document.getElementById('inst-logo-text').value = logoEl ? logoEl.innerText.trim() : '';
+    showToast('Valores restaurados desde la cabecera','info');
+  } catch(e){}
+}
+function saveInstitutionSettings(){
+  const appName = (document.getElementById('inst-app-name').value || '').trim();
+  const subtitle = (document.getElementById('inst-subtitle').value || '').trim();
+  const logoText = (document.getElementById('inst-logo-text').value || '').trim();
+
+  if(typeof db !== 'object') db = { classes: {}, groups: {}, characters: [], googleScriptUrl: '' };
+  db.institution = db.institution || {};
+  db.institution.appName = appName;
+  db.institution.subtitle = subtitle;
+  db.institution.logoText = logoText;
+  try { saveDB(); } catch(e){}
+
+  // Update DOM
+  try {
+    if(appName) document.title = appName;
+    const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child');
+    const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child');
+    const logoEl = document.querySelector('.brand .logo');
+    if(titleEl && appName) titleEl.innerText = appName;
+    if(subtitleEl) subtitleEl.innerText = subtitle || subtitleEl.innerText;
+    if(logoEl && logoText) logoEl.innerText = logoText;
+  } catch(e){}
+  hideModal('institution-settings-modal');
+  showToast('Ajustes guardados', 'success');
 }
 
-/* Save on unload */
-window.addEventListener('beforeunload', ()=> saveDB());
-
-/* Expose some functions for inline handlers */
-window.toggleMenu = toggleMenu;
-window.openTimerModal = openTimerModal;
-window.openRouletteModal = openRouletteModal;
-window.openDiceModal = openDiceModal;
-window.openQuick = openQuick;
-window.openAddStudentModal = openAddStudentModal;
-window.saveNewStudent = saveNewStudent;
-window.openFicha = openFicha;
-window.openGroupsModal = openGroupsModal;
-window.createGrade = createGrade;
-window.createGroupInCurrentGrade = createGroupInCurrentGrade;
-window.distributeGroupsByNumber = distributeGroupsByNumber;
-window.distributeGroupsBySize = distributeGroupsBySize;
-window.openCharactersModal = openCharactersModal;
-window.createCharacter = createCharacter;
-window.exportSubgroup = exportSubgroup;
-window.exportCurrentClassExcel = exportCurrentClassExcel;
-window.exportSingleStudentExcel = exportSingleStudentExcel;
-window.openDeleteGradePrompt = openDeleteGradePrompt;
-window.promptDeleteStudent = promptDeleteStudent;
-window.openManageGroupsModal = openGroupsModal;
-
-</script>
-  <!-- ====== Parche: habilitar menús (clic + teclado) ====== -->
-<style>
-  /* Asegura que el toggle por clase funcione y tenga prioridad */
-  .menu-panel{ display:none !important; }
-  .menu.open .menu-panel{ display:block !important; }
-  /* Asegura que los botones se vean interactivos y accesibles */
-  .menu-button{ cursor:pointer; user-select:none; outline: none; }
-  .menu-button:focus{ box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
-  /* En caso de que haya botones accidentalmente deshabilitados */
-  .menu-button[disabled]{ pointer-events: auto !important; opacity: 1 !important; }
-</style>
-
-<script>
-<!-- ====== Parche: habilitar menús (clic + teclado) ====== -->
-<style>
-  /* Asegura que el toggle por clase funcione y tenga prioridad */
-  .menu-panel{ display:none !important; }
-  .menu.open .menu-panel{ display:block !important; }
-  /* Asegura que los botones se vean interactivos y accesibles */
-  .menu-button{ cursor:pointer; user-select:none; outline: none; }
-  .menu-button:focus{ box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
-  /* En caso de que haya botones accidentalmente deshabilitados */
-  .menu-button[disabled]{ pointer-events: auto !important; opacity: 1 !important; }
-</style>
-
-<script>
-  (function enableMenus(){
-    // Remove disabled attribute from any menu-button accidentally disabled
-    document.querySelectorAll('.menu-button[disabled]').forEach(btn => btn.removeAttribute('disabled'));
-
-    // Make menu-button keyboard-focusable and add ARIA
-    document.querySelectorAll('.menu-button').forEach(btn => {
-      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
-      if (!btn.hasAttribute('role')) btn.setAttribute('role', 'button');
-      btn.setAttribute('aria-expanded', 'false');
-
-      // click toggles its parent .menu open state
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const menu = btn.closest('.menu');
-        if(!menu) return;
-        const isOpen = menu.classList.toggle('open');
-        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-        // close other menus
-        document.querySelectorAll('.menu').forEach(m => { if(m !== menu) { m.classList.remove('open'); const b = m.querySelector('.menu-button'); if(b) b.setAttribute('aria-expanded','false'); } });
-      });
-
-      // keyboard support: Enter and Space toggle menu
-      btn.addEventListener('keydown', (ev) => {
-        if(ev.key === 'Enter' || ev.key === ' '){
-          ev.preventDefault();
-          btn.click();
-        } else if(ev.key === 'Escape'){
-          // close all menus on Escape
-          document.querySelectorAll('.menu').forEach(m => { m.classList.remove('open'); const b = m.querySelector('.menu-button'); if(b) b.setAttribute('aria-expanded','false'); });
-        }
-      });
-    });
-
-    // Close menus when clicking outside
-    document.addEventListener('click', (e) => {
-      if(!e.target.closest('.menu')){
-        document.querySelectorAll('.menu').forEach(m => {
-          m.classList.remove('open');
-          const b = m.querySelector('.menu-button');
-          if(b) b.setAttribute('aria-expanded','false');
-        });
-      }
-    });
-
-    // Optional: close menus on Escape globally
-    document.addEventListener('keydown', (e) => {
-      if(e.key === 'Escape'){
-        document.querySelectorAll('.menu').forEach(m => {
-          m.classList.remove('open');
-          const b = m.querySelector('.menu-button');
-          if(b) b.setAttribute('aria-expanded','false');
-        });
-      }
-    });
-  })();
-</script>
-<!-- ====== /parche ====== -->
-  <!-- Parche: asignar acciones a Clases->Grados y Herramientas->Grupos (sin tocar HTML existente) -->
-<script>
-(function patchMenusAssignActions(){
-  function safeCall(fnName){
-    try {
-      if(typeof window[fnName] === 'function') return window[fnName];
-    } catch(e){}
-    return null;
-  }
-
-  // Prefer openGroupsModal, fallback to openManageGroupsModal, fallback to alert
-  const openGroups = safeCall('openGroupsModal') || safeCall('openManageGroupsModal') || safeCall('openManageGroups') || function(){ alert('Función de abrir gestión de grupos no encontrada'); };
-
-  // Ensure menu-buttons exist and panels present
-  const classesMenu = document.getElementById('menu-classes');
-  const toolsMenu = document.getElementById('menu-tools');
-
-  // Helper: find existing button by regex on textContent
-  function findButtonContaining(panel, regex){
-    if(!panel) return null;
-    return Array.from(panel.querySelectorAll('button')).find(b => regex.test(b.textContent.trim()));
-  }
-
-  // 1) In "Clases" menu: ensure there's a "Grados" or "Grado" button that opens group management.
-  if(classesMenu){
-    const panel = classesMenu.querySelector('.menu-panel');
-    if(panel){
-      let btn = findButtonContaining(panel, /grado/i);
-      if(!btn){
-        // create a small button at top if missing
-        btn = document.createElement('button');
-        btn.innerHTML = '<i class="fa-solid fa-layer-group"></i> Grados';
-        // put it at the top
-        panel.insertBefore(btn, panel.firstChild);
-      }
-      // assign click handler (toggle menu then open)
-      btn.onclick = function(e){
-        e.stopPropagation();
-        // close other menus and open this menu briefly for consistency (optional)
-        document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
-        classesMenu.classList.add('open');
-        // call the open function
-        try { openGroups(); } catch(err){ console.error(err); }
-        // keep menu state consistent (close)
-        setTimeout(()=> classesMenu.classList.remove('open'), 200);
-      };
-      btn.style.cursor = 'pointer';
-    }
-  }
-
-  // 2) In "Herramientas" menu: ensure there's a "Grupos" button that opens group management
-  if(toolsMenu){
-    const panel = toolsMenu.querySelector('.menu-panel');
-    if(panel){
-      let btnG = findButtonContaining(panel, /grupo/i);
-      if(!btnG){
-        btnG = document.createElement('button');
-        btnG.innerHTML = '<i class="fa-solid fa-users"></i> Grupos';
-        panel.appendChild(btnG);
-      }
-      btnG.onclick = function(e){
-        e.stopPropagation();
-        document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
-        toolsMenu.classList.add('open');
-        try { openGroups(); } catch(err){ console.error(err); }
-        setTimeout(()=> toolsMenu.classList.remove('open'), 200);
-      };
-      btnG.style.cursor = 'pointer';
-    }
-  }
-
-  // 3) Defensive: if the menu-button itself has no handler, map click to open the panel (keeps behaviour)
-  document.querySelectorAll('.menu-button').forEach(mbtn => {
-    // If it already has a click listener (inline onclick or bound), don't override
-    const hasOnclick = mbtn.onclick || mbtn.getAttribute('onclick');
-    if(!hasOnclick){
-      mbtn.addEventListener('click', (e) => {
-        const menu = mbtn.closest('.menu');
-        if(!menu) return;
-        menu.classList.toggle('open');
-      });
-    }
-  });
-
-  // 4) Accessibility: ensure menu-button is focusable
-  document.querySelectorAll('.menu-button').forEach(b => {
-    if(!b.hasAttribute('tabindex')) b.setAttribute('tabindex','0');
-    if(!b.hasAttribute('role')) b.setAttribute('role','button');
-  });
-
-  console.log('[patchMenusAssignActions] Parche aplicado: Clases->Grados y Herramientas->Grupos');
-})();
-</script>
-  <!-- Parche: Años/Institución y nombre de la app (modal de ajustes) -->
-<!-- Inserta modal y comportamiento para editar nombre de app y datos institucionales -->
-<div id="institution-settings-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('institution-settings-modal')">
-  <div class="modal" style="max-width:640px">
-    <button class="close-btn" onclick="hideModal('institution-settings-modal')">✕</button>
-    <h3>Ajustes institucionales</h3>
-
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-      <label style="font-weight:700">Nombre de la aplicación</label>
-      <input id="inst-app-name" placeholder="Ej. FantasyClass Convivencial" style="width:100%;padding:8px;border-radius:8px">
-
-      <label style="font-weight:700">Subtítulo / Nombre de la institución</label>
-      <input id="inst-subtitle" placeholder="Ej. Colegio Alfonso López Michelsen" style="width:100%;padding:8px;border-radius:8px">
-
-      <label style="font-weight:700">Texto corto / Logo (2-4 caracteres)</label>
-      <input id="inst-logo-text" placeholder="Ej. ALM" style="width:160px;padding:8px;border-radius:8px">
-    </div>
-
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <div class="btn" onclick="loadInstitutionDefaults()">Restaurar por defecto</div>
-      <div class="btn" onclick="saveInstitutionSettings()">Guardar</div>
-      <div class="btn" onclick="hideModal('institution-settings-modal')">Cancelar</div>
-    </div>
-  </div>
-</div>
-
-<script>
-(function institutionSettingsPatch(){
-  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : (typeof STORAGE_KEY === 'undefined' && typeof STORAGE_KEY === 'string' ? STORAGE_KEY : 'fantasyclass_alm_db');
-
-  // helper: unified save (use existing saveDB if there)
-  function persistDB(){
-    if(typeof saveDB === 'function') {
-      try { saveDB(); return; } catch(e){ console.warn('saveDB() falló, usando localStorage directo', e); }
-    }
-    // fallback: write db if present, else nothing
-    if(typeof db === 'object') localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
-  }
-
-  function toast(msg, type='info', t=2500){
-    if(typeof showToast === 'function') { showToast(msg, type, t); return; }
-    if (window.console) console.log('[toast]', type, msg);
-    else alert(msg);
-  }
-
-  // create a button inside the "Herramientas" panel to open the modal (if not present)
-  function ensureSettingsButton(){
-    const toolsMenu = document.getElementById('menu-tools');
-    if(!toolsMenu) return;
-    const panel = toolsMenu.querySelector('.menu-panel');
-    if(!panel) return;
-    // find existing "Ajustes" by text
-    const existing = Array.from(panel.querySelectorAll('button')).find(b => /ajust/i.test(b.textContent));
-    if(existing) {
-      existing.addEventListener('click', openInstitutionModal);
-      return;
-    }
-    const btn = document.createElement('button');
-    btn.innerHTML = '<i class="fa-solid fa-cog"></i> Ajustes';
-    btn.style.display = 'flex';
-    btn.style.alignItems = 'center';
-    btn.style.gap = '8px';
-    btn.addEventListener('click', openInstitutionModal);
-    panel.appendChild(btn);
-  }
-
-  // show modal and populate fields
-  window.openInstitutionModal = function(){
-    // load current settings from db if available
-    try {
-      if(typeof db === 'object' && db.institution){
-        const inst = db.institution;
-        document.getElementById('inst-app-name').value = inst.appName || '';
-        document.getElementById('inst-subtitle').value = inst.subtitle || '';
-        document.getElementById('inst-logo-text').value = inst.logoText || '';
-      } else {
-        // try reading localStorage directly
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw){
-          try{
-            const parsed = JSON.parse(raw);
-            if(parsed && parsed.institution){
-              document.getElementById('inst-app-name').value = parsed.institution.appName || '';
-              document.getElementById('inst-subtitle').value = parsed.institution.subtitle || '';
-              document.getElementById('inst-logo-text').value = parsed.institution.logoText || '';
-            } else {
-              document.getElementById('inst-app-name').value = '';
-              document.getElementById('inst-subtitle').value = '';
-              document.getElementById('inst-logo-text').value = '';
-            }
-          }catch(e){ console.warn(e); }
-        }
-      }
-    } catch(e) { console.warn(e); }
-    showModal('institution-settings-modal');
-  };
-
-  // load default values (from current DOM as fallback)
-  window.loadInstitutionDefaults = function(){
-    // set default values reading the header DOM if possible
-    try {
-      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
-      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
-      const logoEl = document.querySelector('.brand .logo');
-      document.getElementById('inst-app-name').value = titleEl ? titleEl.innerText.trim() : (document.title || '');
-      document.getElementById('inst-subtitle').value = subtitleEl ? subtitleEl.innerText.trim() : '';
-      document.getElementById('inst-logo-text').value = logoEl ? logoEl.innerText.trim() : '';
-      toast('Valores restaurados desde la cabecera', 'info');
-    } catch(e){ console.warn(e); }
-  };
-
-  // save settings into db and update DOM
-  window.saveInstitutionSettings = function(){
-    const appName = (document.getElementById('inst-app-name').value || '').trim();
-    const subtitle = (document.getElementById('inst-subtitle').value || '').trim();
-    const logoText = (document.getElementById('inst-logo-text').value || '').trim();
-
-    if(typeof db !== 'object') db = { classes: {}, groups: {}, characters: [], googleScriptUrl: '' };
-    db.institution = db.institution || {};
-    db.institution.appName = appName;
-    db.institution.subtitle = subtitle;
-    db.institution.logoText = logoText;
-
-    try { persistDB(); } catch(e){ console.warn(e); }
-
-    // Update DOM: document.title, header title, subtitle, logo
-    try {
-      if(appName) document.title = appName;
-      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
-      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
-      const logoEl = document.querySelector('.brand .logo');
-      if(titleEl && appName) titleEl.innerText = appName;
-      if(subtitleEl) subtitleEl.innerText = subtitle || subtitleEl.innerText;
-      if(logoEl && logoText) logoEl.innerText = logoText;
-    } catch(e){ console.warn('Error actualizando DOM:', e); }
-
-    hideModal('institution-settings-modal');
-    toast('Ajustes guardados', 'success');
-  };
-
-  // On load: update header from stored db.institution automatically
-  function applyStoredInstitution(){
-    try {
-      if(typeof db === 'object' && db.institution){
-        const inst = db.institution;
-        if(inst.appName) document.title = inst.appName;
-        const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
-        const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
-        const logoEl = document.querySelector('.brand .logo');
-        if(titleEl && inst.appName) titleEl.innerText = inst.appName;
-        if(subtitleEl && inst.subtitle !== undefined) subtitleEl.innerText = inst.subtitle;
-        if(logoEl && inst.logoText !== undefined) logoEl.innerText = inst.logoText;
-      } else {
-        // also check localStorage raw
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw){
-          try{
-            const parsed = JSON.parse(raw);
-            if(parsed && parsed.institution){
-              const inst = parsed.institution;
-              if(inst.appName) document.title = inst.appName;
-              const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
-              const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand div[style*="font-size:12px"]');
-              const logoEl = document.querySelector('.brand .logo');
-              if(titleEl && inst.appName) titleEl.innerText = inst.appName;
-              if(subtitleEl && inst.subtitle !== undefined) subtitleEl.innerText = inst.subtitle;
-              if(logoEl && inst.logoText !== undefined) logoEl.innerText = inst.logoText;
-            }
-          }catch(e){}
-        }
-      }
-    } catch(e){ console.warn(e); }
-  }
-
-  // Ensure the "Ajustes" button exists in tools menu (non-destructive)
-  try { ensureSettingsButton(); } catch(e){ console.warn('No se pudo crear boton ajustes:', e); }
-
-  // Apply stored on load
-  applyStoredInstitution();
-
-})();
-</script>
-<!-- /Parche ajustes institucionales -->
-  <!-- PARCHE: panel funcional para crear/eliminar grados y grupos + distribuciones (NO destructivo) -->
-<script>
-(function GradeGroupPatch(){
-  // Helpers
-  const TOAST = (msg, type='info', t=2500) => {
-    if(typeof showToast === 'function'){ showToast(msg, type, t); return; }
-    try { console.log(`[${type}] ${msg}`); } catch(e){}
-    alert(msg);
-  };
-  const SDB = () => { if(typeof saveDB === 'function') return saveDB(); try{ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(db)); }catch(e){} };
-
-  // Find the modal to augment (manage-groups-modal preferred, fallback groups-modal)
-  const modalId = document.getElementById('manage-groups-modal') ? 'manage-groups-modal' : (document.getElementById('groups-modal')? 'groups-modal': null);
-  if(!modalId){
-    console.warn('[patch] No se encontró modal de grupos ("manage-groups-modal" o "groups-modal") - parche inactivo.');
-    return;
-  }
-  const modal = document.getElementById(modalId);
-  const panelContainer = modal.querySelector('.modal');
-
-  // Avoid inserting twice
-  if(panelContainer.querySelector('#patch-gradegroup-panel')) return;
-
-  // Panel HTML
-  const panelHTML = `
-    <div id="patch-gradegroup-panel" style="border:1px dashed rgba(255,255,255,0.06);padding:10px;border-radius:8px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)">
-      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="patch-new-grade" placeholder="Nuevo grado (ej. 805)" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-          <button class="btn" id="patch-create-grade">Crear Grado</button>
-          <button class="btn red" id="patch-delete-grade">Eliminar Grado</button>
-        </div>
-
-        <div style="width:1px;height:36px;background:rgba(255,255,255,0.03)"></div>
-
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="patch-grade-select" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
-          <input id="patch-new-group" placeholder="Nuevo grupo (ej. Grupo A)" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-          <button class="btn" id="patch-create-group">Crear Grupo</button>
-          <button class="btn red" id="patch-delete-group">Eliminar Grupo</button>
-        </div>
-
-        <div style="width:1px;height:36px;background:rgba(255,255,255,0.03)"></div>
-
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="patch-dist-num" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-          <input id="patch-dist-size" type="number" min="1" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-          <button class="btn" id="patch-distribute-by-number">Distribuir por nº</button>
-          <button class="btn" id="patch-distribute-by-size">Distribuir por tamaño</button>
-          <label style="display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="patch-reino-toggle"> Reinos (persistente)</label>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Insert panel at top of modal content (after h3)
-  const h3 = panelContainer.querySelector('h3');
-  if(h3) h3.insertAdjacentHTML('afterend', panelHTML);
-  else panelContainer.insertAdjacentHTML('afterbegin', panelHTML);
-
-  // Wiring helpers
-  function refreshGradeSelect(){
-    const sel = document.getElementById('patch-grade-select');
-    if(!sel) return;
-    sel.innerHTML = '';
-    Object.keys(db.classes || {}).forEach(k => {
-      const o = document.createElement('option'); o.value = k; o.textContent = `Grado ${k} (${(db.classes[k]||[]).length})`; sel.appendChild(o);
-    });
-    if(currentClass && db.classes[currentClass]) sel.value = currentClass;
-    else sel.value = Object.keys(db.classes)[0] || '';
-  }
-  function refreshAfterChange(){
-    try{ if(typeof populateClassSelect === 'function') populateClassSelect(); }catch(e){}
-    try{ if(typeof renderStudentGrid === 'function') renderStudentGrid(); }catch(e){}
-    try{ if(typeof renderStudents === 'function') renderStudents(); }catch(e){}
-    try{ if(typeof renderGroups === 'function') renderGroups(); }catch(e){}
-    try{ if(typeof renderGroupsListOverview === 'function') renderGroupsListOverview(); }catch(e){}
-    try{ if(typeof renderGroupsColumns === 'function') renderGroupsColumns(); }catch(e){}
-    refreshGradeSelect();
-  }
-
-  // Create grade
-  document.getElementById('patch-create-grade').addEventListener('click', ()=>{
-    const name = (document.getElementById('patch-new-grade').value||'').trim();
-    if(!name) return TOAST('Escribe nombre de grado','warn');
-    if(db.classes[name]) return TOAST('Grado ya existe','warn');
-    db.classes[name] = [];
-    db.groups[name] = db.groups[name] || {};
-    // groupsMeta used for 'reinos' meta
-    db.groupsMeta = db.groupsMeta || {};
-    db.groupsMeta[name] = db.groupsMeta[name] || {};
-    SDB(); refreshAfterChange();
-    document.getElementById('patch-new-grade').value='';
-    TOAST('Grado creado: ' + name, 'success');
-  });
-
-  // Delete grade (with confirm)
-  document.getElementById('patch-delete-grade').addEventListener('click', ()=>{
-    const sel = document.getElementById('patch-grade-select'); if(!sel) return;
-    const name = sel.value;
-    if(!name) return TOAST('Selecciona un grado','warn');
-    showConfirm('Eliminar grado', `Eliminar grado ${name} y todos sus datos?`, ()=>{
-      delete db.classes[name];
-      if(db.groups && db.groups[name]) delete db.groups[name];
-      if(db.groupsMeta && db.groupsMeta[name]) delete db.groupsMeta[name];
-      if(currentClass === name) currentClass = Object.keys(db.classes)[0] || null;
-      SDB(); refreshAfterChange();
-      TOAST('Grado eliminado: ' + name, 'success');
-    });
-  });
-
-  // Create group in selected grade
-  document.getElementById('patch-create-group').addEventListener('click', ()=>{
-    const grade = (document.getElementById('patch-grade-select').value || currentClass);
-    const gname = (document.getElementById('patch-new-group').value||'').trim();
-    if(!grade) return TOAST('Selecciona o crea un grado primero','warn');
-    if(!gname) return TOAST('Escribe nombre de grupo','warn');
-    db.groups = db.groups || {};
-    db.groups[grade] = db.groups[grade] || {};
-    if(db.groups[grade][gname]) return TOAST('Grupo ya existe en ese grado','warn');
-    db.groups[grade][gname] = [];
-    db.groupsMeta = db.groupsMeta || {};
-    db.groupsMeta[grade] = db.groupsMeta[grade] || {};
-    const persistent = document.getElementById('patch-reino-toggle').checked;
-    db.groupsMeta[grade][gname] = { persistent: !!persistent };
-    SDB(); refreshAfterChange();
-    document.getElementById('patch-new-group').value='';
-    TOAST(`Grupo "${gname}" creado en grado ${grade}`,'success');
-  });
-
-  // Delete group in selected grade
-  document.getElementById('patch-delete-group').addEventListener('click', ()=>{
-    const grade = (document.getElementById('patch-grade-select').value || currentClass);
-    if(!grade) return TOAST('Selecciona un grado','warn');
-    // prompt to choose group name
-    const groupsFor = (db.groups && db.groups[grade]) ? Object.keys(db.groups[grade]) : [];
-    if(!groupsFor.length) return TOAST('No hay grupos en este grado','warn');
-    const name = prompt('Escribe el nombre exacto del grupo a eliminar. Grupos: ' + groupsFor.join(', '));
-    if(!name) return;
-    if(!db.groups[grade] || !db.groups[grade][name]) return TOAST('Grupo no encontrado','err');
-    showConfirm('Eliminar grupo', `Eliminar grupo "${name}" en ${grade}?`, ()=>{
-      delete db.groups[grade][name];
-      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade][name];
-      SDB(); refreshAfterChange();
-      TOAST(`Grupo "${name}" eliminado`, 'success');
-    });
-  });
-
-  // Distribution by number of groups
-  document.getElementById('patch-distribute-by-number').addEventListener('click', ()=>{
-    const grade = (document.getElementById('patch-grade-select').value || currentClass);
-    const n = parseInt(document.getElementById('patch-dist-num').value);
-    if(!grade) return TOAST('Selecciona un grado','warn');
-    if(!n || n < 1) return TOAST('Número inválido','warn');
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    if(!ids.length) return TOAST('No hay estudiantes en el grado','warn');
-    // shuffle
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
-    for(let i=0;i<ids.length;i++){ const g = `Grupo ${ (i % n) + 1 }`; db.groups[grade][g].push(ids[i]); }
-    // mark meta if 'reinos' checked
-    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {};
-    const persistent = document.getElementById('patch-reino-toggle').checked;
-    if(persistent) Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true });
-    SDB(); refreshAfterChange();
-    TOAST('Distribución completada (por nº)','success');
-  });
-
-  // Distribution by size
-  document.getElementById('patch-distribute-by-size').addEventListener('click', ()=>{
-    const grade = (document.getElementById('patch-grade-select').value || currentClass);
-    const size = parseInt(document.getElementById('patch-dist-size').value);
-    if(!grade) return TOAST('Selecciona un grado','warn');
-    if(!size || size < 1) return TOAST('Tamaño inválido','warn');
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    if(!ids.length) return TOAST('No hay estudiantes en el grado','warn');
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    // delete previous auto groups
-    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
-    let idx=0, g=1;
-    while(idx < ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; }
-    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {};
-    const persistent = document.getElementById('patch-reino-toggle').checked;
-    if(persistent) Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true });
-    SDB(); refreshAfterChange();
-    TOAST('Distribución por tamaño completada','success');
-  });
-
-  // Initial populate
-  refreshGradeSelect();
-
-  // Keep grade select in sync with the main class select (if exists)
-  const mainSel = document.getElementById('class-select');
-  if(mainSel){
-    mainSel.addEventListener('change', ()=> { refreshGradeSelect(); });
-  }
-
-  console.log('[patch] Grade/Group patch instalado');
-})();
-</script>
-<!-- /PARCHE -->
-  <!-- Parche: botón y atajo para editar App name / Institución desde header -->
-<style>
-  .header-edit-btn{
-    margin-left:8px;
-    background:transparent;
-    border:1px solid rgba(255,255,255,0.06);
-    color:inherit;
-    padding:6px 8px;
-    border-radius:8px;
-    cursor:pointer;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    font-weight:700;
-  }
-  .header-edit-btn:hover{ box-shadow: 0 6px 18px rgba(0,0,0,0.45); background:rgba(255,255,255,0.02); }
-</style>
-
-<script>
-(function headerEditPatch(){
-  // utils
-  const STORAGE_KEY = (typeof STORAGE_KEY !== 'undefined') ? STORAGE_KEY : 'fantasyclass_alm_db';
-  const safeSaveDB = () => { if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed',e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); } };
-  const toast = (msg, type='info', t=2200) => { if(typeof showToast === 'function'){ showToast(msg,type,t); } else console.log(`[${type}] ${msg}`); };
-
-  // Helper to apply institution values to DOM consistently
-  function applyInstitutionToDOM(inst){
-    try{
-      if(!inst) return;
-      if(inst.appName) document.title = inst.appName;
-      // title in header: attempt multiple selectors for compatibility
-      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]') || document.querySelector('.brand h1') || document.querySelector('.brand .app-title');
-      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand .small') || document.querySelector('.brand .subtitle');
-      const logoEl = document.querySelector('.brand .logo');
-      if(titleEl && inst.appName) titleEl.innerText = inst.appName;
-      if(subtitleEl && (inst.subtitle !== undefined)) subtitleEl.innerText = inst.subtitle;
-      if(logoEl && (inst.logoText !== undefined)) logoEl.innerText = inst.logoText;
-    }catch(e){ console.warn('applyInstitutionToDOM error', e); }
-  }
-
-  // Fallback editor (prompts) when modal function not present
-  function fallbackEditInstitution(){
-    try{
-      const curr = (typeof db === 'object' && db.institution) ? db.institution : {};
-      const newApp = prompt('Nombre de la aplicación', curr.appName || (document.title || ''));
-      if(newApp === null) return; // cancel
-      const newSub = prompt('Subtítulo / Nombre de la institución', curr.subtitle || '');
-      if(newSub === null) return;
-      const newLogo = prompt('Texto corto / Logo (2-4 caracteres)', curr.logoText || (document.querySelector('.brand .logo')?.innerText || '').trim());
-      if(newLogo === null) return;
-
-      if(typeof db !== 'object') db = { classes:{}, groups:{}, characters:[], googleScriptUrl:'' };
-      db.institution = db.institution || {};
-      db.institution.appName = newApp.trim();
-      db.institution.subtitle = newSub.trim();
-      db.institution.logoText = newLogo.trim().slice(0,4);
-
-      safeSaveDB();
-      applyInstitutionToDOM(db.institution);
-      toast('Ajustes institucionales guardados', 'success');
-    }catch(e){ console.warn(e); toast('Error guardando ajustes','err'); }
-  }
-
-  // Open modal if exists, else fallback
-  function openInstitutionEditor(){
-    if(typeof openInstitutionModal === 'function'){
-      // prefer existing modal
-      try{ openInstitutionModal(); return; }catch(e){ console.warn('openInstitutionModal failed',e); }
-    }
-    // fallback
-    fallbackEditInstitution();
-  }
-
-  // attach an edit button into the header brand (if not already present)
-  function ensureHeaderEditButton(){
-    const brand = document.querySelector('.brand');
-    if(!brand) return;
-    // avoid duplicate
-    if(brand.querySelector('.header-edit-btn')) return;
-
-    const btn = document.createElement('button');
-    btn.className = 'header-edit-btn';
-    btn.title = 'Editar nombre de la aplicación y datos institucionales';
-    btn.setAttribute('aria-label', 'Editar datos institucionales');
-    btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
-
-    btn.addEventListener('click', (e) => { e.stopPropagation(); openInstitutionEditor(); });
-
-    // place after the brand textual block or at end of brand
-    const textualBlock = brand.querySelector('div:nth-child(2)');
-    if(textualBlock) textualBlock.appendChild(btn);
-    else brand.appendChild(btn);
-  }
-
-  // double-click on title to edit
-  function enableHeaderDblClick(){
-    const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]') || document.querySelector('.brand .app-title');
-    if(!titleEl) return;
-    titleEl.style.cursor = 'pointer';
-    titleEl.title = 'Doble click para editar datos institucionales';
-    titleEl.addEventListener('dblclick', (e) => { e.stopPropagation(); openInstitutionEditor(); });
-  }
-
-  // Apply stored institution values on load (if present)
-  try{
-    if(typeof db === 'object' && db.institution){ applyInstitutionToDOM(db.institution); }
-    else {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if(raw){ try{ const parsed = JSON.parse(raw); if(parsed && parsed.institution) applyInstitutionToDOM(parsed.institution); }catch(e){} }
-    }
-  }catch(e){ console.warn(e); }
-
-  // Initialize UI elements
-  ensureHeaderEditButton();
-  enableHeaderDblClick();
-
-  // If an existing settings button exists elsewhere, ensure it opens modal (idempotent)
+/* ========== HELPERS: wire tools menu buttons (non-destructive) ========== */
+function wireToolsPanelButtons(){
+  // add listener for settings and groups buttons in tools panel
   const toolsPanel = document.querySelector('#menu-tools .menu-panel');
   if(toolsPanel){
-    const settingsBtn = Array.from(toolsPanel.querySelectorAll('button')).find(b => /ajust/i.test(b.textContent) || /config/i.test(b.textContent) || /cog/i.test(b.innerHTML));
-    if(settingsBtn) settingsBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openInstitutionEditor(); });
+    const settingsBtn = toolsPanel.querySelector('#tools-settings-btn');
+    if(settingsBtn) settingsBtn.onclick = (e)=> { e.stopPropagation(); openInstitutionModal(); };
+
+    const groupsBtn = toolsPanel.querySelector('#tools-groups-btn');
+    if(groupsBtn) groupsBtn.onclick = (e)=> { e.stopPropagation(); openGroupsModal(); };
   }
-
-  // expose for debug
-  window.openInstitutionEditor = openInstitutionEditor;
-})();
-</script>
-  <!-- PARCHE ÚNICO: asegurar acciones de Herramientas->Grupos, Clases->Grados y edición header -->
-<script>
-(function ALM_EnsureMenusAndActions(){
-  const STORAGE_KEY = 'fantasyclass_alm_db';
-  const toast = (msg, type='info', t=3000) => {
-    if(typeof showToast === 'function') return showToast(msg,type,t);
-    try{ console.log(`[${type}] ${msg}`); } catch(e){}
-    // fallback
-    // alert(msg); // avoid noisy alerts
-  };
-
-  const callIfFunc = (name, ...args) => {
-    try { if(typeof window[name] === 'function') return window[name](...args); } catch(e){ console.warn('callIfFunc error', name, e); }
-    return null;
-  };
-
-  const ensureSave = () => {
-    if(typeof saveDB === 'function') { try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } }
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) { console.warn('localStorage save failed', e); }
-  };
-
-  // Open groups management modal (tries various names, falls back to showing modals)
-  function openGroupsManagement(){
-    if(callIfFunc('openGroupsModal')) return;
-    if(callIfFunc('openManageGroupsModal')) return;
-    if(callIfFunc('openGroups')) return;
-    // Try showing manage modal if present
-    if(document.getElementById('manage-groups-modal')) { showModal('manage-groups-modal'); return; }
-    if(document.getElementById('groups-modal')) { showModal('groups-modal'); return; }
-    toast('No se encontró modal de gestión de Grupos', 'warn');
+  // classes menu grade button
+  const classesPanel = document.querySelector('#menu-classes .menu-panel');
+  if(classesPanel){
+    const gradesBtn = classesPanel.querySelector('#classes-grades-btn');
+    if(gradesBtn) gradesBtn.onclick = (e)=> { e.stopPropagation(); openGroupsModal(); };
   }
+}
 
-  // Open institution editor (use existing openInstitutionModal if present)
-  function openInstitutionEditor(){
-    if(callIfFunc('openInstitutionModal')) return;
-    // fallback prompts
-    try {
-      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      const inst = parsed.institution || {};
-      const name = prompt('Nombre de la aplicación', inst.appName || document.title || '');
-      if(name === null) return;
-      const subtitle = prompt('Subtítulo / Institución', inst.subtitle || '');
-      if(subtitle === null) return;
-      const logoText = prompt('Texto corto (logo)', inst.logoText || (document.querySelector('.brand .logo')?.innerText || 'ALM'));
-      if(logoText === null) return;
-      parsed.institution = { appName: name, subtitle, logoText };
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      // apply to DOM
-      document.title = name;
-      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
-      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child');
-      const logoEl = document.querySelector('.brand .logo');
-      if(titleEl) titleEl.innerText = name;
-      if(subtitleEl) subtitleEl.innerText = subtitle;
-      if(logoEl) logoEl.innerText = logoText.slice(0,4);
-      toast('Ajustes guardados', 'success');
-    } catch(e){ console.warn(e); toast('Error guardando ajustes', 'err'); }
-  }
-
-  // Create grade/group/distribute functions (use existing if present, else implement)
-  function createGrade(name){
-    if(!name) return toast('Nombre de grado requerido','warn');
-    if(typeof window.createGrade === 'function'){ try{ return window.createGrade(name); }catch(e){} }
-    db.classes = db.classes || {};
-    db.groups = db.groups || {};
-    if(db.classes[name]) return toast('Grado ya existe','warn');
-    db.classes[name] = [];
-    db.groups[name] = {};
-    ensureSave();
-    // update UI
-    callIfFunc('populateClassSelect'); callIfFunc('renderStudents'); callIfFunc('renderGroups');
-    toast('Grado creado: ' + name, 'success');
-  }
-
-  function createGroup(grade, groupName, persistent=false){
-    if(typeof window.createGroup === 'function'){ try{ return window.createGroup(groupName); }catch(e){} }
-    if(!grade) grade = currentClass;
-    if(!grade) return toast('Selecciona un grado','warn');
-    db.groups = db.groups || {};
-    db.groups[grade] = db.groups[grade] || {};
-    if(db.groups[grade][groupName]) return toast('Grupo ya existe','warn');
-    db.groups[grade][groupName] = [];
-    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; db.groupsMeta[grade][groupName] = { persistent: !!persistent };
-    ensureSave();
-    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns'); toast('Grupo creado', 'success');
-  }
-
-  function deleteGradePrompt(grade){
-    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
-    if(!grade) return toast('Selecciona un grado','warn');
-    showConfirm('Eliminar grado','Eliminar grado '+grade+' y todos sus datos?', ()=>{
-      if(db.classes && db.classes[grade]) delete db.classes[grade];
-      if(db.groups && db.groups[grade]) delete db.groups[grade];
-      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade];
-      ensureSave();
-      callIfFunc('populateClassSelect'); callIfFunc('renderStudents'); callIfFunc('renderGroups');
-      toast('Grado eliminado: ' + grade, 'success');
-    });
-  }
-
-  function deleteGroupPrompt(grade, groupName){
-    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
-    if(!grade) return toast('Selecciona grado','warn');
-    if(!groupName){
-      const glist = Object.keys((db.groups && db.groups[grade])||{});
-      if(!glist.length) return toast('No hay grupos en este grado','warn');
-      groupName = prompt('Escribe el nombre exacto del grupo a eliminar. Grupos: '+glist.join(', '));
-      if(!groupName) return;
-    }
-    if(!db.groups || !db.groups[grade] || !db.groups[grade][groupName]) return toast('Grupo no encontrado','err');
-    showConfirm('Eliminar grupo', 'Eliminar grupo '+groupName+' en '+grade+'?', ()=>{
-      delete db.groups[grade][groupName];
-      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade][groupName];
-      ensureSave();
-      callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
-      toast('Grupo eliminado', 'success');
-    });
-  }
-
-  function distributeByNumber(grade, n, persistent=false){
-    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
-    if(!grade) return toast('Selecciona grado','warn');
-    n = parseInt(n);
-    if(!n || n<1) return toast('Número inválido','warn');
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    if(!ids.length) return toast('No hay estudiantes','warn');
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
-    ids.forEach((id, idx)=>{ const g = `Grupo ${ (idx % n) + 1 }`; db.groups[grade][g].push(id); });
-    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
-    ensureSave();
-    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
-    toast('Distribución completada','success');
-  }
-
-  function distributeBySize(grade, size, persistent=false){
-    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
-    if(!grade) return toast('Selecciona grado','warn');
-    size = parseInt(size);
-    if(!size || size < 1) return toast('Tamaño inválido','warn');
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    if(!ids.length) return toast('No hay estudiantes','warn');
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    // remove previous Grupo * to avoid collisions
-    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
-    let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx,idx+size); idx+=size; g++; }
-    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
-    ensureSave();
-    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
-    toast('Distribución por tamaño completada','success');
-  }
-
-  // Wire up menu buttons (search by text, case-insensitive)
-  function bindMenuButton(menuId, labelRegex, handler){
-    const menu = document.getElementById(menuId);
-    if(!menu) return;
-    const panel = menu.querySelector('.menu-panel');
-    if(!panel) return;
-    // try to find existing button with label matching regex
-    const btn = Array.from(panel.querySelectorAll('button')).find(b => labelRegex.test(b.textContent.trim().toLowerCase()));
-    if(btn){
-      btn.addEventListener('click', (e)=>{ e.stopPropagation(); handler(e); });
-      btn.style.cursor = 'pointer';
-    } else {
-      // create one
-      const newBtn = document.createElement('button');
-      newBtn.innerHTML = labelRegex.source.includes('grup') ? '<i class="fa-solid fa-users"></i> Grupos' : '<i class="fa-solid fa-layer-group"></i> Grados';
-      newBtn.addEventListener('click', (e)=>{ e.stopPropagation(); handler(e); });
-      panel.appendChild(newBtn);
-    }
-  }
-
-  // Bind "Grupos" under Herramientas
-  bindMenuButton('menu-tools', /grupos|grupo|grup/i, openGroupsManagement);
-
-  // Bind "Grados" under Clases to open groups modal (and "Borrar grado" to prompt delete)
-  bindMenuButton('menu-classes', /grado|grados|grados/i, openGroupsManagement);
-  bindMenuButton('menu-classes', /borrar grado|eliminar grado|borrar/i, () => {
-    // open a prompt to delete (use our deleteGradePrompt wrapper)
-    const g = document.getElementById('class-select')?.value || currentClass;
-    if(!g) return toast('Selecciona un grado primero','warn');
-    deleteGradePrompt(g);
-  });
-
-  // Also ensure header edit button exists and works
-  (function ensureHeaderEdit(){
-    const brand = document.querySelector('.brand');
-    if(!brand) return;
-    if(brand.querySelector('.header-edit-btn')) return;
-    const btn = document.createElement('button');
-    btn.className = 'header-edit-btn';
-    btn.style.cssText = 'margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:6px 8px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:700;';
-    btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
-    btn.addEventListener('click', (e) => { e.stopPropagation(); openInstitutionEditor(); });
-    // attach
-    const textual = brand.querySelector('div:nth-child(2)');
-    if(textual) textual.appendChild(btn); else brand.appendChild(btn);
-    // dblclick title -> open editor
-    const titleEl = brand.querySelector('div:nth-child(2) > div:first-child') || brand.querySelector('div[style*="font-weight:900"]');
-    if(titleEl){ titleEl.style.cursor='pointer'; titleEl.addEventListener('dblclick', openInstitutionEditor); }
-  })();
-
-  // Ensure that if groups modal exists with inputs/buttons, they call our robust functions
-  function wireModalButtons(){
-    // If the patch-panel buttons exist (ids from previous patches), wire them
-    const elCreateGrade = document.getElementById('patch-create-grade');
-    if(elCreateGrade) elCreateGrade.addEventListener('click', ()=> {
-      const name = (document.getElementById('patch-new-grade')?.value||'').trim();
-      if(!name) return toast('Escribe nombre de grado','warn');
-      createGrade(name);
-    });
-    const elDeleteGrade = document.getElementById('patch-delete-grade');
-    if(elDeleteGrade) elDeleteGrade.addEventListener('click', ()=> {
-      const sel = document.getElementById('patch-grade-select'); const grade = sel?.value || currentClass;
-      if(!grade) return toast('Selecciona grado', 'warn');
-      deleteGradePrompt(grade);
-    });
-    const elCreateGroup = document.getElementById('patch-create-group');
-    if(elCreateGroup) elCreateGroup.addEventListener('click', ()=> {
-      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
-      const gn = (document.getElementById('patch-new-group')?.value||'').trim();
-      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
-      if(!gn) return toast('Escribe nombre de grupo','warn');
-      createGroup(grade, gn, persistent);
-    });
-    const elDeleteGroup = document.getElementById('patch-delete-group');
-    if(elDeleteGroup) elDeleteGroup.addEventListener('click', ()=> {
-      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
-      const name = prompt('Escribe el nombre exacto del grupo a eliminar');
-      if(name) deleteGroupPrompt(grade, name);
-    });
-    const elDistribNum = document.getElementById('patch-distribute-by-number');
-    if(elDistribNum) elDistribNum.addEventListener('click', ()=> {
-      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
-      const n = parseInt(document.getElementById('patch-dist-num')?.value);
-      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
-      distributeByNumber(grade, n, persistent);
-    });
-    const elDistribSize = document.getElementById('patch-distribute-by-size');
-    if(elDistribSize) elDistribSize.addEventListener('click', ()=> {
-      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
-      const size = parseInt(document.getElementById('patch-dist-size')?.value);
-      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
-      distributeBySize(grade, size, persistent);
-    });
-
-    // Also wire main modal buttons if they exist with text "Crear grado" etc.
-    const groupsModal = document.getElementById('groups-modal') || document.getElementById('manage-groups-modal');
-    if(groupsModal){
-      const panel = groupsModal.querySelector('.modal');
-      if(panel){
-        // find buttons by text and attach fallback handlers if they don't have one
-        Array.from(panel.querySelectorAll('button')).forEach(btn => {
-          const txt = (btn.textContent||'').toLowerCase();
-          if(/crear grado|crear grado/i.test(txt) && !btn.dataset.patched){
-            btn.addEventListener('click', (e) => {
-              const name = prompt('Nombre grado (ej. 805)');
-              if(name) createGrade(name.trim());
-            });
-            btn.dataset.patched = '1';
-          }
-          if(/crear grupo|nuevo grupo/i.test(txt) && !btn.dataset.patched){
-            btn.addEventListener('click', (e) => {
-              const name = prompt('Nombre grupo (ej. Grupo A)');
-              const grade = document.getElementById('class-select')?.value || currentClass;
-              if(name) createGroup(grade, name.trim(), false);
-            });
-            btn.dataset.patched = '1';
-          }
-        });
-      }
-    }
-  }
-
-  // Run wiring now and also after a short delay (in case DOM is created later)
-  try { wireModalButtons(); } catch(e){ console.warn(e); }
-  setTimeout(wireModalButtons, 600);
-  setTimeout(wireModalButtons, 1600);
-
-  // expose for debug/testing
-  window.__alm_patch = {
-    openGroupsManagement, openInstitutionEditor, createGrade, createGroup, deleteGradePrompt, deleteGroupPrompt, distributeByNumber, distributeBySize
-  };
-
-  toast('Parche de acciones aplicado — prueba Herramientas→Grupos y Clases→Grados', 'info', 2400);
-})();
-</script>
-  <!-- PARCHE: UI mejorada para Manage Groups (grado selector, crear grupos independiente, cuadrícula de estudiantes y asignación) -->
-<script>
-(function installGroupManagerUI(){
-  // Guardado seguro y toasts
-  const STORAGE_KEY = 'fantasyclass_alm_db';
-  const toast = (msg, type='info', t=2500) => { if(typeof showToast === 'function'){ showToast(msg,type,t); } else { console.log(`[${type}] ${msg}`); } };
-  const safeSave = () => { if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB() falló', e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('localStorage save falló', e); } };
-
-  // Find the modal container we will overwrite (non-destructive: only inner html)
-  const modalEl = document.getElementById('manage-groups-modal') || document.getElementById('groups-modal');
-  if(!modalEl){
-    console.warn('[patchGroupUI] No se encontró manage-groups-modal ni groups-modal en el DOM.');
-    return;
-  }
-  const container = modalEl.querySelector('.modal');
-  if(!container){
-    console.warn('[patchGroupUI] No se encontró .modal dentro del modal target.');
-    return;
-  }
-
-  // Build new UI HTML (keeps existing header h3 intact)
-  const patchHTML = `
-    <div id="gm-top" style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-      <div style="display:flex;gap:8px;align-items:center">
-        <label style="font-weight:800">Grado:</label>
-        <select id="gm-grade-select" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
-        <input id="gm-new-grade" placeholder="Nuevo grado (ej. 805)" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-        <button class="btn" id="gm-create-grade">Crear grado</button>
-        <button class="btn red" id="gm-delete-grade">Eliminar grado</button>
-      </div>
-    </div>
-
-    <div id="gm-group-creator" style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
-      <label style="font-weight:800">Crear grupo (en grado seleccionado):</label>
-      <input id="gm-new-group" placeholder="Nombre grupo (ej. Grupo A)" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-      <button class="btn" id="gm-create-group">Crear grupo</button>
-      <label style="margin-left:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="gm-persistent"> Reinos (persistente)</label>
-    </div>
-
-    <div id="gm-students-panel" style="display:flex;gap:12px;align-items:flex-start">
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:800">Estudiantes</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <input id="gm-filter" placeholder="Buscar..." style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-            <button class="btn" id="gm-select-all">Seleccionar todos</button>
-            <button class="btn ghost" id="gm-clear-selection">Limpiar</button>
-          </div>
-        </div>
-        <div id="gm-student-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;max-height:360px;overflow:auto;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)"></div>
-      </div>
-
-      <div style="width:320px">
-        <div style="font-weight:800;margin-bottom:8px">Grupos en grado <span id="gm-selected-grade-label"></span></div>
-        <div id="gm-groups-list" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)"></div>
-
-        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
-          <label style="font-weight:800">Asignar selección a:</label>
-          <select id="gm-assign-select" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
-          <div style="display:flex;gap:8px">
-            <button class="btn" id="gm-assign-btn">Asignar seleccionados</button>
-            <button class="btn ghost" id="gm-unassign-btn">Quitar seleccionados</button>
-          </div>
-        </div>
-
-        <div style="margin-top:12px;border-top:1px dashed rgba(255,255,255,0.04);padding-top:10px">
-          <div style="font-weight:800">Distribución rápida</div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input id="gm-dist-num" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-            <button class="btn" id="gm-dist-by-num">Distribuir por nº</button>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input id="gm-dist-size" type="number" min="1" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
-            <button class="btn" id="gm-dist-by-size">Distribuir por tamaño</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  // Insert UI (replace current modal body content after header h3)
-  const h3 = container.querySelector('h3');
-  if(h3){
-    // remove any previous injected panel to avoid duplicates
-    const old = container.querySelector('#gm-top');
-    if(old) old.remove();
-    h3.insertAdjacentHTML('afterend', patchHTML);
-  } else {
-    container.insertAdjacentHTML('afterbegin', patchHTML);
-  }
-
-  // Helper renderers
-  function populateGradeSelect(){
-    const sel = document.getElementById('gm-grade-select');
-    if(!sel) return;
-    sel.innerHTML = '';
-    Object.keys(db.classes || {}).forEach(k => {
-      const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${(db.classes[k]||[]).length})`; sel.appendChild(opt);
-    });
-    if(currentClass && db.classes[currentClass]) sel.value = currentClass;
-    else sel.value = sel.options[0]?.value || '';
-    document.getElementById('gm-selected-grade-label').innerText = sel.value || '-';
-    // sync with main class-select if present
-    const mainSel = document.getElementById('class-select');
-    if(mainSel) mainSel.value = sel.value;
-  }
-
-  function populateGroupsListAndAssign(){
-    const selGrade = document.getElementById('gm-grade-select').value;
-    const groupsList = document.getElementById('gm-groups-list');
-    const assignSelect = document.getElementById('gm-assign-select');
-    groupsList.innerHTML = ''; assignSelect.innerHTML = '';
-    const groups = (db.groups && db.groups[selGrade]) ? db.groups[selGrade] : {};
-    Object.keys(groups).forEach(g => {
-      const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.justifyContent='space-between'; wrapper.style.alignItems='center';
-      const left = document.createElement('div'); left.innerHTML = `<strong>${g}</strong> <div class="small" style="color:var(--muted)">${groups[g].length} integrantes</div>`;
-      const right = document.createElement('div'); right.style.display='flex'; right.style.gap='6px';
-      const btnView = document.createElement('button'); btnView.className='btn ghost'; btnView.innerText='Ver'; btnView.onclick = ()=> {
-        // scroll student grid and highlight group members
-        const grid = document.getElementById('gm-student-grid');
-        grid.querySelectorAll('.member-card').forEach(c => c.classList.remove('member-highlight'));
-        groups[g].forEach(id => {
-          const el = document.querySelector(`.member-card[data-id="${id}"]`);
-          if(el){ el.classList.add('member-highlight'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
-        });
-      };
-      const btnDel = document.createElement('button'); btnDel.className='btn red'; btnDel.innerText='Eliminar'; btnDel.onclick = ()=> {
-        if(!confirm(`Eliminar grupo "${g}" en ${selGrade}?`)) return;
-        delete db.groups[selGrade][g];
-        if(db.groupsMeta && db.groupsMeta[selGrade]) delete db.groupsMeta[selGrade][g];
-        safeSave(); populateGroupsListAndAssign(); renderGroups(); toast('Grupo eliminado','success');
-      };
-      right.appendChild(btnView); right.appendChild(btnDel);
-      wrapper.appendChild(left); wrapper.appendChild(right);
-      groupsList.appendChild(wrapper);
-
-      const opt = document.createElement('option'); opt.value = g; opt.textContent = g; assignSelect.appendChild(opt);
-    });
-    if(assignSelect.options.length===0){ const o = document.createElement('option'); o.value=''; o.textContent='(Sin grupos)'; assignSelect.appendChild(o); }
-  }
-
-  function renderStudentGrid(filter=''){
-    const grid = document.getElementById('gm-student-grid');
-    grid.innerHTML = '';
-    const students = db.classes[document.getElementById('gm-grade-select').value] || [];
-    const q = (filter||'').toLowerCase();
-    students.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-      const card = document.createElement('div'); card.className = 'member-card'; card.dataset.id = s.id;
-      card.style.padding='8px'; card.style.borderRadius='8px'; card.style.background='rgba(255,255,255,0.02)'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='6px';
-      card.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><input type="checkbox" class="gm-select-checkbox" data-id="${s.id}"><div style="width:40px;height:40px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center;font-weight:900">${s.name.charAt(0)}</div><div style="flex:1"><div style="font-weight:800">${s.name}</div><div class="small" style="color:var(--muted)">ID: ${s.id}</div></div></div>`;
-      grid.appendChild(card);
-    });
-    // style highlight class
-    const style = document.getElementById('gm-patch-styles');
-    if(!style){
-      const st = document.createElement('style'); st.id = 'gm-patch-styles';
-      st.innerHTML = `.member-card.member-highlight{ box-shadow: 0 8px 24px rgba(0,0,0,0.6); border:2px solid rgba(99,102,241,0.2); transform:scale(1.01);} .member-card .gm-select-checkbox{ transform:scale(1.1); }`;
-      document.head.appendChild(st);
-    }
-  }
-
-  // Selection helpers
-  function getSelectedStudentIds(){
-    return Array.from(document.querySelectorAll('.gm-select-checkbox:checked')).map(ch => ch.dataset.id);
-  }
-  function selectAllVisible(){
-    document.querySelectorAll('.gm-select-checkbox').forEach(ch => ch.checked = true);
-  }
-  function clearSelection(){
-    document.querySelectorAll('.gm-select-checkbox').forEach(ch => ch.checked = false);
-    document.querySelectorAll('.member-card').forEach(c => c.classList.remove('member-highlight'));
-  }
-
-  // Assign selected to group
-  function assignSelectedToGroup(){
-    const ids = getSelectedStudentIds();
-    if(!ids.length) return toast('Selecciona al menos 1 estudiante','warn');
-    const groupName = document.getElementById('gm-assign-select').value;
-    const grade = document.getElementById('gm-grade-select').value;
-    if(!groupName) return toast('Selecciona un grupo destino','warn');
-    db.groups = db.groups || {}; db.groups[grade] = db.groups[grade] || {};
-    ids.forEach(id => {
-      // remove from other groups first
-      Object.keys(db.groups[grade]||{}).forEach(g => { db.groups[grade][g] = db.groups[grade][g].filter(x => x !== id); });
-      // add to group
-      if(!db.groups[grade][groupName].includes(id)) db.groups[grade][groupName].push(id);
-    });
-    safeSave(); populateGroupsListAndAssign(); renderStudentGrid(document.getElementById('gm-filter').value||'');
-    toast('Asignación completa','success');
-  }
-
-  function unassignSelectedFromGroup(){
-    const ids = getSelectedStudentIds();
-    if(!ids.length) return toast('Selecciona al menos 1 estudiante','warn');
-    const groupName = document.getElementById('gm-assign-select').value;
-    const grade = document.getElementById('gm-grade-select').value;
-    if(!groupName) return toast('Selecciona el grupo del cual quitar','warn');
-    ids.forEach(id => {
-      if(db.groups && db.groups[grade] && db.groups[grade][groupName]){
-        db.groups[grade][groupName] = db.groups[grade][groupName].filter(x => x !== id);
-      }
-    });
-    safeSave(); populateGroupsListAndAssign(); renderStudentGrid(document.getElementById('gm-filter').value||'');
-    toast('Quitados del grupo','success');
-  }
-
-  // Event wiring
-  // Grade select change
-  document.getElementById('gm-grade-select').addEventListener('change', (e) => {
-    const g = e.target.value; document.getElementById('gm-selected-grade-label').innerText = g; // sync main select if present
-    const main = document.getElementById('class-select'); if(main) main.value = g;
-    populateGroupsListAndAssign();
-    renderStudentGrid(document.getElementById('gm-filter').value||'');
-  });
-
-  // Create/Delete grade
-  document.getElementById('gm-create-grade').addEventListener('click', ()=> {
-    const name = (document.getElementById('gm-new-grade').value||'').trim();
-    if(!name) return toast('Escribe nombre de grado','warn');
-    if(db.classes[name]) return toast('Grado ya existe','warn');
-    db.classes[name] = []; db.groups[name] = {}; safeSave(); populateGradeSelect(); renderStudentGrid(); toast('Grado creado','success');
-    document.getElementById('gm-new-grade').value='';
-  });
-  document.getElementById('gm-delete-grade').addEventListener('click', ()=> {
-    const grade = document.getElementById('gm-grade-select').value;
-    if(!grade) return toast('Selecciona grado','warn');
-    showConfirm('Eliminar grado', `Eliminar grado ${grade} y sus datos?`, ()=>{
-      delete db.classes[grade]; if(db.groups && db.groups[grade]) delete db.groups[grade]; if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade];
-      safeSave(); populateGradeSelect(); populateGroupsListAndAssign(); renderStudentGrid(); toast('Grado eliminado','success');
-    });
-  });
-
-  // Create group
-  document.getElementById('gm-create-group').addEventListener('click', ()=> {
-    const gname = (document.getElementById('gm-new-group').value||'').trim();
-    const grade = document.getElementById('gm-grade-select').value;
-    const persistent = !!document.getElementById('gm-persistent').checked;
-    if(!gname) return toast('Escribe nombre de grupo','warn');
-    db.groups = db.groups || {}; db.groups[grade] = db.groups[grade] || {};
-    if(db.groups[grade][gname]) return toast('Grupo existe','warn');
-    db.groups[grade][gname] = [];
-    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; db.groupsMeta[grade][gname] = { persistent: !!persistent };
-    safeSave(); document.getElementById('gm-new-group').value=''; populateGroupsListAndAssign(); toast('Grupo creado','success');
-  });
-
-  // Student search/filter
-  document.getElementById('gm-filter').addEventListener('input', (e) => {
-    renderStudentGrid(e.target.value || '');
-  });
-
-  // Select all / clear
-  document.getElementById('gm-select-all').addEventListener('click', ()=> selectAllVisible());
-  document.getElementById('gm-clear-selection').addEventListener('click', ()=> clearSelection());
-
-  // Assign / Unassign buttons
-  document.getElementById('gm-assign-btn').addEventListener('click', assignSelectedToGroup);
-  document.getElementById('gm-unassign-btn').addEventListener('click', unassignSelectedFromGroup);
-
-  // Distribution
-  document.getElementById('gm-dist-by-num').addEventListener('click', ()=> {
-    const n = parseInt(document.getElementById('gm-dist-num').value);
-    const grade = document.getElementById('gm-grade-select').value;
-    const persistent = !!document.getElementById('gm-persistent').checked;
-    if(!n || n<1) return toast('Número inválido','warn');
-    // use earlier helper if present
-    if(typeof window.distributeByNumber === 'function'){ window.distributeByNumber(); } // existing if patched earlier
-    // else local
-    // shuffle & distribute
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    if(!ids.length) return toast('No hay estudiantes','warn');
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
-    ids.forEach((id, idx) => { const g = `Grupo ${ (idx % n) +1 }`; db.groups[grade][g].push(id); });
-    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
-    safeSave(); populateGroupsListAndAssign(); toast('Distribuido por número','success');
-  });
-
-  document.getElementById('gm-dist-by-size').addEventListener('click', ()=> {
-    const size = parseInt(document.getElementById('gm-dist-size').value);
-    const grade = document.getElementById('gm-grade-select').value;
-    const persistent = !!document.getElementById('gm-persistent').checked;
-    if(!size || size<1) return toast('Tamaño inválido','warn');
-    const ids = (db.classes[grade]||[]).map(s=>s.id);
-    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-    db.groups[grade] = db.groups[grade] || {};
-    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
-    let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; }
-    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
-    safeSave(); populateGroupsListAndAssign(); toast('Distribuido por tamaño','success');
-  });
-
-  // Initial populate
-  populateGradeSelect();
-  populateGroupsListAndAssign();
-  renderStudentGrid();
-
-  // Ensure external UI refresh functions are called when modal opens (in case modal reconstructed)
-  const origOpenGroups = window.openGroupsModal;
-  window.openGroupsModal = function(){
-    if(typeof origOpenGroups === 'function') origOpenGroups();
-    setTimeout(()=>{ populateGradeSelect(); populateGroupsListAndAssign(); renderStudentGrid(); }, 200);
-  };
-
-})();
-</script>
-<!-- PARCHE RÁPIDO: Asegurar ficha mejorada y override de openFicha -->
-<script>
-(function ensureEnhancedFicha(){
-  // Ejecutar después de que el DOM esté listo
-  function ready(fn){ if(document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
-
-  ready(()=> {
-    const STORAGE_KEY = 'fantasyclass_alm_db';
-    const HP_MAX = 5;
-    const toast = (m)=>{ if(typeof showToast === 'function') showToast(m,'info',2000); else console.log('[TOAST]',m); };
-
-    // Local helper: busca el modal de ficha de forma flexible
-    function findFichaModal(){
-      let modal = document.getElementById('ficha-modal');
-      if(modal) return modal;
-      // busca por clase y estructura
-      const candidates = Array.from(document.querySelectorAll('.modal-backdrop, .modal'));
-      for(const c of candidates){
-        if(c.querySelector && (c.querySelector('#ficha-history') || c.querySelector('[id^="ficha"]') || c.querySelector('.ficha-history'))) return c;
-      }
-      return null;
-    }
-
-    const fichaWrapper = findFichaModal();
-    if(!fichaWrapper){
-      console.warn('[patchFicha] No encontré el modal de ficha (id="ficha-modal"). Asegúrate de que exista antes de aplicar el parche.');
-      return;
-    }
-
-    // Contenedor donde inyectaremos el UI. Preferimos `.modal.white` dentro del backdrop, si existe.
-    let modalContent = fichaWrapper.querySelector('.modal.white') || fichaWrapper.querySelector('.modal') || fichaWrapper;
-
-    // Build UI only once
-    function buildUI(){
-      if(modalContent.dataset.patchedFicha === '1') return;
-      modalContent.dataset.patchedFicha = '1';
-
-      // Keep existing close button if present
-      const closeBtn = modalContent.querySelector('.close-btn');
-      // Clear content but keep close button
-      modalContent.innerHTML = '';
-      if(closeBtn) modalContent.appendChild(closeBtn);
-
-      // Compose header, tabs and panels (compact)
-      modalContent.insertAdjacentHTML('beforeend', `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-          <div id="f_avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:900">A</div>
-          <div style="flex:1">
-            <div id="f_name" style="font-weight:900;font-size:18px;color:#111">Nombre</div>
-            <div id="f_sub" style="color:#666">Ficha • <span id="f_period"></span></div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <div class="btn" id="f_save_all">Guardar</div>
-            <div class="btn" id="f_export">Exportar</div>
-          </div>
-        </div>
-
-        <div id="f_tabs" style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-          <div class="f_tab" data-tab="personal" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:800;background:rgba(255,255,255,0.02)">Personal / Contacto</div>
-          <div class="f_tab" data-tab="actas" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:800;background:rgba(255,255,255,0.02)">Actas / Reuniones</div>
-          <div class="f_tab" data-tab="observador" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:800;background:rgba(255,255,255,0.02)">Observador</div>
-          <div class="f_tab" data-tab="game" style="padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:800;background:rgba(255,255,255,0.02)">Gamificación</div>
-        </div>
-
-        <div id="f_panels" style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
-          <div id="panel-personal" style="background:#fff;padding:10px;border-radius:8px;border:1px solid #eee;max-height:420px;overflow:auto">
-            <div style="font-weight:800;margin-bottom:8px">Datos Personales y Contacto</div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <input id="p_name" placeholder="Nombre completo" class="ficha-input">
-              <input id="p_doc" placeholder="Documento" class="ficha-input">
-              <div style="display:flex;gap:8px">
-                <input id="p_course" placeholder="Curso / Grupo" class="ficha-input" readonly>
-                <input id="p_birth" type="date" class="ficha-input">
-              </div>
-              <div style="display:flex;gap:8px">
-                <input id="p_eps" placeholder="EPS" class="ficha-input">
-                <input id="p_blood" placeholder="Grupo Sanguíneo / RH" class="ficha-input">
-              </div>
-              <hr>
-              <input id="p_acudiente" placeholder="Nombre acudiente" class="ficha-input">
-              <div style="display:flex;gap:8px">
-                <input id="p_phone" placeholder="Teléfono principal" class="ficha-input">
-                <input id="p_emerg" placeholder="Teléfono emergencia" class="ficha-input">
-              </div>
-              <input id="p_email" placeholder="Correo electrónico" class="ficha-input">
-            </div>
-          </div>
-
-          <div id="panel-actas" style="background:#fff;padding:10px;border-radius:8px;border:1px solid #eee;max-height:420px;overflow:auto">
-            <div style="font-weight:800;margin-bottom:8px">Registro de Actas y Reuniones</div>
-            <div style="display:flex;gap:8px;margin-bottom:8px">
-              <input id="a_fecha" type="date" class="ficha-input" style="width:160px">
-              <select id="a_motivo" class="ficha-input" style="width:calc(100% - 180px)">
-                <option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option>
-              </select>
-            </div>
-            <textarea id="a_resumen" rows="3" class="ficha-textarea" placeholder="Resumen..."></textarea>
-            <textarea id="a_compromisos" rows="2" class="ficha-textarea" placeholder="Compromisos..."></textarea>
-            <div style="display:flex;justify-content:flex-end;margin-top:8px">
-              <div class="btn" id="a_add">Agregar acta</div>
-            </div>
-            <div id="actas_list" style="margin-top:10px"></div>
-          </div>
-
-          <div id="panel-obs" style="background:#fff;padding:10px;border-radius:8px;border:1px solid #eee;max-height:420px;overflow:auto">
-            <div style="font-weight:800;margin-bottom:8px">Observador Convivencial</div>
-            <div style="display:flex;gap:8px;margin-bottom:8px">
-              <input id="o_fecha" type="date" class="ficha-input" style="width:160px">
-              <select id="o_tipo" class="ficha-input" style="width:calc(100% - 180px)"><option>Incidente</option><option>Observación</option></select>
-            </div>
-            <select id="o_clasif" class="ficha-input"><option>Leve</option><option>Moderado</option><option>Grave</option></select>
-            <textarea id="o_desc" rows="3" class="ficha-textarea" placeholder="Descripción..."></textarea>
-            <textarea id="o_descargo" rows="2" class="ficha-textarea" placeholder="Descargos..."></textarea>
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-              <select id="o_estado" class="ficha-input" style="width:140px"><option>En proceso</option><option>Cerrado</option></select>
-              <div class="btn" id="o_add">Agregar registro</div>
-            </div>
-            <div id="obs_list" style="margin-top:10px"></div>
-          </div>
-
-          <div id="panel-game" style="background:#fff;padding:10px;border-radius:8px;border:1px solid #eee;max-height:420px;overflow:auto">
-            <div style="font-weight:800;margin-bottom:8px">Gamificación / RPG</div>
-            <div style="display:flex;gap:8px;margin-bottom:8px">
-              <input id="g_level" placeholder="Nivel" class="ficha-input" style="width:100px"/>
-              <input id="g_xp" type="number" placeholder="XP" class="ficha-input" style="width:120px"/>
-              <input id="g_hp" type="number" placeholder="HP" class="ficha-input" style="width:120px"/>
-            </div>
-            <input id="g_clan" placeholder="Clan / Equipo" class="ficha-input">
-            <input id="g_badges" placeholder="Insignias (coma-sep.)" class="ficha-input">
-            <div style="display:flex;justify-content:flex-end;margin-top:8px">
-              <div class="btn" id="g_save">Guardar Gamificación</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-top:10px;background:#fff;padding:8px;border-radius:8px;border:1px solid #eee;max-height:140px;overflow:auto">
-          <div style="font-weight:800;margin-bottom:6px">Historial</div>
-          <div id="f_quick_history"></div>
-        </div>
-      `);
-
-      // Wiring tabs
-      const tabs = modalContent.querySelectorAll('.f_tab');
-      tabs.forEach(t=> t.addEventListener('click', ()=> {
-        tabs.forEach(x=> x.style.boxShadow=''); tabs.forEach(x=> x.style.background='rgba(255,255,255,0.02)');
-        t.style.background='linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))';
-        // switch panels: simple show/hide by data-tab
-        const map = {personal:'panel-personal', actas:'panel-actas', observador:'panel-obs', game:'panel-game'};
-        Object.values(map).forEach(id => { const el=modalContent.querySelector('#'+id); if(el) el.style.display = 'none'; });
-        const showId = map[t.dataset.tab]; const toShow = modalContent.querySelector('#'+showId); if(toShow) toShow.style.display = 'block';
-      }));
-      // activate first tab
-      if(tabs[0]) tabs[0].click();
-
-      // Attach buttons actions
-      modalContent.querySelector('#a_add').addEventListener('click', ()=>{
-        const sid = modalContent.dataset.currentStudent;
-        if(!sid) return toast('Abre ficha primero');
-        const s = findStudentById(sid); if(!s) return toast('Estudiante no encontrado');
-        s.actas = s.actas || [];
-        s.actas.push({ id:Date.now(), fecha: modalContent.querySelector('#a_fecha').value || new Date().toLocaleDateString(), motivo: modalContent.querySelector('#a_motivo').value, resumen: modalContent.querySelector('#a_resumen').value, compromisos: modalContent.querySelector('#a_compromisos').value });
-        persistDB(); renderActasUI(s);
-        modalContent.querySelector('#a_resumen').value=''; modalContent.querySelector('#a_compromisos').value='';
-        toast('Acta guardada');
-      });
-
-      modalContent.querySelector('#o_add').addEventListener('click', ()=>{
-        const sid = modalContent.dataset.currentStudent;
-        if(!sid) return toast('Abre ficha primero');
-        const s = findStudentById(sid); if(!s) return toast('Estudiante no encontrado');
-        s.observador = s.observador || [];
-        s.observador.push({ id:Date.now(), fecha: modalContent.querySelector('#o_fecha').value || new Date().toLocaleDateString(), tipo: modalContent.querySelector('#o_tipo').value, clasif: modalContent.querySelector('#o_clasif').value, desc: modalContent.querySelector('#o_desc').value, descargo: modalContent.querySelector('#o_descargo').value, estado: modalContent.querySelector('#o_estado').value });
-        persistDB(); renderObsUI(s);
-        modalContent.querySelector('#o_desc').value=''; modalContent.querySelector('#o_descargo').value='';
-        toast('Registro convivencial guardado');
-      });
-
-      modalContent.querySelector('#g_save').addEventListener('click', ()=>{
-        const sid = modalContent.dataset.currentStudent;
-        if(!sid) return toast('Abre ficha primero');
-        const s = findStudentById(sid); if(!s) return toast('Estudiante no encontrado');
-        s.gamification = s.gamification || {};
-        s.gamification.level = modalContent.querySelector('#g_level').value;
-        s.gamification.xp = parseInt(modalContent.querySelector('#g_xp').value) || 0;
-        s.gamification.hp = parseInt(modalContent.querySelector('#g_hp').value) || HP_MAX;
-        s.gamification.clan = modalContent.querySelector('#g_clan').value;
-        s.gamification.badges = (modalContent.querySelector('#g_badges').value || '').split(',').map(x=>x.trim()).filter(Boolean);
-        persistDB(); toast('Gamificación actualizada');
-      });
-
-      modalContent.querySelector('#f_save_all').addEventListener('click', ()=>{
-        const sid = modalContent.dataset.currentStudent; if(!sid) return toast('Abre ficha primero');
-        const s = findStudentById(sid); if(!s) return toast('Estudiante no encontrado');
-        // personal fields
-        s.name = modalContent.querySelector('#p_name').value || s.name;
-        s.document = modalContent.querySelector('#p_doc').value || s.document;
-        s.birthdate = modalContent.querySelector('#p_birth').value || s.birthdate;
-        s.eps = modalContent.querySelector('#p_eps').value || s.eps;
-        s.sangre = modalContent.querySelector('#p_blood').value || s.sangre;
-        s.acudiente = { name: modalContent.querySelector('#p_acudiente').value || '', phone: modalContent.querySelector('#p_phone').value || '', emerg: modalContent.querySelector('#p_emerg').value || '', email: modalContent.querySelector('#p_email').value || '' };
-        persistDB(); toast('Ficha guardada');
-        // refresh student grid if exists
-        if(typeof renderStudentGrid === 'function') renderStudentGrid(); if(typeof renderStudents === 'function') renderStudents();
-      });
-
-      // Export button
-      modalContent.querySelector('#f_export').addEventListener('click', ()=>{
-        const sid = modalContent.dataset.currentStudent;
-        if(!sid) return toast('Abre ficha primero');
-        if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel();
-        else toast('Función export no disponible');
-      });
-
-    } // end buildUI
-
-    // Helper functions used above
-    function persistDB(){ if(typeof saveDB==='function'){ try{ saveDB(); return; }catch(e){ console.warn(e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); } }
-    function findStudentById(id){ for(const g of Object.keys(db.classes||{})){ const s = (db.classes[g]||[]).find(x=>x.id===id); if(s) return s; } return null; }
-
-    function renderActasUI(student){
-      const list = modalContent.querySelector('#actas_list'); if(!list) return;
-      list.innerHTML = '';
-      const arr = student.actas||[];
-      if(!arr.length) { list.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
-      arr.slice().reverse().forEach(a=>{
-        const el = document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eee';
-        el.innerHTML = `<div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div>`;
-        list.appendChild(el);
-      });
-    }
-
-    function renderObsUI(student){
-      const list = modalContent.querySelector('#obs_list'); if(!list) return;
-      list.innerHTML = '';
-      const arr = student.observador||[];
-      if(!arr.length) { list.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
-      arr.slice().reverse().forEach(o=>{
-        const el = document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eee';
-        el.innerHTML = `<div style="font-weight:800">${o.tipo} • ${o.fecha}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div>`;
-        list.appendChild(el);
-      });
-    }
-
-    // New openFicha that fills and shows the enhanced UI
-    function openFichaEnhanced(id){
-      buildUI();
-      // find student (search in classes)
-      const student = findStudentById(id);
-      if(!student) { alert('Estudiante no encontrado'); return; }
-      // fill modalContent dataset current student
-      modalContent.dataset.currentStudent = id;
-      // fill header
-      modalContent.querySelector('#f_avatar').innerText = (student.name||' ')[0] || 'A';
-      modalContent.querySelector('#f_name').innerText = student.name || '';
-      modalContent.querySelector('#f_period').innerText = document.getElementById('period-select')?.value || '';
-
-      // personal
-      modalContent.querySelector('#p_name').value = student.name || '';
-      modalContent.querySelector('#p_doc').value = student.document || student.doc || '';
-      // course/group: try to compute
-      let course = '';
-      for(const g of Object.keys(db.classes||{})){ if((db.classes[g]||[]).find(s=>s.id===id)){ course = g; break; } }
-      modalContent.querySelector('#p_course').value = course + ' / ' + ( findStudentGroup(course, id) || '-' );
-      modalContent.querySelector('#p_birth').value = student.birthdate || student.fnac || '';
-      modalContent.querySelector('#p_eps').value = student.eps || '';
-      modalContent.querySelector('#p_blood').value = student.sangre || '';
-      modalContent.querySelector('#p_acudiente').value = (student.acudiente && student.acudiente.name) || student.acudiente || '';
-      modalContent.querySelector('#p_phone').value = (student.acudiente && student.acudiente.phone) || student.phone || '';
-      modalContent.querySelector('#p_emerg').value = student.phone_emerg || '';
-      modalContent.querySelector('#p_email').value = student.email || '';
-
-      // actas / obs / gamification
-      renderActasUI(student); renderObsUI(student);
-      modalContent.querySelector('#g_level').value = (student.gamification && student.gamification.level) || student.level || 1;
-      modalContent.querySelector('#g_xp').value = (student.gamification && student.gamification.xp) || student.xp || 0;
-      modalContent.querySelector('#g_hp').value = (student.gamification && student.gamification.hp) || student.hp || HP_MAX;
-      modalContent.querySelector('#g_clan').value = (student.gamification && student.gamification.clan) || student.clan || '';
-      modalContent.querySelector('#g_badges').value = (student.gamification && (student.gamification.badges||[]).join(', ')) || (student.badges||[]).join(', ');
-
-      // quick history
-      const quick = modalContent.querySelector('#f_quick_history'); quick.innerHTML = '';
-      (student.history||[]).slice().reverse().slice(0,8).forEach(h=>{
-        const di = document.createElement('div'); di.style.padding='6px'; di.style.borderBottom='1px solid #eee';
-        di.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div>`;
-        quick.appendChild(di);
-      });
-
-      showModal('ficha-modal');
-    }
-
-    // helper: find student's group in grade
-    function findStudentGroup(grade, sid){
-      if(!grade || !db.groups || !db.groups[grade]) return null;
-      for(const g of Object.keys(db.groups[grade])){
-        if(db.groups[grade][g].includes(sid)) return g;
-      }
-      return null;
-    }
-
-    // override global openFicha function so old buttons keep working
-    window.openFicha = function(id){ try{ openFichaEnhanced(id); }catch(e){ console.error(e); alert('Error abriendo ficha'); } };
-
-    // expose internal for debug
-    window.openFichaEnhanced = openFichaEnhanced;
-
-    // small persistence alias
-    function persist(){ if(typeof saveDB === 'function'){ try{ saveDB(); }catch(e){ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } } else { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } }
-
-    // done
-    console.log('[patchFicha] Ficha mejorada instalada y openFicha overriden.');
-  }); // ready
-})();
-</script>
-  <!-- PARCHE: Ficha organizada y función de guardado saveFicha(id) -->
-<script>
-(function enhancedFichaWithSave(){
-  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'fantasyclass_alm_db';
+/* ========== CONSOLIDATED: Enhanced Ficha UI injection (single, robust) ========== */
+(function enhancedFichaInjection(){
   const HP_DEFAULT = 5;
-  const useToast = (msg, type='info', t=2500) => { if(typeof showToast === 'function') showToast(msg, type, t); else console.log(`[${type}] ${msg}`); };
-  const persistDB = () => {
-    if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } }
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e){ console.warn('localStorage write failed', e); }
-  };
 
-  function ready(fn){ if(document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
-
-  ready(() => {
-    // Find ficha modal container robustly
-    const fichaBackdrop = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]') || null;
-    if(!fichaBackdrop){ console.warn('[enhancedFicha] No se encontró el modal ficha (id="ficha-modal")'); return; }
-    const modalContent = fichaBackdrop.querySelector('.modal.white') || fichaBackdrop.querySelector('.modal') || fichaBackdrop;
-
-    // Avoid injecting twice
-    if(modalContent.dataset.enhancedFicha === '1') return;
-    modalContent.dataset.enhancedFicha = '1';
-
-    // Preserve close button if exists
-    const closeBtn = modalContent.querySelector('.close-btn');
-    // Clear content and rebuild structured UI
-    modalContent.innerHTML = '';
-    if(closeBtn) modalContent.appendChild(closeBtn);
-
-    // Compact organized layout: header + tabs + single-column content for compactness
-    modalContent.insertAdjacentHTML('beforeend', `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
-        <div id="f_avatar_large" style="width:64px;height:64px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:900">A</div>
-        <div style="flex:1">
-          <div id="f_name_large" style="font-weight:900;font-size:18px;color:#111">Nombre estudiante</div>
-          <div id="f_subtitle" style="color:#666">Ficha • <span id="f_period_label"></span></div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <div class="btn" id="f_save_button">Guardar</div>
-          <div class="btn" id="f_export_button">Exportar</div>
-        </div>
-      </div>
-
-      <div id="f_tabs" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-        <button class="f_tab_btn" data-tab="personal">1 • Personal / Contacto</button>
-        <button class="f_tab_btn" data-tab="actas">2 • Actas / Reuniones</button>
-        <button class="f_tab_btn" data-tab="observador">3 • Observador</button>
-        <button class="f_tab_btn" data-tab="gamificacion">4 • Gamificación</button>
-      </div>
-
-      <div id="f_tab_panels" style="display:grid;grid-template-columns:1fr;gap:12px">
-        <!-- Personal -->
-        <section id="tab-personal" class="f_tab_panel" style="display:block;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
-          <div style="font-weight:800;margin-bottom:8px">Datos Personales y Contacto</div>
-          <div style="display:flex;flex-direction:column;gap:8px">
-            <input id="f_field_name" class="f_input" placeholder="Nombre completo">
-            <div style="display:flex;gap:8px">
-              <input id="f_field_doc" class="f_input" placeholder="Documento">
-              <input id="f_field_birth" type="date" class="f_input" placeholder="Fecha de nacimiento">
-            </div>
-            <div style="display:flex;gap:8px">
-              <input id="f_field_course" class="f_input" placeholder="Curso (ej. 801)" readonly>
-              <input id="f_field_group" class="f_input" placeholder="Grupo (ej. Grupo A)" readonly>
-            </div>
-            <div style="display:flex;gap:8px">
-              <input id="f_field_eps" class="f_input" placeholder="EPS">
-              <input id="f_field_blood" class="f_input" placeholder="Grupo Sanguíneo / RH">
-            </div>
-            <hr>
-            <input id="f_field_parent" class="f_input" placeholder="Nombres acudientes">
-            <div style="display:flex;gap:8px">
-              <input id="f_field_phone" class="f_input" placeholder="Teléfono principal">
-              <input id="f_field_phone_emerg" class="f_input" placeholder="Teléfono emergencia">
-            </div>
-            <input id="f_field_email" class="f_input" placeholder="Correo electrónico">
-          </div>
-        </section>
-
-        <!-- Actas -->
-        <section id="tab-actas" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
-          <div style="font-weight:800;margin-bottom:8px">Registro de Actas y Reuniones</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input id="a_fecha" type="date" class="f_input" style="width:160px">
-            <select id="a_motivo" class="f_input" style="flex:1"><option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option></select>
-          </div>
-          <textarea id="a_resumen" rows="3" class="f_input" placeholder="Resumen / descargos..."></textarea>
-          <textarea id="a_compromisos" rows="2" class="f_input" placeholder="Compromisos / intervenciones..."></textarea>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-            <div class="btn" id="a_add_btn">Agregar Acta</div>
-          </div>
-          <div id="a_list" style="margin-top:10px;max-height:220px;overflow:auto"></div>
-        </section>
-
-        <!-- Observador -->
-        <section id="tab-observador" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
-          <div style="font-weight:800;margin-bottom:8px">Observador Convivencial</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input id="o_fecha" type="date" class="f_input" style="width:160px">
-            <select id="o_tipo" class="f_input" style="flex:1"><option>Incidente</option><option>Observación</option><option>Reporte</option></select>
-          </div>
-          <select id="o_clasif" class="f_input"><option>Leve</option><option>Moderado</option><option>Grave</option></select>
-          <textarea id="o_desc" rows="3" class="f_input" placeholder="Registro / ocurrencia..."></textarea>
-          <textarea id="o_descargo" rows="2" class="f_input" placeholder="Descargos del estudiante / acudiente..."></textarea>
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-            <select id="o_estado" class="f_input" style="width:160px"><option>En proceso</option><option>Cerrado</option><option>Derivado</option></select>
-            <div class="btn" id="o_add_btn">Agregar Registro</div>
-          </div>
-          <div id="o_list" style="margin-top:10px;max-height:220px;overflow:auto"></div>
-        </section>
-
-        <!-- Gamificación -->
-        <section id="tab-game" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
-          <div style="font-weight:800;margin-bottom:8px">Elementos Gamificados</div>
-          <div style="display:flex;gap:8px;margin-bottom:8px">
-            <input id="g_level" class="f_input" placeholder="Nivel" style="width:120px">
-            <input id="g_xp" class="f_input" placeholder="XP" style="width:140px" type="number">
-            <input id="g_hp" class="f_input" placeholder="HP" style="width:120px" type="number">
-          </div>
-          <input id="g_clan" class="f_input" placeholder="Clan / Equipo">
-          <input id="g_badges" class="f_input" placeholder="Insignias (separadas por comas)">
-          <div style="display:flex;justify-content:flex-end;margin-top:8px"><div class="btn" id="g_save_btn">Guardar gamificación</div></div>
-        </section>
-      </div>
-    `);
-
-    // Minimal styling helper for inputs (in case not present)
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .f_input{ width:100%; padding:8px; border-radius:8px; border:1px solid #e6e6e6; box-sizing:border-box; }
-      .f_tab_btn{ padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); font-weight:800; cursor:pointer; }
-      .f_tab_btn.active{ background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01)); box-shadow:0 8px 30px rgba(0,0,0,0.2); }
-      .f_tab_panel{ display:block; }
-      .f_item{ padding:8px;border-bottom:1px solid #eee }
-    `;
-    document.head.appendChild(style);
-
-    // Tab behavior
-    const tabButtons = modalContent.querySelectorAll('.f_tab_btn');
-    tabButtons.forEach(btn => btn.addEventListener('click', () => {
-      tabButtons.forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      const selected = btn.dataset.tab;
-      modalContent.querySelectorAll('.f_tab_panel').forEach(p => p.style.display = (p.id === 'tab-'+selected) ? 'block' : 'none');
-    }));
-    // activate personal tab
-    if(tabButtons[0]) tabButtons[0].click();
-
-    // Internal render helpers
-    function renderActasList(student){
-      const list = modalContent.querySelector('#a_list'); if(!list) return;
-      list.innerHTML = '';
-      const arr = student.actas || [];
-      if(!arr.length){ list.innerHTML = '<div class="f_item" style="color:#666">Sin actas</div>'; return; }
-      arr.slice().reverse().forEach(a=>{
-        const d = document.createElement('div'); d.className='f_item';
-        d.innerHTML = `<div style="font-weight:800">${a.motivo} — ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div>`;
-        list.appendChild(d);
-      });
-    }
-    function renderObsList(student){
-      const list = modalContent.querySelector('#o_list'); if(!list) return;
-      list.innerHTML = '';
-      const arr = student.observador || [];
-      if(!arr.length){ list.innerHTML = '<div class="f_item" style="color:#666">Sin registros</div>'; return; }
-      arr.slice().reverse().forEach(o=>{
-        const d = document.createElement('div'); d.className='f_item';
-        d.innerHTML = `<div style="font-weight:800">${o.tipo} — ${o.fecha} • ${o.clasif || ''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div>`;
-        list.appendChild(d);
-      });
-    }
-
-    // find student utility
-    function findStudentById(id){
-      for(const grade of Object.keys(db.classes || {})){
-        const s = (db.classes[grade]||[]).find(x=>x.id===id);
-        if(s) return { student: s, grade };
-      }
-      return null;
-    }
-
-    // Fill UI from student object
-    function fillFichaUI(studentId){
-      const res = findStudentById(studentId);
-      if(!res){ useToast('Estudiante no encontrado','err'); return; }
-      const s = res.student;
-      modalContent.dataset.currentStudent = studentId;
-      modalContent.querySelector('#f_avatar_large').innerText = (s.name || ' ')[0] || 'A';
-      modalContent.querySelector('#f_name_large').innerText = s.name || '';
-      modalContent.querySelector('#f_period_label').innerText = document.getElementById('period-select')?.value || '';
-
-      modalContent.querySelector('#f_field_name')?.value = s.name || '';
-      modalContent.querySelector('#f_field_doc')?.value = s.document || s.doc || '';
-      modalContent.querySelector('#f_field_birth')?.value = s.birthdate || s.fnac || '';
-      modalContent.querySelector('#f_field_course')?.value = res.grade || '';
-      modalContent.querySelector('#f_field_group')?.value = (db.groups && db.groups[res.grade]) ? (Object.keys(db.groups[res.grade]).find(g=> db.groups[res.grade][g].includes(s.id)) || '-') : '-';
-      modalContent.querySelector('#f_field_eps')?.value = s.eps || '';
-      modalContent.querySelector('#f_field_blood')?.value = s.sangre || '';
-      modalContent.querySelector('#f_field_parent')?.value = (s.acudiente && s.acudiente.name) || s.acudiente || '';
-      modalContent.querySelector('#f_field_phone')?.value = (s.acudiente && s.acudiente.phone) || s.phone || '';
-      modalContent.querySelector('#f_field_phone_emerg')?.value = s.phone_emerg || '';
-      modalContent.querySelector('#f_field_email')?.value = s.email || '';
-
-      // actas & observador
-      s.actas = s.actas || [];
-      s.observador = s.observador || [];
-      renderActasList(s);
-      renderObsList(s);
-
-      // gamification
-      s.gamification = s.gamification || {};
-      modalContent.querySelector('#g_level').value = s.gamification.level || s.level || '';
-      modalContent.querySelector('#g_xp').value = s.gamification.xp || s.xp || 0;
-      modalContent.querySelector('#g_hp').value = s.gamification.hp || s.hp || HP_DEFAULT;
-      modalContent.querySelector('#g_clan').value = s.gamification.clan || s.clan || '';
-      modalContent.querySelector('#g_badges').value = (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', ');
-    }
-
-    // Action: add acta
-    modalContent.querySelector('#a_add_btn').addEventListener('click', ()=>{
-      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
-      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
-      const s = res.student;
-      const act = { id: Date.now(), fecha: modalContent.querySelector('#a_fecha').value || new Date().toLocaleDateString(), motivo: modalContent.querySelector('#a_motivo').value, resumen: modalContent.querySelector('#a_resumen').value, compromisos: modalContent.querySelector('#a_compromisos').value };
-      s.actas = s.actas || []; s.actas.push(act);
-      persistDB(); renderActasList(s); modalContent.querySelector('#a_resumen').value=''; modalContent.querySelector('#a_compromisos').value=''; useToast('Acta guardada','success');
-    });
-
-    // Action: add observador
-    modalContent.querySelector('#o_add_btn').addEventListener('click', ()=>{
-      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
-      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
-      const s = res.student;
-      const obs = { id: Date.now(), fecha: modalContent.querySelector('#o_fecha').value || new Date().toLocaleDateString(), tipo: modalContent.querySelector('#o_tipo').value, clasif: modalContent.querySelector('#o_clasif').value, desc: modalContent.querySelector('#o_desc').value, descargo: modalContent.querySelector('#o_descargo').value, estado: modalContent.querySelector('#o_estado').value };
-      s.observador = s.observador || []; s.observador.push(obs);
-      persistDB(); renderObsList(s); modalContent.querySelector('#o_desc').value=''; modalContent.querySelector('#o_descargo').value=''; useToast('Registro guardado','success');
-    });
-
-    // Action: save gamification
-    modalContent.querySelector('#g_save_btn').addEventListener('click', ()=>{
-      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
-      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
-      const s = res.student;
-      s.gamification = s.gamification || {};
-      s.gamification.level = modalContent.querySelector('#g_level').value || s.gamification.level;
-      s.gamification.xp = parseInt(modalContent.querySelector('#g_xp').value) || 0;
-      s.gamification.hp = parseInt(modalContent.querySelector('#g_hp').value) || HP_DEFAULT;
-      s.gamification.clan = modalContent.querySelector('#g_clan').value || '';
-      s.gamification.badges = (modalContent.querySelector('#g_badges').value||'').split(',').map(x=>x.trim()).filter(Boolean);
-      // reflect into main fields
-      s.level = parseInt(s.gamification.level) || s.level;
-      s.xp = parseInt(s.gamification.xp) || s.xp;
-      s.hp = parseInt(s.gamification.hp) || s.hp;
-      persistDB();
-      useToast('Gamificación guardada','success');
-      if(typeof renderStudentGrid === 'function') renderStudentGrid();
-    });
-
-    // Save all button: writes personal fields + calls persist
-    modalContent.querySelector('#f_save_button').addEventListener('click', ()=> {
-      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
-      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
-      const s = res.student;
-      s.name = modalContent.querySelector('#f_field_name').value || s.name;
-      s.document = modalContent.querySelector('#f_field_doc').value || s.document;
-      s.birthdate = modalContent.querySelector('#f_field_birth').value || s.birthdate;
-      s.eps = modalContent.querySelector('#f_field_eps').value || s.eps;
-      s.sangre = modalContent.querySelector('#f_field_blood').value || s.sangre;
-      s.acudiente = { name: modalContent.querySelector('#f_field_parent').value || '', phone: modalContent.querySelector('#f_field_phone').value || '', emerg: modalContent.querySelector('#f_field_phone_emerg').value || '', email: modalContent.querySelector('#f_field_email').value || '' };
-      persistDB();
-      useToast('Ficha guardada','success');
-      if(typeof renderStudentGrid === 'function') renderStudentGrid();
-    });
-
-    // Export button
-    modalContent.querySelector('#f_export_button').addEventListener('click', ()=>{
-      if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel();
-      else useToast('Export no disponible','warn');
-    });
-
-    // Expose public save function: saveFicha(studentId)
-    window.saveFicha = function(studentId){
-      try{
-        if(!studentId) studentId = modalContent.dataset.currentStudent;
-        if(!studentId) return useToast('No hay estudiante seleccionado','warn');
-        const res = findStudentById(studentId); if(!res) return useToast('Estudiante no encontrado','err');
-        // Do same as f_save_button handler
-        const s = res.student;
-        s.name = modalContent.querySelector('#f_field_name').value || s.name;
-        s.document = modalContent.querySelector('#f_field_doc').value || s.document;
-        s.birthdate = modalContent.querySelector('#f_field_birth').value || s.birthdate;
-        s.eps = modalContent.querySelector('#f_field_eps').value || s.eps;
-        s.sangre = modalContent.querySelector('#f_field_blood').value || s.sangre;
-        s.acudiente = { name: modalContent.querySelector('#f_field_parent').value || '', phone: modalContent.querySelector('#f_field_phone').value || '', emerg: modalContent.querySelector('#f_field_phone_emerg').value || '', email: modalContent.querySelector('#f_field_email').value || '' };
-        persistDB();
-        useToast('Ficha guardada (saveFicha)','success');
-        if(typeof renderStudentGrid === 'function') renderStudentGrid();
-      } catch(e){ console.error(e); useToast('Error guardando ficha','err'); }
-    };
-
-    // Helper: render actas/obs when filling
-    // (already used renderActasList/renderObsList above)
-
-    // Override global openFicha so existing buttons open this enhanced ficha
-    window.openFicha = function(studentId){
-      fillFichaUI(studentId);
-      showModal && showModal('ficha-modal');
-    };
-
-    // final log
-    console.log('[enhancedFicha] UI inyectada y saveFicha() expuesta.');
-  }); // ready
-})();
-</script>
-  <!-- PARCHE: poblar/guardar ficha (Personal, Actas, Observador, Gamificación) -->
-<script>
-(function ensureFichaPopAndSave(){
-  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'fantasyclass_alm_db';
-  const HP_DEFAULT = 5;
-  const toast = (m,t='info',dur=2200) => { if(typeof showToast==='function') showToast(m,t,dur); else console.log('[toast]',t,m); };
-  const persistDB = () => { if(typeof saveDB==='function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('localStorage write failed', e); } };
-
-  // utility: find student by id across classes
+  function findModal(){ return document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]') || null; }
+  function findModalContent(){ const m = findModal(); if(!m) return null; return m.querySelector('.modal.white') || m.querySelector('.modal') || m; }
   function findStudentById(id){
     if(!id) return null;
-    for(const grade of Object.keys(db.classes || {})){
-      const s = (db.classes[grade]||[]).find(x => x.id === id);
-      if(s) return { student: s, grade };
+    for(const g of Object.keys(db.classes||{})){
+      const s = (db.classes[g]||[]).find(x=>x.id===id);
+      if(s) return { student: s, grade: g };
     }
     return null;
   }
 
-  // helpers to set/get UI values with fallback selectors
-  function $(sel){ return document.querySelector(sel); }
-  function setVal(selectors, value){
-    for(const s of selectors){
-      const el = $(s);
-      if(el){ el.value = (value==null ? '' : value); return true; }
-    }
-    return false;
-  }
-  function getVal(selectors){
-    for(const s of selectors){
-      const el = $(s);
-      if(el) return el.value;
-    }
-    return '';
-  }
-  function appendHtml(sel, html){
-    const el = $(sel); if(!el) return; el.insertAdjacentHTML('beforeend', html);
-  }
-  function clearHtml(sel){ const el = $(sel); if(el) el.innerHTML = ''; }
-
-  // Render lists helpers (actas, observador, history)
-  function renderActas(student){
-    clearHtml('#a_list'); clearHtml('#actas_list'); // support both ids
-    const arr = student.actas || [];
-    const target = $('#a_list') || $('#actas_list') || $('#ficha-history') || null;
-    if(!target) return;
-    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
-    target.innerHTML = '';
-    arr.slice().reverse().forEach(a=>{
-      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div></div>`;
-      target.insertAdjacentHTML('beforeend', html);
-    });
-  }
-  function renderObs(student){
-    clearHtml('#o_list'); clearHtml('#obs_list');
-    const arr = student.observador || [];
-    const target = $('#o_list') || $('#obs_list') || null;
-    if(!target) return;
-    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
-    target.innerHTML = '';
-    arr.slice().reverse().forEach(o=>{
-      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${o.tipo} • ${o.fecha} • ${o.clasif||''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div></div>`;
-      target.insertAdjacentHTML('beforeend', html);
-    });
-  }
-  function renderQuickHistory(student){
-    const target = $('#f_quick_history') || $('#ficha-history') || $('#ficha-history'); if(!target) return;
-    target.innerHTML = '';
-    const arr = student.history || [];
-    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
-    arr.slice().reverse().slice(0,8).forEach(h=>{
-      const html = `<div style="padding:6px;border-bottom:1px solid #eee"><div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div></div>`;
-      target.insertAdjacentHTML('beforeend', html);
-    });
-  }
-
-  // Fill UI from student data (tries many selector names so it works with your current UI)
-  function fillFichaUI(studentId){
-    const found = findStudentById(studentId);
-    if(!found){ toast('Estudiante no encontrado','err'); return; }
-    const s = found.student;
-    const grade = found.grade;
-
-    // header
-    setVal(['#ficha-avatar','#f_avatar','#f_avatar_large','#ficha-avatar-large'], (s.name||' ')[0] || 'A');
-    setVal(['#ficha-name','#f_name','#f_name_large','#f_name_large'], s.name || '');
-    setVal(['#ficha-period','#f_period','#f_period_label'], document.getElementById('period-select')?.value || '');
-    // Personal fields
-    setVal(['#f_field_name','#p_name','#f_nombre','#f_field_name'], s.name || '');
-    setVal(['#f_field_doc','#p_doc','#f_documento'], s.document || s.doc || '');
-    setVal(['#f_field_birth','#p_birth','#f_fnac'], s.birthdate || s.fnac || '');
-    setVal(['#f_field_course','#p_course'], grade || '');
-    setVal(['#f_field_group','#p_group','#f_field_group'], (db.groups && db.groups[grade]) ? (Object.keys(db.groups[grade]).find(g=> db.groups[grade][g].includes(s.id)) || '') : '');
-    setVal(['#f_field_eps','#p_eps'], s.eps || '');
-    setVal(['#f_field_blood','#p_blood','#f_sangre'], s.sangre || '');
-    setVal(['#f_field_parent','#p_acudiente','#f_acudiente'], (s.acudiente && (s.acudiente.name || s.acudiente)) || '');
-    setVal(['#f_field_phone','#p_phone'], (s.acudiente && s.acudiente.phone) || s.phone || '');
-    setVal(['#f_field_phone_emerg','#p_emerg','#f_tel_emerg'], s.phone_emerg || '');
-    setVal(['#f_field_email','#p_email'], s.email || '');
-
-    // Actas / Observador
-    s.actas = s.actas || [];
-    s.observador = s.observador || [];
-    renderActas(s);
-    renderObs(s);
-    renderQuickHistory(s);
-
-    // Gamificación
-    s.gamification = s.gamification || {};
-    setVal(['#g_level','#game-level','#f_game_level'], s.gamification.level || s.level || '');
-    setVal(['#g_xp','#game-xp','#f_game_xp','#ficha-xp'], s.gamification.xp || s.xp || 0);
-    setVal(['#g_hp','#game-hp','#f_game_hp','#ficha-hp'], s.gamification.hp || s.hp || HP_DEFAULT);
-    setVal(['#g_clan','#game-clan'], s.gamification.clan || s.clan || '');
-    setVal(['#g_badges','#game-badges'], (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', '));
-
-    // store current id on modal so saveFicha() can use it
-    const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
-    if(modal) modal.dataset.currentStudent = s.id;
-  }
-
-  // Save function: reads UI and writes to db
-  function saveFicha(studentId){
-    try{
-      if(!studentId){
-        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
-        studentId = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      }
-      if(!studentId) return toast('No hay estudiante seleccionado','warn');
-      const found = findStudentById(studentId);
-      if(!found) return toast('Estudiante no encontrado', 'err');
-      const s = found.student;
-
-      // read personal
-      s.name = getVal(['#f_field_name','#p_name','#f_nombre']) || s.name;
-      s.document = getVal(['#f_field_doc','#p_doc','#f_documento']) || s.document;
-      s.birthdate = getVal(['#f_field_birth','#p_birth','#f_fnac']) || s.birthdate;
-      s.eps = getVal(['#f_field_eps','#p_eps']) || s.eps;
-      s.sangre = getVal(['#f_field_blood','#p_blood','#f_sangre']) || s.sangre;
-      s.acudiente = { name: getVal(['#f_field_parent','#p_acudiente','#f_acudiente']) || '', phone: getVal(['#f_field_phone','#p_phone','#f_tel']) || '', emerg: getVal(['#f_field_phone_emerg','#p_emerg','#f_tel_emerg']) || '', email: getVal(['#f_field_email','#p_email','#f_email']) || '' };
-
-      // gamification
-      s.gamification = s.gamification || {};
-      s.gamification.level = getVal(['#g_level','#game-level','#f_game_level']) || s.gamification.level;
-      s.gamification.xp = parseInt(getVal(['#g_xp','#game-xp','#f_game_xp','#ficha-xp'])) || (s.gamification.xp||s.xp||0);
-      s.gamification.hp = parseInt(getVal(['#g_hp','#game-hp','#f_game_hp','#ficha-hp'])) || (s.gamification.hp||s.hp||HP_DEFAULT);
-      s.gamification.clan = getVal(['#g_clan','#game-clan']) || s.gamification.clan;
-      s.gamification.badges = (getVal(['#g_badges','#game-badges']) || '').split(',').map(x=>x.trim()).filter(Boolean);
-
-      // actas & observador saved via their respective handlers (below), but ensure arrays exist
-      s.actas = s.actas || [];
-      s.observador = s.observador || [];
-
-      persistDB();
-      toast('Ficha guardada','success');
-      if(typeof renderStudentGrid === 'function') renderStudentGrid();
-      return true;
-    } catch(e){
-      console.error(e);
-      toast('Error guardando ficha','err');
-      return false;
-    }
-  }
-
-  // Attach saveFicha to window for console or other usage
-  window.saveFicha = saveFicha;
-
-  // wire up Add Acta and Add Observador buttons (if present) — they should push into arrays and persist
-  function wireButtons(){
-    const aBtn = $('#a_add') || $('#a_add_btn') || $('#acta-add') || $('#acta-add');
-    if(aBtn && !aBtn.dataset.wired){
-      aBtn.addEventListener('click', ()=>{
-        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
-        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-        if(!sid) return toast('Abre la ficha primero','warn');
-        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
-        const s = res.student;
-        s.actas = s.actas || [];
-        const act = { id: Date.now(), fecha: getVal(['#a_fecha','input[name="a_fecha"]']) || new Date().toLocaleDateString(), motivo: getVal(['#a_motivo','#a_motivo_select']) || 'Otro', resumen: getVal(['#a_resumen','#acta-resumen']) || '', compromisos: getVal(['#a_compromisos','#acta-compromisos']) || '' };
-        s.actas.push(act);
-        persistDB(); renderActas(s); toast('Acta agregada','success');
-      });
-      aBtn.dataset.wired = '1';
-    }
-
-    const oBtn = $('#o_add') || $('#o_add_btn') || $('#obs-add') || $('#obs-add');
-    if(oBtn && !oBtn.dataset.wired){
-      oBtn.addEventListener('click', ()=>{
-        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
-        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-        if(!sid) return toast('Abre la ficha primero','warn');
-        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
-        const s = res.student;
-        s.observador = s.observador || [];
-        const obs = { id: Date.now(), fecha: getVal(['#o_fecha']) || new Date().toLocaleDateString(), tipo: getVal(['#o_tipo']) || 'Observación', clasif: getVal(['#o_clasif']) || '', desc: getVal(['#o_desc']) || '', descargo: getVal(['#o_descargo']) || '', estado: getVal(['#o_estado']) || 'En proceso' };
-        s.observador.push(obs);
-        persistDB(); renderObs(s); toast('Registro convivencial agregado','success');
-      });
-      oBtn.dataset.wired = '1';
-    }
-
-    // gamification save
-    const gBtn = $('#g_save') || $('#g_save_btn') || $('#game-save');
-    if(gBtn && !gBtn.dataset.wired){
-      gBtn.addEventListener('click', ()=>{
-        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
-        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-        if(!sid) return toast('Abre la ficha primero','warn');
-        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
-        const s = res.student;
-        s.gamification = s.gamification || {};
-        s.gamification.level = getVal(['#g_level','#game-level']) || s.gamification.level;
-        s.gamification.xp = parseInt(getVal(['#g_xp','#game-xp'])) || s.gamification.xp || 0;
-        s.gamification.hp = parseInt(getVal(['#g_hp','#game-hp'])) || s.gamification.hp || HP_DEFAULT;
-        s.gamification.clan = getVal(['#g_clan','#game-clan']) || s.gamification.clan || '';
-        s.gamification.badges = (getVal(['#g_badges','#game-badges'])||'').split(',').map(x=>x.trim()).filter(Boolean);
-        // reflect
-        s.level = parseInt(s.gamification.level) || s.level;
-        s.xp = parseInt(s.gamification.xp) || s.xp;
-        s.hp = parseInt(s.gamification.hp) || s.hp;
-        persistDB();
-        toast('Gamificación guardada','success');
-        if(typeof renderStudentGrid === 'function') renderStudentGrid();
-      });
-      gBtn.dataset.wired = '1';
-    }
-
-    // wire save main button if present
-    const saveBtn = $('#f_save_all') || $('#f_save_button') || $('#f_save');
-    if(saveBtn && !saveBtn.dataset.wired){
-      saveBtn.addEventListener('click', ()=> saveFicha());
-      saveBtn.dataset.wired = '1';
-    }
-  }
-
-  // renderActas/renderObs helpers used by buttons above (re-declare but safe)
-  function renderActas(student){
-    const target = $('#a_list') || $('#actas_list') || $('#ficha-history') || null;
-    if(!target) return;
-    target.innerHTML = '';
-    const arr = student.actas || [];
-    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
-    arr.slice().reverse().forEach(a=>{
-      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div></div>`;
-      target.insertAdjacentHTML('beforeend', html);
-    });
-  }
-  function renderObs(student){
-    const target = $('#o_list') || $('#obs_list') || null;
-    if(!target) return;
-    target.innerHTML = '';
-    const arr = student.observador || [];
-    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
-    arr.slice().reverse().forEach(o=>{
-      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${o.tipo} • ${o.fecha}</div><div style="color:#444">${o.desc}</div></div>`;
-      target.insertAdjacentHTML('beforeend', html);
-    });
-  }
-
-  // Override window.openFicha so it populates new fields when opening
-  const originalOpenFicha = window.openFicha;
-  window.openFicha = function(id){
-    // call original if exists (to open modal and any side effects)
-    try{ if(typeof originalOpenFicha === 'function') originalOpenFicha(id); }catch(e){ console.warn('original openFicha failed', e); }
-    // then populate fields after short delay (modal DOM may be shown)
-    setTimeout(()=> {
-      fillFichaUI(id);
-      wireButtons();
-    }, 120);
-  };
-
-  // expose helpers for debug
-  window.__ficha_helpers = { fillFichaUI, saveFicha, wireButtons, findStudentById };
-
-  // initial wire (if modal already open)
-  setTimeout(()=>{ wireButtons(); }, 500);
-})();
-</script>
-  <!-- PARCHE: Ficha reorganizada y botón Guardar (compacta, 2 columnas + secciones) -->
-<style>
-  /* Scoped styles para la ficha mejorada */
-  #enh-ficha .ef-header{display:flex;gap:12px;align-items:center;margin-bottom:10px}
-  #enh-ficha .ef-avatar{width:64px;height:64px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:900}
-  #enh-ficha .ef-title{font-weight:900;font-size:18px}
-  #enh-ficha .ef-sub{color:#666}
-  #enh-ficha .ef-grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
-  #enh-ficha .ef-panel{background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;max-height:520px;overflow:auto}
-  #enh-ficha .ef-row{display:flex;gap:8px;margin-bottom:8px}
-  #enh-ficha .ef-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;box-sizing:border-box}
-  #enh-ficha .ef-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-  #enh-ficha .ef-section-title{font-weight:800;margin-bottom:8px}
-  #enh-ficha .ef-collapsible{background:#fafafa;padding:8px;border-radius:8px;border:1px solid #f0f0f0;margin-top:8px}
-  @media(max-width:900px){ #enh-ficha .ef-grid{grid-template-columns:1fr} }
-</style>
-<script>
-  <!-- FICHA: Presentación mejorada + botones Guardar (pegar antes de </body>) -->
-<style>
-  /* Scoped styles para la ficha mejorada (idempotente) */
-  #ef2-ficha { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#111; }
-  #ef2-ficha .ef2-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
-  #ef2-ficha .ef2-avatar{width:64px;height:64px;border-radius:10px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:800}
-  #ef2-ficha .ef2-title{font-weight:900;font-size:18px}
-  #ef2-ficha .ef2-sub{color:var(--muted)}
-  #ef2-ficha .ef2-grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
-  #ef2-ficha .ef2-panel{background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;box-shadow:0 6px 18px rgba(10,10,10,0.03)}
-  #ef2-ficha .ef2-section{margin-bottom:10px}
-  #ef2-ficha .ef2-row{display:flex;gap:8px;margin-bottom:8px}
-  #ef2-ficha .ef2-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;box-sizing:border-box}
-  #ef2-ficha .ef2-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
-  #ef2-ficha .ef2-small{font-size:13px;color:var(--muted)}
-  @media(max-width:900px){ #ef2-ficha .ef2-grid{grid-template-columns:1fr} }
-</style>
-
-<script>
-(function injectFichaV2(){
-  const STORAGE_KEY = 'fantasyclass_alm_db';
-  const HP_DEFAULT = 5;
-  const modalId = 'ficha-modal';
-
-  function safePersist(){
-    try{
-      if(typeof saveDB === 'function'){ saveDB(); return; }
-    }catch(e){ console.warn('saveDB fallo', e); }
-    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
-  }
-  function toast(msg, type='info', t=2200){
-    if(typeof showToast === 'function') return showToast(msg,type,t);
-    console.log('[toast]',type,msg);
-  }
-
-  function findModal(){
-    return document.getElementById(modalId) || document.querySelector('[id*="ficha-modal"]') || null;
-  }
-  function findModalContent(modal){
-    if(!modal) return null;
-    return modal.querySelector('.modal.white') || modal.querySelector('.modal') || modal;
-  }
-
-  // build UI once
-  function buildUI(){
-    const modal = findModal(); if(!modal) return;
-    const content = findModalContent(modal); if(!content) return;
+  function buildEnhancedFichaUI(){
+    const content = findModalContent();
+    if(!content) return;
     if(content.querySelector('#ef2-ficha')) return; // already injected
 
-    // preserve close button
+    // keep close btn
     const closeBtn = content.querySelector('.close-btn');
-    content.innerHTML = '';
-    if(closeBtn) content.appendChild(closeBtn);
-
-    content.insertAdjacentHTML('beforeend', `
-      <div id="ef2-ficha">
-        <div class="ef2-header">
-          <div class="ef2-avatar" id="ef2-avatar">A</div>
-          <div style="flex:1">
-            <div class="ef2-title" id="ef2-name">Nombre estudiante</div>
-            <div class="ef2-sub">Ficha • <span id="ef2-period"></span></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-            <div style="display:flex;gap:8px">
-              <button class="btn" id="ef2-save-close">Guardar y cerrar</button>
-              <button class="btn" id="ef2-export">Exportar</button>
-            </div>
-            <div class="ef2-small">Última modificación: <span id="ef2-last">—</span></div>
-          </div>
+    // we'll append our container after the existing initial header so we preserve backwards compat
+    const container = document.createElement('div');
+    container.id = 'ef2-ficha';
+    container.style.marginTop = '6px';
+    container.innerHTML = `
+      <div class="ef2-header" style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div class="ef2-avatar" id="ef2-avatar">A</div>
+        <div style="flex:1">
+          <div class="ef2-title" id="ef2-name">Nombre estudiante</div>
+          <div class="ef2-sub">Ficha • <span id="ef2-period"></span></div>
         </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="ef2-save-close">Guardar y cerrar</button>
+            <button class="btn" id="ef2-export">Exportar</button>
+          </div>
+          <div class="ef2-small">Última modificación: <span id="ef2-last">—</span></div>
+        </div>
+      </div>
 
-        <div class="ef2-grid">
-          <div class="ef2-panel">
-            <div class="ef2-section">
-              <div style="font-weight:800;margin-bottom:8px">1 • Personal y contacto</div>
-              <div class="ef2-row"><input id="ef2_name" class="ef2-input" placeholder="Nombre completo"></div>
-              <div class="ef2-row"><input id="ef2_doc" class="ef2-input" placeholder="Documento"></div>
-              <div class="ef2-row">
-                <input id="ef2_course" class="ef2-input" placeholder="Curso" readonly>
-                <input id="ef2_group" class="ef2-input" placeholder="Grupo" readonly>
-              </div>
-              <div class="ef2-row"><input id="ef2_birth" type="date" class="ef2-input"></div>
-              <div class="ef2-row">
-                <input id="ef2_eps" class="ef2-input" placeholder="EPS">
-                <input id="ef2_blood" class="ef2-input" placeholder="Grupo sanguíneo / RH">
-              </div>
-              <div style="height:6px"></div>
-              <div style="font-weight:800;margin-bottom:8px">Contacto acudientes</div>
-              <div class="ef2-row"><input id="ef2_parent" class="ef2-input" placeholder="Nombres acudientes"></div>
-              <div class="ef2-row">
-                <input id="ef2_phone" class="ef2-input" placeholder="Teléfono principal">
-                <input id="ef2_phone_emerg" class="ef2-input" placeholder="Teléfono emergencia">
-              </div>
-              <div class="ef2-row"><input id="ef2_email" class="ef2-input" placeholder="Correo electrónico"></div>
-              <div class="ef2-actions"><button class="btn" id="ef2-save-personal">Guardar personal</button></div>
+      <div class="ef2-grid" style="display:grid;grid-template-columns:1fr 360px;gap:14px">
+        <div class="ef2-panel" style="background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;box-shadow:0 6px 18px rgba(10,10,10,0.03)">
+          <div style="font-weight:800;margin-bottom:8px">1 • Personal y contacto</div>
+          <input id="ef2_name" class="ef2-input" placeholder="Nombre completo" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;margin-bottom:8px">
+          <input id="ef2_doc" class="ef2-input" placeholder="Documento" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;margin-bottom:8px">
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="ef2_course" class="ef2-input" placeholder="Curso" readonly style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6">
+            <input id="ef2_group" class="ef2-input" placeholder="Grupo" readonly style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6">
+          </div>
+          <input id="ef2_birth" type="date" class="ef2-input" style="width:100%;padding:8px;border-radius:8px;border:1px
+                      :1px solid #e6e6e6">
+            <div style="height:6px"></div>
+            <div style="font-weight:800;margin-bottom:8px">Contacto acudientes</div>
+            <input id="ef2_parent" class="ef2-input" placeholder="Nombres acudientes" style="margin-bottom:8px">
+            <div style="display:flex;gap:8px;margin-bottom:8px">
+              <input id="ef2_phone" class="ef2-input" placeholder="Teléfono principal">
+              <input id="ef2_phone_emerg" class="ef2-input" placeholder="Teléfono emergencia">
             </div>
+            <input id="ef2_email" class="ef2-input" placeholder="Correo electrónico">
+            <div class="ef2-actions"><button class="btn" id="ef2-save-personal">Guardar personal</button></div>
 
-            <div class="ef2-section" style="margin-top:12px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div style="font-weight:800">2 • Actas y reuniones</div>
-                <div class="ef2-small">Registra seguimiento</div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="margin-top:12px">
+              <div style="font-weight:800;margin-bottom:8px">2 • Actas y reuniones</div>
+              <div style="display:flex;gap:8px;margin-bottom:8px">
                 <input id="ef2_acta_fecha" type="date" class="ef2-input" style="width:160px">
                 <select id="ef2_acta_motivo" class="ef2-input" style="flex:1"><option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option></select>
                 <button class="btn" id="ef2-acta-add">Agregar</button>
@@ -3226,8 +999,8 @@ window.openManageGroupsModal = openGroupsModal;
           </div>
 
           <div>
-            <div class="ef2-panel">
-              <div style="font-weight:800">4 • Gamificación / RPG</div>
+            <div class="ef2-panel" style="background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;box-shadow:0 6px 18px rgba(10,10,10,0.03)">
+              <div style="font-weight:800;margin-bottom:8px">4 • Gamificación / RPG</div>
               <div class="ef2-row" style="margin-top:8px">
                 <input id="ef2_level" class="ef2-input" placeholder="Nivel" style="width:100px">
                 <input id="ef2_xp" class="ef2-input" placeholder="XP" style="width:140px" type="number">
@@ -3242,12 +1015,9 @@ window.openManageGroupsModal = openGroupsModal;
               <div class="ef2-actions"><button class="btn" id="ef2-save-game">Guardar gamificación</button></div>
             </div>
 
-            <div class="ef2-panel" style="margin-top:12px">
-              <div style="display:flex;justify-content:space-between;align-items:center">
-                <div style="font-weight:800">3 • Observador convivencial</div>
-                <div class="ef2-small">Seguimiento conductual</div>
-              </div>
-              <div style="display:flex;gap:8px;margin-top:8px">
+            <div class="ef2-panel" style="margin-top:12px;background:#fff;padding:12px;border-radius:10px;border:1px solid #eee">
+              <div style="font-weight:800;margin-bottom:8px">3 • Observador convivencial</div>
+              <div style="display:flex;gap:8px;margin-bottom:8px">
                 <input id="ef2_obs_fecha" type="date" class="ef2-input" style="width:140px">
                 <select id="ef2_obs_tipo" class="ef2-input" style="width:140px"><option>Incidente</option><option>Observación</option><option>Reporte</option></select>
                 <button class="btn" id="ef2-obs-add">Agregar</button>
@@ -3264,7 +1034,7 @@ window.openManageGroupsModal = openGroupsModal;
         </div>
 
         <div style="margin-top:12px">
-          <div class="ef2-panel">
+          <div class="ef2-panel" style="background:#fff;padding:12px;border-radius:10px;border:1px solid #eee">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div style="font-weight:800">Historial</div>
               <div class="ef2-small">Últimos registros</div>
@@ -3273,57 +1043,54 @@ window.openManageGroupsModal = openGroupsModal;
           </div>
         </div>
       </div>
-    `);
+    `;
 
-    // wire actions after injection
-    const saveCloseBtn = content.querySelector('#ef2-save-close');
-    saveCloseBtn && saveCloseBtn.addEventListener('click', ()=>{
+    // insert after initial header
+    const header = content.querySelector('#ficha-initial-header') || content.firstElementChild;
+    if(header) header.insertAdjacentElement('afterend', container);
+    else content.appendChild(container);
+
+    // Attach listeners
+    container.querySelector('#ef2-save-close').addEventListener('click', ()=>{
       const modal = findModal();
       const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!sid){ toast('Abre una ficha primero','warn'); return; }
-      saveFicha(sid);
-      // close modal (use hideModal if exists)
+      if(!sid){ showToast('Abre una ficha primero','warn'); return; }
+      saveFichaEF(sid);
       try{ hideModal && hideModal('ficha-modal'); }catch(e){}
     });
 
-    const exportBtn = content.querySelector('#ef2-export');
-    exportBtn && exportBtn.addEventListener('click', ()=> { if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel(); else toast('Export no disponible','warn'); });
-
-    content.querySelector('#ef2-save-personal')?.addEventListener('click', ()=>{
-      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!sid){ toast('Abre ficha primero','warn'); return; }
-      savePersonal(sid);
+    container.querySelector('#ef2-export').addEventListener('click', ()=> {
+      if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel();
+      else showToast('Export no disponible','warn');
     });
 
-    content.querySelector('#ef2-acta-add')?.addEventListener('click', ()=>{
+    container.querySelector('#ef2-save-personal').addEventListener('click', ()=>{
       const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!sid){ toast('Abre ficha primero','warn'); return; }
-      addActa(sid);
+      if(!sid){ showToast('Abre ficha primero','warn'); return; }
+      savePersonalEF(sid);
     });
 
-    content.querySelector('#ef2-obs-add')?.addEventListener('click', ()=>{
+    container.querySelector('#ef2-acta-add').addEventListener('click', ()=>{
       const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!sid){ toast('Abre ficha primero','warn'); return; }
-      addObservacion(sid);
+      if(!sid){ showToast('Abre ficha primero','warn'); return; }
+      addActaEF(sid);
     });
 
-    content.querySelector('#ef2-save-game')?.addEventListener('click', ()=>{
+    container.querySelector('#ef2-obs-add').addEventListener('click', ()=>{
       const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!sid){ toast('Abre ficha primero','warn'); return; }
-      saveGamification(sid);
+      if(!sid){ showToast('Abre ficha primero','warn'); return; }
+      addObsEF(sid);
     });
-  } // end buildUI
 
-  // helpers to find and render student data
-  function findStudentById(id){
-    if(!id) return null;
-    for(const g of Object.keys(db.classes || {})){
-      const s = (db.classes[g]||[]).find(x=>x.id===id);
-      if(s) return { student: s, grade: g };
-    }
-    return null;
-  }
-  function renderActas(student){
+    container.querySelector('#ef2-save-game').addEventListener('click', ()=>{
+      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ showToast('Abre ficha primero','warn'); return; }
+      saveGameEF(sid);
+    });
+  } // end buildEnhancedFichaUI
+
+  // helper renderers
+  function renderActasEF(student){
     const list = document.getElementById('ef2-actas-list'); if(!list) return;
     list.innerHTML = '';
     const arr = student.actas || [];
@@ -3334,7 +1101,7 @@ window.openManageGroupsModal = openGroupsModal;
       list.appendChild(node);
     });
   }
-  function renderObservador(student){
+  function renderObsEF(student){
     const list = document.getElementById('ef2-obs-list'); if(!list) return;
     list.innerHTML = '';
     const arr = student.observador || [];
@@ -3345,7 +1112,7 @@ window.openManageGroupsModal = openGroupsModal;
       list.appendChild(node);
     });
   }
-  function renderHistory(student){
+  function renderHistoryEF(student){
     const list = document.getElementById('ef2-history'); if(!list) return;
     list.innerHTML = '';
     const arr = student.history || [];
@@ -3357,9 +1124,9 @@ window.openManageGroupsModal = openGroupsModal;
     });
   }
 
-  // save helpers
-  function savePersonal(studentId){
-    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+  // save handlers
+  function savePersonalEF(studentId){
+    const found = findStudentById(studentId); if(!found) return showToast('Estudiante no encontrado','err');
     const s = found.student;
     s.name = document.getElementById('ef2_name')?.value || s.name;
     s.document = document.getElementById('ef2_doc')?.value || s.document;
@@ -3367,14 +1134,14 @@ window.openManageGroupsModal = openGroupsModal;
     s.eps = document.getElementById('ef2_eps')?.value || s.eps;
     s.sangre = document.getElementById('ef2_blood')?.value || s.sangre;
     s.acudiente = { name: document.getElementById('ef2_parent')?.value || '', phone: document.getElementById('ef2_phone')?.value || '', emerg: document.getElementById('ef2_phone_emerg')?.value || '', email: document.getElementById('ef2_email')?.value || '' };
-    safePersist();
+    saveDB();
     document.getElementById('ef2-last') && (document.getElementById('ef2-last').innerText = new Date().toLocaleString());
-    toast('Datos personales guardados','success');
+    showToast('Datos personales guardados','success');
     if(typeof renderStudentGrid === 'function') renderStudentGrid();
   }
 
-  function addActa(studentId){
-    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+  function addActaEF(studentId){
+    const found = findStudentById(studentId); if(!found) return showToast('Estudiante no encontrado','err');
     const s = found.student;
     s.actas = s.actas || [];
     const fecha = document.getElementById('ef2_acta_fecha')?.value || new Date().toLocaleDateString();
@@ -3382,15 +1149,15 @@ window.openManageGroupsModal = openGroupsModal;
     const resumen = document.getElementById('ef2_acta_resumen')?.value || '';
     const compromisos = document.getElementById('ef2_acta_compromisos')?.value || '';
     s.actas.push({ id: Date.now(), fecha, motivo, resumen, compromisos });
-    safePersist();
-    renderActas(s);
+    saveDB();
+    renderActasEF(s);
     document.getElementById('ef2_acta_resumen') && (document.getElementById('ef2_acta_resumen').value='');
     document.getElementById('ef2_acta_compromisos') && (document.getElementById('ef2_acta_compromisos').value='');
-    toast('Acta agregada','success');
+    showToast('Acta agregada','success');
   }
 
-  function addObservacion(studentId){
-    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+  function addObsEF(studentId){
+    const found = findStudentById(studentId); if(!found) return showToast('Estudiante no encontrado','err');
     const s = found.student;
     s.observador = s.observador || [];
     const fecha = document.getElementById('ef2_obs_fecha')?.value || new Date().toLocaleDateString();
@@ -3400,15 +1167,15 @@ window.openManageGroupsModal = openGroupsModal;
     const descargo = document.getElementById('ef2_obs_descargo')?.value || '';
     const estado = document.getElementById('ef2_obs_estado')?.value || 'En proceso';
     s.observador.push({ id: Date.now(), fecha, tipo, clasif, desc, descargo, estado });
-    safePersist();
-    renderObservador(s);
+    saveDB();
+    renderObsEF(s);
     document.getElementById('ef2_obs_desc') && (document.getElementById('ef2_obs_desc').value='');
     document.getElementById('ef2_obs_descargo') && (document.getElementById('ef2_obs_descargo').value='');
-    toast('Registro guardado','success');
+    showToast('Registro guardado','success');
   }
 
-  function saveGamification(studentId){
-    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+  function saveGameEF(studentId){
+    const found = findStudentById(studentId); if(!found) return showToast('Estudiante no encontrado','err');
     const s = found.student;
     s.gamification = s.gamification || {};
     s.gamification.level = document.getElementById('ef2_level')?.value || s.gamification.level || s.level;
@@ -3416,40 +1183,32 @@ window.openManageGroupsModal = openGroupsModal;
     s.gamification.hp = parseInt(document.getElementById('ef2_hp')?.value) || s.gamification.hp || s.hp || HP_DEFAULT;
     s.gamification.clan = document.getElementById('ef2_clan')?.value || s.gamification.clan || '';
     s.gamification.badges = (document.getElementById('ef2_badges')?.value || '').split(',').map(x=>x.trim()).filter(Boolean);
-    // reflect principal values
     s.level = parseInt(s.gamification.level) || s.level;
     s.xp = parseInt(s.gamification.xp) || s.xp;
     s.hp = parseInt(s.gamification.hp) || s.hp;
-    safePersist();
-    toast('Gamificación guardada','success');
+    saveDB();
+    showToast('Gamificación guardada','success');
     if(typeof renderStudentGrid === 'function') renderStudentGrid();
   }
 
-  // global save that calls sections and updates timestamp
-  function saveFicha(studentId){
-    if(!studentId){
-      const modal = findModal(); studentId = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
-      if(!studentId) return toast('No hay ficha abierta','warn');
-    }
-    savePersonal(studentId);
-    saveGamification(studentId);
+  function saveFichaEF(studentId){
+    savePersonalEF(studentId);
+    saveGameEF(studentId);
     document.getElementById('ef2-last') && (document.getElementById('ef2-last').innerText = new Date().toLocaleString());
-    safePersist();
-    toast('Ficha guardada','success');
+    saveDB();
+    showToast('Ficha guardada','success');
   }
 
-  // fill UI (called after modal opens)
-  function fillUI(studentId){
-    buildUI();
-    const found = findStudentById(studentId);
-    if(!found) return toast('Estudiante no encontrado','err');
+  // fill UI when openFicha is called
+  function fillEF2(studentId){
+    buildEnhancedFichaUI();
+    const found = findStudentById(studentId); if(!found) return showToast('Estudiante no encontrado','err');
     const s = found.student;
     document.getElementById('ef2-avatar') && (document.getElementById('ef2-avatar').innerText = (s.name||' ')[0] || 'A');
     document.getElementById('ef2-name') && (document.getElementById('ef2-name').innerText = s.name || '');
     document.getElementById('ef2-period') && (document.getElementById('ef2-period').innerText = document.getElementById('period-select')?.value || '');
     document.getElementById('ef2_name') && (document.getElementById('ef2_name').value = s.name || '');
     document.getElementById('ef2_doc') && (document.getElementById('ef2_doc').value = s.document || s.doc || '');
-    // find grade, group
     let gradeFound = '';
     for(const g of Object.keys(db.classes||{})){ if((db.classes[g]||[]).find(x=>x.id===s.id)){ gradeFound = g; break; } }
     document.getElementById('ef2_course') && (document.getElementById('ef2_course').value = gradeFound || '');
@@ -3463,7 +1222,6 @@ window.openManageGroupsModal = openGroupsModal;
     document.getElementById('ef2_phone_emerg') && (document.getElementById('ef2_phone_emerg').value = s.phone_emerg || '');
     document.getElementById('ef2_email') && (document.getElementById('ef2_email').value = s.email || '');
 
-    // gamification
     s.gamification = s.gamification || {};
     document.getElementById('ef2_level') && (document.getElementById('ef2_level').value = s.gamification.level || s.level || '');
     document.getElementById('ef2_xp') && (document.getElementById('ef2_xp').value = s.gamification.xp || s.xp || 0);
@@ -3471,28 +1229,20 @@ window.openManageGroupsModal = openGroupsModal;
     document.getElementById('ef2_clan') && (document.getElementById('ef2_clan').value = s.gamification.clan || s.clan || '');
     document.getElementById('ef2_badges') && (document.getElementById('ef2_badges').value = (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', '));
 
-    // lists
-    renderActas(s); renderObservador(s); renderHistory(s);
+    renderActasEF(s); renderObsEF(s); renderHistoryEF(s);
 
-    // set modal dataset currentStudent for saves
     const modal = findModal(); if(modal) modal.dataset.currentStudent = s.id;
   }
 
-  // override openFicha to fill our UI after original opens
-  const originalOpenFicha = typeof window.openFicha === 'function' ? window.openFicha : null;
+  // override openFicha to fill EF2 after opening
+  const originalOpenFicha = window.openFicha;
   window.openFicha = function(id){
-    try{ if(originalOpenFicha) originalOpenFicha(id); }catch(e){ /* ignore */ }
-    setTimeout(()=> fillUI(id), 120);
+    try{ if(typeof originalOpenFicha === 'function') originalOpenFicha(id); }catch(e){}
+    setTimeout(()=> fillEF2(id), 140);
   };
 
-  // Expose public functions for console/testing
-  window.ef2_saveFicha = saveFicha;
-  window.ef2_addActa = addActa;
-  window.ef2_addObservacion = addObservacion;
-  window.ef2_saveGamification = saveGamification;
-
-  // build UI on load so elements are available
-  document.addEventListener('DOMContentLoaded', buildUI);
+  // expose save function
+  window.saveFicha = saveFichaEF;
 })();
 </script>
 
