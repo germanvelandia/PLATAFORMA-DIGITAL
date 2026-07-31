@@ -2506,5 +2506,318 @@ window.openManageGroupsModal = openGroupsModal;
   }); // ready
 })();
 </script>
+  <!-- PARCHE: Ficha organizada y función de guardado saveFicha(id) -->
+<script>
+(function enhancedFichaWithSave(){
+  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'fantasyclass_alm_db';
+  const HP_DEFAULT = 5;
+  const useToast = (msg, type='info', t=2500) => { if(typeof showToast === 'function') showToast(msg, type, t); else console.log(`[${type}] ${msg}`); };
+  const persistDB = () => {
+    if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e){ console.warn('localStorage write failed', e); }
+  };
+
+  function ready(fn){ if(document.readyState !== 'loading') fn(); else document.addEventListener('DOMContentLoaded', fn); }
+
+  ready(() => {
+    // Find ficha modal container robustly
+    const fichaBackdrop = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]') || null;
+    if(!fichaBackdrop){ console.warn('[enhancedFicha] No se encontró el modal ficha (id="ficha-modal")'); return; }
+    const modalContent = fichaBackdrop.querySelector('.modal.white') || fichaBackdrop.querySelector('.modal') || fichaBackdrop;
+
+    // Avoid injecting twice
+    if(modalContent.dataset.enhancedFicha === '1') return;
+    modalContent.dataset.enhancedFicha = '1';
+
+    // Preserve close button if exists
+    const closeBtn = modalContent.querySelector('.close-btn');
+    // Clear content and rebuild structured UI
+    modalContent.innerHTML = '';
+    if(closeBtn) modalContent.appendChild(closeBtn);
+
+    // Compact organized layout: header + tabs + single-column content for compactness
+    modalContent.insertAdjacentHTML('beforeend', `
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+        <div id="f_avatar_large" style="width:64px;height:64px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:900">A</div>
+        <div style="flex:1">
+          <div id="f_name_large" style="font-weight:900;font-size:18px;color:#111">Nombre estudiante</div>
+          <div id="f_subtitle" style="color:#666">Ficha • <span id="f_period_label"></span></div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div class="btn" id="f_save_button">Guardar</div>
+          <div class="btn" id="f_export_button">Exportar</div>
+        </div>
+      </div>
+
+      <div id="f_tabs" style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="f_tab_btn" data-tab="personal">1 • Personal / Contacto</button>
+        <button class="f_tab_btn" data-tab="actas">2 • Actas / Reuniones</button>
+        <button class="f_tab_btn" data-tab="observador">3 • Observador</button>
+        <button class="f_tab_btn" data-tab="gamificacion">4 • Gamificación</button>
+      </div>
+
+      <div id="f_tab_panels" style="display:grid;grid-template-columns:1fr;gap:12px">
+        <!-- Personal -->
+        <section id="tab-personal" class="f_tab_panel" style="display:block;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
+          <div style="font-weight:800;margin-bottom:8px">Datos Personales y Contacto</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <input id="f_field_name" class="f_input" placeholder="Nombre completo">
+            <div style="display:flex;gap:8px">
+              <input id="f_field_doc" class="f_input" placeholder="Documento">
+              <input id="f_field_birth" type="date" class="f_input" placeholder="Fecha de nacimiento">
+            </div>
+            <div style="display:flex;gap:8px">
+              <input id="f_field_course" class="f_input" placeholder="Curso (ej. 801)" readonly>
+              <input id="f_field_group" class="f_input" placeholder="Grupo (ej. Grupo A)" readonly>
+            </div>
+            <div style="display:flex;gap:8px">
+              <input id="f_field_eps" class="f_input" placeholder="EPS">
+              <input id="f_field_blood" class="f_input" placeholder="Grupo Sanguíneo / RH">
+            </div>
+            <hr>
+            <input id="f_field_parent" class="f_input" placeholder="Nombres acudientes">
+            <div style="display:flex;gap:8px">
+              <input id="f_field_phone" class="f_input" placeholder="Teléfono principal">
+              <input id="f_field_phone_emerg" class="f_input" placeholder="Teléfono emergencia">
+            </div>
+            <input id="f_field_email" class="f_input" placeholder="Correo electrónico">
+          </div>
+        </section>
+
+        <!-- Actas -->
+        <section id="tab-actas" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
+          <div style="font-weight:800;margin-bottom:8px">Registro de Actas y Reuniones</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="a_fecha" type="date" class="f_input" style="width:160px">
+            <select id="a_motivo" class="f_input" style="flex:1"><option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option></select>
+          </div>
+          <textarea id="a_resumen" rows="3" class="f_input" placeholder="Resumen / descargos..."></textarea>
+          <textarea id="a_compromisos" rows="2" class="f_input" placeholder="Compromisos / intervenciones..."></textarea>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <div class="btn" id="a_add_btn">Agregar Acta</div>
+          </div>
+          <div id="a_list" style="margin-top:10px;max-height:220px;overflow:auto"></div>
+        </section>
+
+        <!-- Observador -->
+        <section id="tab-observador" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
+          <div style="font-weight:800;margin-bottom:8px">Observador Convivencial</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="o_fecha" type="date" class="f_input" style="width:160px">
+            <select id="o_tipo" class="f_input" style="flex:1"><option>Incidente</option><option>Observación</option><option>Reporte</option></select>
+          </div>
+          <select id="o_clasif" class="f_input"><option>Leve</option><option>Moderado</option><option>Grave</option></select>
+          <textarea id="o_desc" rows="3" class="f_input" placeholder="Registro / ocurrencia..."></textarea>
+          <textarea id="o_descargo" rows="2" class="f_input" placeholder="Descargos del estudiante / acudiente..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <select id="o_estado" class="f_input" style="width:160px"><option>En proceso</option><option>Cerrado</option><option>Derivado</option></select>
+            <div class="btn" id="o_add_btn">Agregar Registro</div>
+          </div>
+          <div id="o_list" style="margin-top:10px;max-height:220px;overflow:auto"></div>
+        </section>
+
+        <!-- Gamificación -->
+        <section id="tab-game" class="f_tab_panel" style="display:none;background:#fff;padding:10px;border-radius:8px;border:1px solid #eee">
+          <div style="font-weight:800;margin-bottom:8px">Elementos Gamificados</div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="g_level" class="f_input" placeholder="Nivel" style="width:120px">
+            <input id="g_xp" class="f_input" placeholder="XP" style="width:140px" type="number">
+            <input id="g_hp" class="f_input" placeholder="HP" style="width:120px" type="number">
+          </div>
+          <input id="g_clan" class="f_input" placeholder="Clan / Equipo">
+          <input id="g_badges" class="f_input" placeholder="Insignias (separadas por comas)">
+          <div style="display:flex;justify-content:flex-end;margin-top:8px"><div class="btn" id="g_save_btn">Guardar gamificación</div></div>
+        </section>
+      </div>
+    `);
+
+    // Minimal styling helper for inputs (in case not present)
+    const style = document.createElement('style');
+    style.innerHTML = `
+      .f_input{ width:100%; padding:8px; border-radius:8px; border:1px solid #e6e6e6; box-sizing:border-box; }
+      .f_tab_btn{ padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); font-weight:800; cursor:pointer; }
+      .f_tab_btn.active{ background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01)); box-shadow:0 8px 30px rgba(0,0,0,0.2); }
+      .f_tab_panel{ display:block; }
+      .f_item{ padding:8px;border-bottom:1px solid #eee }
+    `;
+    document.head.appendChild(style);
+
+    // Tab behavior
+    const tabButtons = modalContent.querySelectorAll('.f_tab_btn');
+    tabButtons.forEach(btn => btn.addEventListener('click', () => {
+      tabButtons.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const selected = btn.dataset.tab;
+      modalContent.querySelectorAll('.f_tab_panel').forEach(p => p.style.display = (p.id === 'tab-'+selected) ? 'block' : 'none');
+    }));
+    // activate personal tab
+    if(tabButtons[0]) tabButtons[0].click();
+
+    // Internal render helpers
+    function renderActasList(student){
+      const list = modalContent.querySelector('#a_list'); if(!list) return;
+      list.innerHTML = '';
+      const arr = student.actas || [];
+      if(!arr.length){ list.innerHTML = '<div class="f_item" style="color:#666">Sin actas</div>'; return; }
+      arr.slice().reverse().forEach(a=>{
+        const d = document.createElement('div'); d.className='f_item';
+        d.innerHTML = `<div style="font-weight:800">${a.motivo} — ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div>`;
+        list.appendChild(d);
+      });
+    }
+    function renderObsList(student){
+      const list = modalContent.querySelector('#o_list'); if(!list) return;
+      list.innerHTML = '';
+      const arr = student.observador || [];
+      if(!arr.length){ list.innerHTML = '<div class="f_item" style="color:#666">Sin registros</div>'; return; }
+      arr.slice().reverse().forEach(o=>{
+        const d = document.createElement('div'); d.className='f_item';
+        d.innerHTML = `<div style="font-weight:800">${o.tipo} — ${o.fecha} • ${o.clasif || ''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div>`;
+        list.appendChild(d);
+      });
+    }
+
+    // find student utility
+    function findStudentById(id){
+      for(const grade of Object.keys(db.classes || {})){
+        const s = (db.classes[grade]||[]).find(x=>x.id===id);
+        if(s) return { student: s, grade };
+      }
+      return null;
+    }
+
+    // Fill UI from student object
+    function fillFichaUI(studentId){
+      const res = findStudentById(studentId);
+      if(!res){ useToast('Estudiante no encontrado','err'); return; }
+      const s = res.student;
+      modalContent.dataset.currentStudent = studentId;
+      modalContent.querySelector('#f_avatar_large').innerText = (s.name || ' ')[0] || 'A';
+      modalContent.querySelector('#f_name_large').innerText = s.name || '';
+      modalContent.querySelector('#f_period_label').innerText = document.getElementById('period-select')?.value || '';
+
+      modalContent.querySelector('#f_field_name')?.value = s.name || '';
+      modalContent.querySelector('#f_field_doc')?.value = s.document || s.doc || '';
+      modalContent.querySelector('#f_field_birth')?.value = s.birthdate || s.fnac || '';
+      modalContent.querySelector('#f_field_course')?.value = res.grade || '';
+      modalContent.querySelector('#f_field_group')?.value = (db.groups && db.groups[res.grade]) ? (Object.keys(db.groups[res.grade]).find(g=> db.groups[res.grade][g].includes(s.id)) || '-') : '-';
+      modalContent.querySelector('#f_field_eps')?.value = s.eps || '';
+      modalContent.querySelector('#f_field_blood')?.value = s.sangre || '';
+      modalContent.querySelector('#f_field_parent')?.value = (s.acudiente && s.acudiente.name) || s.acudiente || '';
+      modalContent.querySelector('#f_field_phone')?.value = (s.acudiente && s.acudiente.phone) || s.phone || '';
+      modalContent.querySelector('#f_field_phone_emerg')?.value = s.phone_emerg || '';
+      modalContent.querySelector('#f_field_email')?.value = s.email || '';
+
+      // actas & observador
+      s.actas = s.actas || [];
+      s.observador = s.observador || [];
+      renderActasList(s);
+      renderObsList(s);
+
+      // gamification
+      s.gamification = s.gamification || {};
+      modalContent.querySelector('#g_level').value = s.gamification.level || s.level || '';
+      modalContent.querySelector('#g_xp').value = s.gamification.xp || s.xp || 0;
+      modalContent.querySelector('#g_hp').value = s.gamification.hp || s.hp || HP_DEFAULT;
+      modalContent.querySelector('#g_clan').value = s.gamification.clan || s.clan || '';
+      modalContent.querySelector('#g_badges').value = (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', ');
+    }
+
+    // Action: add acta
+    modalContent.querySelector('#a_add_btn').addEventListener('click', ()=>{
+      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
+      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
+      const s = res.student;
+      const act = { id: Date.now(), fecha: modalContent.querySelector('#a_fecha').value || new Date().toLocaleDateString(), motivo: modalContent.querySelector('#a_motivo').value, resumen: modalContent.querySelector('#a_resumen').value, compromisos: modalContent.querySelector('#a_compromisos').value };
+      s.actas = s.actas || []; s.actas.push(act);
+      persistDB(); renderActasList(s); modalContent.querySelector('#a_resumen').value=''; modalContent.querySelector('#a_compromisos').value=''; useToast('Acta guardada','success');
+    });
+
+    // Action: add observador
+    modalContent.querySelector('#o_add_btn').addEventListener('click', ()=>{
+      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
+      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
+      const s = res.student;
+      const obs = { id: Date.now(), fecha: modalContent.querySelector('#o_fecha').value || new Date().toLocaleDateString(), tipo: modalContent.querySelector('#o_tipo').value, clasif: modalContent.querySelector('#o_clasif').value, desc: modalContent.querySelector('#o_desc').value, descargo: modalContent.querySelector('#o_descargo').value, estado: modalContent.querySelector('#o_estado').value };
+      s.observador = s.observador || []; s.observador.push(obs);
+      persistDB(); renderObsList(s); modalContent.querySelector('#o_desc').value=''; modalContent.querySelector('#o_descargo').value=''; useToast('Registro guardado','success');
+    });
+
+    // Action: save gamification
+    modalContent.querySelector('#g_save_btn').addEventListener('click', ()=>{
+      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
+      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
+      const s = res.student;
+      s.gamification = s.gamification || {};
+      s.gamification.level = modalContent.querySelector('#g_level').value || s.gamification.level;
+      s.gamification.xp = parseInt(modalContent.querySelector('#g_xp').value) || 0;
+      s.gamification.hp = parseInt(modalContent.querySelector('#g_hp').value) || HP_DEFAULT;
+      s.gamification.clan = modalContent.querySelector('#g_clan').value || '';
+      s.gamification.badges = (modalContent.querySelector('#g_badges').value||'').split(',').map(x=>x.trim()).filter(Boolean);
+      // reflect into main fields
+      s.level = parseInt(s.gamification.level) || s.level;
+      s.xp = parseInt(s.gamification.xp) || s.xp;
+      s.hp = parseInt(s.gamification.hp) || s.hp;
+      persistDB();
+      useToast('Gamificación guardada','success');
+      if(typeof renderStudentGrid === 'function') renderStudentGrid();
+    });
+
+    // Save all button: writes personal fields + calls persist
+    modalContent.querySelector('#f_save_button').addEventListener('click', ()=> {
+      const sid = modalContent.dataset.currentStudent; if(!sid) return useToast('Abre la ficha primero','warn');
+      const res = findStudentById(sid); if(!res) return useToast('Estudiante no encontrado','err');
+      const s = res.student;
+      s.name = modalContent.querySelector('#f_field_name').value || s.name;
+      s.document = modalContent.querySelector('#f_field_doc').value || s.document;
+      s.birthdate = modalContent.querySelector('#f_field_birth').value || s.birthdate;
+      s.eps = modalContent.querySelector('#f_field_eps').value || s.eps;
+      s.sangre = modalContent.querySelector('#f_field_blood').value || s.sangre;
+      s.acudiente = { name: modalContent.querySelector('#f_field_parent').value || '', phone: modalContent.querySelector('#f_field_phone').value || '', emerg: modalContent.querySelector('#f_field_phone_emerg').value || '', email: modalContent.querySelector('#f_field_email').value || '' };
+      persistDB();
+      useToast('Ficha guardada','success');
+      if(typeof renderStudentGrid === 'function') renderStudentGrid();
+    });
+
+    // Export button
+    modalContent.querySelector('#f_export_button').addEventListener('click', ()=>{
+      if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel();
+      else useToast('Export no disponible','warn');
+    });
+
+    // Expose public save function: saveFicha(studentId)
+    window.saveFicha = function(studentId){
+      try{
+        if(!studentId) studentId = modalContent.dataset.currentStudent;
+        if(!studentId) return useToast('No hay estudiante seleccionado','warn');
+        const res = findStudentById(studentId); if(!res) return useToast('Estudiante no encontrado','err');
+        // Do same as f_save_button handler
+        const s = res.student;
+        s.name = modalContent.querySelector('#f_field_name').value || s.name;
+        s.document = modalContent.querySelector('#f_field_doc').value || s.document;
+        s.birthdate = modalContent.querySelector('#f_field_birth').value || s.birthdate;
+        s.eps = modalContent.querySelector('#f_field_eps').value || s.eps;
+        s.sangre = modalContent.querySelector('#f_field_blood').value || s.sangre;
+        s.acudiente = { name: modalContent.querySelector('#f_field_parent').value || '', phone: modalContent.querySelector('#f_field_phone').value || '', emerg: modalContent.querySelector('#f_field_phone_emerg').value || '', email: modalContent.querySelector('#f_field_email').value || '' };
+        persistDB();
+        useToast('Ficha guardada (saveFicha)','success');
+        if(typeof renderStudentGrid === 'function') renderStudentGrid();
+      } catch(e){ console.error(e); useToast('Error guardando ficha','err'); }
+    };
+
+    // Helper: render actas/obs when filling
+    // (already used renderActasList/renderObsList above)
+
+    // Override global openFicha so existing buttons open this enhanced ficha
+    window.openFicha = function(studentId){
+      fillFichaUI(studentId);
+      showModal && showModal('ficha-modal');
+    };
+
+    // final log
+    console.log('[enhancedFicha] UI inyectada y saveFicha() expuesta.');
+  }); // ready
+})();
+</script>
 </body>
 </html>
