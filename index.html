@@ -2819,5 +2819,281 @@ window.openManageGroupsModal = openGroupsModal;
   }); // ready
 })();
 </script>
+  <!-- PARCHE: poblar/guardar ficha (Personal, Actas, Observador, Gamificación) -->
+<script>
+(function ensureFichaPopAndSave(){
+  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'fantasyclass_alm_db';
+  const HP_DEFAULT = 5;
+  const toast = (m,t='info',dur=2200) => { if(typeof showToast==='function') showToast(m,t,dur); else console.log('[toast]',t,m); };
+  const persistDB = () => { if(typeof saveDB==='function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('localStorage write failed', e); } };
+
+  // utility: find student by id across classes
+  function findStudentById(id){
+    if(!id) return null;
+    for(const grade of Object.keys(db.classes || {})){
+      const s = (db.classes[grade]||[]).find(x => x.id === id);
+      if(s) return { student: s, grade };
+    }
+    return null;
+  }
+
+  // helpers to set/get UI values with fallback selectors
+  function $(sel){ return document.querySelector(sel); }
+  function setVal(selectors, value){
+    for(const s of selectors){
+      const el = $(s);
+      if(el){ el.value = (value==null ? '' : value); return true; }
+    }
+    return false;
+  }
+  function getVal(selectors){
+    for(const s of selectors){
+      const el = $(s);
+      if(el) return el.value;
+    }
+    return '';
+  }
+  function appendHtml(sel, html){
+    const el = $(sel); if(!el) return; el.insertAdjacentHTML('beforeend', html);
+  }
+  function clearHtml(sel){ const el = $(sel); if(el) el.innerHTML = ''; }
+
+  // Render lists helpers (actas, observador, history)
+  function renderActas(student){
+    clearHtml('#a_list'); clearHtml('#actas_list'); // support both ids
+    const arr = student.actas || [];
+    const target = $('#a_list') || $('#actas_list') || $('#ficha-history') || null;
+    if(!target) return;
+    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
+    target.innerHTML = '';
+    arr.slice().reverse().forEach(a=>{
+      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div></div>`;
+      target.insertAdjacentHTML('beforeend', html);
+    });
+  }
+  function renderObs(student){
+    clearHtml('#o_list'); clearHtml('#obs_list');
+    const arr = student.observador || [];
+    const target = $('#o_list') || $('#obs_list') || null;
+    if(!target) return;
+    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
+    target.innerHTML = '';
+    arr.slice().reverse().forEach(o=>{
+      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${o.tipo} • ${o.fecha} • ${o.clasif||''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div></div>`;
+      target.insertAdjacentHTML('beforeend', html);
+    });
+  }
+  function renderQuickHistory(student){
+    const target = $('#f_quick_history') || $('#ficha-history') || $('#ficha-history'); if(!target) return;
+    target.innerHTML = '';
+    const arr = student.history || [];
+    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
+    arr.slice().reverse().slice(0,8).forEach(h=>{
+      const html = `<div style="padding:6px;border-bottom:1px solid #eee"><div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div></div>`;
+      target.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  // Fill UI from student data (tries many selector names so it works with your current UI)
+  function fillFichaUI(studentId){
+    const found = findStudentById(studentId);
+    if(!found){ toast('Estudiante no encontrado','err'); return; }
+    const s = found.student;
+    const grade = found.grade;
+
+    // header
+    setVal(['#ficha-avatar','#f_avatar','#f_avatar_large','#ficha-avatar-large'], (s.name||' ')[0] || 'A');
+    setVal(['#ficha-name','#f_name','#f_name_large','#f_name_large'], s.name || '');
+    setVal(['#ficha-period','#f_period','#f_period_label'], document.getElementById('period-select')?.value || '');
+    // Personal fields
+    setVal(['#f_field_name','#p_name','#f_nombre','#f_field_name'], s.name || '');
+    setVal(['#f_field_doc','#p_doc','#f_documento'], s.document || s.doc || '');
+    setVal(['#f_field_birth','#p_birth','#f_fnac'], s.birthdate || s.fnac || '');
+    setVal(['#f_field_course','#p_course'], grade || '');
+    setVal(['#f_field_group','#p_group','#f_field_group'], (db.groups && db.groups[grade]) ? (Object.keys(db.groups[grade]).find(g=> db.groups[grade][g].includes(s.id)) || '') : '');
+    setVal(['#f_field_eps','#p_eps'], s.eps || '');
+    setVal(['#f_field_blood','#p_blood','#f_sangre'], s.sangre || '');
+    setVal(['#f_field_parent','#p_acudiente','#f_acudiente'], (s.acudiente && (s.acudiente.name || s.acudiente)) || '');
+    setVal(['#f_field_phone','#p_phone'], (s.acudiente && s.acudiente.phone) || s.phone || '');
+    setVal(['#f_field_phone_emerg','#p_emerg','#f_tel_emerg'], s.phone_emerg || '');
+    setVal(['#f_field_email','#p_email'], s.email || '');
+
+    // Actas / Observador
+    s.actas = s.actas || [];
+    s.observador = s.observador || [];
+    renderActas(s);
+    renderObs(s);
+    renderQuickHistory(s);
+
+    // Gamificación
+    s.gamification = s.gamification || {};
+    setVal(['#g_level','#game-level','#f_game_level'], s.gamification.level || s.level || '');
+    setVal(['#g_xp','#game-xp','#f_game_xp','#ficha-xp'], s.gamification.xp || s.xp || 0);
+    setVal(['#g_hp','#game-hp','#f_game_hp','#ficha-hp'], s.gamification.hp || s.hp || HP_DEFAULT);
+    setVal(['#g_clan','#game-clan'], s.gamification.clan || s.clan || '');
+    setVal(['#g_badges','#game-badges'], (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', '));
+
+    // store current id on modal so saveFicha() can use it
+    const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
+    if(modal) modal.dataset.currentStudent = s.id;
+  }
+
+  // Save function: reads UI and writes to db
+  function saveFicha(studentId){
+    try{
+      if(!studentId){
+        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
+        studentId = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      }
+      if(!studentId) return toast('No hay estudiante seleccionado','warn');
+      const found = findStudentById(studentId);
+      if(!found) return toast('Estudiante no encontrado', 'err');
+      const s = found.student;
+
+      // read personal
+      s.name = getVal(['#f_field_name','#p_name','#f_nombre']) || s.name;
+      s.document = getVal(['#f_field_doc','#p_doc','#f_documento']) || s.document;
+      s.birthdate = getVal(['#f_field_birth','#p_birth','#f_fnac']) || s.birthdate;
+      s.eps = getVal(['#f_field_eps','#p_eps']) || s.eps;
+      s.sangre = getVal(['#f_field_blood','#p_blood','#f_sangre']) || s.sangre;
+      s.acudiente = { name: getVal(['#f_field_parent','#p_acudiente','#f_acudiente']) || '', phone: getVal(['#f_field_phone','#p_phone','#f_tel']) || '', emerg: getVal(['#f_field_phone_emerg','#p_emerg','#f_tel_emerg']) || '', email: getVal(['#f_field_email','#p_email','#f_email']) || '' };
+
+      // gamification
+      s.gamification = s.gamification || {};
+      s.gamification.level = getVal(['#g_level','#game-level','#f_game_level']) || s.gamification.level;
+      s.gamification.xp = parseInt(getVal(['#g_xp','#game-xp','#f_game_xp','#ficha-xp'])) || (s.gamification.xp||s.xp||0);
+      s.gamification.hp = parseInt(getVal(['#g_hp','#game-hp','#f_game_hp','#ficha-hp'])) || (s.gamification.hp||s.hp||HP_DEFAULT);
+      s.gamification.clan = getVal(['#g_clan','#game-clan']) || s.gamification.clan;
+      s.gamification.badges = (getVal(['#g_badges','#game-badges']) || '').split(',').map(x=>x.trim()).filter(Boolean);
+
+      // actas & observador saved via their respective handlers (below), but ensure arrays exist
+      s.actas = s.actas || [];
+      s.observador = s.observador || [];
+
+      persistDB();
+      toast('Ficha guardada','success');
+      if(typeof renderStudentGrid === 'function') renderStudentGrid();
+      return true;
+    } catch(e){
+      console.error(e);
+      toast('Error guardando ficha','err');
+      return false;
+    }
+  }
+
+  // Attach saveFicha to window for console or other usage
+  window.saveFicha = saveFicha;
+
+  // wire up Add Acta and Add Observador buttons (if present) — they should push into arrays and persist
+  function wireButtons(){
+    const aBtn = $('#a_add') || $('#a_add_btn') || $('#acta-add') || $('#acta-add');
+    if(aBtn && !aBtn.dataset.wired){
+      aBtn.addEventListener('click', ()=>{
+        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
+        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+        if(!sid) return toast('Abre la ficha primero','warn');
+        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
+        const s = res.student;
+        s.actas = s.actas || [];
+        const act = { id: Date.now(), fecha: getVal(['#a_fecha','input[name="a_fecha"]']) || new Date().toLocaleDateString(), motivo: getVal(['#a_motivo','#a_motivo_select']) || 'Otro', resumen: getVal(['#a_resumen','#acta-resumen']) || '', compromisos: getVal(['#a_compromisos','#acta-compromisos']) || '' };
+        s.actas.push(act);
+        persistDB(); renderActas(s); toast('Acta agregada','success');
+      });
+      aBtn.dataset.wired = '1';
+    }
+
+    const oBtn = $('#o_add') || $('#o_add_btn') || $('#obs-add') || $('#obs-add');
+    if(oBtn && !oBtn.dataset.wired){
+      oBtn.addEventListener('click', ()=>{
+        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
+        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+        if(!sid) return toast('Abre la ficha primero','warn');
+        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
+        const s = res.student;
+        s.observador = s.observador || [];
+        const obs = { id: Date.now(), fecha: getVal(['#o_fecha']) || new Date().toLocaleDateString(), tipo: getVal(['#o_tipo']) || 'Observación', clasif: getVal(['#o_clasif']) || '', desc: getVal(['#o_desc']) || '', descargo: getVal(['#o_descargo']) || '', estado: getVal(['#o_estado']) || 'En proceso' };
+        s.observador.push(obs);
+        persistDB(); renderObs(s); toast('Registro convivencial agregado','success');
+      });
+      oBtn.dataset.wired = '1';
+    }
+
+    // gamification save
+    const gBtn = $('#g_save') || $('#g_save_btn') || $('#game-save');
+    if(gBtn && !gBtn.dataset.wired){
+      gBtn.addEventListener('click', ()=>{
+        const modal = document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]');
+        const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+        if(!sid) return toast('Abre la ficha primero','warn');
+        const res = findStudentById(sid); if(!res) return toast('Estudiante no encontrado','err');
+        const s = res.student;
+        s.gamification = s.gamification || {};
+        s.gamification.level = getVal(['#g_level','#game-level']) || s.gamification.level;
+        s.gamification.xp = parseInt(getVal(['#g_xp','#game-xp'])) || s.gamification.xp || 0;
+        s.gamification.hp = parseInt(getVal(['#g_hp','#game-hp'])) || s.gamification.hp || HP_DEFAULT;
+        s.gamification.clan = getVal(['#g_clan','#game-clan']) || s.gamification.clan || '';
+        s.gamification.badges = (getVal(['#g_badges','#game-badges'])||'').split(',').map(x=>x.trim()).filter(Boolean);
+        // reflect
+        s.level = parseInt(s.gamification.level) || s.level;
+        s.xp = parseInt(s.gamification.xp) || s.xp;
+        s.hp = parseInt(s.gamification.hp) || s.hp;
+        persistDB();
+        toast('Gamificación guardada','success');
+        if(typeof renderStudentGrid === 'function') renderStudentGrid();
+      });
+      gBtn.dataset.wired = '1';
+    }
+
+    // wire save main button if present
+    const saveBtn = $('#f_save_all') || $('#f_save_button') || $('#f_save');
+    if(saveBtn && !saveBtn.dataset.wired){
+      saveBtn.addEventListener('click', ()=> saveFicha());
+      saveBtn.dataset.wired = '1';
+    }
+  }
+
+  // renderActas/renderObs helpers used by buttons above (re-declare but safe)
+  function renderActas(student){
+    const target = $('#a_list') || $('#actas_list') || $('#ficha-history') || null;
+    if(!target) return;
+    target.innerHTML = '';
+    const arr = student.actas || [];
+    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
+    arr.slice().reverse().forEach(a=>{
+      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div></div>`;
+      target.insertAdjacentHTML('beforeend', html);
+    });
+  }
+  function renderObs(student){
+    const target = $('#o_list') || $('#obs_list') || null;
+    if(!target) return;
+    target.innerHTML = '';
+    const arr = student.observador || [];
+    if(!arr.length){ target.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
+    arr.slice().reverse().forEach(o=>{
+      const html = `<div style="padding:8px;border-bottom:1px solid #eee"><div style="font-weight:800">${o.tipo} • ${o.fecha}</div><div style="color:#444">${o.desc}</div></div>`;
+      target.insertAdjacentHTML('beforeend', html);
+    });
+  }
+
+  // Override window.openFicha so it populates new fields when opening
+  const originalOpenFicha = window.openFicha;
+  window.openFicha = function(id){
+    // call original if exists (to open modal and any side effects)
+    try{ if(typeof originalOpenFicha === 'function') originalOpenFicha(id); }catch(e){ console.warn('original openFicha failed', e); }
+    // then populate fields after short delay (modal DOM may be shown)
+    setTimeout(()=> {
+      fillFichaUI(id);
+      wireButtons();
+    }, 120);
+  };
+
+  // expose helpers for debug
+  window.__ficha_helpers = { fillFichaUI, saveFicha, wireButtons, findStudentById };
+
+  // initial wire (if modal already open)
+  setTimeout(()=>{ wireButtons(); }, 500);
+})();
+</script>
 </body>
 </html>
