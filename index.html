@@ -909,5 +909,75 @@ window.promptDeleteStudent = promptDeleteStudent;
 window.openManageGroupsModal = openGroupsModal;
 
 </script>
+  <!-- ====== Parche: habilitar menús (clic + teclado) ====== -->
+<style>
+  /* Asegura que el toggle por clase funcione y tenga prioridad */
+  .menu-panel{ display:none !important; }
+  .menu.open .menu-panel{ display:block !important; }
+  /* Asegura que los botones se vean interactivos y accesibles */
+  .menu-button{ cursor:pointer; user-select:none; outline: none; }
+  .menu-button:focus{ box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+  /* En caso de que haya botones accidentalmente deshabilitados */
+  .menu-button[disabled]{ pointer-events: auto !important; opacity: 1 !important; }
+</style>
+
+<script>
+  (function enableMenus(){
+    // Remove disabled attribute from any menu-button accidentally disabled
+    document.querySelectorAll('.menu-button[disabled]').forEach(btn => btn.removeAttribute('disabled'));
+
+    // Make menu-button keyboard-focusable and add ARIA
+    document.querySelectorAll('.menu-button').forEach(btn => {
+      if (!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex', '0');
+      if (!btn.hasAttribute('role')) btn.setAttribute('role', 'button');
+      btn.setAttribute('aria-expanded', 'false');
+
+      // click toggles its parent .menu open state
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const menu = btn.closest('.menu');
+        if(!menu) return;
+        const isOpen = menu.classList.toggle('open');
+        btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        // close other menus
+        document.querySelectorAll('.menu').forEach(m => { if(m !== menu) { m.classList.remove('open'); const b = m.querySelector('.menu-button'); if(b) b.setAttribute('aria-expanded','false'); } });
+      });
+
+      // keyboard support: Enter and Space toggle menu
+      btn.addEventListener('keydown', (ev) => {
+        if(ev.key === 'Enter' || ev.key === ' '){
+          ev.preventDefault();
+          btn.click();
+        } else if(ev.key === 'Escape'){
+          // close all menus on Escape
+          document.querySelectorAll('.menu').forEach(m => { m.classList.remove('open'); const b = m.querySelector('.menu-button'); if(b) b.setAttribute('aria-expanded','false'); });
+        }
+      });
+    });
+
+    // Close menus when clicking outside
+    document.addEventListener('click', (e) => {
+      if(!e.target.closest('.menu')){
+        document.querySelectorAll('.menu').forEach(m => {
+          m.classList.remove('open');
+          const b = m.querySelector('.menu-button');
+          if(b) b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+
+    // Optional: close menus on Escape globally
+    document.addEventListener('keydown', (e) => {
+      if(e.key === 'Escape'){
+        document.querySelectorAll('.menu').forEach(m => {
+          m.classList.remove('open');
+          const b = m.querySelector('.menu-button');
+          if(b) b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+  })();
+</script>
+<!-- ====== /parche ====== -->
 </body>
 </html>
