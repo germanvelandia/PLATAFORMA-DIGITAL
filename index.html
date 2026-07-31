@@ -3,34 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FantasyClass Convivencial | ALM</title>
-    <!-- Cargamos Tailwind -->
+    <title>FantasyClass Convivencial - Colegio Alfonso López Michelsen</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; }
-        .glass { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%); color: #f8fafc; min-height: 100vh; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); }
+        .card-hover { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(245, 158, 11, 0.25); border-color: rgba(245, 158, 11, 0.4); }
     </style>
 </head>
-<body class="p-4 md:p-6">
-    
-    <div id="app" class="max-w-7xl mx-auto space-y-6">
-        <!-- HEADER -->
-        <header class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
+<body class="p-6">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        <!-- Header -->
+        <header class="glass-panel p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
             <div>
                 <h1 class="text-2xl font-black text-amber-400">FantasyClass ALM</h1>
                 <p class="text-xs text-slate-400">Panel de Control Convivencial</p>
             </div>
-            <div id="global-stats" class="flex gap-4">
-                <!-- Aquí irán los 6 pilares de métricas -->
+            <div id="stats" class="flex gap-4 text-xs font-bold">
+                <span class="text-emerald-400">🐘 Resp: 0 pts</span>
+                <span class="text-amber-400">🦁 Resp: 0 pts</span>
             </div>
         </header>
 
-        <!-- GRILLA DE ESTUDIANTES -->
+        <!-- Grilla de Estudiantes -->
         <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Las tarjetas de los estudiantes se inyectarán aquí -->
+            <!-- Las tarjetas se cargarán aquí -->
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script>
+        // Datos de prueba
+        const estudiantes = [
+            { id: 1, nombre: "Alan Felipe Llanos", nivel: 1, xp: 9 },
+            { id: 2, nombre: "Alison Maria Gracia", nivel: 1, xp: 9 }
+        ];
+
+        function renderGrid() {
+            const grid = document.getElementById('students-grid');
+            grid.innerHTML = estudiantes.map(e => `
+                <div class="glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between mb-2">
+                            <span class="bg-amber-500/20 text-amber-300 text-[10px] px-2 py-0.5 rounded-full">NIVEL ${e.level}</span>
+                            <span class="text-emerald-400 text-xs font-bold">+ ${e.xp} XP</span>
+                        </div>
+                        <h2 class="font-bold text-sm text-white">${e.nombre}</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button class="bg-emerald-600/80 hover:bg-emerald-500 text-[10px] py-1.5 rounded-xl font-bold transition">Mérito</button>
+                        <button class="bg-red-600/80 hover:bg-red-500 text-[10px] py-1.5 rounded-xl font-bold transition">Falta</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderGrid();
+    </script>
 </body>
 </html>
