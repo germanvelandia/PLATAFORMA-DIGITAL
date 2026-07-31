@@ -992,5 +992,98 @@ window.openManageGroupsModal = openGroupsModal;
   })();
 </script>
 <!-- ====== /parche ====== -->
+  <!-- Parche: asignar acciones a Clases->Grados y Herramientas->Grupos (sin tocar HTML existente) -->
+<script>
+(function patchMenusAssignActions(){
+  function safeCall(fnName){
+    try {
+      if(typeof window[fnName] === 'function') return window[fnName];
+    } catch(e){}
+    return null;
+  }
+
+  // Prefer openGroupsModal, fallback to openManageGroupsModal, fallback to alert
+  const openGroups = safeCall('openGroupsModal') || safeCall('openManageGroupsModal') || safeCall('openManageGroups') || function(){ alert('Función de abrir gestión de grupos no encontrada'); };
+
+  // Ensure menu-buttons exist and panels present
+  const classesMenu = document.getElementById('menu-classes');
+  const toolsMenu = document.getElementById('menu-tools');
+
+  // Helper: find existing button by regex on textContent
+  function findButtonContaining(panel, regex){
+    if(!panel) return null;
+    return Array.from(panel.querySelectorAll('button')).find(b => regex.test(b.textContent.trim()));
+  }
+
+  // 1) In "Clases" menu: ensure there's a "Grados" or "Grado" button that opens group management.
+  if(classesMenu){
+    const panel = classesMenu.querySelector('.menu-panel');
+    if(panel){
+      let btn = findButtonContaining(panel, /grado/i);
+      if(!btn){
+        // create a small button at top if missing
+        btn = document.createElement('button');
+        btn.innerHTML = '<i class="fa-solid fa-layer-group"></i> Grados';
+        // put it at the top
+        panel.insertBefore(btn, panel.firstChild);
+      }
+      // assign click handler (toggle menu then open)
+      btn.onclick = function(e){
+        e.stopPropagation();
+        // close other menus and open this menu briefly for consistency (optional)
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+        classesMenu.classList.add('open');
+        // call the open function
+        try { openGroups(); } catch(err){ console.error(err); }
+        // keep menu state consistent (close)
+        setTimeout(()=> classesMenu.classList.remove('open'), 200);
+      };
+      btn.style.cursor = 'pointer';
+    }
+  }
+
+  // 2) In "Herramientas" menu: ensure there's a "Grupos" button that opens group management
+  if(toolsMenu){
+    const panel = toolsMenu.querySelector('.menu-panel');
+    if(panel){
+      let btnG = findButtonContaining(panel, /grupo/i);
+      if(!btnG){
+        btnG = document.createElement('button');
+        btnG.innerHTML = '<i class="fa-solid fa-users"></i> Grupos';
+        panel.appendChild(btnG);
+      }
+      btnG.onclick = function(e){
+        e.stopPropagation();
+        document.querySelectorAll('.menu').forEach(m => m.classList.remove('open'));
+        toolsMenu.classList.add('open');
+        try { openGroups(); } catch(err){ console.error(err); }
+        setTimeout(()=> toolsMenu.classList.remove('open'), 200);
+      };
+      btnG.style.cursor = 'pointer';
+    }
+  }
+
+  // 3) Defensive: if the menu-button itself has no handler, map click to open the panel (keeps behaviour)
+  document.querySelectorAll('.menu-button').forEach(mbtn => {
+    // If it already has a click listener (inline onclick or bound), don't override
+    const hasOnclick = mbtn.onclick || mbtn.getAttribute('onclick');
+    if(!hasOnclick){
+      mbtn.addEventListener('click', (e) => {
+        const menu = mbtn.closest('.menu');
+        if(!menu) return;
+        menu.classList.toggle('open');
+      });
+    }
+  });
+
+  // 4) Accessibility: ensure menu-button is focusable
+  document.querySelectorAll('.menu-button').forEach(b => {
+    if(!b.hasAttribute('tabindex')) b.setAttribute('tabindex','0');
+    if(!b.hasAttribute('role')) b.setAttribute('role','button');
+  });
+
+  console.log('[patchMenusAssignActions] Parche aplicado: Clases->Grados y Herramientas->Grupos');
+})();
+</script>
 </body>
 </html>
