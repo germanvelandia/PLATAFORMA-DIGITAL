@@ -38,6 +38,10 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+    <!-- FIREBASE COMPAT SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -79,7 +83,6 @@
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen">
 
-    <!-- HEADER / BARRA DE NAVEGACIÓN -->
     <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
         <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
             
@@ -99,16 +102,16 @@
                 </div>
             </div>
 
-            <!-- CONTROLES Y HERRAMIENTAS -->
+            <!-- CLASS SELECTOR & ACTIONS TOOLBAR -->
             <div class="flex items-center flex-wrap justify-center gap-2">
                 
-                <!-- Google Sync Badge -->
+                <!-- Google Sync Badge (Forms & Drive) -->
                 <button onclick="openDriveSettingsModal()" id="drive-status-badge" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 transition" title="Configurar conexión directa con Google Drive / Forms / Sheets">
                     <i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-1.5"></i>
                     <span id="drive-status-text">Google Forms/Drive Sync</span>
                 </button>
 
-                <!-- Selector de Periodo -->
+                <!-- Academic Period Selector -->
                 <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-1.5">
                     <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-2"></i>
                     <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
@@ -120,21 +123,21 @@
                     </select>
                 </div>
 
-                <!-- Selector de Curso -->
+                <!-- Select Class Dropdown -->
                 <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5">
                     <i class="fa-solid fa-users text-colegio-gold text-xs mr-2"></i>
                     <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer">
-                        <!-- Generado dinámicamente -->
+                        <!-- Options generated dynamically -->
                     </select>
                 </div>
 
-                <!-- Botón Gestión de Grupos -->
+                <!-- MANAGE GROUPS BUTTON -->
                 <button onclick="openManageGroupsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Añadir o eliminar grupos">
                     <i class="fa-solid fa-layer-group text-indigo-400"></i>
                     <span class="hidden sm:inline">Grupos</span>
                 </button>
 
-                <!-- Menú Exportar Excel -->
+                <!-- EXPORT DROPDOWN MENU -->
                 <div class="relative inline-block text-left">
                     <button onclick="toggleExportMenu()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
                         <i class="fa-solid fa-file-excel text-emerald-300"></i>
@@ -153,7 +156,7 @@
                     </div>
                 </div>
 
-                <!-- Botones de Herramientas Rápida -->
+                <!-- Quick Action Tools Buttons -->
                 <button onclick="openDiceModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Tirar Dado Virtual">
                     <i class="fa-solid fa-dice text-rose-400"></i>
                     <span class="hidden sm:inline">Dado</span>
@@ -174,7 +177,7 @@
 
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
-        <!-- DASHBOARD DE MÉTRICAS (6 PILARES) -->
+        <!-- DASHBOARD METRICS BAR (6 CHARACTER COUNTS PILLARS) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
                 <div class="text-xl">🐘</div>
@@ -225,7 +228,6 @@
             </div>
         </div>
 
-        <!-- BARRA DE BÚSQUEDA Y ACCIÓN -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="relative w-full sm:w-80">
                 <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
@@ -248,14 +250,13 @@
             </div>
         </div>
 
-        <!-- GRILLA DE TARJETAS DE ESTUDIANTES -->
+        <!-- STUDENTS GRID CONTAINER -->
         <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <!-- Inyectado dinámicamente -->
+            <!-- Student cards injected dynamically -->
         </div>
     </main>
 
-
-    <!-- MODAL 1: REGISTRAR MÉRITO O FALTA -->
+    <!-- MODAL 1: AWARD MERIT / REGISTER INCIDENT -->
     <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeAwardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -327,12 +328,12 @@
 
             <button onclick="saveStudentEntry()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-floppy-disk"></i>
-                <span>Guardar Registro</span>
+                <span>Guardar Registro en Observador y Nube</span>
             </button>
         </div>
     </div>
 
-    <!-- MODAL 2: HISTORIAL Y OBSERVADOR DEL ESTUDIANTE -->
+    <!-- MODAL 2: STUDENT OBSERVADOR & HISTORY SHEET -->
     <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
             <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -352,6 +353,7 @@
                     </div>
                 </div>
 
+                <!-- EXPORT SINGLE STUDENT TO EXCEL -->
                 <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar esta Ficha Individual a Excel (.xlsx)">
                     <i class="fa-solid fa-file-excel text-emerald-300"></i>
                     <span>Exportar Ficha (.xlsx)</span>
@@ -385,7 +387,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: GOOGLE DRIVE / FORMS SETTINGS -->
+    <!-- MODAL 3: GOOGLE DRIVE / FORMS AUTOMATIC SYNC SETTINGS -->
     <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -398,16 +400,18 @@
                 </div>
                 <div>
                     <h3 class="font-display font-extrabold text-base text-white">Conexión con Google Drive mediante Formularios</h3>
-                    <p class="text-xs text-emerald-300 font-bold">Guarda automáticamente cada falta/mérito en Drive</p>
+                    <p class="text-xs text-emerald-300 font-bold">¡Sin necesidad de programar ni usar Apps Script!</p>
                 </div>
             </div>
 
             <div class="bg-slate-900 p-3 rounded-2xl border border-white/10 text-xs space-y-3 mb-4">
-                <p class="font-bold text-amber-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Instrucciones de Vinculación:</p>
+                <p class="font-bold text-amber-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> ¿Cómo funciona la conexión con Google Forms?</p>
                 <ol class="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px]">
-                    <li>Crea un Formulario de Google en tu Drive.</li>
-                    <li>Vincúlalo con una Hoja de Cálculo en Google Sheets.</li>
-                    <li>Pega la URL del formulario o Webhook abajo.</li>
+                    <li>Crea un <strong>Formulario de Google</strong> en tu Drive con estas preguntas breves: 
+                        <span class="text-slate-400 italic">(Curso, Estudiante, Tipo, Pilar, Puntos, Observación)</span>.
+                    </li>
+                    <li>En el formulario, ve a la pestaña <strong>Respuestas</strong> y haz clic en <strong>"Vincular con Hoja de cálculo"</strong>.</li>
+                    <li>Pega la URL de tu formulario o enlace de respuesta abajo.</li>
                 </ol>
             </div>
 
@@ -429,7 +433,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: GESTIÓN DE GRUPOS Y CURSOS -->
+    <!-- MODAL 4: MANAGE GROUPS & COURSES -->
     <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -441,20 +445,22 @@
                 <span>Gestión de Cursos y Grupos</span>
             </h3>
 
+            <!-- Add new group form -->
             <div class="flex gap-2 mb-4 bg-slate-900 p-2 rounded-2xl border border-white/10">
                 <input type="text" id="new-group-input" placeholder="Nombre de nuevo grupo (Ej. 1101)" class="flex-grow bg-transparent px-2 text-xs text-white placeholder-slate-500 focus:outline-none">
                 <button onclick="addNewGroup()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition">
-                    Crear Grupo
+                    Crear
                 </button>
             </div>
 
+            <!-- List of available groups -->
             <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container">
-                <!-- Inyectado dinámicamente -->
+                <!-- Injected dynamically -->
             </div>
         </div>
     </div>
 
-    <!-- MODAL 5: AÑADIR NUEVO ESTUDIANTE -->
+    <!-- MODAL 5: ADD NEW STUDENT MODAL -->
     <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -469,7 +475,7 @@
         </div>
     </div>
 
-    <!-- MODAL 6: CONFIRMACIÓN Y ALERTAS -->
+    <!-- MODAL 6: CONFIRMATION MODAL -->
     <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
@@ -479,7 +485,7 @@
             <p id="confirm-message" class="text-xs text-slate-400 mb-5 leading-relaxed">Esta acción no se puede deshacer.</p>
             <div class="flex gap-2">
                 <button id="confirm-action-btn" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition">
-                    Aceptar
+                    Eliminar
                 </button>
                 <button onclick="closeConfirmModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition">
                     Cancelar
@@ -488,7 +494,7 @@
         </div>
     </div>
 
-    <!-- MODAL 7: RULETA DE SELECCIÓN ALEATORIA -->
+    <!-- MODALS: RULETA, DADO & CRONÓMETRO -->
     <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -504,7 +510,6 @@
         </div>
     </div>
 
-    <!-- MODAL 8: DADO VIRTUAL -->
     <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeDiceModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -520,7 +525,6 @@
         </div>
     </div>
 
-    <!-- MODAL 9: CRONÓMETRO DE CLASE -->
     <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeTimerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -546,8 +550,8 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN COMPLETA -->
     <script>
+        // DEFAULT ROSTERS FOR ALL GRADES
         const DEFAULT_ROSTERS = {
             "801": ["Jhanair Cantillo buelvas", "Emily Alejandra Carabali calvo", "Johan Alejandro Carrillo Daza", "Nataly Gisseth Carvajal Alba", "JUAN ESTEBAN CUERVO HERRERA", "Sara Sofía Galeano Vargas", "MELANY GARCIA GIRALDO", "HELEN GONZALEZ YAYA", "JULIAN GONZALEZ (801)", "ALISON MARIA GRACIA CULMA", "CAMILA ANDREA HERRERA ALVAREZ", "Alan Felipe Llanos Hernandez", "JHAN VALENTIN LOPEZ VALENCIA", "Mariany Marquez Lizo", "OMAR OSPINO BANDERAS", "Saira Palacios Riaño", "johan sebastian pardo niño (801)", "GENESIS VALENTINA POLO MERIÑO", "Sebastián Alberto Portillo colmenares", "Jhoel Riaño Garzón", "ALISSON RIVEROS (801)", "Samantha Rodríguez Moreno", "DANNA RODRIGUEZ NAVARRO", "Lina Sofia Rojas Salamanca", "Miguel Ruiz (801)", "YUNAISIS SALGADO CASTRO", "Nathaly Solano Torres", "Cindylorena Tellez(801)", "Fernanda Tenorio quiñones", "SAMUEL ALEJANDRO TINOCO PINZON", "NICOOL SARA VASQUEZ URREA", "GREYSMAR ZUÑIGA VITORINO"],
             "802": ["MARYIS CAMILA AREVALO (802)", "Emanuel Buitrago (802)", "Elisabeth Carmona Gracia", "Jobsanim susana Colina calles", "Luisa Alejandra Díaz Yepes (802)", "Matias Escobar flores", "Dilan David Garcia Leal 802", "Héctor Garzón Ramirez", "ANGEL DANIEL GONZALEZ (802)", "Sharol Dayana Gutierrez Téllez", "Karol Dayana Hueso Pulido", "Claudia Gabriela Leiva Gomez", "Holman Esneyder Mena Mosquera", "Sara Gisell Neira Pardo(802)", "Dyland Alejandro Nieto (802)", "Sara Ocampo Isaza", "María Fernanda Orozco Diaz 802", "Juan Esteban Orozco Higuita", "María Fernanda Osorio huérfano", "ZARA VALENTINA PEDRAZA ZAMORA", "Sharith Liceth Riascos Conrado", "Maria Victoria Rodriguez Moreno", "Sara Valentina Rodriguez Ocampo", "David Santiago Rodríguez Ortiz", "Danna Valeria Rojas Florez(802)", "Valery Maria Romero Capera", "Angel David Saavedra Peñuela", "María Fernanda Saenz Fresneda", "Alisson Geraldine Sanabria Bernal", "Darly maryori Solano cubides", "DYLAN SEBASTIAN SOLIS HERNANDEZ", "MARIA JOSE TORO RUIZ (802)"],
@@ -562,12 +566,22 @@
             "1003": ["Laura Estefania Arenas Real", "OMAR BUITRAGO PEREZ", "MAICOL ANDRES CAMACHO BARRERA", "Steeven Daniel Cantero Geney", "Andrea Camila Cudris (1003)", "DANIELA SOFIA GARCERA GONZALEZ", "KEVIN SANTIAGO GARCIA RAMIREZ", "Laura Giron (1003)", "ANGIE KATHERINE GODOY LOPEZ", "Jhonatan Gonzalez 1003", "Sara González 1003", "DANNA GABRIELA GONZALEZ LOPEZ", "URIEL STEVEN GUTIERREZ GALINDO", "David Santiago Herrera Sanabria", "Nicolás Holguín Amador", "ANGIE JULIETH JIMENEZ LUMBA", "AURA CRISTINA MARQUEZ PINTO", "MAURA VALERIA MARTINEZ ACOSTA", "BREYNER MARTINEZ MONSALVE", "JONATHAN DAVID MARTINEZ TELLEZ", "Sara sofia Matiz Sandoval", "DANYERY NATALIA MORENO PIRATOBA", "Sara Milena Murillo Cifuentes", "Valery Ximena Ochoa farigua", "DANNA GABRIELA OSORIO VARGAS", "BRANDON JAVIER OSORIO VELASQUEZ", "sara camila Patino Orjuela", "SARA ISABEL PEREA RAMIREZ", "melany ramos1003", "Alejandro Reyes pinzón", "DANNA KAMILA RODRIGUEZ ACOSTA", "Maria Alejandra Romero Díaz", "SARA VALENTINA SAENZ GARCIA", "DANIEL ALEJANDRO SUAREZ GALINDO", "Yulian Santiago Torres Arevalo", "ISABELLA TORRES VERGARA", "LAURA VIVIANA VASQUEZ BUSTOS", "Duban Stiver Velasco (1003)", "JOSETT JAIR ZAMORA AMANTE"]
         };
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGjUdnghS8bMwu3T5zDR0FgOAIOsjKaDY",
+            authDomain: "fantasyclass-alm.firebaseapp.com",
+            projectId: "fantasyclass-alm",
+            storageBucket: "fantasyclass-alm.firebasestorage.app",
+            messagingSenderId: "197366368735",
+            appId: "1:197366368735:web:aff964290af5d93eae1c6a"
+        };
+
         let currentClassKey = "801";
         let currentPeriod = "P1";
         let selectedStudentId = null;
         let activeEntryType = 'positive';
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
+        let firestoreDb = null;
         let confirmCallback = null;
 
         function initDatabase() {
@@ -596,6 +610,14 @@
 
         function saveDatabase() {
             localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState));
+            if (firestoreDb) {
+                try {
+                    firestoreDb.collection("cursos").doc(currentClassKey).set({
+                        estudiantes: dbState.classes[currentClassKey],
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch(e) {}
+            }
         }
 
         function updateClassSelectOptions() {
@@ -626,7 +648,11 @@
                     formData.append('entry.5', entryData.puntos || 0);
                     formData.append('entry.6', entryData.nota || '');
 
-                    fetch(url, { method: 'POST', mode: 'no-cors', body: formData });
+                    fetch(url, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData
+                    });
                 } else {
                     fetch(url, {
                         method: 'POST',
@@ -680,6 +706,7 @@
 
         function exportCurrentClassExcel() {
             const students = dbState.classes[currentClassKey] || [];
+            
             const summaryRows = students.map((s, idx) => {
                 const obsCount = (s.history || []).filter(h => h.type === 'negative').length;
                 const positiveCount = (s.history || []).filter(h => h.type === 'positive').length;
@@ -824,9 +851,8 @@
             const name = input.value.trim();
             if (!name) return;
 
-            if (!dbState.classes[currentClassKey]) dbState.classes[currentClassKey] = [];
-
-            dbState.classes[currentClassKey].push({
+            const students = dbState.classes[currentClassKey] || [];
+            students.push({
                 id: `${currentClassKey}_${Date.now()}`,
                 name: name,
                 xp: 0,
@@ -1231,15 +1257,11 @@
             input.value = '';
         }
 
-        // FUNCIONES DE RULETA
         function openWheelModal() { document.getElementById('wheel-modal').classList.remove('hidden'); }
         function closeWheelModal() { document.getElementById('wheel-modal').classList.add('hidden'); }
         function spinStudentWheel() {
             const students = dbState.classes[currentClassKey] || [];
-            if (students.length === 0) {
-                document.getElementById('wheel-display').innerText = "Sin estudiantes";
-                return;
-            }
+            if (students.length === 0) return;
             const display = document.getElementById('wheel-display');
             let count = 0;
             const interval = setInterval(() => {
@@ -1253,7 +1275,6 @@
             }, 100);
         }
 
-        // FUNCIONES DE DADO
         function openDiceModal() { document.getElementById('dice-modal').classList.remove('hidden'); }
         function closeDiceModal() { document.getElementById('dice-modal').classList.add('hidden'); }
         function rollDice() {
@@ -1266,7 +1287,6 @@
             }, 80);
         }
 
-        // FUNCIONES DE CRONÓMETRO
         let timerSeconds = 300;
         let timerInterval = null;
         function openTimerModal() { document.getElementById('timer-modal').classList.remove('hidden'); }
@@ -1306,7 +1326,7 @@
             document.getElementById('timer-toggle-btn').innerText = "Iniciar";
         }
 
-        // INICIALIZACIÓN
+        // INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
             initDatabase();
             renderStudentGrid();
