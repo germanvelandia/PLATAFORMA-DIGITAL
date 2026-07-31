@@ -3111,8 +3111,390 @@ window.openManageGroupsModal = openGroupsModal;
   #enh-ficha .ef-collapsible{background:#fafafa;padding:8px;border-radius:8px;border:1px solid #f0f0f0;margin-top:8px}
   @media(max-width:900px){ #enh-ficha .ef-grid{grid-template-columns:1fr} }
 </style>
+<script>
+  <!-- FICHA: Presentación mejorada + botones Guardar (pegar antes de </body>) -->
+<style>
+  /* Scoped styles para la ficha mejorada (idempotente) */
+  #ef2-ficha { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; color:#111; }
+  #ef2-ficha .ef2-header{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+  #ef2-ficha .ef2-avatar{width:64px;height:64px;border-radius:10px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-weight:800}
+  #ef2-ficha .ef2-title{font-weight:900;font-size:18px}
+  #ef2-ficha .ef2-sub{color:var(--muted)}
+  #ef2-ficha .ef2-grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
+  #ef2-ficha .ef2-panel{background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;box-shadow:0 6px 18px rgba(10,10,10,0.03)}
+  #ef2-ficha .ef2-section{margin-bottom:10px}
+  #ef2-ficha .ef2-row{display:flex;gap:8px;margin-bottom:8px}
+  #ef2-ficha .ef2-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;box-sizing:border-box}
+  #ef2-ficha .ef2-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+  #ef2-ficha .ef2-small{font-size:13px;color:var(--muted)}
+  @media(max-width:900px){ #ef2-ficha .ef2-grid{grid-template-columns:1fr} }
+</style>
 
 <script>
+(function injectFichaV2(){
+  const STORAGE_KEY = 'fantasyclass_alm_db';
+  const HP_DEFAULT = 5;
+  const modalId = 'ficha-modal';
+
+  function safePersist(){
+    try{
+      if(typeof saveDB === 'function'){ saveDB(); return; }
+    }catch(e){ console.warn('saveDB fallo', e); }
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){}
+  }
+  function toast(msg, type='info', t=2200){
+    if(typeof showToast === 'function') return showToast(msg,type,t);
+    console.log('[toast]',type,msg);
+  }
+
+  function findModal(){
+    return document.getElementById(modalId) || document.querySelector('[id*="ficha-modal"]') || null;
+  }
+  function findModalContent(modal){
+    if(!modal) return null;
+    return modal.querySelector('.modal.white') || modal.querySelector('.modal') || modal;
+  }
+
+  // build UI once
+  function buildUI(){
+    const modal = findModal(); if(!modal) return;
+    const content = findModalContent(modal); if(!content) return;
+    if(content.querySelector('#ef2-ficha')) return; // already injected
+
+    // preserve close button
+    const closeBtn = content.querySelector('.close-btn');
+    content.innerHTML = '';
+    if(closeBtn) content.appendChild(closeBtn);
+
+    content.insertAdjacentHTML('beforeend', `
+      <div id="ef2-ficha">
+        <div class="ef2-header">
+          <div class="ef2-avatar" id="ef2-avatar">A</div>
+          <div style="flex:1">
+            <div class="ef2-title" id="ef2-name">Nombre estudiante</div>
+            <div class="ef2-sub">Ficha • <span id="ef2-period"></span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <div style="display:flex;gap:8px">
+              <button class="btn" id="ef2-save-close">Guardar y cerrar</button>
+              <button class="btn" id="ef2-export">Exportar</button>
+            </div>
+            <div class="ef2-small">Última modificación: <span id="ef2-last">—</span></div>
+          </div>
+        </div>
+
+        <div class="ef2-grid">
+          <div class="ef2-panel">
+            <div class="ef2-section">
+              <div style="font-weight:800;margin-bottom:8px">1 • Personal y contacto</div>
+              <div class="ef2-row"><input id="ef2_name" class="ef2-input" placeholder="Nombre completo"></div>
+              <div class="ef2-row"><input id="ef2_doc" class="ef2-input" placeholder="Documento"></div>
+              <div class="ef2-row">
+                <input id="ef2_course" class="ef2-input" placeholder="Curso" readonly>
+                <input id="ef2_group" class="ef2-input" placeholder="Grupo" readonly>
+              </div>
+              <div class="ef2-row"><input id="ef2_birth" type="date" class="ef2-input"></div>
+              <div class="ef2-row">
+                <input id="ef2_eps" class="ef2-input" placeholder="EPS">
+                <input id="ef2_blood" class="ef2-input" placeholder="Grupo sanguíneo / RH">
+              </div>
+              <div style="height:6px"></div>
+              <div style="font-weight:800;margin-bottom:8px">Contacto acudientes</div>
+              <div class="ef2-row"><input id="ef2_parent" class="ef2-input" placeholder="Nombres acudientes"></div>
+              <div class="ef2-row">
+                <input id="ef2_phone" class="ef2-input" placeholder="Teléfono principal">
+                <input id="ef2_phone_emerg" class="ef2-input" placeholder="Teléfono emergencia">
+              </div>
+              <div class="ef2-row"><input id="ef2_email" class="ef2-input" placeholder="Correo electrónico"></div>
+              <div class="ef2-actions"><button class="btn" id="ef2-save-personal">Guardar personal</button></div>
+            </div>
+
+            <div class="ef2-section" style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:800">2 • Actas y reuniones</div>
+                <div class="ef2-small">Registra seguimiento</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input id="ef2_acta_fecha" type="date" class="ef2-input" style="width:160px">
+                <select id="ef2_acta_motivo" class="ef2-input" style="flex:1"><option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option></select>
+                <button class="btn" id="ef2-acta-add">Agregar</button>
+              </div>
+              <textarea id="ef2_acta_resumen" class="ef2-input" rows="3" placeholder="Resumen..."></textarea>
+              <textarea id="ef2_acta_compromisos" class="ef2-input" rows="2" placeholder="Compromisos..."></textarea>
+              <div id="ef2-actas-list" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+            </div>
+          </div>
+
+          <div>
+            <div class="ef2-panel">
+              <div style="font-weight:800">4 • Gamificación / RPG</div>
+              <div class="ef2-row" style="margin-top:8px">
+                <input id="ef2_level" class="ef2-input" placeholder="Nivel" style="width:100px">
+                <input id="ef2_xp" class="ef2-input" placeholder="XP" style="width:140px" type="number">
+                <input id="ef2_hp" class="ef2-input" placeholder="HP" style="width:100px" type="number">
+              </div>
+              <div class="ef2-row">
+                <input id="ef2_clan" class="ef2-input" placeholder="Clan / Equipo">
+              </div>
+              <div class="ef2-row">
+                <input id="ef2_badges" class="ef2-input" placeholder="Insignias (coma-sep.)">
+              </div>
+              <div class="ef2-actions"><button class="btn" id="ef2-save-game">Guardar gamificación</button></div>
+            </div>
+
+            <div class="ef2-panel" style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div style="font-weight:800">3 • Observador convivencial</div>
+                <div class="ef2-small">Seguimiento conductual</div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:8px">
+                <input id="ef2_obs_fecha" type="date" class="ef2-input" style="width:140px">
+                <select id="ef2_obs_tipo" class="ef2-input" style="width:140px"><option>Incidente</option><option>Observación</option><option>Reporte</option></select>
+                <button class="btn" id="ef2-obs-add">Agregar</button>
+              </div>
+              <select id="ef2_obs_clasif" class="ef2-input"><option>Leve</option><option>Moderada</option><option>Grave</option></select>
+              <textarea id="ef2_obs_desc" class="ef2-input" rows="3" placeholder="Descripción..."></textarea>
+              <textarea id="ef2_obs_descargo" class="ef2-input" rows="2" placeholder="Descargos..."></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <select id="ef2_obs_estado" class="ef2-input" style="width:160px"><option>En proceso</option><option>Cerrado</option><option>Derivado</option></select>
+              </div>
+              <div id="ef2-obs-list" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="ef2-panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:800">Historial</div>
+              <div class="ef2-small">Últimos registros</div>
+            </div>
+            <div id="ef2-history" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+          </div>
+        </div>
+      </div>
+    `);
+
+    // wire actions after injection
+    const saveCloseBtn = content.querySelector('#ef2-save-close');
+    saveCloseBtn && saveCloseBtn.addEventListener('click', ()=>{
+      const modal = findModal();
+      const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ toast('Abre una ficha primero','warn'); return; }
+      saveFicha(sid);
+      // close modal (use hideModal if exists)
+      try{ hideModal && hideModal('ficha-modal'); }catch(e){}
+    });
+
+    const exportBtn = content.querySelector('#ef2-export');
+    exportBtn && exportBtn.addEventListener('click', ()=> { if(typeof exportSingleStudentExcel === 'function') exportSingleStudentExcel(); else toast('Export no disponible','warn'); });
+
+    content.querySelector('#ef2-save-personal')?.addEventListener('click', ()=>{
+      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ toast('Abre ficha primero','warn'); return; }
+      savePersonal(sid);
+    });
+
+    content.querySelector('#ef2-acta-add')?.addEventListener('click', ()=>{
+      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ toast('Abre ficha primero','warn'); return; }
+      addActa(sid);
+    });
+
+    content.querySelector('#ef2-obs-add')?.addEventListener('click', ()=>{
+      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ toast('Abre ficha primero','warn'); return; }
+      addObservacion(sid);
+    });
+
+    content.querySelector('#ef2-save-game')?.addEventListener('click', ()=>{
+      const modal = findModal(); const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!sid){ toast('Abre ficha primero','warn'); return; }
+      saveGamification(sid);
+    });
+  } // end buildUI
+
+  // helpers to find and render student data
+  function findStudentById(id){
+    if(!id) return null;
+    for(const g of Object.keys(db.classes || {})){
+      const s = (db.classes[g]||[]).find(x=>x.id===id);
+      if(s) return { student: s, grade: g };
+    }
+    return null;
+  }
+  function renderActas(student){
+    const list = document.getElementById('ef2-actas-list'); if(!list) return;
+    list.innerHTML = '';
+    const arr = student.actas || [];
+    if(!arr.length){ list.innerHTML = '<div style="color:#666">Sin actas</div>'; return; }
+    arr.slice().reverse().forEach(a=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div>`;
+      list.appendChild(node);
+    });
+  }
+  function renderObservador(student){
+    const list = document.getElementById('ef2-obs-list'); if(!list) return;
+    list.innerHTML = '';
+    const arr = student.observador || [];
+    if(!arr.length){ list.innerHTML = '<div style="color:#666">Sin registros</div>'; return; }
+    arr.slice().reverse().forEach(o=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${o.tipo} • ${o.fecha} • ${o.clasif||''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Estado: ${o.estado||''}</div>`;
+      list.appendChild(node);
+    });
+  }
+  function renderHistory(student){
+    const list = document.getElementById('ef2-history'); if(!list) return;
+    list.innerHTML = '';
+    const arr = student.history || [];
+    if(!arr.length){ list.innerHTML = '<div style="color:#666">Sin historial</div>'; return; }
+    arr.slice().reverse().slice(0,15).forEach(h=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div>`;
+      list.appendChild(node);
+    });
+  }
+
+  // save helpers
+  function savePersonal(studentId){
+    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.name = document.getElementById('ef2_name')?.value || s.name;
+    s.document = document.getElementById('ef2_doc')?.value || s.document;
+    s.birthdate = document.getElementById('ef2_birth')?.value || s.birthdate;
+    s.eps = document.getElementById('ef2_eps')?.value || s.eps;
+    s.sangre = document.getElementById('ef2_blood')?.value || s.sangre;
+    s.acudiente = { name: document.getElementById('ef2_parent')?.value || '', phone: document.getElementById('ef2_phone')?.value || '', emerg: document.getElementById('ef2_phone_emerg')?.value || '', email: document.getElementById('ef2_email')?.value || '' };
+    safePersist();
+    document.getElementById('ef2-last') && (document.getElementById('ef2-last').innerText = new Date().toLocaleString());
+    toast('Datos personales guardados','success');
+    if(typeof renderStudentGrid === 'function') renderStudentGrid();
+  }
+
+  function addActa(studentId){
+    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.actas = s.actas || [];
+    const fecha = document.getElementById('ef2_acta_fecha')?.value || new Date().toLocaleDateString();
+    const motivo = document.getElementById('ef2_acta_motivo')?.value || 'Otro';
+    const resumen = document.getElementById('ef2_acta_resumen')?.value || '';
+    const compromisos = document.getElementById('ef2_acta_compromisos')?.value || '';
+    s.actas.push({ id: Date.now(), fecha, motivo, resumen, compromisos });
+    safePersist();
+    renderActas(s);
+    document.getElementById('ef2_acta_resumen') && (document.getElementById('ef2_acta_resumen').value='');
+    document.getElementById('ef2_acta_compromisos') && (document.getElementById('ef2_acta_compromisos').value='');
+    toast('Acta agregada','success');
+  }
+
+  function addObservacion(studentId){
+    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.observador = s.observador || [];
+    const fecha = document.getElementById('ef2_obs_fecha')?.value || new Date().toLocaleDateString();
+    const tipo = document.getElementById('ef2_obs_tipo')?.value || 'Observación';
+    const clasif = document.getElementById('ef2_obs_clasif')?.value || '';
+    const desc = document.getElementById('ef2_obs_desc')?.value || '';
+    const descargo = document.getElementById('ef2_obs_descargo')?.value || '';
+    const estado = document.getElementById('ef2_obs_estado')?.value || 'En proceso';
+    s.observador.push({ id: Date.now(), fecha, tipo, clasif, desc, descargo, estado });
+    safePersist();
+    renderObservador(s);
+    document.getElementById('ef2_obs_desc') && (document.getElementById('ef2_obs_desc').value='');
+    document.getElementById('ef2_obs_descargo') && (document.getElementById('ef2_obs_descargo').value='');
+    toast('Registro guardado','success');
+  }
+
+  function saveGamification(studentId){
+    const found = findStudentById(studentId); if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.gamification = s.gamification || {};
+    s.gamification.level = document.getElementById('ef2_level')?.value || s.gamification.level || s.level;
+    s.gamification.xp = parseInt(document.getElementById('ef2_xp')?.value) || s.gamification.xp || s.xp || 0;
+    s.gamification.hp = parseInt(document.getElementById('ef2_hp')?.value) || s.gamification.hp || s.hp || HP_DEFAULT;
+    s.gamification.clan = document.getElementById('ef2_clan')?.value || s.gamification.clan || '';
+    s.gamification.badges = (document.getElementById('ef2_badges')?.value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    // reflect principal values
+    s.level = parseInt(s.gamification.level) || s.level;
+    s.xp = parseInt(s.gamification.xp) || s.xp;
+    s.hp = parseInt(s.gamification.hp) || s.hp;
+    safePersist();
+    toast('Gamificación guardada','success');
+    if(typeof renderStudentGrid === 'function') renderStudentGrid();
+  }
+
+  // global save that calls sections and updates timestamp
+  function saveFicha(studentId){
+    if(!studentId){
+      const modal = findModal(); studentId = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+      if(!studentId) return toast('No hay ficha abierta','warn');
+    }
+    savePersonal(studentId);
+    saveGamification(studentId);
+    document.getElementById('ef2-last') && (document.getElementById('ef2-last').innerText = new Date().toLocaleString());
+    safePersist();
+    toast('Ficha guardada','success');
+  }
+
+  // fill UI (called after modal opens)
+  function fillUI(studentId){
+    buildUI();
+    const found = findStudentById(studentId);
+    if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    document.getElementById('ef2-avatar') && (document.getElementById('ef2-avatar').innerText = (s.name||' ')[0] || 'A');
+    document.getElementById('ef2-name') && (document.getElementById('ef2-name').innerText = s.name || '');
+    document.getElementById('ef2-period') && (document.getElementById('ef2-period').innerText = document.getElementById('period-select')?.value || '');
+    document.getElementById('ef2_name') && (document.getElementById('ef2_name').value = s.name || '');
+    document.getElementById('ef2_doc') && (document.getElementById('ef2_doc').value = s.document || s.doc || '');
+    // find grade, group
+    let gradeFound = '';
+    for(const g of Object.keys(db.classes||{})){ if((db.classes[g]||[]).find(x=>x.id===s.id)){ gradeFound = g; break; } }
+    document.getElementById('ef2_course') && (document.getElementById('ef2_course').value = gradeFound || '');
+    const grp = (db.groups && db.groups[gradeFound]) ? (Object.keys(db.groups[gradeFound]).find(g=>db.groups[gradeFound][g].includes(s.id)) || '') : '';
+    document.getElementById('ef2_group') && (document.getElementById('ef2_group').value = grp);
+    document.getElementById('ef2_birth') && (document.getElementById('ef2_birth').value = s.birthdate || s.fnac || '');
+    document.getElementById('ef2_eps') && (document.getElementById('ef2_eps').value = s.eps || '');
+    document.getElementById('ef2_blood') && (document.getElementById('ef2_blood').value = s.sangre || '');
+    document.getElementById('ef2_parent') && (document.getElementById('ef2_parent').value = (s.acudiente && (s.acudiente.name || s.acudiente)) || '');
+    document.getElementById('ef2_phone') && (document.getElementById('ef2_phone').value = (s.acudiente && s.acudiente.phone) || s.phone || '');
+    document.getElementById('ef2_phone_emerg') && (document.getElementById('ef2_phone_emerg').value = s.phone_emerg || '');
+    document.getElementById('ef2_email') && (document.getElementById('ef2_email').value = s.email || '');
+
+    // gamification
+    s.gamification = s.gamification || {};
+    document.getElementById('ef2_level') && (document.getElementById('ef2_level').value = s.gamification.level || s.level || '');
+    document.getElementById('ef2_xp') && (document.getElementById('ef2_xp').value = s.gamification.xp || s.xp || 0);
+    document.getElementById('ef2_hp') && (document.getElementById('ef2_hp').value = s.gamification.hp || s.hp || HP_DEFAULT);
+    document.getElementById('ef2_clan') && (document.getElementById('ef2_clan').value = s.gamification.clan || s.clan || '');
+    document.getElementById('ef2_badges') && (document.getElementById('ef2_badges').value = (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', '));
+
+    // lists
+    renderActas(s); renderObservador(s); renderHistory(s);
+
+    // set modal dataset currentStudent for saves
+    const modal = findModal(); if(modal) modal.dataset.currentStudent = s.id;
+  }
+
+  // override openFicha to fill our UI after original opens
+  const originalOpenFicha = typeof window.openFicha === 'function' ? window.openFicha : null;
+  window.openFicha = function(id){
+    try{ if(originalOpenFicha) originalOpenFicha(id); }catch(e){ /* ignore */ }
+    setTimeout(()=> fillUI(id), 120);
+  };
+
+  // Expose public functions for console/testing
+  window.ef2_saveFicha = saveFicha;
+  window.ef2_addActa = addActa;
+  window.ef2_addObservacion = addObservacion;
+  window.ef2_saveGamification = saveGamification;
+
+  // build UI on load so elements are available
+  document.addEventListener('DOMContentLoaded', buildUI);
+})();
+</script>
 
 </body>
 </html>
