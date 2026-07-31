@@ -922,6 +922,19 @@ window.openManageGroupsModal = openGroupsModal;
 </style>
 
 <script>
+<!-- ====== Parche: habilitar menús (clic + teclado) ====== -->
+<style>
+  /* Asegura que el toggle por clase funcione y tenga prioridad */
+  .menu-panel{ display:none !important; }
+  .menu.open .menu-panel{ display:block !important; }
+  /* Asegura que los botones se vean interactivos y accesibles */
+  .menu-button{ cursor:pointer; user-select:none; outline: none; }
+  .menu-button:focus{ box-shadow: 0 0 0 3px rgba(16,185,129,0.12); }
+  /* En caso de que haya botones accidentalmente deshabilitados */
+  .menu-button[disabled]{ pointer-events: auto !important; opacity: 1 !important; }
+</style>
+
+<script>
   (function enableMenus(){
     // Remove disabled attribute from any menu-button accidentally disabled
     document.querySelectorAll('.menu-button[disabled]').forEach(btn => btn.removeAttribute('disabled'));
