@@ -1268,5 +1268,208 @@ window.openManageGroupsModal = openGroupsModal;
 })();
 </script>
 <!-- /Parche ajustes institucionales -->
+  <!-- PARCHE: panel funcional para crear/eliminar grados y grupos + distribuciones (NO destructivo) -->
+<script>
+(function GradeGroupPatch(){
+  // Helpers
+  const TOAST = (msg, type='info', t=2500) => {
+    if(typeof showToast === 'function'){ showToast(msg, type, t); return; }
+    try { console.log(`[${type}] ${msg}`); } catch(e){}
+    alert(msg);
+  };
+  const SDB = () => { if(typeof saveDB === 'function') return saveDB(); try{ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(db)); }catch(e){} };
+
+  // Find the modal to augment (manage-groups-modal preferred, fallback groups-modal)
+  const modalId = document.getElementById('manage-groups-modal') ? 'manage-groups-modal' : (document.getElementById('groups-modal')? 'groups-modal': null);
+  if(!modalId){
+    console.warn('[patch] No se encontró modal de grupos ("manage-groups-modal" o "groups-modal") - parche inactivo.');
+    return;
+  }
+  const modal = document.getElementById(modalId);
+  const panelContainer = modal.querySelector('.modal');
+
+  // Avoid inserting twice
+  if(panelContainer.querySelector('#patch-gradegroup-panel')) return;
+
+  // Panel HTML
+  const panelHTML = `
+    <div id="patch-gradegroup-panel" style="border:1px dashed rgba(255,255,255,0.06);padding:10px;border-radius:8px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="patch-new-grade" placeholder="Nuevo grado (ej. 805)" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+          <button class="btn" id="patch-create-grade">Crear Grado</button>
+          <button class="btn red" id="patch-delete-grade">Eliminar Grado</button>
+        </div>
+
+        <div style="width:1px;height:36px;background:rgba(255,255,255,0.03)"></div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="patch-grade-select" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
+          <input id="patch-new-group" placeholder="Nuevo grupo (ej. Grupo A)" style="padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+          <button class="btn" id="patch-create-group">Crear Grupo</button>
+          <button class="btn red" id="patch-delete-group">Eliminar Grupo</button>
+        </div>
+
+        <div style="width:1px;height:36px;background:rgba(255,255,255,0.03)"></div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="patch-dist-num" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+          <input id="patch-dist-size" type="number" min="1" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+          <button class="btn" id="patch-distribute-by-number">Distribuir por nº</button>
+          <button class="btn" id="patch-distribute-by-size">Distribuir por tamaño</button>
+          <label style="display:flex;align-items:center;gap:6px;margin-left:8px"><input type="checkbox" id="patch-reino-toggle"> Reinos (persistente)</label>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert panel at top of modal content (after h3)
+  const h3 = panelContainer.querySelector('h3');
+  if(h3) h3.insertAdjacentHTML('afterend', panelHTML);
+  else panelContainer.insertAdjacentHTML('afterbegin', panelHTML);
+
+  // Wiring helpers
+  function refreshGradeSelect(){
+    const sel = document.getElementById('patch-grade-select');
+    if(!sel) return;
+    sel.innerHTML = '';
+    Object.keys(db.classes || {}).forEach(k => {
+      const o = document.createElement('option'); o.value = k; o.textContent = `Grado ${k} (${(db.classes[k]||[]).length})`; sel.appendChild(o);
+    });
+    if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+    else sel.value = Object.keys(db.classes)[0] || '';
+  }
+  function refreshAfterChange(){
+    try{ if(typeof populateClassSelect === 'function') populateClassSelect(); }catch(e){}
+    try{ if(typeof renderStudentGrid === 'function') renderStudentGrid(); }catch(e){}
+    try{ if(typeof renderStudents === 'function') renderStudents(); }catch(e){}
+    try{ if(typeof renderGroups === 'function') renderGroups(); }catch(e){}
+    try{ if(typeof renderGroupsListOverview === 'function') renderGroupsListOverview(); }catch(e){}
+    try{ if(typeof renderGroupsColumns === 'function') renderGroupsColumns(); }catch(e){}
+    refreshGradeSelect();
+  }
+
+  // Create grade
+  document.getElementById('patch-create-grade').addEventListener('click', ()=>{
+    const name = (document.getElementById('patch-new-grade').value||'').trim();
+    if(!name) return TOAST('Escribe nombre de grado','warn');
+    if(db.classes[name]) return TOAST('Grado ya existe','warn');
+    db.classes[name] = [];
+    db.groups[name] = db.groups[name] || {};
+    // groupsMeta used for 'reinos' meta
+    db.groupsMeta = db.groupsMeta || {};
+    db.groupsMeta[name] = db.groupsMeta[name] || {};
+    SDB(); refreshAfterChange();
+    document.getElementById('patch-new-grade').value='';
+    TOAST('Grado creado: ' + name, 'success');
+  });
+
+  // Delete grade (with confirm)
+  document.getElementById('patch-delete-grade').addEventListener('click', ()=>{
+    const sel = document.getElementById('patch-grade-select'); if(!sel) return;
+    const name = sel.value;
+    if(!name) return TOAST('Selecciona un grado','warn');
+    showConfirm('Eliminar grado', `Eliminar grado ${name} y todos sus datos?`, ()=>{
+      delete db.classes[name];
+      if(db.groups && db.groups[name]) delete db.groups[name];
+      if(db.groupsMeta && db.groupsMeta[name]) delete db.groupsMeta[name];
+      if(currentClass === name) currentClass = Object.keys(db.classes)[0] || null;
+      SDB(); refreshAfterChange();
+      TOAST('Grado eliminado: ' + name, 'success');
+    });
+  });
+
+  // Create group in selected grade
+  document.getElementById('patch-create-group').addEventListener('click', ()=>{
+    const grade = (document.getElementById('patch-grade-select').value || currentClass);
+    const gname = (document.getElementById('patch-new-group').value||'').trim();
+    if(!grade) return TOAST('Selecciona o crea un grado primero','warn');
+    if(!gname) return TOAST('Escribe nombre de grupo','warn');
+    db.groups = db.groups || {};
+    db.groups[grade] = db.groups[grade] || {};
+    if(db.groups[grade][gname]) return TOAST('Grupo ya existe en ese grado','warn');
+    db.groups[grade][gname] = [];
+    db.groupsMeta = db.groupsMeta || {};
+    db.groupsMeta[grade] = db.groupsMeta[grade] || {};
+    const persistent = document.getElementById('patch-reino-toggle').checked;
+    db.groupsMeta[grade][gname] = { persistent: !!persistent };
+    SDB(); refreshAfterChange();
+    document.getElementById('patch-new-group').value='';
+    TOAST(`Grupo "${gname}" creado en grado ${grade}`,'success');
+  });
+
+  // Delete group in selected grade
+  document.getElementById('patch-delete-group').addEventListener('click', ()=>{
+    const grade = (document.getElementById('patch-grade-select').value || currentClass);
+    if(!grade) return TOAST('Selecciona un grado','warn');
+    // prompt to choose group name
+    const groupsFor = (db.groups && db.groups[grade]) ? Object.keys(db.groups[grade]) : [];
+    if(!groupsFor.length) return TOAST('No hay grupos en este grado','warn');
+    const name = prompt('Escribe el nombre exacto del grupo a eliminar. Grupos: ' + groupsFor.join(', '));
+    if(!name) return;
+    if(!db.groups[grade] || !db.groups[grade][name]) return TOAST('Grupo no encontrado','err');
+    showConfirm('Eliminar grupo', `Eliminar grupo "${name}" en ${grade}?`, ()=>{
+      delete db.groups[grade][name];
+      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade][name];
+      SDB(); refreshAfterChange();
+      TOAST(`Grupo "${name}" eliminado`, 'success');
+    });
+  });
+
+  // Distribution by number of groups
+  document.getElementById('patch-distribute-by-number').addEventListener('click', ()=>{
+    const grade = (document.getElementById('patch-grade-select').value || currentClass);
+    const n = parseInt(document.getElementById('patch-dist-num').value);
+    if(!grade) return TOAST('Selecciona un grado','warn');
+    if(!n || n < 1) return TOAST('Número inválido','warn');
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    if(!ids.length) return TOAST('No hay estudiantes en el grado','warn');
+    // shuffle
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
+    for(let i=0;i<ids.length;i++){ const g = `Grupo ${ (i % n) + 1 }`; db.groups[grade][g].push(ids[i]); }
+    // mark meta if 'reinos' checked
+    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {};
+    const persistent = document.getElementById('patch-reino-toggle').checked;
+    if(persistent) Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true });
+    SDB(); refreshAfterChange();
+    TOAST('Distribución completada (por nº)','success');
+  });
+
+  // Distribution by size
+  document.getElementById('patch-distribute-by-size').addEventListener('click', ()=>{
+    const grade = (document.getElementById('patch-grade-select').value || currentClass);
+    const size = parseInt(document.getElementById('patch-dist-size').value);
+    if(!grade) return TOAST('Selecciona un grado','warn');
+    if(!size || size < 1) return TOAST('Tamaño inválido','warn');
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    if(!ids.length) return TOAST('No hay estudiantes en el grado','warn');
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    // delete previous auto groups
+    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
+    let idx=0, g=1;
+    while(idx < ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; }
+    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {};
+    const persistent = document.getElementById('patch-reino-toggle').checked;
+    if(persistent) Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true });
+    SDB(); refreshAfterChange();
+    TOAST('Distribución por tamaño completada','success');
+  });
+
+  // Initial populate
+  refreshGradeSelect();
+
+  // Keep grade select in sync with the main class select (if exists)
+  const mainSel = document.getElementById('class-select');
+  if(mainSel){
+    mainSel.addEventListener('change', ()=> { refreshGradeSelect(); });
+  }
+
+  console.log('[patch] Grade/Group patch instalado');
+})();
+</script>
+<!-- /PARCHE -->
 </body>
 </html>
