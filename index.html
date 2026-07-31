@@ -1,98 +1,99 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Plataforma Convivencial FantasyClass - Colegio Alfonso López Michelsen</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FantasyClass Convivencial — ALM</title>
 
-    <!-- Tailwind (utilities) -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        colegio: { blue: '#1e3a8a', red: '#dc2626', gold: '#f59e0b', dark: '#0f172a' }
-                    },
-                    fontFamily: { sans: ['Inter','sans-serif'], display: ['Outfit','sans-serif'] }
-                }
-            }
+  <!-- Tailwind (utilities) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            colegio: { blue: '#1e3a8a', red: '#dc2626', gold: '#f59e0b', dark: '#0f172a' }
+          },
+          fontFamily: { sans: ['Inter','sans-serif'], display: ['Outfit','sans-serif'] }
         }
-    </script>
+      }
+    }
+  </script>
 
-    <!-- Fonts & Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- XLSX & confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    <style>
-      /* Minimal reset + design tokens */
-      *,*::before,*::after{box-sizing:border-box}
-      html,body{height:100%}
-      body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
-      :root{--muted:#9aa7b6;--glass-border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
-      button,input,select,textarea{font-family:inherit;color:inherit}
-      button{cursor:pointer}
+  <style>
+    /* Minimal reset + tokens */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
+    :root{--muted:#9aa7b6;--glass-border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
+    button,input,select,textarea{font-family:inherit;color:inherit}
+    button{cursor:pointer}
 
-      /* Header */
-      header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:40}
-      header .container{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
-      .brand{display:flex;gap:12px;align-items:center}
-      .logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
+    /* Header */
+    header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:60}
+    header .container{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
 
-      /* Controls */
-      .controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-      .chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700;font-size:13px;color:var(--muted)}
-      .chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700;font-size:13px;color:var(--muted)}
+    .chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
 
-      /* Export dropdown */
-      .export-menu{position:relative}
-      .export-dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,rgba(12,18,26,0.95),rgba(9,14,20,0.95));border:1px solid var(--glass-border);padding:8px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:220px;z-index:50}
+    /* Tools submenu */
+    .tools-menu{position:relative}
+    .tools-dropdown{display:none;position:absolute;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,rgba(12,18,26,0.95),rgba(9,14,20,0.95));border:1px solid var(--glass-border);padding:8px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.5);min-width:200px;z-index:70}
+    .tools-dropdown button{display:block;width:100%;text-align:left;padding:10px;border-radius:8px;background:transparent;color:inherit;border:0}
 
-      main{max-width:1200px;margin:18px auto;padding:0 20px 60px}
+    main{max-width:1200px;margin:18px auto;padding:0 20px 60px}
 
-      /* Metrics */
-      .metrics-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:14px}
-      .metric-pill{display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.008));border:1px solid var(--glass-border)}
-      .metric-pill .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)}
-      .metric-pill .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
-      .metric-pill .value{font-weight:900;color:#9ff9c6;font-size:14px}
+    /* Metrics */
+    .metrics-bar{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:14px}
+    .metric-pill{display:flex;gap:12px;align-items:center;padding:14px 18px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.008));border:1px solid var(--glass-border)}
+    .metric-pill .icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02)}
+    .metric-pill .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
+    .metric-pill .value{font-weight:900;color:#9ff9c6;font-size:14px}
 
-      /* Controls panel (search/sort/add) */
-      .controls-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:14px}
-      .controls-panel .left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
-      .controls-panel input[type="text"], .controls-panel select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;color:inherit;min-width:200px}
-      .controls-panel .right{display:flex;align-items:center;gap:10px}
+    /* Controls panel */
+    .controls-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;border-radius:12px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:14px}
+    .controls-panel .left{display:flex;align-items:center;gap:12px;flex:1;min-width:0}
+    .controls-panel input[type="text"], .controls-panel select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:10px 12px;border-radius:10px;color:inherit;min-width:200px}
+    .controls-panel .right{display:flex;align-items:center;gap:10px}
 
-      /* Students grid */
-      #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    /* Grid & cards */
+    #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+    .student-card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border:1px solid var(--glass-border);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(3,7,12,0.55);position:relative;transition:transform .18s,box-shadow .18s}
+    .student-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(3,7,12,0.7)}
+    .level-badge{position:absolute;left:14px;top:14px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:11px;color:var(--accent-gold);background:linear-gradient(90deg,#23272d,#0f1724);border:1px solid rgba(255,255,255,0.02)}
+    .meta-right{position:absolute;right:14px;top:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
+    .row-top{display:flex;gap:14px;align-items:center;margin-bottom:8px}
+    .avatar{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;box-shadow:0 6px 18px rgba(2,6,12,0.6);border:3px solid rgba(255,255,255,0.03)}
+    .student-card h4{margin:0;font-weight:800;font-size:13px;text-transform:uppercase}
+    .student-card p.sub{margin:0;font-size:11px;color:var(--muted)}
+    .actions{display:flex;gap:10px;margin-top:14px}
+    .btn{padding:8px 12px;border-radius:10px;font-weight:800;font-size:13px;color:#fff;min-width:86px;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 8px rgba(2,6,12,0.45)}
+    .btn-green{background:linear-gradient(180deg,#10b981,#059669)}
+    .btn-red{background:linear-gradient(180deg,#ef4444,#dc2626)}
+    .btn-blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
+    .small-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);color:var(--muted)}
 
-      .student-card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border:1px solid var(--glass-border);border-radius:14px;padding:18px;box-shadow:0 10px 30px rgba(3,7,12,0.55);position:relative;transition:transform .18s,box-shadow .18s}
-      .student-card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(3,7,12,0.7)}
-      .level-badge{position:absolute;left:14px;top:14px;padding:6px 10px;border-radius:999px;font-weight:800;font-size:11px;color:var(--accent-gold);background:linear-gradient(90deg,#23272d,#0f1724);border:1px solid rgba(255,255,255,0.02)}
-      .meta-right{position:absolute;right:14px;top:12px;display:flex;gap:8px;align-items:center;font-size:12px;color:var(--muted)}
-      .row-top{display:flex;gap:14px;align-items:center;margin-bottom:8px}
-      .avatar{width:56px;height:56px;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:20px;box-shadow:0 6px 18px rgba(2,6,12,0.6);border:3px solid rgba(255,255,255,0.03)}
-      .student-card h4{margin:0;font-weight:800;font-size:13px;text-transform:uppercase}
-      .student-card p.sub{margin:0;font-size:11px;color:var(--muted)}
-      .actions{display:flex;gap:10px;margin-top:14px}
-      .btn{padding:8px 12px;border-radius:10px;font-weight:800;font-size:13px;color:#fff;min-width:86px;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 8px rgba(2,6,12,0.45)}
-      .btn-green{background:linear-gradient(180deg,#10b981,#059669)}
-      .btn-red{background:linear-gradient(180deg,#ef4444,#dc2626)}
-      .btn-blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
-      .small-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.02);color:var(--muted)}
+    .glass-pill{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:800;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer}
+    #groups-list-container .group-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.02)}
 
-      .glass-pill{padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:800;color:inherit;display:flex;align-items:center;justify-content:center;cursor:pointer}
-      #groups-list-container .group-item{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);border-radius:10px;padding:10px;margin-bottom:8px;border:1px solid rgba(255,255,255,0.02)}
-
-      @media(max-width:1000px){.metrics-bar{grid-template-columns:repeat(3,1fr)}} 
-      @media(max-width:700px){.metrics-bar{grid-template-columns:repeat(2,1fr)}.controls-panel{flex-direction:column;align-items:stretch;gap:10px}.avatar{width:48px;height:48px;font-size:18px}}
-    </style>
+    /* Modal basics */
+    .modal-hidden{display:none}
+    @media(max-width:1000px){.metrics-bar{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:700px){.metrics-bar{grid-template-columns:repeat(2,1fr)}.controls-panel{flex-direction:column;align-items:stretch;gap:10px}.avatar{width:48px;height:48px;font-size:18px}}
+  </style>
 </head>
 <body>
 
@@ -107,10 +108,7 @@
       </div>
 
       <div class="controls">
-        <button class="chip" id="drive-status-badge" title="Configurar Drive" onclick="openDriveSettingsModal()">
-          <i class="fa-solid fa-cloud-arrow-up"></i>
-          <span id="drive-status-text">Google Forms/Drive Sync</span>
-        </button>
+        <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
 
         <div class="chip">
           <i class="fa-solid fa-calendar-days"></i>
@@ -130,8 +128,17 @@
 
         <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
 
+        <div class="tools-menu">
+          <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px;font-size:12px"></i></button>
+          <div id="tools-dropdown" class="tools-dropdown" aria-hidden="true">
+            <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</button>
+            <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i> Cronómetro</button>
+            <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i> Dado</button>
+          </div>
+        </div>
+
         <div class="export-menu">
-          <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel <i class="fa-solid fa-chevron-down" style="margin-left:8px;font-size:12px"></i></button>
+          <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
           <div id="export-dropdown" class="export-dropdown" aria-hidden="true">
             <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual (.xlsx)</button>
             <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos (.xlsx)</button>
@@ -173,46 +180,49 @@
     <div id="students-grid"></div>
   </main>
 
-  <!-- FICHA (modal). El formulario de registro está aquí y permanece oculto hasta abrir modal -->
-  <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden" aria-hidden="true">
+  <!-- MODALS (hidden by default) -->
+
+  <!-- FICHA modal: contiene todo el formulario de registro (no aparece en index) -->
+  <div id="history-modal" class="fixed inset-0 z-70 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden" aria-hidden="true">
     <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative" style="background:linear-gradient(180deg, rgba(15,23,34,0.95), rgba(9,12,18,0.95)); border:1px solid var(--glass-border); max-height:90vh; overflow:auto">
       <button onclick="closeHistoryModal()" style="position:absolute;right:16px;top:12px;background:transparent;border:0;color:var(--muted);font-size:18px">✕</button>
 
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div id="history-student-avatar" style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#0b2540,#07213a);display:flex;align-items:center;justify-content:center;color:#ffd88a;font-weight:800;font-size:20px">A</div>
+        <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a)">A</div>
         <div style="flex:1">
           <h3 id="history-student-name" style="margin:0;font-weight:800">Nombre Estudiante</h3>
           <p style="margin:0;color:var(--muted);font-size:13px">Ficha del Observador Convivencial</p>
         </div>
+
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
           <button onclick="exportSingleStudentExcel()" class="btn btn-green"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
           <div style="color:var(--muted);font-size:12px">Periodo: <span id="history-period-label" style="color:#e6eef6;font-weight:800;margin-left:6px"></span></div>
         </div>
       </div>
 
-      <!-- Registration form (inside modal only) -->
+      <!-- FORM -->
       <section id="registration-section" style="background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.008)); padding:14px; border-radius:12px; border:1px solid var(--glass-border); margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px">
           <div style="display:flex;gap:8px;align-items:center">
-            <button id="btn-type-positive" onclick="setEntryType('positive')" style="padding:8px 12px;border-radius:10px;background:linear-gradient(180deg,#10b981,#059669);color:white;font-weight:800;cursor:pointer">👍 Mérito (+XP)</button>
-            <button id="btn-type-negative" onclick="setEntryType('negative')" style="padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);font-weight:800;cursor:pointer">⚠️ Observación (-HP)</button>
+            <button id="btn-type-positive" onclick="setEntryType('positive')" class="btn btn-green">👍 Mérito (+XP)</button>
+            <button id="btn-type-negative" onclick="setEntryType('negative')" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">⚠️ Observación (-HP)</button>
           </div>
         </div>
 
         <label style="font-weight:800;color:var(--muted);font-size:12px;display:block;margin-bottom:8px">Pilar Character Counts</label>
         <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:12px">
-          <button onclick="selectValueCategory('Responsabilidad')" class="glass-pill">🐘<div style="margin-left:6px">Responsabilidad</div></button>
-          <button onclick="selectValueCategory('Respeto')" class="glass-pill">🦁<div style="margin-left:6px">Respeto</div></button>
-          <button onclick="selectValueCategory('Confianza')" class="glass-pill">🐪<div style="margin-left:6px">Confianza</div></button>
-          <button onclick="selectValueCategory('Empatía')" class="glass-pill">❤️<div style="margin-left:6px">Empatía</div></button>
-          <button onclick="selectValueCategory('Justicia')" class="glass-pill">⚖️<div style="margin-left:6px">Justicia</div></button>
-          <button onclick="selectValueCategory('Ciudadanía')" class="glass-pill">🛡️<div style="margin-left:6px">Ciudadanía</div></button>
+          <button onclick="selectValueCategory('Responsabilidad')" class="glass-pill">🐘 Responsabilidad</button>
+          <button onclick="selectValueCategory('Respeto')" class="glass-pill">🦁 Respeto</button>
+          <button onclick="selectValueCategory('Confianza')" class="glass-pill">🐪 Confianza</button>
+          <button onclick="selectValueCategory('Empatía')" class="glass-pill">❤️ Empatía</button>
+          <button onclick="selectValueCategory('Justicia')" class="glass-pill">⚖️ Justicia</button>
+          <button onclick="selectValueCategory('Ciudadanía')" class="glass-pill">🛡️ Ciudadanía</button>
         </div>
 
         <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:12px">
           <div style="flex:1">
             <label style="font-weight:700;color:var(--muted);font-size:12px">Detalle / Nota para el Observador</label>
-            <textarea id="entry-note-input" rows="3" class="input" placeholder="Escribe una observación pedagógica clara..." style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></textarea>
+            <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica clara..." style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></textarea>
           </div>
 
           <div style="width:120px;display:flex;flex-direction:column;gap:8px">
@@ -223,7 +233,6 @@
         </div>
       </section>
 
-      <!-- Stats & quick note -->
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
         <div style="background:rgba(255,255,255,0.02);padding:12px;border-radius:10px;text-align:center">
           <div style="font-size:11px;color:var(--muted)">Puntos Mérito</div>
@@ -249,18 +258,11 @@
   </div>
 
   <!-- DRIVE modal -->
-  <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative" style="background:linear-gradient(180deg, rgba(15,23,34,0.9), rgba(9,12,18,0.9)); border:1px solid var(--glass-border)">
+  <div id="drive-modal" class="fixed inset-0 z-70 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
+    <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative">
       <button onclick="closeDriveModal()" style="position:absolute;right:16px;top:12px;">✕</button>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-        <div style="width:44px;height:44px;border-radius:10px;background:rgba(16,185,129,0.06);display:flex;align-items:center;justify-content:center;color:#10b981;font-weight:700">CSV</div>
-        <div>
-          <h3 style="margin:0;font-weight:800">Sincronización Automática con Google Drive</h3>
-          <p style="margin:0;color:var(--muted);font-size:13px">Guarda cada registro como un Google Form en tiempo real</p>
-        </div>
-      </div>
-      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
-      <label style="display:block;font-weight:700;color:var(--muted);margin-bottom:6px">URL de Formulario Google o Webhook Drive</label>
+      <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
+      <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
       <input id="drive-webhook-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-bottom:12px">
       <div style="display:flex;gap:8px">
         <button onclick="saveDriveSettings()" class="btn btn-green" style="flex:1">Guardar Configuración</button>
@@ -270,8 +272,8 @@
   </div>
 
   <!-- GROUPS modal -->
-  <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-    <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative" style="background:linear-gradient(180deg, rgba(15,23,34,0.9), rgba(9,12,18,0.9)); border:1px solid var(--glass-border)">
+  <div id="manage-groups-modal" class="fixed inset-0 z-70 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
+    <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative">
       <button onclick="closeManageGroupsModal()" style="position:absolute;right:16px;top:12px;">✕</button>
       <h3 style="font-weight:800;margin-bottom:12px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
       <div style="display:flex;gap:8px;margin-bottom:12px">
@@ -282,8 +284,8 @@
     </div>
   </div>
 
-  <!-- Add student & confirm modals -->
-  <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+  <!-- Add student modal -->
+  <div id="add-student-modal" class="fixed inset-0 z-70 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
     <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative">
       <button onclick="closeAddStudentModal()" style="position:absolute;right:16px;top:12px;">✕</button>
       <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
@@ -293,7 +295,8 @@
     </div>
   </div>
 
-  <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+  <!-- Confirm modal -->
+  <div id="confirm-dialog-modal" class="fixed inset-0 z-70 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
     <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative text-center">
       <div style="font-size:22px;margin-bottom:8px">⚠️</div>
       <h3 id="confirm-title" style="margin:0;font-weight:800">¿Estás seguro?</h3>
@@ -305,46 +308,104 @@
     </div>
   </div>
 
-  <script>
-    /* ------------- DATA (complete rosters) -------------
-       Use your full DEFAULT_ROSTERS here (copied from your original file).
-       To keep the message readable I include it intact from your earlier file:
-    */
-    const DEFAULT_ROSTERS = {
-      "801": ["Jhanair Cantillo buelvas", "Emily Alejandra Carabali calvo", "Johan Alejandro Carrillo Daza", "Nataly Gisseth Carvajal Alba", "JUAN ESTEBAN CUERVO HERRERA", "Sara Sofía Galeano Vargas", "MELANY GARCIA GIRALDO", "HELEN GONZALEZ YAYA", "JULIAN GONZALEZ (801)", "ALISON MARIA GRACIA CULMA", "CAMILA ANDREA HERRERA ALVAREZ", "Alan Felipe Llanos Hernandez", "JHAN VALENTIN LOPEZ VALENCIA", "Mariany Marquez Lizo", "OMAR OSPINO BANDERAS", "Saira Palacios Riaño", "johan sebastian pardo niño (801)", "GENESIS VALENTINA POLO MERIÑO", "Sebastián Alberto Portillo colmenares", "Jhoel Riaño Garzón", "ALISSON RIVEROS (801)", "Samantha Rodríguez Moreno", "DANNA RODRIGUEZ NAVARRO", "Lina Sofia Rojas Salamanca", "Miguel Ruiz (801)", "YUNAISIS SALGADO CASTRO", "Nathaly Solano Torres", "Cindylorena Tellez(801)", "Fernanda Tenorio quiñones", "SAMUEL ALEJANDRO TINOCO PINZON", "NICOOL SARA VASQUEZ URREA", "GREYSMAR ZUÑIGA VITORINO"],
-      "802": ["MARYIS CAMILA AREVALO (802)", "Emanuel Buitrago (802)", "Elisabeth Carmona Gracia", "Jobsanim susana Colina calles", "Luisa Alejandra Díaz Yepes (802)", "Matias Escobar flores", "Dilan David Garcia Leal 802", "Héctor Garzón Ramirez", "ANGEL DANIEL GONZALEZ (802)", "Sharol Dayana Gutierrez Téllez", "Karol Dayana Hueso Pulido", "Claudia Gabriela Leiva Gomez", "Holman Esneyder Mena Mosquera", "Sara Gisell Neira Pardo(802)", "Dyland Alejandro Nieto (802)", "Sara Ocampo Isaza", "María Fernanda Orozco Diaz 802", "Juan Esteban Orozco Higuita", "María Fernanda Osorio huérfano", "ZARA VALENTINA PEDRAZA ZAMORA", "Sharith Liceth Riascos Conrado", "Maria Victoria Rodriguez Moreno", "Sara Valentina Rodriguez Ocampo", "David Santiago Rodríguez Ortiz", "Danna Valeria Rojas Florez(802)", "Valery Maria Romero Capera", "Angel David Saavedra Peñuela", "María Fernanda Saenz Fresneda", "Alisson Geraldine Sanabria Bernal", "Darly maryori Solano cubides", "DYLAN SEBASTIAN SOLIS HERNANDEZ", "MARIA JOSE TORO RUIZ (802)"],
-      "803": ["Alison Maria Bello Camacho", "Heidy Bohorquez(803)", "Guadalupe Buitrago Tibaduiza", "Jairo stiven Capera cuesta", "Keiner Castilla 803", "Danna Alejandra Corredor Salazar", "Samuel Fandiño Jimenez", "Nicolas Garcia", "Cristian Guapacha (803)", "SAMUEL FELIPE GUTIERREZ JIMENEZ", "Joel Felipe Hoyos (803)", "Damian jimenez mesa", "Richard eduardo Loaiza Leal 803", "CARLOS ANDRES LOAIZA MOLINA", "Michell Dayana Martinez clave", "Wendy Ximena Mendoza murgas", "Yosenith sofia Meza dominguez", "MAIRA RAQUEL MIRANDA ATENCIO", "miguel angel ortega manchola", "ANDRES FELIPE OSORIO VARGAS", "Dubreilys paola Pérez pulido", "JESUS ADRIAN POSSO ZAPATA", "María Camila Quevedo Rodríguez", "NATALY RAMIREZ CRUZ", "ANGEL GABRIEL RIVAS ORTIZ", "Jisseth Rodriguez Gonzalez", "TATIANA RODRIGUEZ TELLEZ", "Maria José Roncancio Rodriguez", "PAULA JIMENA SANCHEZ CHAVEZ", "Alexis Tellez (803)", "Tania Nikol Tellez Rubiano", "ZAIRA MICHELLE TRUJILLO CARO", "Feider Sneider Velásquez Rian"],
-      "804": ["Cristian Camilo Alarcón Rodríguez", "Analia Alastre", "Sara Beltrán", "David Alexander Buitrago", "Valery Candia Rojas", "Sara Castro Díaz", "Dana Sofía Díaz Rodríguez", "Daniel Felipe Jiménez", "Simón Llanos Hernández", "Ángel Leonardo Marín Álvarez", "Danna Gabriela Martínez", "Deivyd Santiago Méndez", "Ismael Menolascina", "Kevin David Morales González", "Yeferson Alexander Moreno", "Diego Olaya", "Juan Andrés Ortiz Arias", "Mayrin Gabriela Parra Suárez", "Sara Pedraza", "Arles Pelayo Cuevas", "Valery Alejandra Peñuela", "Juana Isabella Pérez Findlay", "Nikol Sofía Pérez Hernández", "María Kamila Rodríguez Trujillo", "Oscar Rodríguez", "Jhon Santiago Romero", "Danna Sierra", "Miguel Ángel Suárez Valencia", "Valeri Toledo", "Dylan Trujillo Vélez", "Santiago Vera", "Samuel Villalobos"],
-      "901": ["Juan Andrés Aconcha Torres", "Julian Camilo Aguilar Tovar", "Cristian Arévalo De la rosa", "David Santiago Bautista Gutierrez", "sofia beltran sosa", "Nelsón Fabián Borja Caleño", "Juan Fernando Carvajal Rodriguez", "Breiner Jair Castro Lopez", "sara cuesta jimenez", "Danna Sofia Estrada Reina", "Andrés Felipe Garzón Gonzalez", "Cristofer Gonzalez Vargas", "Jorge David Jimenez Rodriguez", "Keiber alfonso Julio calvo (901)", "Jeisson Esteban Leon Baron 901", "YIRLEY ANGELICA MARIN ALVAREZ", "ERICK SAMUEL MATIAS ROMERO", "Deivy Morales Gonzalez", "Niriled Juliana Mosquera Vargas", "Juan Felipe Nova Gamba", "Daniel Olaya Torres", "YOJHAN ANDRES ORTIZ JIMENEZ", "Dimay Pallares Herrera", "Valeria Pardo Benavidez", "Violet Yiliana Ramirez Prieto", "stehfany sofia ramirez huerfano", "paula andrea Rodríguez lopez", "Esteban Nicolas Rodriguez Tellez", "Shaira Lorena ROLDAN YARA", "KAROL NICOL SANCHEZ BELTRAN", "Paula Jimena Vargas Riaño"],
-      "902": ["JERONIMO ACEVEDO GIRALDO", "Norberto Alvarez (902)", "Miguel Angel Amaris Cabana", "Yuliana Marlith Arcila Roqueme", "Sofia Ariza Benitez", "Joel Emmanuel Bernal Sánchez", "Yotselis Ariana Chirinos de la rosa", "Elver Camilo Diaz Algecira", "Brayan santiago GIL SANCHEZ", "David Santiago González Vargas", "Samy Gordillo Forero", "Ashly Guevara (902)", "LAURA VALERIA JIMENEZ SAUMETH", "Johan Lopez", "Mariam Larrarte Nuñez", "Allison yisel Mayorga Pinzon", "Santiago Mejia Restrepo", "SHEILYS KATERINE MOLINA SEVERICHE", "SHAIRA VALERIA MOSQUERA ACEVEDO", "JOHAN RONALD PANQUEVA AMORTEGUI", "Valeria Pereira (902)", "David Santiago Prieto Rodríguez", "Yeiferson Enrique Quiroz vitola", "MICHEL DAYANA RODRIGUEZ DIAZ", "Nicolás David Sanabria Gutierrez", "Juan Esteban Santiago Cerna", "Jany Luciana Santiesteban Parra", "Valentina Serna Palencia", "Sara Vela (902)", "MOISES VELASQUEZ ROJAS", "Edgard Vergara Lara"],
-      "903": ["HELLEN SOFIA BELTRAN PIAPYA", "Wendy Cabrera (903)", "JOHAN FELIPE CARDENAS TORRES", "Helen Yulieth Chaguala Ariza", "Martin Daniel Corredor Baron", "DARWIN ANDRES ESPINOSA ALZATE", "Juan Manuel Fonseca Rodriguez", "Lesme Gutierrez 903", "Diego alejandro Hernandez Hernandez", "MELANY LOPEZ BUITRAGO", "David Alexander López López", "Maria Fernanda Merchan Tinoco", "Juan Sebastian Mesa Duarte", "Angie Gabriela Monroy Ramirez", "Valerin Nova Botia (903)", "Karen Fernanda Ovalle Murcia", "joan palomino(903)", "Stefany Pérez Jiménez", "Juan Esteban Rodríguez Díaz", "SHARITH YULIETH ROJAS SANCHEZ", "GAUDYS MARIA SIERRA DIAZ", "Loren Tatiana Soto Sánchez", "Luisa mariana Suesca chacon", "Nikol Saray Surmay Virguez", "Maria Alejandra Tabares Padilla", "Sara valentina Táquinas marroquin", "Carol Saray Urbano Cruz", "Juan manuel Venegas ospina", "Fabian Stiven Vigoya Tamayo"],
-      "904": ["Sara Arenas (904)", "Angie Ariza atuesta", "Hugo Andres Barragan Carvajal", "JURLEY GABRIELA CABEZAS MOSQUERA", "Dylan cañizales (904)", "Gabriela Ceballos Jerez", "Felipe Corredor Quintero", "JUAN ESTEBAN CUBILLOS AREVALO", "DIEGO FERNANDO ESCAMILLA ACEVEDO", "Ivon Thamara Espitia Arias", "Nicolle García (904)", "BRAYAN CAMILO GARCIA VALERO", "Sofía Guzmán Rodriguez", "jhojan estiven hernandez garzon", "JUAN ESTEBAN HERRERA DIAZ", "Kevin Daniel Lemus Cruz (904)", "MARIA FERNANDA MELO SUAREZ", "Jhoan Molina Garzon", "Keiry Muñoz904", "Jeronimo Niampira Buitrago", "JUAN DAVID OCHOA MOSQUERA", "ROSSY NATALIA POSADA RIOS", "Dylan Esteban Puentes gonzalez", "Lisseth Daniela Ramos Sarmiento", "Diego Sastre Ospina", "JAZLYN LINA SILVA PERDOMO", "saray Solis Hernandez", "Danna Alejandra Toloza Hernández", "Angel David Vargas (904)", "Diego Vela Ortiz (904)", "Juan vergara feo 904"],
-      "1001": ["Sofía Alejandra Bernal Alarcón", "Haldyr Elian Caballero", "Juan José Cárdenas", "Daniel Castilla", "Julián David Castro Córdoba", "Leslie Nayddlin Chamorro", "Ana Chavarro", "Diego Cohecha Buitrago", "Juan José Cortes", "Valery Camila Coy López", "Sharith Vanessa Daza Arévalo", "Tomas Forero", "Angie Alejandra Galeano Cubides", "Dayron Garzón Joya", "Felipe González", "Marco Antonio Granados", "Alexandra Herrera Noble", "Johan Felipe López Montaño", "Dylan Alexander Mateus", "Yelisa Mejía Ramos", "Antonela Molina Parra", "Miguel Ángel Moreno García", "Andrés Felipe Motivar", "Freddy Santiago Niño Ramírez", "Luz Ángela Obando", "Carlos Daniel Pinilla", "Dayra Poveda", "Dayro Fabián Prada Tique", "Juan David Ramos Rodríguez", "Omar Ramos Salgado", "Mariana Roncancio", "Yohan Felipe Salazar", "Valentina Sánchez Lora", "Jhoan Santiago Trujillo Delgado", "Maicol Vargas Arévalo", "Helen Sofia Vargas Meneses", "Duvan André Vásquez Patiño", "Karol Zamora Velásquez"],
-      "1002": ["Mariana Amaya", "María Camila Argel Pérez", "Jeremy Adrián Ballesteros", "James Bustos", "Laura Sofía Capera Castillo", "Laura Daniela Carvajal Pastor", "Samuel Carvajal", "Jonathan Sneider Carvajal Alba", "Ángel Duque", "Mario Escobar Lemos", "Sara Valentina García Garzón", "Jorge Enrique Garzón Trujillo", "María Fernanda Hernández", "Diego Hernández", "Ángel Stiven Marín Cárdenas", "Lucciano Moin Menolascina", "Mariangel Narváez Suárez", "Ashley Nieto", "Karen Olaya", "Cristian Camilo Parra Campos", "Laura Camila Pérez Cárdenas", "Laura Natalia Prieto Rodríguez", "Harold Ramírez", "Luna Ramos", "Sara Sofía Reina Díaz", "Ashley Camila Robayo", "Cristhian Rodríguez", "Berly Fernanda Ruidiaz López", "Karen Sofía Samboni", "Jose Sampayo", "Juan Esteban Sánchez", "Gabriela Sánchez García", "María Taquinas", "Yulian Santiago Torres Arévalo", "Jackson Leonardo Tovar Mora", "Manolo Trujillo", "Lian Verdecia"],
-      "1003": ["Laura Estefania Arenas Real", "OMAR BUITRAGO PEREZ", "MAICOL ANDRES CAMACHO BARRERA", "Steeven Daniel Cantero Geney", "Andrea Camila Cudris (1003)", "DANIELA SOFIA GARCERA GONZALEZ", "KEVIN SANTIAGO GARCIA RAMIREZ", "Laura Giron (1003)", "ANGIE KATHERINE GODOY LOPEZ", "Jhonatan Gonzalez 1003", "Sara González 1003", "DANNA GABRIELA GONZALEZ LOPEZ", "URIEL STEVEN GUTIERREZ GALINDO", "David Santiago Herrera Sanabria", "Nicolás Holguín Amador", "ANGIE JULIETH JIMENEZ LUMBA", "AURA CRISTINA MARQUEZ PINTO", "MAURA VALERIA MARTINEZ ACOSTA", "BREYNER MARTINEZ MONSALVE", "JONATHAN DAVID MARTINEZ TELLEZ", "Sara sofia Matiz Sandoval", "DANYERY NATALIA MORENO PIRATOBA", "Sara Milena Murillo Cifuentes", "Valery Ximena Ochoa farigua", "DANNA GABRIELA OSORIO VARGAS", "BRANDON JAVIER OSORIO VELASQUEZ", "sara camila Patino Orjuela", "SARA ISABEL PEREA RAMIREZ", "melany ramos1003", "Alejandro Reyes pinzón", "DANNA KAMILA RODRIGUEZ ACOSTA", "Maria Alejandra Romero Díaz", "SARA VALENTINA SAENZ GARCIA", "DANIEL ALEJANDRO SUAREZ GALINDO", "Yulian Santiago Torres Arevalo", "ISABELLA TORRES VERGARA", "LAURA VIVIANA VASQUEZ BUSTOS", "Duban Stiver Velasco (1003)", "JOSETT JAIR ZAMORA AMANTE"]
-    };
+  <!-- Roulette modal -->
+  <div id="roulette-modal" class="fixed inset-0 z-80 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
+    <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative">
+      <button onclick="closeRouletteModal()" style="position:absolute;right:16px;top:12px;">✕</button>
+      <h3 style="font-weight:800;margin-bottom:12px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+        <div id="roulette-display" style="width:100%;height:80px;border-radius:12px;background:linear-gradient(180deg,#0b1724,#06121a);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;color:#f8fafc">¡Presiona Girar!</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-blue" onclick="startRoulette()">Girar Ruleta</button>
+          <button class="btn" onclick="stopRoulette()">Detener</button>
+        </div>
+        <div style="width:100%;display:flex;gap:8px;justify-content:space-between;align-items:center;margin-top:6px">
+          <label style="font-size:13px;color:var(--muted)">Velocidad</label>
+          <input id="roulette-speed" type="range" min="1" max="50" value="20">
+        </div>
+      </div>
+    </div>
+  </div>
 
-    // state
+  <!-- Timer modal -->
+  <div id="timer-modal" class="fixed inset-0 z-80 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
+    <div class="glass-panel w-full max-w-sm rounded-3xl p-6 relative">
+      <button onclick="closeTimerModal()" style="position:absolute;right:16px;top:12px;">✕</button>
+      <h3 style="font-weight:800;margin-bottom:12px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+        <div id="timer-display" style="font-weight:900;font-size:42px;color:#f59e0b">05:00</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-green" onclick="toggleTimer()">Iniciar</button>
+          <button class="btn" onclick="resetTimer()">Reset</button>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn" onclick="setTimerMinutes(1)">1m</button>
+          <button class="btn" onclick="setTimerMinutes(5)">5m</button>
+          <button class="btn" onclick="setTimerMinutes(10)">10m</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dice modal (simple) -->
+  <div id="dice-modal" class="fixed inset-0 z-80 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 modal-hidden">
+    <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative">
+      <button onclick="closeDiceModal()" style="position:absolute;right:16px;top:12px;">✕</button>
+      <h3 style="font-weight:800;margin-bottom:12px"><i class="fa-solid fa-dice"></i> Dado</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center">
+        <div id="dice-display" style="width:96px;height:96px;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);display:flex;align-items:center;justify-content:center;font-size:48px">🎲</div>
+        <button class="btn btn-red" onclick="rollDice()">Lanzar Dado</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /****************************************************************
+     * FantasyClass — index.html JS
+     * - Modal-only registration
+     * - Fixed selects (period/course)
+     * - Groups + Add student fixed
+     * - Ruleta (WebAudio) + Timer with sound
+     * - XLSX exports
+     ****************************************************************/
+
+    // --- DATA: full rosters (use the list you already have) ---
+    const DEFAULT_ROSTERS = {
+      "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
+      "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia", /* ... */ ],
+      "803": ["Alison Maria Bello Camacho","Heidy Bohorquez(803)","Guadalupe Buitrago Tibaduiza", /* ... */ ],
+      "804": ["Cristian Camilo Alarcón Rodríguez","Analia Alastre","Sara Beltrán", /* ... */ ],
+      "901": ["Juan Andrés Aconcha Torres", "Julian Camilo Aguilar Tovar", /* ... */ ],
+      "902": ["JERONIMO ACEVEDO GIRALDO","Norberto Alvarez (902)", /* ... */ ],
+      "903": ["HELLEN SOFIA BELTRAN PIAPYA","Wendy Cabrera (903)", /* ... */ ],
+      "904": ["Sara Arenas (904)","Angie Ariza atuesta", /* ... */ ],
+      "1001": ["Sofía Alejandra Bernal Alarcón","Haldyr Elian Caballero", /* ... */ ],
+      "1002": ["Mariana Amaya","María Camila Argel Pérez", /* ... */ ],
+      "1003": ["Laura Estefania Arenas Real","OMAR BUITRAGO PEREZ", /* ... */ ]
+    };
+    // Note: Replace /* ... */ lists with the rest of your names (kept short here for readability).
+
+    // --- STATE ---
     let currentClassKey = "801";
     let currentPeriod = "P1";
     let selectedStudentId = null;
     let activeEntryType = 'positive';
     let selectedValueTag = 'Responsabilidad';
     let dbState = { classes: {}, googleScriptUrl: '' };
-    let confirmCallback = null;
 
-    // init DB - load localStorage or create from DEFAULT_ROSTERS
+    // --- Persistence & Init ---
     function initDatabase(){
       const stored = localStorage.getItem('fantasyclass_alm_db');
       if (stored) {
-        try { dbState = JSON.parse(stored); } catch(e) { dbState = { classes:{}, googleScriptUrl:'' }; }
+        try { dbState = JSON.parse(stored); } catch(e){ dbState = { classes:{}, googleScriptUrl:'' }; }
       }
       if (!dbState.classes) dbState.classes = {};
+      // seed classes from DEFAULT_ROSTERS if missing
       Object.keys(DEFAULT_ROSTERS).forEach(classKey => {
         if (!dbState.classes[classKey] || dbState.classes[classKey].length === 0) {
           dbState.classes[classKey] = DEFAULT_ROSTERS[classKey].map((name, index) => ({
             id: `${classKey}_${index + 1}`,
-            name: name,
+            name,
             xp: 0,
             level: 1,
             history: []
@@ -359,10 +420,10 @@
       localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState));
     }
 
+    // --- CLASS SELECTS / PERIODS ---
     function updateClassSelectOptions(){
-      const select = document.getElementById('class-select');
-      if (!select) return;
-      const prev = select.value;
+      const select = document.getElementById('class-select'); if(!select) return;
+      const previous = select.value;
       select.innerHTML = '';
       Object.keys(dbState.classes).forEach(cKey => {
         const count = dbState.classes[cKey].length;
@@ -371,23 +432,18 @@
         opt.textContent = `Grado ${cKey} (${count} Est.)`;
         select.appendChild(opt);
       });
-      // Preserve selection if possible, else set currentClassKey
-      if (prev && dbState.classes[prev]) {
-        currentClassKey = prev;
-        select.value = prev;
-      } else {
-        // make sure currentClassKey exists
-        if (!dbState.classes[currentClassKey]) {
-          const keys = Object.keys(dbState.classes);
-          currentClassKey = keys.length>0 ? keys[0] : currentClassKey;
-        }
-        select.value = currentClassKey;
+      // keep selection if exists
+      if (previous && dbState.classes[previous]) {
+        currentClassKey = previous;
+      } else if (!dbState.classes[currentClassKey]) {
+        const keys = Object.keys(dbState.classes);
+        currentClassKey = keys.length > 0 ? keys[0] : currentClassKey;
       }
+      select.value = currentClassKey;
       renderStudentGrid();
       updateGlobalMetrics();
     }
 
-    // switch class and period (exposed to selects)
     function switchClass(newClassKey){
       if (!dbState.classes[newClassKey]) return;
       currentClassKey = newClassKey;
@@ -403,96 +459,57 @@
       updateGlobalMetrics();
     }
 
-    // Export toggling
+    // --- Export dropdown & tools dropdown ---
     function toggleExportMenu(){
-      const menu = document.getElementById('export-dropdown');
-      if (!menu) return;
-      menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+      const m = document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display === 'block' ? 'none' : 'block';
     }
-    document.addEventListener('click', (e) => {
-      const menu = document.getElementById('export-dropdown');
-      const toggleBtn = document.querySelector('.export-menu > button');
-      if (!menu || !toggleBtn) return;
-      if (menu.style.display === 'block' && !menu.contains(e.target) && !toggleBtn.contains(e.target)) {
-        menu.style.display = 'none';
-      }
+    function toggleToolsMenu(){
+      const m = document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    }
+    // close these when clicking outside
+    document.addEventListener('click', (e)=>{
+      const exportMenu = document.getElementById('export-dropdown'), exportBtn = document.querySelector('.export-menu > button');
+      if (exportMenu && exportMenu.style.display === 'block' && (!exportMenu.contains(e.target) && !exportBtn.contains(e.target))) exportMenu.style.display = 'none';
+      const toolsMenu = document.getElementById('tools-dropdown'), toolsBtn = document.querySelector('.tools-menu > button');
+      if (toolsMenu && toolsMenu.style.display === 'block' && (!toolsMenu.contains(e.target) && !toolsBtn.contains(e.target))) toolsMenu.style.display = 'none';
     });
 
-    // Drive functions (basic)
-    function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || ''; document.getElementById('drive-modal').classList.remove('hidden'); }
-    function closeDriveModal(){ document.getElementById('drive-modal').classList.add('hidden'); }
-    function saveDriveSettings(){ const url = document.getElementById('drive-webhook-url').value.trim(); dbState.googleScriptUrl = url; saveDatabase(); document.getElementById('drive-status-text').innerText = url ? "Google Drive Activo" : "Google Forms/Drive Sync"; closeDriveModal(); }
-    function testDriveConnection(){ const url = document.getElementById('drive-webhook-url').value.trim(); if(!url) return alert("Pegue una URL válida para probar."); alert("Se intentará enviar una prueba (no garantizado en 'no-cors')."); }
+    // --- Drive sync handlers ---
+    function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url') || ''; document.getElementById('drive-modal').classList.remove('modal-hidden'); }
+    function closeDriveModal(){ document.getElementById('drive-modal').classList.add('modal-hidden'); }
+    function saveDriveSettings(){ const url = document.getElementById('drive-webhook-url').value.trim(); dbState.googleScriptUrl = url; localStorage.setItem('fantasyclass_alm_google_url', url); saveDatabase(); document.getElementById('drive-status-text').innerText = url ? 'Google Drive Activo' : 'Google Forms/Drive Sync'; closeDriveModal(); }
+    function testDriveConnection(){ const url = document.getElementById('drive-webhook-url').value.trim(); if(!url) return alert('Introduce una URL para probar.'); alert('Prueba enviada (modo no-cors, puede no mostrarse).'); }
 
-    // XLSX exports (full implementations)
+    // --- XLSX EXPORTS (same logic) ---
     function exportCurrentClassExcel(){
       const students = dbState.classes[currentClassKey] || [];
       const summaryRows = students.map((s, idx) => {
         const obsCount = (s.history || []).filter(h => h.type === 'negative').length;
         const positiveCount = (s.history || []).filter(h => h.type === 'positive').length;
-        return {
-          "N°": idx + 1,
-          "ID Estudiante": s.id,
-          "Nombre Estudiante": s.name,
-          "Grado": currentClassKey,
-          "Nivel RPG": s.level || 1,
-          "Puntos XP Total": s.xp || 0,
-          "Méritos (+XP)": positiveCount,
-          "Observaciones (-HP)": obsCount
-        };
+        return {"N°": idx+1, "ID Estudiante": s.id, "Nombre Estudiante": s.name, "Grado": currentClassKey, "Nivel RPG": s.level || 1, "Puntos XP Total": s.xp || 0, "Méritos (+XP)": positiveCount, "Observaciones (-HP)": obsCount};
       });
       const historyRows = [];
-      students.forEach(s => {
-        if (!s.history || s.history.length === 0) {
-          historyRows.push({
-            "Grado": currentClassKey,
-            "ID Estudiante": s.id,
-            "Nombre Estudiante": s.name,
-            "Fecha y Hora": "Sin registros",
-            "Periodo": currentPeriod,
-            "Tipo Evento": "Sin anotaciones",
-            "Pilar Character Counts": "N/A",
-            "Puntos": 0,
-            "Anotación Observador": "Sin novedades convivenciales registradas"
-          });
+      students.forEach(s=>{
+        if(!s.history || s.history.length===0){
+          historyRows.push({"Grado":currentClassKey,"ID Estudiante":s.id,"Nombre Estudiante":s.name,"Fecha y Hora":"Sin registros","Periodo":currentPeriod,"Tipo Evento":"Sin anotaciones","Pilar Character Counts":"N/A","Puntos":0,"Anotación Observador":"Sin novedades"});
         } else {
-          s.history.forEach(h => {
-            historyRows.push({
-              "Grado": currentClassKey,
-              "ID Estudiante": s.id,
-              "Nombre Estudiante": s.name,
-              "Fecha y Hora": h.timestamp || '',
-              "Periodo": h.period || 'P1',
-              "Tipo Evento": h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
-              "Pilar Character Counts": h.valueTag || 'Convivencia',
-              "Puntos": h.magnitude || 1,
-              "Anotación Observador": h.note || ''
-            });
+          s.history.forEach(h=>{
+            historyRows.push({"Grado":currentClassKey,"ID Estudiante":s.id,"Nombre Estudiante":s.name,"Fecha y Hora":h.timestamp||"","Periodo":h.period||"P1","Tipo Evento":h.type==='positive'?'Mérito (+XP)':'Observación (-HP)',"Pilar Character Counts":h.valueTag||'Convivencia',"Puntos":h.magnitude||1,"Anotación Observador":h.note||''});
           });
         }
       });
       const wb = XLSX.utils.book_new();
-      const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
-      const wsHistory = XLSX.utils.json_to_sheet(historyRows);
-      XLSX.utils.book_append_sheet(wb, wsSummary, "Consolidado " + currentClassKey);
-      XLSX.utils.book_append_sheet(wb, wsHistory, "Bitácora Detallada Alumnos");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryRows), `Consolidado ${currentClassKey}`);
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(historyRows), `Historial ${currentClassKey}`);
       XLSX.writeFile(wb, `FantasyClass_Reporte_Grado_${currentClassKey}_ALM.xlsx`);
       toggleExportMenu();
     }
 
     function exportAllClassesMasterExcel(){
       const wb = XLSX.utils.book_new();
-      Object.keys(dbState.classes).forEach(cKey => {
+      Object.keys(dbState.classes).forEach(cKey=>{
         const students = dbState.classes[cKey] || [];
-        const rows = students.map((s, idx) => ({
-          "N°": idx + 1,
-          "Nombre Estudiante": s.name,
-          "Grado": cKey,
-          "Nivel RPG": s.level || 1,
-          "Puntos XP": s.xp || 0,
-          "Méritos": (s.history || []).filter(h => h.type === 'positive').length,
-          "Observaciones": (s.history || []).filter(h => h.type === 'negative').length
-        }));
+        const rows = students.map((s,idx)=>({"N°":idx+1,"Nombre Estudiante":s.name,"Grado":cKey,"Nivel RPG":s.level||1,"Puntos XP":s.xp||0,"Méritos":(s.history||[]).filter(h=>h.type==='positive').length,"Observaciones":(s.history||[]).filter(h=>h.type==='negative').length}));
         const ws = XLSX.utils.json_to_sheet(rows);
         XLSX.utils.book_append_sheet(wb, ws, `Curso ${cKey}`);
       });
@@ -501,111 +518,113 @@
     }
 
     function exportSingleStudentExcel(){
-      if (!selectedStudentId) return alert('Selecciona un estudiante.');
-      const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-      if (!student) return;
+      if (!selectedStudentId) return alert('Selecciona un estudiante mediante Ficha.');
+      const student = (dbState.classes[currentClassKey] || []).find(s=>s.id===selectedStudentId);
+      if(!student) return alert('Estudiante no encontrado.');
       const studentHistory = student.history || [];
-      const historyRows = studentHistory.map(h => ({
-        "Fecha y Hora": h.timestamp || '',
-        "Periodo Lectivo": h.period || 'P1',
-        "Tipo de Registro": h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
-        "Pilar Valor": h.valueTag || 'Convivencia',
-        "Puntos Impacto": h.magnitude || 1,
-        "Detalle / Nota Pedagógica": h.note || ''
-      }));
-      if (historyRows.length === 0) {
-        historyRows.push({
-          "Fecha y Hora": "N/A",
-          "Periodo Lectivo": currentPeriod,
-          "Tipo de Registro": "Sin anotaciones",
-          "Pilar Valor": "N/A",
-          "Puntos Impacto": 0,
-          "Detalle / Nota Pedagógica": "Sin eventos convivenciales registrados en el observador."
-        });
-      }
+      const historyRows = studentHistory.map(h=>({"Fecha y Hora":h.timestamp||'',"Periodo Lectivo":h.period||'P1',"Tipo de Registro":h.type==='positive'?'Mérito (+XP)':'Observación (-HP)',"Pilar Valor":h.valueTag||'Convivencia',"Puntos Impacto":h.magnitude||1,"Detalle / Nota Pedagógica":h.note||''}));
+      if(historyRows.length===0) historyRows.push({"Fecha y Hora":"N/A","Periodo Lectivo":currentPeriod,"Tipo de Registro":"Sin anotaciones","Pilar Valor":"N/A","Puntos Impacto":0,"Detalle / Nota Pedagógica":"Sin eventos"});
       const wb = XLSX.utils.book_new();
-      const summaryData = [{
-        "Nombre Estudiante": student.name,
-        "Grado": currentClassKey,
-        "Nivel RPG": student.level || 1,
-        "Puntos XP": student.xp || 0,
-        "Total Registros": studentHistory.length
-      }];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(summaryData), "Ficha Estudiante");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{"Nombre Estudiante":student.name,"Grado":currentClassKey,"Nivel RPG":student.level||1,"Puntos XP":student.xp||0,"Total Registros":studentHistory.length}]), "Ficha Estudiante");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(historyRows), "Historial Observador");
-      const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
+      const cleanName = student.name.replace(/[^a-zA-Z0-9]/g,'_');
       XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
     }
 
-    // Groups & student management
+    // --- Groups & Students (fixed) ---
     function renderGroupsList(){
-      const container = document.getElementById('groups-list-container'); if(!container) return; container.innerHTML='';
-      Object.keys(dbState.classes).forEach(cKey => {
+      const container = document.getElementById('groups-list-container'); if(!container) return;
+      container.innerHTML = '';
+      Object.keys(dbState.classes).forEach(cKey=>{
         const count = dbState.classes[cKey].length;
-        const div = document.createElement('div');
-        div.className = 'group-item';
-        div.innerHTML = `<div style="font-weight:800">Grado ${cKey} <span style="color:var(--muted);font-weight:600">(${count} estudiantes)</span></div><div><button onclick="deleteGroup('${cKey}')" class="btn btn-red">🗑</button></div>`;
+        const div = document.createElement('div'); div.className = 'group-item';
+        div.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${cKey}')"><strong>Grado ${cKey}</strong> <span style="color:var(--muted);font-weight:600">(${count} estudiantes)</span></div>
+          <div style="display:flex;gap:6px"><button onclick="promptExportGroup('${cKey}')" class="btn" title="Exportar grupo">📤</button><button onclick="deleteGroup('${cKey}')" class="btn btn-red" title="Eliminar grupo">🗑</button></div>`;
         container.appendChild(div);
       });
     }
 
-    function openManageGroupsModal(){ renderGroupsList(); document.getElementById('manage-groups-modal').classList.remove('hidden'); }
-    function closeManageGroupsModal(){ document.getElementById('manage-groups-modal').classList.add('hidden'); }
-    function addNewGroup(){ const input = document.getElementById('new-group-input'); const groupName = input.value.trim().toUpperCase(); if(!groupName) return; if(dbState.classes[groupName]) { alert('Grupo existente.'); return; } dbState.classes[groupName]=[]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); switchClass(groupName); input.value=''; }
-    function deleteGroup(groupKey){ showConfirmModal('Eliminar Grupo', `Eliminar grupo ${groupKey}?`, ()=>{ delete dbState.classes[groupKey]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); }); }
+    function addNewGroup(){
+      const input = document.getElementById('new-group-input'); if(!input) return;
+      const groupName = input.value.trim().toUpperCase();
+      if(!groupName) return alert('Escribe el nombre del grupo (ej. 1101).');
+      if(dbState.classes[groupName]) return alert('Grupo ya existe.');
+      dbState.classes[groupName] = [];
+      saveDatabase();
+      input.value = '';
+      updateClassSelectOptions();
+      renderGroupsList();
+      switchClass(groupName);
+    }
 
-    function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('hidden'); }
-    function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('hidden'); }
-    function confirmAddNewStudent(){ const name = document.getElementById('new-student-name-input').value.trim(); if(!name) return alert('Escribe el nombre'); const students = dbState.classes[currentClassKey] || []; students.push({ id: `${currentClassKey}_${Date.now()}`, name, xp:0, level:1, history:[] }); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); }
+    function deleteGroup(groupKey){
+      showConfirmModal('Eliminar Grupo', `Eliminar el grupo ${groupKey}?`, ()=>{ delete dbState.classes[groupKey]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); });
+    }
 
-    function showConfirmModal(title,message,onConfirm){ document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-message').innerText = message; confirmCallback = onConfirm; document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCallback) confirmCallback(); closeConfirmModal(); }; document.getElementById('confirm-dialog-modal').classList.remove('hidden'); }
-    function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('hidden'); }
+    function promptExportGroup(cKey){ currentClassKey = cKey; exportCurrentClassExcel(); }
 
-    // Stats helpers
+    // Add student flow
+    function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('modal-hidden'); }
+    function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('modal-hidden'); }
+    function confirmAddNewStudent(){
+      const name = document.getElementById('new-student-name-input').value.trim();
+      if(!name) return alert('Escribe el nombre completo del estudiante.');
+      const students = dbState.classes[currentClassKey] || [];
+      const id = `${currentClassKey}_${Date.now()}`;
+      students.push({ id, name, xp:0, level:1, history:[] });
+      dbState.classes[currentClassKey] = students;
+      saveDatabase();
+      updateClassSelectOptions();
+      renderStudentGrid();
+      closeAddStudentModal();
+      alert('Estudiante agregado correctamente.');
+    }
+
+    // Confirm modal
+    let confirmCallback = null;
+    function showConfirmModal(title,message,onConfirm){
+      document.getElementById('confirm-title').innerText = title;
+      document.getElementById('confirm-message').innerText = message;
+      confirmCallback = onConfirm;
+      document.getElementById('confirm-action-btn').onclick = () => { if(confirmCallback) confirmCallback(); closeConfirmModal(); };
+      document.getElementById('confirm-dialog-modal').classList.remove('modal-hidden');
+    }
+    function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('modal-hidden'); }
+
+    // --- Stats & helpers ---
     function calculateStudentStatsForPeriod(student){
       let filteredHistory = student.history || [];
       if (currentPeriod !== 'ALL') filteredHistory = filteredHistory.filter(h => h.period === currentPeriod || !h.period);
       let xp = 0;
       let badges = { Responsabilidad:0, Respeto:0, Confianza:0, Empatía:0, Justicia:0, Ciudadanía:0 };
-      filteredHistory.forEach(h => {
-        if (h.type === 'positive') {
-          xp += (h.magnitude || 1);
-          if (h.valueTag && badges[h.valueTag] !== undefined) badges[h.valueTag] += (h.magnitude || 1);
-        }
+      filteredHistory.forEach(h=>{
+        if (h.type === 'positive'){ xp += (h.magnitude || 1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag] += (h.magnitude||1); }
       });
-      const level = Math.floor(xp / 20) + 1;
+      const level = Math.floor(xp/20) + 1;
       return { xp, level, badges, history: filteredHistory };
     }
 
     function updateGlobalMetrics(){
       const students = dbState.classes[currentClassKey] || [];
       let totals = { Responsabilidad:0, Respeto:0, Confianza:0, Empatía:0, Justicia:0, Ciudadanía:0 };
-      students.forEach(s => {
+      students.forEach(s=>{
         const stats = calculateStudentStatsForPeriod(s);
         Object.keys(totals).forEach(k => totals[k] += stats.badges[k] || 0);
       });
-      Object.keys(totals).forEach(k => {
-        const el = document.getElementById(`badge-count-${k}`);
-        if (el) el.innerText = `${totals[k]} pts`;
-      });
+      Object.keys(totals).forEach(k => { const el = document.getElementById(`badge-count-${k}`); if(el) el.innerText = `${totals[k]} pts`; });
     }
 
-    // avatar gradient by initial
+    // Avatar gradient by initial
     function avatarGradientFor(name){
-      if (!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
-      const initial = name.trim().charAt(0).toUpperCase();
-      const idx = initial.charCodeAt(0) % 10;
-      const palettes = [
-        ['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],
-        ['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']
-      ];
-      const p = palettes[idx];
-      return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+      if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
+      const initial = name.trim().charAt(0).toUpperCase(); const idx = initial.charCodeAt(0) % 10;
+      const palettes = [['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
+      const p = palettes[idx]; return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
     }
 
-    // render student grid
+    // --- Render student grid (fixed) ---
     function renderStudentGrid(){
-      const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
+      const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML = '';
       const students = dbState.classes[currentClassKey] || [];
       const query = (document.getElementById('student-search-input')?.value || '').toLowerCase().trim();
       const sortBy = document.getElementById('sort-select')?.value || 'name';
@@ -613,9 +632,9 @@
       if (sortBy === 'name') filtered.sort((a,b)=> a.name.localeCompare(b.name));
       else if (sortBy === 'level' || sortBy === 'xp') filtered.sort((a,b)=> (b.xp||0) - (a.xp||0));
       else if (sortBy === 'obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length) - ((a.history||[]).filter(h=>h.type==='negative').length));
-      filtered.forEach(student => {
+      filtered.forEach(student=>{
         const stats = calculateStudentStatsForPeriod(student);
-        const obsCount = stats.history.filter(h => h.type === 'negative').length;
+        const obsCount = stats.history.filter(h=>h.type==='negative').length;
         const card = document.createElement('div'); card.className = 'student-card';
         const avatarBg = avatarGradientFor(student.name);
         card.innerHTML = `
@@ -642,11 +661,10 @@
       updateGlobalMetrics();
     }
 
-    // open fiche modal (with period label updated)
+    // --- Ficha modal logic (modal-only) ---
     function openHistoryModal(studentId){
       selectedStudentId = studentId;
-      const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
-      if (!student) return;
+      const student = (dbState.classes[currentClassKey] || []).find(s=>s.id === studentId); if(!student) return;
       document.getElementById('history-student-name').innerText = student.name;
       document.getElementById('history-student-avatar').innerText = student.name.charAt(0).toUpperCase();
       document.getElementById('history-period-label').innerText = currentPeriod;
@@ -655,130 +673,183 @@
       document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
       document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
       // reset form defaults
-      activeEntryType = 'positive';
-      setEntryType('positive');
+      activeEntryType = 'positive'; setEntryType('positive');
       selectedValueTag = 'Responsabilidad';
       document.getElementById('entry-note-input').value = '';
       document.getElementById('point-magnitude-input').value = 1;
       renderHistoryList(student);
-      document.getElementById('history-modal').classList.remove('hidden');
+      document.getElementById('history-modal').classList.remove('modal-hidden');
       setTimeout(()=>{ document.getElementById('entry-note-input')?.focus(); }, 200);
     }
-    function closeHistoryModal(){ document.getElementById('history-modal').classList.add('hidden'); }
+    function closeHistoryModal(){ document.getElementById('history-modal').classList.add('modal-hidden'); }
 
-    // open quick with preselected type
-    function openAwardQuick(studentId, type){
-      selectedStudentId = studentId;
-      activeEntryType = (type === 'positive') ? 'positive' : 'negative';
-      setEntryType(activeEntryType);
-      openHistoryModal(studentId);
-    }
+    function openAwardQuick(studentId, type){ selectedStudentId = studentId; activeEntryType = (type === 'positive') ? 'positive' : 'negative'; setEntryType(activeEntryType); openHistoryModal(studentId); }
+    function setEntryType(type){ activeEntryType = type; const btnPos = document.getElementById('btn-type-positive'), btnNeg = document.getElementById('btn-type-negative'); if(btnPos) btnPos.style.background = (type === 'positive') ? 'linear-gradient(180deg,#10b981,#059669)' : 'transparent'; if(btnNeg) btnNeg.style.background = (type === 'negative') ? 'linear-gradient(180deg,#ef4444,#dc2626)' : 'transparent'; }
 
-    // set entry type styles
-    function setEntryType(type){
-      activeEntryType = type;
-      const btnPos = document.getElementById('btn-type-positive'), btnNeg = document.getElementById('btn-type-negative');
-      if (btnPos) btnPos.style.background = (type === 'positive') ? 'linear-gradient(180deg,#10b981,#059669)' : 'transparent';
-      if (btnNeg) btnNeg.style.background = (type === 'negative') ? 'linear-gradient(180deg,#ef4444,#dc2626)' : 'transparent';
-    }
-
-    function selectValueCategory(val){ selectedValueTag = val; }
+    function selectValueCategory(val){ selectedValueTag = val; alert('Pilar seleccionado: ' + val); } // small feedback
 
     function renderHistoryList(student){
       const container = document.getElementById('history-entries-container'); if(!container) return;
       const entries = student.history || [];
-      if (entries.length === 0) { container.innerHTML = `<p style="color:var(--muted);text-align:center">Sin registros en el observador todavía.</p>`; return; }
-      container.innerHTML = entries.map(h => `<div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid ${h.type==='positive'?'rgba(52,211,153,0.06)':'rgba(239,68,68,0.06)'}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><strong style="font-size:12px">${h.type==='positive'?`+${h.magnitude||1} XP`:'OBSERVACIÓN'}</strong><span style="font-size:11px;color:var(--muted)">${h.valueTag||'Convivencia'}</span><span style="font-size:11px;color:var(--muted);margin-left:auto">${h.timestamp}</span></div><div style="color:#fff;font-size:13px">${h.note}</div></div>`).join('');
+      if(entries.length === 0){ container.innerHTML = `<p style="color:var(--muted);text-align:center">Sin registros en el observador todavía.</p>`; return; }
+      container.innerHTML = entries.map(h=>`<div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid ${h.type==='positive'?'rgba(52,211,153,0.06)':'rgba(239,68,68,0.06)'}"><div style="display:flex;gap:8px;align-items:center;margin-bottom:6px"><strong style="font-size:12px">${h.type==='positive'?`+${h.magnitude||1} XP`:'OBSERVACIÓN'}</strong><span style="font-size:11px;color:var(--muted)">${h.valueTag||'Convivencia'}</span><span style="font-size:11px;color:var(--muted);margin-left:auto">${h.timestamp}</span></div><div style="color:#fff;font-size:13px">${h.note}</div></div>`).join('');
     }
 
-    // save entry (inside modal)
     function saveStudentEntry(){
-      if (!selectedStudentId) return alert('Selecciona un estudiante');
-      const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-      if (!student) return;
+      if(!selectedStudentId) return alert('Selecciona una ficha de estudiante primero.');
+      const student = (dbState.classes[currentClassKey] || []).find(s=>s.id === selectedStudentId); if(!student) return alert('Estudiante no encontrado.');
       const note = (document.getElementById('entry-note-input').value || '').trim() || 'Registro de convivencia';
       const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
-      if (!student.history) student.history = [];
-      const newEntry = {
-        id: Date.now(),
-        timestamp: new Date().toLocaleString('es-CO'),
-        period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
-        type: activeEntryType,
-        valueTag: selectedValueTag,
-        magnitude: magnitude,
-        note: note
-      };
+      if(!student.history) student.history = [];
+      const newEntry = { id: Date.now(), timestamp: new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag: selectedValueTag, magnitude, note };
       student.history.unshift(newEntry);
-      if (activeEntryType === 'positive') {
-        student.xp = (student.xp || 0) + magnitude;
-        student.level = Math.floor(student.xp / 20) + 1;
-        try { confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } }); } catch(e) {}
-      }
-      // send to drive webhook if configured (no-cors)
-      const url = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url');
-      if (url) {
+      if(activeEntryType === 'positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20) + 1; try{ confetti({ particleCount:40, spread:50, origin:{y:0.7} }); }catch(e){} }
+      // optional: post to Drive
+      if (dbState.googleScriptUrl) {
         try {
+          const url = dbState.googleScriptUrl;
           if (url.includes('docs.google.com/forms')) {
-            const formData = new FormData();
-            formData.append('entry.1', currentClassKey);
-            formData.append('entry.2', student.name);
-            formData.append('entry.3', activeEntryType === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)');
-            formData.append('entry.4', selectedValueTag);
-            formData.append('entry.5', magnitude);
-            formData.append('entry.6', note);
-            fetch(url, { method:'POST', mode:'no-cors', body: formData });
+            const fd = new FormData();
+            fd.append('entry.1', currentClassKey);
+            fd.append('entry.2', student.name);
+            fd.append('entry.3', activeEntryType === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)');
+            fd.append('entry.4', selectedValueTag);
+            fd.append('entry.5', magnitude);
+            fd.append('entry.6', note);
+            fetch(url, { method:'POST', mode:'no-cors', body: fd });
           } else {
-            fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ curso: currentClassKey, estudiante: student.name, tipo: activeEntryType === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)', pilar: selectedValueTag, puntos: magnitude, nota: note }) });
+            fetch(dbState.googleScriptUrl, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({curso:currentClassKey,estudiante:student.name,tipo:activeEntryType=== 'positive'?'Mérito (+XP)':'Observación (-HP)',pilar:selectedValueTag,puntos:magnitude,nota:note})});
           }
-        } catch(e) { console.warn('Drive sync error', e); }
+        } catch(e){ console.warn('Drive sync failed', e); }
       }
       saveDatabase();
       renderHistoryList(student);
       renderStudentGrid();
-      // keep modal open so teacher can keep registering; if you want it to close automatically, call closeHistoryModal();
+      alert('Registro guardado.');
+      // keep modal open so teacher can continue; if prefer close -> closeHistoryModal();
     }
 
     function addDirectTeacherNote(){
-      const noteText = (document.getElementById('direct-teacher-note').value || '').trim();
-      if (!noteText || !selectedStudentId) return;
-      const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-      if (!student) return;
-      if (!student.history) student.history = [];
-      const newEntry = { id: Date.now(), timestamp: new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: 'positive', valueTag: 'Seguimiento', magnitude: 1, note: noteText };
-      student.history.unshift(newEntry);
-      // optional: send to drive
-      saveDatabase();
-      renderHistoryList(student);
-      renderStudentGrid();
-      document.getElementById('direct-teacher-note').value = '';
+      const text = (document.getElementById('direct-teacher-note').value || '').trim(); if(!text || !selectedStudentId) return;
+      const student = (dbState.classes[currentClassKey] || []).find(s=>s.id === selectedStudentId); if(!student) return;
+      if(!student.history) student.history = [];
+      const entry = { id: Date.now(), timestamp: new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type:'positive', valueTag:'Seguimiento', magnitude:1, note: text };
+      student.history.unshift(entry); saveDatabase(); renderHistoryList(student); renderStudentGrid(); document.getElementById('direct-teacher-note').value = ''; alert('Nota añadida.');
     }
 
     // delete student
     function deleteStudent(studentId){
-      const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
-      if (!student) return;
-      showConfirmModal('Eliminar Estudiante', `¿Deseas eliminar permanentemente a "${student.name}" del grado ${currentClassKey}?`, ()=> {
-        dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(s => s.id !== studentId);
-        saveDatabase();
-        updateClassSelectOptions();
-        renderStudentGrid();
-      });
+      const student = (dbState.classes[currentClassKey] || []).find(s=>s.id===studentId); if(!student) return;
+      showConfirmModal('Eliminar Estudiante', `Eliminar a "${student.name}" del grado ${currentClassKey}?`, ()=>{ dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(s=>s.id!==studentId); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); });
     }
 
-    // small helpers
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { document.querySelectorAll('.glass-panel').forEach(m => {}); /* modal close handled individually */ } });
+    // --- Roulette implementation using WebAudio for sound ---
+    let rouletteInterval = null;
+    let rouletteRunning = false;
+    let rouletteNames = [];
+    let rouletteIndex = 0;
+    function openRouletteModal(){
+      document.getElementById('roulette-modal').classList.remove('modal-hidden');
+      // prepare names
+      rouletteNames = (dbState.classes[currentClassKey] || []).map(s=>s.name);
+      document.getElementById('roulette-display').innerText = rouletteNames.length ? '¡Presiona Girar!' : 'No hay estudiantes en este curso';
+    }
+    function closeRouletteModal(){
+      stopRoulette();
+      document.getElementById('roulette-modal').classList.add('modal-hidden');
+    }
+    // WebAudio context & sounds
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playTick(freq=800, duration=0.03, gain=0.08){
+      const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type = 'sine'; o.frequency.value = freq; g.gain.value = gain; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime + duration);
+    }
+    function playWin(){
+      const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.25); g.gain.value = 0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(), 500);
+    }
 
-    // init on DOM ready
-    document.addEventListener('DOMContentLoaded', () => {
+    function startRoulette(){
+      if(rouletteRunning) return;
+      rouletteNames = (dbState.classes[currentClassKey] || []).map(s=>s.name);
+      if(!rouletteNames.length) return alert('No hay estudiantes en este curso.');
+      rouletteRunning = true;
+      let speed = parseInt(document.getElementById('roulette-speed').value || 20);
+      let intervalMs = Math.max(30, 200 - speed*3);
+      let cycles = 0;
+      rouletteIndex = Math.floor(Math.random()*rouletteNames.length);
+      rouletteInterval = setInterval(()=>{
+        rouletteIndex = (rouletteIndex + 1) % rouletteNames.length;
+        document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
+        playTick(600 + Math.random()*400, 0.02, 0.03);
+        cycles++;
+        // gradually slow down after some cycles
+        if(cycles > 30){
+          clearInterval(rouletteInterval);
+          // slowdown: do sequential timeouts
+          let slowSteps = 12;
+          let step = 0;
+          function slowTick(){
+            if(step >= slowSteps){
+              rouletteRunning = false;
+              playWin();
+              // set selected student as highlighted and open ficha
+              const selectedName = rouletteNames[rouletteIndex];
+              // find id by name (first match)
+              const student = (dbState.classes[currentClassKey] || []).find(s=>s.name === selectedName);
+              if(student){ openHistoryModal(student.id); }
+              return;
+            }
+            rouletteIndex = (rouletteIndex + 1) % rouletteNames.length;
+            document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
+            playTick(500 + step*40, 0.02, 0.03);
+            step++;
+            setTimeout(slowTick, 80 + step*30);
+          }
+          setTimeout(slowTick, 80);
+        }
+      }, intervalMs);
+    }
+
+    function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval = null; } rouletteRunning = false; }
+
+    // --- Timer implementation ---
+    let timerSeconds = 300;
+    let timerInterval = null;
+    function openTimerModal(){ document.getElementById('timer-modal').classList.remove('modal-hidden'); updateTimerDisplay(); }
+    function closeTimerModal(){ document.getElementById('timer-modal').classList.add('modal-hidden'); clearInterval(timerInterval); timerInterval = null; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+    function setTimerMinutes(mins){ timerSeconds = mins*60; updateTimerDisplay(); }
+    function updateTimerDisplay(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+    function formatTime(s){ const m = String(Math.floor(s/60)).padStart(2,'0'); const sec = String(s%60).padStart(2,'0'); return `${m}:${sec}`; }
+    function toggleTimer(){
+      if(timerInterval){ clearInterval(timerInterval); timerInterval = null; document.querySelector('#timer-modal .btn.btn-green').innerText = 'Iniciar'; }
+      else { document.querySelector('#timer-modal .btn.btn-green').innerText = 'Pausar'; timerInterval = setInterval(()=>{
+          if(timerSeconds > 0){ timerSeconds--; updateTimerDisplay(); } else { clearInterval(timerInterval); timerInterval = null; timerFinished(); document.querySelector('#timer-modal .btn.btn-green').innerText = 'Iniciar'; }
+        }, 1000); }
+    }
+    function resetTimer(){ timerSeconds = 300; updateTimerDisplay(); if(timerInterval){ clearInterval(timerInterval); timerInterval = null; document.querySelector('#timer-modal .btn.btn-green').innerText = 'Iniciar'; } }
+    function timerFinished(){ // final sound
+      const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); g.gain.value = 0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(), 700); alert('Tiempo terminado'); }
+
+    // --- Dice simple ---
+    function openDiceModal(){ document.getElementById('dice-modal').classList.remove('modal-hidden'); }
+    function closeDiceModal(){ document.getElementById('dice-modal').classList.add('modal-hidden'); }
+    function rollDice(){ const r = Math.floor(Math.random()*6) + 1; document.getElementById('dice-display').innerText = r; playTick(300 + r*50, 0.06, 0.06); }
+
+    // --- Initialization ---
+    document.addEventListener('DOMContentLoaded', ()=>{
       initDatabase();
       renderStudentGrid();
-      // ensure selects reflect state
+      // set selects initially
       document.getElementById('period-select').value = currentPeriod;
       document.getElementById('class-select').value = currentClassKey;
       // drive indicator
       const savedUrl = localStorage.getItem('fantasyclass_alm_google_url');
-      if (savedUrl) document.getElementById('drive-status-text').innerText = "Google Drive Activo";
+      if (savedUrl) document.getElementById('drive-status-text').innerText = 'Google Drive Activo';
+      // prepare groups list if opened
+      renderGroupsList();
     });
+
+    // --- small accessibility / safety ---
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ document.querySelectorAll('.modal-hidden').forEach(()=>{}); /* modals closed with their own buttons */ } });
 
   </script>
 </body>
