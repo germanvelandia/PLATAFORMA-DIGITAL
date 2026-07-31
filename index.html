@@ -1,668 +1,633 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FantasyClass Convivencial — ALM</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>FantasyClass Convivencial — ALM</title>
 
-  <!-- Simple styles (no external frameworks required) -->
-  <style>
-    :root{
-      --bg:#08121a; --panel:#0f1720; --muted:#9aa7b6; --accent:#10b981; --danger:#ef4444; --gold:#f59e0b;
-      --white:#ffffff;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#051016);color:#e6eef6;min-height:100vh}
-    header{background:linear-gradient(180deg,#07121a,#061019);padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);position:sticky;top:0;z-index:60}
-    .container{max-width:1120px;margin:0 auto;padding:16px}
-    .header-row{display:flex;align-items:center;gap:12px;justify-content:space-between}
-    .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#122033);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold)}
-    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700}
-    select.muted{color:var(--muted);background:transparent;border:0;font-weight:800}
-    main{max-width:1120px;margin:18px auto;padding:0 16px 60px}
-    .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:12px}
-    .metric{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-    .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;background:rgba(255,255,255,0.01);border-radius:10px;border:1px solid rgba(255,255,255,0.03);margin-bottom:12px}
-    .control-left{display:flex;gap:8px;align-items:center}
-    .control-left input{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:inherit}
-    #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+<!-- Tailwind (optional) -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { theme: { extend: { colors: { colegio: { blue:'#1e3a8a', red:'#dc2626', gold:'#f59e0b' } }, fontFamily: { sans:['Inter','sans-serif'] } } } };</script>
 
-    .card{background:linear-gradient(180deg,rgba(12,18,26,0.85),rgba(7,12,18,0.65));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);position:relative;overflow:hidden}
-    .card .row{display:flex;gap:10px;align-items:center}
-    .avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;background:linear-gradient(135deg,#0b2540,#07213a);color:#ffd88a}
-    .hp-wrap{margin-top:8px}
-    .hp-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
-    .hp-fill{height:100%;background:linear-gradient(90deg,var(--danger),var(--gold));width:100%}
-    .card .actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    /* Modals */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:120}
-    .modal{background:var(--panel);padding:16px;border-radius:12px;max-height:90vh;overflow:auto;width:100%;max-width:980px;border:1px solid rgba(255,255,255,0.04)}
-    .modal.white{background:#ffffff;color:#111}
-    .modal h3{margin:0 0 12px 0}
-    .modal .row{display:flex;gap:8px}
-    .modal .input{padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#f7f7f7}
-    .small{font-size:13px;color:var(--muted)}
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-    /* Icon grid in ficha */
-    .icon-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:12px 0}
-    .icon-btn{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;border:2px solid rgba(0,0,0,0.06);cursor:pointer}
-    .icon-btn.positive{border-color:rgba(16,185,129,0.12);color:var(--accent)}
-    .icon-btn.negative{border-color:rgba(239,68,68,0.12);color:var(--danger)}
-    .icon-btn.selected{box-shadow:0 8px 30px rgba(0,0,0,0.2)}
+<style>
+  :root{--muted:#9aa7b6;--glass-border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
+  *{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
+  header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:90}
+  .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
+  .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700}
+  .chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
+  .muted-select{color:var(--muted);background:transparent;border:0;font-weight:800}
 
-    /* Groups modal columns for drag & drop */
-    .groups-area{display:flex;gap:12px;align-items:flex-start}
-    .group-col{min-width:200px;max-width:260px;background:rgba(255,255,255,0.02);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-    .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:6px;cursor:grab}
+  main{max-width:1200px;margin:18px auto;padding:0 18px 80px}
+  .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+  .metric{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.007));border:1px solid var(--glass-border)}
+  .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:12px}
+  .control-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+  .control-left input, .control-left select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:inherit}
 
-    .btn{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700}
-    .btn.danger{background:linear-gradient(180deg,var(--danger),#c0392b);color:white;border:none}
-    .hidden{display:none}
-    @media(max-width:900px){ .icon-grid{grid-template-columns:repeat(4,64px)} .groups-area{flex-direction:column} }
-  </style>
+  #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);position:relative}
+  .avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900}
+  .level{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.35);color:var(--accent-gold);font-weight:800}
+
+  .actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
+  .btn{padding:8px 12px;border-radius:10px;font-weight:800;color:#fff;cursor:pointer}
+  .btn.green{background:linear-gradient(180deg,#10b981,#059669)}
+  .btn.red{background:linear-gradient(180deg,#ef4444,#dc2626)}
+  .btn.blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
+  .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+  .hp-wrap{margin-top:8px}
+  .hp-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+  .hp-fill{height:100%;background:linear-gradient(90deg,var(--accent-red),var(--accent-gold));width:100%}
+
+  /* modals */
+  .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:16px;z-index:120;background:rgba(0,0,0,0.6)}
+  .modal{background:linear-gradient(180deg,rgba(15,23,34,0.98),rgba(9,12,18,0.98));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);max-height:90vh;overflow:auto; width:100%;max-width:980px}
+  .modal.white{background:#fff;color:#111}
+  .modal .close{position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted);cursor:pointer}
+
+  .icon-grid{display:grid;grid-template-columns:repeat(5,64px);gap:12px;justify-content:center;margin:12px 0}
+  .icon-btn{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.03);cursor:pointer;background:transparent}
+  .icon-btn.positive{border-color:rgba(16,185,129,0.12);color:var(--accent-green)}
+  .icon-btn.negative{border-color:rgba(239,68,68,0.12);color:var(--accent-red)}
+  .icon-btn.selected{box-shadow:0 10px 30px rgba(0,0,0,0.2)}
+
+  .groups-area{display:flex;gap:12px;align-items:flex-start}
+  .group-col{min-width:200px;max-width:260px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+  .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:8px;cursor:grab}
+
+  .hidden{display:none}
+  @media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}.icon-grid{grid-template-columns:repeat(4,64px)}.groups-area{flex-direction:column}}
+</style>
 </head>
 <body>
-  <header>
-    <div class="container header-row">
-      <div class="brand">
-        <div class="logo">ALM</div>
-        <div>
-          <div style="font-weight:900">FantasyClass Convivencial</div>
-          <div class="small">Colegio Alfonso López Michelsen</div>
-        </div>
-      </div>
 
-      <div class="controls">
-        <div class="chip" onclick="openQuickActionModal('positive')">+ Mérito</div>
-        <div class="chip" onclick="openQuickActionModal('negative')">− Falta</div>
-
-        <div class="chip">
-          <span style="margin-right:6px">Periodo</span>
-          <select id="period-select" class="muted" onchange="switchPeriod(this.value)">
-            <option value="ALL">Todo el Año</option>
-            <option value="P1" selected>Periodo 1</option>
-            <option value="P2">Periodo 2</option>
-            <option value="P3">Periodo 3</option>
-            <option value="P4">Periodo 4</option>
-          </select>
-        </div>
-
-        <div class="chip">
-          <span style="margin-right:6px">Curso</span>
-          <select id="class-select" class="muted" onchange="switchClass(this.value)"></select>
-        </div>
-
-        <div class="chip" onclick="openManageGroupsModal()">Grupos</div>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <div class="container">
-      <div class="metrics" id="metrics-bar">
-        <div class="metric"><div class="small">Responsabilidad</div><div id="badge-Responsabilidad">0</div></div>
-        <div class="metric"><div class="small">Respeto</div><div id="badge-Respeto">0</div></div>
-        <div class="metric"><div class="small">Confianza</div><div id="badge-Confianza">0</div></div>
-        <div class="metric"><div class="small">Empatía</div><div id="badge-Empatía">0</div></div>
-        <div class="metric"><div class="small">Justicia</div><div id="badge-Justicia">0</div></div>
-        <div class="metric"><div class="small">Ciudadanía</div><div id="badge-Ciudadanía">0</div></div>
-      </div>
-
-      <div class="control-panel">
-        <div class="control-left">
-          <input id="student-search" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="btn" onclick="openAddStudentModal()">Añadir Estudiante</div>
-        </div>
-      </div>
-
-      <div id="students-grid"></div>
-    </div>
-  </main>
-
-  <!-- Modals -->
-
-  <!-- Quick action modal -->
-  <div id="quick-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeQuickActionModal()">
-    <div class="modal">
-      <h3 id="quick-title">Acción rápida</h3>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <select id="quick-student-select" style="flex:1"></select>
-        <input id="quick-points" type="number" min="1" max="10" value="1" style="width:80px;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <div class="btn" onclick="applyQuick(true)">Aplicar + Mérito</div>
-        <div class="btn danger" onclick="applyQuick(false)">Aplicar − Falta</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add student modal -->
-  <div id="add-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeAddStudentModal()">
-    <div class="modal">
-      <h3>Nuevo estudiante</h3>
-      <input id="new-student-name" class="input" placeholder="Nombre completo" style="width:100%;margin-bottom:8px">
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <div class="btn" onclick="addStudent()">Guardar</div>
-        <div class="btn" onclick="closeAddStudentModal()">Cancelar</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Ficha modal (white background for readability) -->
-  <div id="ficha-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeFichaModal()">
-    <div class="modal white">
-      <h3 id="ficha-name">Ficha Estudiante</h3>
-
+<header class="glass-panel">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="logo">ALM</div>
       <div>
-        <div class="icon-grid" id="ficha-icons"></div>
-      </div>
-
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-        <div style="background:#f3f4f6;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
-          <div style="font-weight:800;color:#111">EXPERIENCIA</div>
-          <div id="ficha-xp" style="font-weight:900">0</div>
-        </div>
-        <div style="background:#fff7ed;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
-          <div style="font-weight:800;color:#111">ORO</div>
-          <div id="ficha-gold" style="font-weight:900">0</div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:12px">
-        <textarea id="ficha-note" rows="3" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6" placeholder="Nota..."></textarea>
-        <div style="width:180px;display:flex;flex-direction:column;gap:8px">
-          <input id="ficha-points" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;border:1px solid #e6e6e6">
-          <div style="display:flex;gap:6px">
-            <div class="btn" onclick="fichaApply(true)">+ Mérito</div>
-            <div class="btn danger" onclick="fichaApply(false)">− Falta</div>
-          </div>
-        </div>
-      </div>
-
-      <hr style="margin:12px 0">
-
-      <div id="ficha-history" style="max-height:280px;overflow:auto;background:#fff;padding:8px;border-radius:8px"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <div class="btn" onclick="closeFichaModal()">Cerrar</div>
+        <div style="font-weight:900">FantasyClass Convivencial</div>
+        <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen</div>
       </div>
     </div>
-  </div>
 
-  <!-- Groups modal (drag & drop) -->
-  <div id="groups-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeManageGroupsModal()">
-    <div class="modal" style="max-width:1100px">
-      <h3>Gestión de cursos y grupos</h3>
+    <div class="controls">
+      <div class="chip" onclick="openQuick('positive')"><i class="fa-solid fa-plus"></i> + Mérito</div>
+      <div class="chip" onclick="openQuick('negative')"><i class="fa-solid fa-minus"></i> − Falta</div>
 
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input id="new-grade" class="input" placeholder="Nuevo grado (ej. 805)">
-        <div class="btn" onclick="createGrade()">Crear grado</div>
-        <input id="new-group-name" class="input" placeholder="Crear grupo (ej. Grupo A)">
-        <div class="btn" onclick="createGroup()">Crear grupo</div>
+      <div class="chip">
+        <i class="fa-solid fa-calendar-days"></i>
+        <select id="period-select" class="muted-select" onchange="switchPeriod(this.value)">
+          <option value="ALL">Todo el Año</option>
+          <option value="P1" selected>Periodo 1</option>
+          <option value="P2">Periodo 2</option>
+          <option value="P3">Periodo 3</option>
+          <option value="P4">Periodo 4</option>
+        </select>
       </div>
 
-      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-        <input id="dist-num" type="number" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:8px">
-        <input id="dist-size" type="number" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:8px">
-        <div class="btn" onclick="distributeByNumber()">Distribuir por nº</div>
-        <div class="btn" onclick="distributeBySize()">Distribuir por tamaño</div>
-        <div style="margin-left:auto;color:var(--muted)">Grado: <strong id="groups-current-grade"></strong></div>
+      <div class="chip">
+        <i class="fa-solid fa-users"></i>
+        <select id="class-select" class="muted-select" onchange="switchClass(this.value)"></select>
       </div>
 
-      <div class="groups-area" id="groups-area" style="margin-top:8px"></div>
-
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <div class="btn" onclick="closeManageGroupsModal()">Cerrar</div>
-      </div>
+      <div class="chip" onclick="openGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</div>
     </div>
   </div>
+</header>
 
-  <!-- Confirm modal -->
-  <div id="confirm-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeConfirm()">
-    <div class="modal" style="max-width:420px;text-align:center">
-      <h3 id="confirm-title">¿Estás seguro?</h3>
-      <p id="confirm-text" class="small"></p>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <div class="btn danger" id="confirm-yes">Eliminar</div>
-        <div class="btn" onclick="closeConfirm()">Cancelar</div>
+<main>
+  <div class="container">
+    <div class="metrics">
+      <div class="metric"><div class="label">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0</div></div>
+      <div class="metric"><div class="label">Respeto</div><div id="badge-Respeto" style="font-weight:900">0</div></div>
+      <div class="metric"><div class="label">Confianza</div><div id="badge-Confianza" style="font-weight:900">0</div></div>
+      <div class="metric"><div class="label">Empatía</div><div id="badge-Empatía" style="font-weight:900">0</div></div>
+      <div class="metric"><div class="label">Justicia</div><div id="badge-Justicia" style="font-weight:900">0</div></div>
+      <div class="metric"><div class="label">Ciudadanía</div><div id="badge-Ciudadanía" style="font-weight:900">0</div></div>
+    </div>
+
+    <div class="control-panel">
+      <div class="control-left">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+        <input id="student-search" placeholder="Buscar estudiante..." oninput="renderStudents()">
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" onclick="openAddStudent()">Añadir Estudiante</div>
       </div>
     </div>
+
+    <div id="students-grid"></div>
   </div>
+</main>
+
+<!-- MODALS -->
+
+<!-- Quick action modal -->
+<div id="quick-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) closeQuick()">
+  <div class="modal">
+    <button class="close" onclick="closeQuick()">✕</button>
+    <h3 id="quick-title">Acción rápida</h3>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <select id="quick-students" style="flex:1"></select>
+      <input id="quick-points" type="number" min="1" max="10" value="1" style="width:90px;padding:8px;border-radius:8px">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <div class="btn green" onclick="applyQuick(true)">Aplicar + Mérito</div>
+      <div class="btn red" onclick="applyQuick(false)">Aplicar − Falta</div>
+    </div>
+  </div>
+</div>
+
+<!-- Add student modal -->
+<div id="add-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) closeAddStudentModal()">
+  <div class="modal">
+    <button class="close" onclick="closeAddStudentModal()">✕</button>
+    <h3>Nuevo Estudiante</h3>
+    <input id="new-student-name" placeholder="Nombre completo" style="width:100%;padding:8px;border-radius:8px;margin-bottom:8px">
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <div class="btn" onclick="saveNewStudent()">Guardar</div>
+      <div class="btn" onclick="closeAddStudentModal()">Cancelar</div>
+    </div>
+  </div>
+</div>
+
+<!-- Ficha modal (white background) -->
+<div id="ficha-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) closeFicha()">
+  <div class="modal white">
+    <button class="close" onclick="closeFicha()">✕</button>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <div id="ficha-avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
+      <div style="flex:1">
+        <div id="ficha-name" style="font-weight:900;color:#111"></div>
+        <div style="color:#666">Ficha • <span id="ficha-period"></span></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" onclick="exportFicha()">Exportar</div>
+      </div>
+    </div>
+
+    <label style="font-weight:800;color:#444">Selecciona acción / pilar</label>
+    <div id="ficha-icons" class="icon-grid"></div>
+
+    <div style="display:flex;gap:12px;align-items:center;margin:12px 0">
+      <div style="background:#f3f4f6;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
+        <div style="font-weight:800;color:#111">EXPERIENCIA</div>
+        <div id="ficha-xp" style="font-weight:900;color:#111">0</div>
+      </div>
+      <div style="background:#fff7ed;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
+        <div style="font-weight:800;color:#111">ORO</div>
+        <div id="ficha-gold" style="font-weight:900;color:#111">0</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px">
+      <textarea id="ficha-note" rows="3" placeholder="Nota..." style="flex:1;padding:10px;border-radius:8px;border:1px solid #e6e6e6"></textarea>
+      <div style="width:180px;display:flex;flex-direction:column;gap:8px">
+        <input id="ficha-points" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;border:1px solid #e6e6e6">
+        <div style="display:flex;gap:8px">
+          <div class="btn green" onclick="fichaApply(true)">+ Mérito</div>
+          <div class="btn red" onclick="fichaApply(false)">− Falta</div>
+        </div>
+      </div>
+    </div>
+
+    <hr style="margin:12px 0">
+
+    <div id="ficha-history" style="max-height:260px;overflow:auto;background:#fff;padding:8px;border-radius:8px;color:#111"></div>
+  </div>
+</div>
+
+<!-- Groups modal (drag & drop) -->
+<div id="groups-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) closeGroupsModal()">
+  <div class="modal" style="max-width:1100px">
+    <button class="close" onclick="closeGroupsModal()">✕</button>
+    <h3>Gestión de Cursos y Grupos</h3>
+
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <input id="new-grade" placeholder="Nuevo grado (ej. 805)" style="flex:1;padding:8px;border-radius:8px">
+      <div class="btn" onclick="createGrade()">Crear grado</div>
+      <input id="new-group" placeholder="Nuevo grupo (ej. Grupo A)" style="padding:8px;border-radius:8px">
+      <div class="btn" onclick="createGroup()">Crear grupo</div>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <input id="dist-num" type="number" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:8px">
+      <input id="dist-size" type="number" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:8px">
+      <div class="btn" onclick="distributeByNumber()">Distribuir por nº</div>
+      <div class="btn" onclick="distributeBySize()">Distribuir por tamaño</div>
+      <div style="margin-left:auto;color:var(--muted)">Grado: <strong id="groups-grade-label"></strong></div>
+    </div>
+
+    <div id="groups-area" class="groups-area"></div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div id="confirm-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) closeConfirm()">
+  <div class="modal" style="max-width:420px;text-align:center">
+    <h3 id="confirm-title">¿Estás seguro?</h3>
+    <p id="confirm-text" style="color:var(--muted)"></p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <div class="btn red" id="confirm-yes">Eliminar</div>
+      <div class="btn" onclick="closeConfirm()">Cancelar</div>
+    </div>
+  </div>
+</div>
 
 <script>
-/* ----------------- Data & state ----------------- */
-const DEFAULT_ROSTERS = {
-  "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba"],
+/* ----------------- State & persistence ----------------- */
+const DEFAULT = {
+  "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA"],
   "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia"]
 };
-
-let db = { classes: {}, groups: {} }; // groups[grade] = { groupName: [studentId,...] }
-let currentGrade = null;
-let selectedStudentId = null;
 const HP_MAX = 5;
-
-/* Utilities */
-function save(){ localStorage.setItem('fantasy_db_v1', JSON.stringify(db)); }
-function load(){
-  const s = localStorage.getItem('fantasy_db_v1');
-  if(s){ try{ db = JSON.parse(s); }catch(e){ db = { classes:{}, groups:{} }; } }
+let db = { classes: {}, groups: {}, googleScriptUrl: '' };
+let currentClass = null;
+let selectedStudent = null;
+function loadDB(){
+  const s = localStorage.getItem('fantasyclass_alm_db');
+  if(s) {
+    try{ db = JSON.parse(s); } catch(e){ db = { classes:{}, groups:{}, googleScriptUrl:'' }; }
+  }
   if(!db.classes) db.classes = {};
   if(!db.groups) db.groups = {};
-  // populate defaults when missing
-  for(const g of Object.keys(DEFAULT_ROSTERS)){
-    if(!db.classes[g] || db.classes[g].length === 0){
-      db.classes[g] = DEFAULT_ROSTERS[g].map((name,i)=> ({ id: `${g}_${i+1}`, name, xp:0, level:1, hp:HP_MAX, history: [] }));
+  Object.keys(DEFAULT).forEach(k=>{
+    if(!db.classes[k] || db.classes[k].length===0) {
+      db.classes[k] = DEFAULT[k].map((name,i)=> ({ id:`${k}_${i+1}`, name, xp:0, level:1, hp:HP_MAX, history:[] }));
+    } else {
+      // ensure hp and history present for each
+      db.classes[k] = db.classes[k].map(s => ({ hp: HP_MAX, history: [], level: 1, xp:0, ...s }));
     }
-    if(!db.groups[g]) db.groups[g] = {};
-  }
-  // set currentGrade
-  const grades = Object.keys(db.classes);
-  currentGrade = grades.length ? grades[0] : null;
+    if(!db.groups[k]) db.groups[k] = {};
+  });
+  if(!currentClass) currentClass = Object.keys(db.classes)[0];
 }
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function saveDB(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(db)); }
 
-/* Init */
+/* ----------------- Init ----------------- */
 document.addEventListener('DOMContentLoaded', ()=>{
-  load();
+  loadDB();
   populateClassSelect();
-  renderStudentGrid();
+  renderStudents();
   buildFichaIcons();
 });
 
-/* ----------------- Class & UI helpers ----------------- */
+/* ----------------- UI helpers ----------------- */
 function populateClassSelect(){
   const sel = document.getElementById('class-select');
   sel.innerHTML = '';
-  Object.keys(db.classes).forEach(g=>{
-    const opt = document.createElement('option'); opt.value = g; opt.textContent = `Grado ${g} (${db.classes[g].length})`; sel.appendChild(opt);
+  Object.keys(db.classes).forEach(k=>{
+    const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt);
   });
-  if(currentGrade && db.classes[currentGrade]) sel.value = currentGrade;
-  else { currentGrade = sel.value || Object.keys(db.classes)[0]; sel.value = currentGrade; }
-  document.getElementById('groups-current-grade').innerText = currentGrade || '-';
+  if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+  else currentClass = sel.value || Object.keys(db.classes)[0];
+  document.getElementById('groups-grade-label').innerText = currentClass;
 }
-function switchClass(val){
-  currentGrade = val;
-  document.getElementById('groups-current-grade').innerText = currentGrade || '-';
-  renderStudentGrid();
-  renderGroupsArea();
-}
+function switchClass(v){ currentClass = v; populateClassSelect(); renderStudents(); renderGroups(); }
 
-/* ----------------- Students grid ----------------- */
-function renderStudentGrid(){
+/* ----------------- Students list & card rendering ----------------- */
+function renderStudents(){
   const grid = document.getElementById('students-grid'); grid.innerHTML = '';
-  if(!currentGrade) return;
+  if(!currentClass) return;
   const q = (document.getElementById('student-search').value || '').toLowerCase();
-  const list = db.classes[currentGrade] || [];
+  const list = db.classes[currentClass] || [];
   list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
-    const card = document.createElement('div'); card.className = 'card';
-    card.innerHTML = `
-      <div class="row">
-        <div class="avatar">${s.name.charAt(0)}</div>
+    const el = document.createElement('div'); el.className='card';
+    el.innerHTML = `
+      <div class="level">NIV ${s.level}</div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="avatar" style="background:${avatarGradient(s.name)}">${s.name.charAt(0)}</div>
         <div style="flex:1">
-          <div style="font-weight:900">${s.name}</div>
-          <div class="small">Nivel ${s.level} • XP: ${s.xp}</div>
+          <div style="font-weight:800">${s.name}</div>
+          <div style="color:var(--muted)">Grado ${currentClass}</div>
           <div class="hp-wrap">
             <div class="hp-bar"><div class="hp-fill" style="width:${(s.hp/HP_MAX)*100}%"></div></div>
-            <div class="small" style="margin-top:6px">HP: ${s.hp}/${HP_MAX}</div>
+            <div style="color:var(--muted);margin-top:6px">HP: ${s.hp}/${HP_MAX} • XP: ${s.xp}</div>
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <div class="btn" onclick="openFicha('${s.id}')">Ficha</div>
-          <div class="btn" onclick="openAssignQuick('${s.id}')">Asignar</div>
-          <div class="btn danger" onclick="confirmDeleteStudent('${s.id}')">🗑</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="btn blue" onclick="openFicha('${s.id}')">Ficha</div>
+          <div class="btn ghost" onclick="assignQuick('${s.id}')">Asignar</div>
+          <div class="btn red" onclick="confirmDelete('${s.id}')"><i class="fa-solid fa-trash"></i></div>
         </div>
       </div>
     `;
-    grid.appendChild(card);
+    grid.appendChild(el);
   });
 }
 
 /* ----------------- Add student ----------------- */
-function openAddStudentModal(){ document.getElementById('new-student-name').value=''; document.getElementById('add-modal').classList.remove('hidden'); }
-function closeAddStudentModal(){ document.getElementById('add-modal').classList.add('hidden'); }
-function addStudent(){
+function openAddStudent(){ document.getElementById('new-student-name').value=''; showModal('add-modal'); }
+function closeAddStudentModal(){ hideModal('add-modal'); }
+function saveNewStudent(){
   const name = (document.getElementById('new-student-name').value || '').trim();
   if(!name) return alert('Escribe nombre');
-  const id = uid();
-  if(!db.classes[currentGrade]) db.classes[currentGrade] = [];
-  db.classes[currentGrade].push({ id, name, xp:0, level:1, hp:HP_MAX, history: [] });
-  save();
-  populateClassSelect(); renderStudentGrid(); renderGroupsArea();
-  closeAddStudentModal();
+  const id = `${currentClass}_${Date.now()}`;
+  if(!db.classes[currentClass]) db.classes[currentClass] = [];
+  db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[] });
+  saveDB(); populateClassSelect(); renderStudents(); hideModal('add-modal');
 }
 
 /* ----------------- Delete student ----------------- */
-function confirmDeleteStudent(id){
-  showConfirm('Eliminar estudiante', '¿Eliminar este estudiante permanentemente?', ()=>{
-    db.classes[currentGrade] = (db.classes[currentGrade] || []).filter(s=>s.id !== id);
+function confirmDelete(id){
+  showConfirm('Eliminar estudiante', '¿Eliminar este estudiante?', ()=>{
+    db.classes[currentClass] = db.classes[currentClass].filter(s=>s.id!==id);
     // remove from groups
-    if(db.groups[currentGrade]) for(const g of Object.keys(db.groups[currentGrade])) db.groups[currentGrade][g] = db.groups[currentGrade][g].filter(x=>x!==id);
-    save(); populateClassSelect(); renderStudentGrid(); renderGroupsArea();
+    if(db.groups[currentClass]) for(const g of Object.keys(db.groups[currentClass])) db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id);
+    saveDB(); populateClassSelect(); renderStudents(); renderGroups();
   });
 }
 
 /* ----------------- Ficha (white modal) ----------------- */
-const FICHA_ICONS = [
-  {key:'Responsabilidad', emoji:'🐘', type:'positive'},
-  {key:'Respeto', emoji:'🦁', type:'positive'},
-  {key:'Confianza', emoji:'🐪', type:'positive'},
-  {key:'Empatía', emoji:'❤️', type:'positive'},
-  {key:'Justicia', emoji:'⚖️', type:'positive'},
-  {key:'Ciudadanía', emoji:'🛡️', type:'positive'},
-  // negatives
-  {key:'Distracción', emoji:'📵', type:'negative'},
-  {key:'No tarea', emoji:'📕', type:'negative'},
-  {key:'Mal comportamiento', emoji:'😡', type:'negative'}
+const FICHA = [
+  {key:'Responsabilidad', icon:'🐘', type:'positive'},
+  {key:'Respeto', icon:'🦁', type:'positive'},
+  {key:'Confianza', icon:'🐪', type:'positive'},
+  {key:'Empatía', icon:'❤️', type:'positive'},
+  {key:'Justicia', icon:'⚖️', type:'positive'},
+  {key:'Ciudadanía', icon:'🛡️', type:'positive'},
+  {key:'Distracción', icon:'📵', type:'negative'},
+  {key:'No tarea', icon:'📕', type:'negative'},
+  {key:'Mal comportamiento', icon:'😡', type:'negative'}
 ];
-
 function buildFichaIcons(){
   const grid = document.getElementById('ficha-icons'); grid.innerHTML = '';
-  FICHA_ICONS.forEach(cfg=>{
-    const b = document.createElement('button');
-    b.className = 'icon-btn ' + (cfg.type==='positive' ? 'positive' : 'negative');
-    b.innerHTML = `<div style="font-size:20px">${cfg.emoji}</div>`;
+  FICHA.forEach(cfg=>{
+    const b = document.createElement('button'); b.className='icon-btn ' + (cfg.type==='positive'?'positive':'negative');
+    b.innerHTML = `<div style="font-size:20px">${cfg.icon}</div>`;
     b.title = cfg.key;
-    b.onclick = ()=> {
-      // select visual
-      grid.querySelectorAll('.icon-btn').forEach(x=>x.classList.remove('selected'));
-      b.classList.add('selected');
-      document.getElementById('ficha-note').placeholder = `${cfg.key} — nota...`;
-      b.dataset.selectedKey = cfg.key;
-      // store selected on modal element
-      document.getElementById('ficha-modal').dataset.selected = cfg.key;
-      document.getElementById('ficha-modal').dataset.selectedType = cfg.type;
-    };
+    b.onclick = ()=>{ grid.querySelectorAll('.icon-btn').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); document.getElementById('ficha-modal').dataset.pilar = cfg.key; document.getElementById('ficha-modal').dataset.pilartype = cfg.type; };
     grid.appendChild(b);
   });
 }
-
-function openFicha(studentId){
-  selectedStudentId = studentId;
-  const s = (db.classes[currentGrade] || []).find(x=>x.id === studentId);
+function openFicha(id){
+  selectedStudent = id;
+  const s = (db.classes[currentClass] || []).find(x=>x.id===id);
   if(!s) return alert('Estudiante no encontrado');
   document.getElementById('ficha-name').innerText = s.name;
+  document.getElementById('ficha-avatar').innerText = s.name.charAt(0);
+  document.getElementById('ficha-period').innerText = document.getElementById('period-select').value;
   document.getElementById('ficha-xp').innerText = s.xp;
   document.getElementById('ficha-gold').innerText = s.gold || 0;
   document.getElementById('ficha-note').value = '';
-  // history
   renderFichaHistory(s);
-  // clear icon selection
-  document.querySelectorAll('#ficha-icons .icon-btn').forEach(x=>x.classList.remove('selected'));
-  document.getElementById('ficha-modal').dataset.selected = '';
-  document.getElementById('ficha-modal').dataset.selectedType = '';
-  document.getElementById('ficha-modal').classList.remove('hidden');
+  document.getElementById('ficha-modal').dataset.pilar = '';
+  document.getElementById('ficha-modal').dataset.pilartype = '';
+  showModal('ficha-modal');
 }
-function closeFichaModal(){ document.getElementById('ficha-modal').classList.add('hidden'); }
-function renderFichaHistory(student){
+function closeFicha(){ hideModal('ficha-modal'); }
+function renderFichaHistory(s){
   const c = document.getElementById('ficha-history'); c.innerHTML = '';
-  const arr = student.history || [];
-  if(!arr.length){ c.innerHTML = '<div class="small">Sin registros</div>'; return; }
-  arr.forEach(h=>{
-    const el = document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eee';
-    el.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'} ${h.magnitude} • ${h.pilar}</div><div class="small">${h.ts}</div><div style="margin-top:6px">${h.note}</div>`;
-    c.appendChild(el);
+  if(!s.history || !s.history.length){ c.innerHTML = '<div style="color:#666">Sin registros</div>'; return; }
+  s.history.forEach(h=>{
+    const d = document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #eee';
+    d.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div><div style="margin-top:6px">${h.note}</div>`;
+    c.appendChild(d);
   });
 }
 function fichaApply(isPositive){
-  if(!selectedStudentId) return alert('Abre ficha primero');
-  const s = (db.classes[currentGrade] || []).find(x=>x.id===selectedStudentId);
+  if(!selectedStudent) return alert('Abre ficha primero');
+  const s = (db.classes[currentClass] || []).find(x=>x.id===selectedStudent);
   if(!s) return;
   const points = parseInt(document.getElementById('ficha-points').value) || 1;
-  const pilar = document.getElementById('ficha-modal').dataset.selected || 'Convivencia';
-  const tipo = isPositive ? 'positive' : 'negative';
+  const pilar = document.getElementById('ficha-modal').dataset.pilar || 'General';
+  const type = isPositive ? 'positive' : 'negative';
   const note = document.getElementById('ficha-note').value || '';
-  const entry = { id: uid(), ts: new Date().toLocaleString(), type: tipo, pilar, magnitude: points, note };
   s.history = s.history || [];
-  s.history.unshift(entry);
-  if(isPositive){
-    s.xp = (s.xp||0) + points;
-    if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); // restore 1 HP on merit
-  } else {
-    s.hp = Math.max(0, s.hp - points);
-  }
-  // recalc level
+  s.history.unshift({ id: Date.now(), ts: new Date().toLocaleString(), type, pilar, magnitude: points, note });
+  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
+  else { s.hp = Math.max(0, s.hp - points); }
   s.level = Math.floor((s.xp||0)/20) + 1;
-  save();
-  renderFichaHistory(s);
-  renderStudentGrid();
-  document.getElementById('ficha-xp').innerText = s.xp;
+  saveDB(); renderStudents(); renderFichaHistory(s);
   alert('Registro guardado');
 }
 
-/* ----------------- Quick actions from header ----------------- */
-function openQuickActionModal(type){
-  // populate student select
-  const sel = document.getElementById('quick-student-select'); sel.innerHTML = '';
-  (db.classes[currentGrade] || []).forEach(s=>{
-    const o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o);
-  });
-  document.getElementById('quick-points').value = 1;
-  document.getElementById('quick-title').innerText = type==='positive' ? 'Aplicar Mérito' : 'Aplicar Falta';
-  document.getElementById('quick-modal').dataset.type = type;
-  document.getElementById('quick-modal').classList.remove('hidden');
+/* ----------------- Quick header actions ----------------- */
+function openQuick(kind){
+  const sel = document.getElementById('quick-students'); sel.innerHTML = '';
+  (db.classes[currentClass] || []).forEach(s => { const o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o); });
+  document.getElementById('quick-title').innerText = kind==='positive' ? 'Aplicar Mérito' : 'Aplicar Falta';
+  document.getElementById('quick-modal').dataset.kind = kind;
+  showModal('quick-modal');
 }
-function closeQuickActionModal(){ document.getElementById('quick-modal').classList.add('hidden'); }
+function closeQuick(){ hideModal('quick-modal'); }
 function applyQuick(isPositive){
-  const sid = document.getElementById('quick-student-select').value;
-  const points = parseInt(document.getElementById('quick-points').value) || 1;
-  const s = (db.classes[currentGrade] || []).find(x=>x.id===sid);
+  const sid = document.getElementById('quick-students').value;
+  const pts = parseInt(document.getElementById('quick-points').value) || 1;
+  const s = (db.classes[currentClass] || []).find(x=>x.id===sid);
   if(!s) return alert('Selecciona estudiante');
-  const entry = { id: uid(), ts: new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: 'Rápido', magnitude: points, note: 'Acción rápida' };
-  s.history = s.history || []; s.history.unshift(entry);
-  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); } else { s.hp = Math.max(0, s.hp - points); }
+  s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: 'Rápido', magnitude: pts, note: 'Acción rápida' });
+  if(isPositive){ s.xp = (s.xp||0) + pts; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); } else { s.hp = Math.max(0, s.hp - pts); }
   s.level = Math.floor((s.xp||0)/20) + 1;
-  save(); renderStudentGrid(); closeQuickActionModal();
+  saveDB(); closeQuick(); renderStudents();
 }
 
-/* ----------------- Groups management ----------------- */
-function openManageGroupsModal(){
-  if(!currentGrade) return alert('No hay grado seleccionado');
-  document.getElementById('groups-current-grade').innerText = currentGrade;
-  renderGroupsArea();
-  document.getElementById('groups-modal').classList.remove('hidden');
-}
-function closeManageGroupsModal(){ document.getElementById('groups-modal').classList.add('hidden'); }
+/* ----------------- Groups management & drag drop ----------------- */
+function openGroupsModal(){ populateClassSelect(); renderGroups(); showModal('groups-modal'); }
+function closeGroupsModal(){ hideModal('groups-modal'); }
 function createGrade(){
-  const name = (document.getElementById('new-grade').value || '').trim();
+  const name = (document.getElementById('new-grade').value||'').trim();
   if(!name) return alert('Escribe nombre de grado');
-  if(db.classes[name]) return alert('El grado ya existe');
-  db.classes[name] = []; db.groups[name] = {};
-  save(); populateClassSelect(); renderStudentGrid(); alert('Grado creado: ' + name);
+  if(db.classes[name]) return alert('Ya existe');
+  db.classes[name] = []; db.groups[name] = {}; saveDB(); populateClassSelect(); renderGroups();
+  document.getElementById('new-grade').value='';
 }
 function createGroup(){
-  const gname = (document.getElementById('new-group-name').value || '').trim();
-  if(!gname) return alert('Escribe nombre de grupo');
-  if(!db.groups[currentGrade]) db.groups[currentGrade] = {};
-  if(db.groups[currentGrade][gname]) return alert('Grupo ya existe');
-  db.groups[currentGrade][gname] = [];
-  save(); renderGroupsArea(); document.getElementById('new-group-name').value='';
+  const g = (document.getElementById('new-group').value||'').trim();
+  if(!g) return alert('Escribe nombre de grupo');
+  if(!db.groups[currentClass]) db.groups[currentClass] = {};
+  if(db.groups[currentClass][g]) return alert('Grupo existe');
+  db.groups[currentClass][g] = []; saveDB(); renderGroups(); document.getElementById('new-group').value='';
 }
-function deleteGroup(grade, group){
-  showConfirm('Eliminar grupo', `Eliminar "${group}" en ${grade}?`, ()=>{
-    delete db.groups[grade][group];
-    save(); renderGroupsArea();
-  });
-}
-function deleteGrade(grade){
-  showConfirm('Eliminar grado', `Eliminar grado ${grade} con todos sus datos?`, ()=>{
-    delete db.classes[grade]; delete db.groups[grade];
-    if(currentGrade === grade) currentGrade = Object.keys(db.classes)[0] || null;
-    save(); populateClassSelect(); renderStudentGrid(); renderGroupsArea();
-  });
-}
-
-/* Drag & Drop for groups */
-function renderGroupsArea(){
+function renderGroups(){
   const area = document.getElementById('groups-area'); area.innerHTML = '';
-  if(!currentGrade) return;
-  // build "Sin asignar" column with students not in any group
-  const allStudents = db.classes[currentGrade] || [];
+  document.getElementById('groups-grade-label').innerText = currentClass;
+  // prepare unassigned
+  const students = db.classes[currentClass] || [];
   const assigned = new Set();
-  const groups = db.groups[currentGrade] || {};
-  for(const g of Object.keys(groups)) groups[g].forEach(id=>assigned.add(id));
-  const unassigned = allStudents.filter(s=>!assigned.has(s.id));
+  const groups = db.groups[currentClass] || {};
+  for(const g in groups) groups[g].forEach(id=>assigned.add(id));
+  const unassigned = students.filter(s=>!assigned.has(s.id));
 
-  // helper to create column
-  function makeCol(title, idKey, members){
+  function makeCol(title, key, members){
     const col = document.createElement('div'); col.className='group-col';
-    col.dataset.group = idKey;
-    col.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>${title}</strong> ${idKey!=='__unassigned' ? `<button class="btn" onclick="exportSubgroup('${currentGrade}','${idKey}')">Export</button><button class="btn danger" onclick="deleteGroup('${currentGrade}','${idKey}')">Eliminar</button>` : ''}</div>`;
-    const list = document.createElement('div'); list.dataset.target = idKey;
-    list.style.minHeight = '40px';
-    list.ondragover = ev => ev.preventDefault();
-    list.ondrop = ev => {
-      ev.preventDefault();
-      const sid = ev.dataTransfer.getData('text/plain');
+    const head = document.createElement('div'); head.style.display='flex'; head.style.justifyContent='space-between'; head.style.alignItems='center';
+    head.innerHTML = `<strong>${title}</strong>`;
+    if(key!=='__unassigned') {
+      const btns = document.createElement('div');
+      btns.innerHTML = `<button class="btn" onclick="exportGroup('${currentClass}','${key}')">Export</button> <button class="btn red" onclick="confirmDeleteGroup('${key}')">Eliminar</button>`;
+      head.appendChild(btns);
+    }
+    col.appendChild(head);
+    const list = document.createElement('div'); list.style.minHeight='40px';
+    list.ondragover = e => e.preventDefault();
+    list.ondrop = e => {
+      e.preventDefault();
+      const sid = e.dataTransfer.getData('text/plain');
       if(!sid) return;
-      moveStudentToGroup(sid, currentGrade, idKey);
+      moveToGroup(sid, key);
     };
     members.forEach(m=>{
-      const el = document.createElement('div'); el.className='member'; el.draggable=true;
-      el.innerText = m.name;
-      el.dataset.sid = m.id;
-      el.ondragstart = ev => { ev.dataTransfer.setData('text/plain', m.id); };
-      // small actions
-      const btns = document.createElement('div'); btns.style.display='flex'; btns.style.gap='6px'; btns.style.marginTop='6px';
-      const btFicha = document.createElement('div'); btFicha.className='btn'; btFicha.style.padding='4px 6px'; btFicha.innerText='Ficha'; btFicha.onclick = ()=> openFicha(m.id);
-      const btDel = document.createElement('div'); btDel.className='btn danger'; btDel.style.padding='4px 6px'; btDel.innerText='Eliminar'; btDel.onclick = ()=> confirmDeleteStudent(m.id);
-      btns.appendChild(btFicha); btns.appendChild(btDel);
-      el.appendChild(btns);
-      list.appendChild(el);
+      const item = document.createElement('div'); item.className='member'; item.draggable=true; item.innerText = m.name;
+      item.ondragstart = ev => ev.dataTransfer.setData('text/plain', m.id);
+      // small actions row
+      const arow = document.createElement('div'); arow.style.display='flex'; arow.style.gap='6px'; arow.style.marginTop='6px';
+      const bf = document.createElement('div'); bf.className='btn ghost'; bf.style.padding='4px'; bf.innerText='Ficha'; bf.onclick = ()=> openFicha(m.id);
+      const bd = document.createElement('div'); bd.className='btn red'; bd.style.padding='4px'; bd.innerText='Eliminar'; bd.onclick = ()=> confirmDelete(m.id);
+      arow.appendChild(bf); arow.appendChild(bd); item.appendChild(arow);
+
+      list.appendChild(item);
     });
     col.appendChild(list);
     return col;
   }
 
-  // unassigned
-  area.appendChild(makeCol('Sin asignar','__unassigned',unassigned));
-  // each subgroup
-  for(const g of Object.keys(groups)){
-    const members = (groups[g]||[]).map(id => db.classes[currentGrade].find(s=>s.id===id)).filter(Boolean);
-    area.appendChild(makeCol(g,g,members));
+  area.appendChild(makeCol('Sin asignar', '__unassigned', unassigned));
+  for(const g in groups){
+    const members = (groups[g] || []).map(id => (db.classes[currentClass]||[]).find(s=>s.id===id)).filter(Boolean);
+    area.appendChild(makeCol(g, g, members));
   }
 }
 
-/* Move student to group (remove from others) */
-function moveStudentToGroup(studentId, grade, groupKey){
-  // remove from all groups in grade
-  const groups = db.groups[grade] || {};
-  for(const g of Object.keys(groups)) groups[g] = groups[g].filter(id=>id!==studentId);
-  // add if not unassigned
-  if(groupKey !== '__unassigned'){
-    groups[groupKey] = groups[groupKey] || [];
-    if(!groups[groupKey].includes(studentId)) groups[groupKey].push(studentId);
-  }
-  db.groups[grade] = groups;
-  save();
-  renderGroupsArea();
-  renderStudentGrid();
+function moveToGroup(studentId, groupKey){
+  // remove from all
+  for(const g in db.groups[currentClass]) db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==studentId);
+  if(groupKey !== '__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); }
+  saveDB(); renderGroups(); renderStudents();
 }
 
-/* Distribute functions */
 function distributeByNumber(){
   const n = parseInt(document.getElementById('dist-num').value);
-  if(!n || n < 1) return alert('Ingresa número válido');
-  const students = db.classes[currentGrade] || [];
-  if(!students.length) return alert('No hay estudiantes en este grado');
-  const ids = students.map(s=>s.id);
+  if(!n || n<1) return alert('Número inválido');
+  const ids = (db.classes[currentClass]||[]).map(s=>s.id);
+  if(!ids.length) return alert('No hay estudiantes');
   // shuffle
-  for(let i = ids.length -1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-  db.groups[currentGrade] = db.groups[currentGrade] || {};
-  // create groups Grupo 1..n
-  for(let i=1;i<=n;i++) db.groups[currentGrade][`Grupo ${i}`]=[];
-  for(let i=0;i<ids.length;i++){
-    const g = `Grupo ${ (i % n) + 1 }`;
-    db.groups[currentGrade][g].push(ids[i]);
-  }
-  save(); renderGroupsArea();
+  for(let i=ids.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[currentClass] = db.groups[currentClass] || {};
+  for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`] = [];
+  for(let i=0;i<ids.length;i++){ const g = `Grupo ${ (i % n) + 1 }`; db.groups[currentClass][g].push(ids[i]); }
+  saveDB(); renderGroups();
 }
 function distributeBySize(){
   const size = parseInt(document.getElementById('dist-size').value);
-  if(!size || size < 1) return alert('Ingresa tamaño válido');
-  const students = db.classes[currentGrade] || [];
-  if(!students.length) return alert('No hay estudiantes');
-  const ids = students.map(s=>s.id);
-  // shuffle
-  for(let i = ids.length -1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-  db.groups[currentGrade] = db.groups[currentGrade] || {};
-  // clear previous Grupo * auto groups
-  Object.keys(db.groups[currentGrade]).forEach(k=>{ if(k.startsWith('Grupo ')) delete db.groups[currentGrade][k]; });
-  let idx=0; let g=1;
-  while(idx < ids.length){
-    db.groups[currentGrade][`Grupo ${g}`] = ids.slice(idx, idx+size);
-    idx += size; g++;
-  }
-  save(); renderGroupsArea();
+  if(!size || size<1) return alert('Tamaño inválido');
+  const ids = (db.classes[currentClass]||[]).map(s=>s.id);
+  if(!ids.length) return alert('No hay estudiantes');
+  for(let i=ids.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[currentClass] = db.groups[currentClass] || {};
+  // clear previous Grupo*
+  Object.keys(db.groups[currentClass]||{}).forEach(k=>{ if(k.startsWith('Grupo ')) delete db.groups[currentClass][k]; });
+  let idx=0,g=1;
+  while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`] = ids.slice(idx,idx+size); idx+=size; g++; }
+  saveDB(); renderGroups();
 }
 
-/* Export stub (we'll do later) */
-function exportSubgroup(grade, subgroup){
-  alert(`Export: ${grade} / ${subgroup} (funcionalidad pendiente)`);
+function confirmDeleteGroup(name){
+  showConfirm('Eliminar grupo','Eliminar grupo '+name+' ?', ()=>{
+    delete db.groups[currentClass][name]; saveDB(); renderGroups();
+  });
+}
+function exportGroup(grade, name){
+  alert('Export (pendiente) ' + grade + ' / ' + name);
 }
 
-/* ----------------- Confirm helper ----------------- */
+/* ----------------- Small utilities ----------------- */
+function avatarGradient(name){
+  const i = (name.charCodeAt(0) || 65) % 10;
+  const palettes = [['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
+  return `linear-gradient(135deg, ${palettes[i][0]}, ${palettes[i][1]})`;
+}
+
+/* ----------------- Modal helpers ----------------- */
+function showModal(id){ document.getElementById(id).style.display = 'flex'; }
+function hideModal(id){ document.getElementById(id).style.display = 'none'; }
+
+/* ----------------- Confirm modal ----------------- */
 let confirmCb = null;
-function showConfirm(title, text, cb){
+function showConfirm(title,text,cb){
   document.getElementById('confirm-title').innerText = title;
   document.getElementById('confirm-text').innerText = text;
   confirmCb = cb;
   document.getElementById('confirm-yes').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirm(); };
-  document.getElementById('confirm-modal').classList.remove('hidden');
+  showModal('confirm-modal');
 }
-function closeConfirm(){ document.getElementById('confirm-modal').classList.add('hidden'); }
+function closeConfirm(){ hideModal('confirm-modal'); }
 
-/* ----------------- Small helpers ----------------- */
-function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
-
-/* ----------------- Modal management ----------------- */
-function closeAllModals(){ document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden')); }
-function showConfirmDelete(cb){ showConfirm('Confirmar', '¿Confirmas la acción?', cb); }
-
-/* ----------------- Assign quick (open groups modal focused to student) ----------------- */
-function openAssignQuick(studentId){
-  openManageGroupsModal();
-  // after small delay, start dragging highlight (not real drag) - instead offer instruction: user drag manually
-  setTimeout(()=>{ alert('Arrastra al estudiante desde la columna "Sin asignar" a un grupo. Si no está en "Sin asignar", úsalo en la lista.'); }, 200);
+/* ----------------- Quick assign helper (open groups modal) ----------------- */
+function assignQuick(id){
+  openGroupsModal();
+  // ensure student appears highlighted in unassigned (user can drag); small tip
+  setTimeout(()=>alert('Arrastra la tarjeta del estudiante desde "Sin asignar" hacia un grupo.\nSi no está en "Sin asignar", usa la lista general.'),200);
 }
 
-/* ----------------- Simple alerts for now ----------------- */
-function alert(msg){ window.alert(msg); }
-
-/* ----------------- Save / load wrapper already present - wire UI ----------------- */
-function switchPeriod(v){
-  // already wired on select
+/* ----------------- Quick modal actions ----------------- */
+function closeQuick(){ hideModal('quick-modal'); }
+function applyQuick(isPositive){
+  const sid = document.getElementById('quick-students').value;
+  const pts = parseInt(document.getElementById('quick-points').value) || 1;
+  const s = (db.classes[currentClass] || []).find(x=>x.id===sid);
+  if(!s) return alert('Selecciona estudiante');
+  s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPositive?'positive':'negative', pilar:'Rápido', magnitude:pts, note:'Acción rápida' });
+  if(isPositive){ s.xp = (s.xp||0) + pts; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); } else { s.hp = Math.max(0, s.hp-pts); }
+  s.level = Math.floor((s.xp||0)/20)+1; saveDB(); hideModal('quick-modal'); renderStudents();
 }
 
-/* expose some functions to global for inline handlers */
-window.openAddStudentModal = openAddStudentModal;
+/* ----------------- Ficha export stub & helpers ----------------- */
+function exportFicha(){ alert('Export ficha (pendiente)'); }
+
+/* ----------------- Modal open/close utilities wiring ----------------- */
+function openQuick(kind){ openQuickDialog(kind); }
+function openQuickDialog(kind){
+  const sel = document.getElementById('quick-students'); sel.innerHTML = '';
+  (db.classes[currentClass]||[]).forEach(s=>{ const o=document.createElement('option'); o.value=s.id; o.textContent=s.name; sel.appendChild(o);});
+  document.getElementById('quick-title').innerText = kind==='positive'?'Aplicar Mérito':'Aplicar Falta';
+  document.getElementById('quick-modal').dataset.kind = kind;
+  showModal('quick-modal');
+}
+
+/* ----------------- Initialize UI wiring ----------------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // initial population of quick-students etc.
+  populateClassSelect();
+  // ensure quick-students filled when open
+  // populate class-select on change handled earlier
+});
+
+/* Expose minimal functions for inline handlers */
+window.openQuick = openQuick;
+window.closeQuick = closeQuick;
+window.applyQuick = applyQuick;
+window.openAddStudent = openAddStudent;
 window.closeAddStudentModal = closeAddStudentModal;
-window.addStudent = addStudent;
-window.openManageGroupsModal = openManageGroupsModal;
-window.closeManageGroupsModal = closeManageGroupsModal;
+window.saveNewStudent = saveNewStudent;
+window.openFicha = openFicha;
+window.closeFicha = closeFicha;
+window.openGroupsModal = openGroupsModal;
+window.closeGroupsModal = closeGroupsModal;
 window.createGrade = createGrade;
 window.createGroup = createGroup;
 window.distributeByNumber = distributeByNumber;
 window.distributeBySize = distributeBySize;
-window.openQuickActionModal = openQuickActionModal;
-window.closeQuickActionModal = closeQuickActionModal;
-window.applyQuick = applyQuick;
-window.openFicha = openFicha;
-window.closeFichaModal = closeFichaModal;
-window.renderStudentGrid = renderStudentGrid;
-window.populateClassSelect = populateClassSelect;
+window.renderStudents = renderStudents;
 window.switchClass = switchClass;
-window.switchPeriod = switchPeriod;
-window.confirmDeleteStudent = confirmDeleteStudent;
-window.deleteGroup = deleteGroup;
-window.deleteGrade = deleteGrade;
-window.exportSubgroup = exportSubgroup;
+window.switchPeriod = function(v){ document.getElementById('period-select').value=v; };
+window.openQuickDialog = openQuickDialog;
+window.confirmDelete = confirmDelete;
 
-/* Save state when leaving */
-window.addEventListener('beforeunload', ()=> save());
+/* Save before unload */
+window.addEventListener('beforeunload', ()=> saveDB());
 </script>
 </body>
 </html>
