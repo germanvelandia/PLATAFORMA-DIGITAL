@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Plataforma Convivencial FantasyClass - Colegio Alfonso López Michelsen</title>
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (kept for utility classes used elsewhere) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -42,57 +42,131 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
+    <!-- New CSS to match requested design -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-        }
+      :root{
+        --bg-900: #071122;
+        --bg-800: #0b1724;
+        --panel: rgba(9,15,23,0.75);
+        --muted: #9aa7b6;
+        --accent-gold: #f59e0b;
+        --accent-blue: #1e3a8a;
+        --glass-border: rgba(255,255,255,0.04);
+        --card-radius: 14px;
+      }
 
-        .glass-panel {
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-        }
+      html,body{
+        height:100%;
+      }
 
-        .card-hover {
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px -10px rgba(245, 158, 11, 0.25);
-            border-color: rgba(245, 158, 11, 0.4);
-        }
+      body{
+        font-family: 'Inter', sans-serif;
+        background: linear-gradient(180deg, rgba(8,14,22,1) 0%, rgba(11,23,36,1) 100%);
+        color: #e6eef6;
+        min-height:100vh;
+        margin:0;
+      }
 
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
+      /* Header */
+      header.glass-panel{
+        background: linear-gradient(180deg, rgba(6,11,18,0.88), rgba(8,14,22,0.88));
+        padding: 12px 20px;
+        border-radius: 0;
+        border-bottom: 1px solid rgba(255,255,255,0.03);
+        box-shadow: 0 6px 20px rgba(2,6,12,0.6);
+      }
+
+      header .brand { display:flex; gap:12px; align-items:center; }
+      header .brand .logo { width:44px; height:44px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:900; color:#ffd88a; background:linear-gradient(135deg,#1f2937,#0b2540); box-shadow:0 6px 18px rgba(2,6,12,0.6); }
+
+      /* Metrics bar */
+      .metrics-bar{ display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-bottom: 12px; }
+      .metric-pill{
+        background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+        border: 1px solid var(--glass-border);
+        padding: 14px 18px;
+        border-radius: 12px;
+        display:flex;
+        gap:12px;
+        align-items:center;
+        min-height:56px;
+      }
+      .metric-pill .icon{ width:36px; height:36px; border-radius:10px; background: rgba(255,255,255,0.03); display:flex; align-items:center; justify-content:center; font-size:18px; color:var(--accent-gold);}
+      .metric-pill .label{ font-size:11px; color:var(--muted); text-transform:uppercase; font-weight:700; }
+      .metric-pill .value{ font-weight:800; color:#9ff9c6; font-size:13px; }
+
+      /* Search / controls row */
+      .controls-panel { padding: 14px; margin-bottom: 8px; border-radius:12px; background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00)); border:1px solid var(--glass-border); display:flex; gap:12px; align-items:center; justify-content:space-between; }
+
+      #student-search-input{ background: transparent; border:1px solid rgba(255,255,255,0.03); padding:10px 14px; border-radius:10px; min-width:280px; color:#e6eef6; }
+      #sort-select{ background: transparent; border:1px solid rgba(255,255,255,0.03); padding:8px 12px; border-radius:10px; color:#e6eef6; }
+
+      /* Students grid: */
+      #students-grid{ display:grid; grid-template-columns: repeat(auto-fill, minmax(300px,1fr)); gap:20px; }
+
+      /* Card */
+      .student-card{
+        background: linear-gradient(180deg, rgba(12,18,26,0.7), rgba(7,12,18,0.65));
+        border: 1px solid var(--glass-border);
+        border-radius: var(--card-radius);
+        padding: 18px;
+        box-shadow: 0 10px 30px rgba(3,7,12,0.55);
+        transition: transform .22s cubic-bezier(.2,.9,.3,1), box-shadow .22s;
+        position:relative;
+        overflow:hidden;
+      }
+
+      .student-card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(3,7,12,0.7); }
+
+      .student-card .level-badge{ position:absolute; left:14px; top:14px; background: linear-gradient(90deg,#2b2f37,#111827); border: 1px solid rgba(255,255,255,0.03); padding:6px 10px; border-radius:999px; font-weight:800; font-size:11px; color:var(--accent-gold); box-shadow: inset 0 -2px 0 rgba(0,0,0,0.25); }
+
+      .student-card .meta-right{ position:absolute; right:14px; top:12px; display:flex; gap:8px; align-items:center; font-size:12px; color:var(--muted); }
+
+      .row-top{ display:flex; gap:14px; align-items:center; margin-bottom:8px; }
+      .avatar{
+        width:56px; height:56px; border-radius:12px; display:flex; align-items:center; justify-content:center;
+        color:#fff; font-weight:800; font-size:20px; box-shadow: 0 6px 18px rgba(2,6,12,0.6);
+        border: 3px solid rgba(255,255,255,0.03);
+      }
+
+      .student-card h4{ margin:0; font-weight:800; font-size:13px; color:#fff; letter-spacing:0.3px; text-transform:uppercase; }
+      .student-card p.sub { margin:0; font-size:11px; color:var(--muted); }
+
+      .actions{ display:flex; gap:10px; margin-top:14px; }
+      .btn{ padding:8px 12px; border-radius:10px; font-weight:800; font-size:13px; color:#fff; border:0; cursor:pointer; min-width:86px; box-shadow: 0 4px 8px rgba(2,6,12,0.45); display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+      .btn-green{ background: linear-gradient(180deg,#10b981,#059669); }
+      .btn-red{ background: linear-gradient(180deg,#ef4444,#dc2626); }
+      .btn-blue{ background: linear-gradient(180deg,#0ea5e9,#0284c7); }
+
+      .small-icon{ width:28px; height:28px; border-radius:8px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.02); color:var(--muted); }
+
+      /* Avatar color utility classes — fallback if JS doesn't set inline style */
+      .avatar.color-0{ background: linear-gradient(135deg,#0b2540,#07213a); }
+      .avatar.color-1{ background: linear-gradient(135deg,#2b0f3a,#3b1b59); }
+      .avatar.color-2{ background: linear-gradient(135deg,#243b2e,#0f2b2a); }
+      .avatar.color-3{ background: linear-gradient(135deg,#3b2336,#231026); }
+      .avatar.color-4{ background: linear-gradient(135deg,#2c3e50,#0f2540); }
+      .avatar.color-5{ background: linear-gradient(135deg,#3b2b0f,#4a350f); }
+      .avatar.color-6{ background: linear-gradient(135deg,#2b2540,#1b2b4a); }
+      .avatar.color-7{ background: linear-gradient(135deg,#40302b,#2d241f); }
+      .avatar.color-8{ background: linear-gradient(135deg,#24304a,#18203a); }
+      .avatar.color-9{ background: linear-gradient(135deg,#25322b,#17221a); }
+
+      @media (max-width:900px){
+        .metrics-bar{ grid-template-columns: repeat(2,1fr); }
+        .avatar{ width:48px; height:48px; font-size:18px; }
+        #students-grid{ gap:14px; }
+      }
+
     </style>
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen">
 
-    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
-            
-            <!-- BRANDING -->
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 flex items-center justify-center shadow-md">
-                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-lg">
-                        ALM
-                    </div>
-                </div>
+    <header class="glass-panel sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-6">
+            <!-- Branding -->
+            <div class="brand">
+                <div class="logo">ALM</div>
                 <div>
                     <h1 class="font-display font-extrabold text-base md:text-lg text-white leading-tight flex items-center gap-2">
                         <span>FantasyClass Convivencial</span>
@@ -102,16 +176,13 @@
                 </div>
             </div>
 
-            <!-- CLASS SELECTOR & ACTIONS TOOLBAR -->
-            <div class="flex items-center flex-wrap justify-center gap-2">
-                
-                <!-- Google Sync Badge (Forms & Drive) -->
-                <button onclick="openDriveSettingsModal()" id="drive-status-badge" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 transition" title="Configurar conexión directa con Google Drive / Forms / Sheets">
-                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-1.5"></i>
+            <!-- Compact controls area -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <button onclick="openDriveSettingsModal()" id="drive-status-badge" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-3 py-1.5 text-[11px] font-bold text-emerald-300 transition" title="Configurar conexión directa con Google Drive / Forms / Sheets">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-2"></i>
                     <span id="drive-status-text">Google Forms/Drive Sync</span>
                 </button>
 
-                <!-- Academic Period Selector -->
                 <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-1.5">
                     <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-2"></i>
                     <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
@@ -123,7 +194,6 @@
                     </select>
                 </div>
 
-                <!-- Select Class Dropdown -->
                 <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5">
                     <i class="fa-solid fa-users text-colegio-gold text-xs mr-2"></i>
                     <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer">
@@ -131,112 +201,77 @@
                     </select>
                 </div>
 
-                <!-- MANAGE GROUPS BUTTON -->
                 <button onclick="openManageGroupsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Añadir o eliminar grupos">
                     <i class="fa-solid fa-layer-group text-indigo-400"></i>
                     <span class="hidden sm:inline">Grupos</span>
                 </button>
 
-                <!-- EXPORT DROPDOWN MENU -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleExportMenu()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                        <span>Exportar Excel</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
-                    </button>
-                    <div id="export-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
-                        <button onclick="exportCurrentClassExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-slate-200">
-                            <i class="fa-solid fa-file-export text-emerald-400"></i>
-                            <span>Exportar Curso Actual (.xlsx)</span>
-                        </button>
-                        <button onclick="exportAllClassesMasterExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold border-t border-white/10">
-                            <i class="fa-solid fa-database text-amber-400"></i>
-                            <span>Master Todos los Cursos (.xlsx)</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Quick Action Tools Buttons -->
-                <button onclick="openDiceModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Tirar Dado Virtual">
-                    <i class="fa-solid fa-dice text-rose-400"></i>
-                    <span class="hidden sm:inline">Dado</span>
-                </button>
-
-                <button onclick="openTimerModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Cronómetro de Clase">
-                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
-                    <span class="hidden sm:inline">Tiempo</span>
-                </button>
-
-                <button onclick="openWheelModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md" title="Girar Ruleta de Alumnos">
-                    <i class="fa-solid fa-arrows-spin text-xs"></i>
-                    <span>Ruleta</span>
+                <button onclick="toggleExportMenu()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-2 shadow-md">
+                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                    <span>Exportar Excel</span>
+                    <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
                 </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
-
-        <!-- DASHBOARD METRICS BAR (6 CHARACTER COUNTS PILLARS) -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">🐘</div>
+        <!-- Metrics bar -->
+        <div class="metrics-bar">
+            <div class="metric-pill">
+                <div class="icon">🐘</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Responsabilidad</p>
-                    <p id="badge-count-Responsabilidad" class="font-display font-black text-xs text-emerald-300">0 pts</p>
+                    <div class="label">Responsabilidad</div>
+                    <div id="badge-count-Responsabilidad" class="value">0 pts</div>
                 </div>
             </div>
-
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">🦁</div>
+            <div class="metric-pill">
+                <div class="icon">🦁</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Respeto</p>
-                    <p id="badge-count-Respeto" class="font-display font-black text-xs text-amber-300">0 pts</p>
+                    <div class="label">Respeto</div>
+                    <div id="badge-count-Respeto" class="value">0 pts</div>
                 </div>
             </div>
-
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">🐪</div>
+            <div class="metric-pill">
+                <div class="icon">🐪</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Confianza</p>
-                    <p id="badge-count-Confianza" class="font-display font-black text-xs text-sky-300">0 pts</p>
+                    <div class="label">Confianza</div>
+                    <div id="badge-count-Confianza" class="value">0 pts</div>
                 </div>
             </div>
-
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">❤️</div>
+            <div class="metric-pill">
+                <div class="icon">❤️</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Empatía</p>
-                    <p id="badge-count-Empatía" class="font-display font-black text-xs text-rose-300">0 pts</p>
+                    <div class="label">Empatía</div>
+                    <div id="badge-count-Empatía" class="value">0 pts</div>
                 </div>
             </div>
-
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">⚖️</div>
+            <div class="metric-pill">
+                <div class="icon">⚖️</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Justicia</p>
-                    <p id="badge-count-Justicia" class="font-display font-black text-xs text-purple-300">0 pts</p>
+                    <div class="label">Justicia</div>
+                    <div id="badge-count-Justicia" class="value">0 pts</div>
                 </div>
             </div>
-
-            <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
-                <div class="text-xl">🛡️</div>
+            <div class="metric-pill">
+                <div class="icon">🛡️</div>
                 <div>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase">Ciudadanía</p>
-                    <p id="badge-count-Ciudadanía" class="font-display font-black text-xs text-orange-300">0 pts</p>
+                    <div class="label">Ciudadanía</div>
+                    <div id="badge-count-Ciudadanía" class="value">0 pts</div>
                 </div>
             </div>
         </div>
 
-        <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="relative w-full sm:w-80">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                <input type="text" id="student-search-input" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante por nombre..." class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold transition">
+        <!-- Search and controls -->
+        <div class="controls-panel">
+            <div style="display:flex;gap:12px;align-items:center;flex:1;">
+                <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+                <input id="student-search-input" type="text" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante por nombre...">
             </div>
 
-            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <div style="display:flex;align-items:center;gap:12px;">
                 <span class="text-xs text-slate-400 font-semibold">Ordenar:</span>
-                <select id="sort-select" onchange="renderStudentGrid()" class="bg-slate-900 border border-white/10 text-xs text-white rounded-xl px-3 py-2 font-semibold focus:outline-none cursor-pointer">
+                <select id="sort-select" onchange="renderStudentGrid()" class="">
                     <option value="name">Nombre (A-Z)</option>
                     <option value="level">Mayor Nivel RPG</option>
                     <option value="xp">Más Puntos (+XP)</option>
@@ -250,12 +285,9 @@
             </div>
         </div>
 
-        <!-- STUDENTS GRID CONTAINER -->
-        <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <!-- Student cards injected dynamically -->
-        </div>
+        <!-- STUDENTS GRID -->
+        <div id="students-grid"></div>
     </main>
-
 
     <!-- MODAL 1: AWARD MERIT / REGISTER INCIDENT -->
     <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
@@ -354,7 +386,6 @@
                     </div>
                 </div>
 
-                <!-- EXPORT SINGLE STUDENT TO EXCEL -->
                 <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar esta Ficha Individual a Excel (.xlsx)">
                     <i class="fa-solid fa-file-excel text-emerald-300"></i>
                     <span>Exportar Ficha (.xlsx)</span>
@@ -388,7 +419,7 @@
         </div>
     </div>
 
-    <!-- MODAL 3: GOOGLE DRIVE / SHEETS AUTOMATIC SYNC SETTINGS -->
+    <!-- MODAL: DRIVE SETTINGS -->
     <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -406,39 +437,8 @@
             </div>
 
             <p class="text-xs text-slate-300 mb-4 leading-relaxed">
-                Al vincular la URL de tu **Google Apps Script**, cada mérito o falta registrada viajará automáticamente a tu hoja de cálculo en Google Drive sin tener que descargar archivos manualmente.
+                Al vincular la URL de tu <strong>Google Apps Script</strong>, cada mérito o falta registrada viajará automáticamente a tu hoja de cálculo en Google Drive.
             </p>
-
-            <div class="space-y-3 mb-5">
-                <div>
-    <!-- MODAL 3: GOOGLE DRIVE / FORMS AUTOMATIC SYNC SETTINGS -->
-    <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
-            <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                    <i class="fa-solid fa-file-waveform text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-display font-extrabold text-base text-white">Conexión con Google Drive mediante Formularios</h3>
-                    <p class="text-xs text-emerald-300 font-bold">¡Sin necesidad de programar ni usar Apps Script!</p>
-                </div>
-            </div>
-
-            <!-- TABS CHOICE: GOOGLE FORMS VS WEBHOOK -->
-            <div class="bg-slate-900 p-3 rounded-2xl border border-white/10 text-xs space-y-3 mb-4">
-                <p class="font-bold text-amber-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> ¿Cómo funciona la conexión con Google Forms?</p>
-                <ol class="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px]">
-                    <li>Crea un **Formulario de Google** en tu Drive con estas preguntas breves: 
-                        <span class="text-slate-400 italic">(Curso, Estudiante, Tipo, Pilar, Puntos, Observación)</span>.
-                    </li>
-                    <li>En el formulario, ve a la pestaña **Respuestas** y haz clic en **"Vincular con Hoja de cálculo"**.</li>
-                    <li>Pega la URL de tu formulario o enlace de respuesta abajo.</li>
-                </ol>
-            </div>
 
             <div class="space-y-3 mb-5">
                 <div>
@@ -458,7 +458,7 @@
         </div>
     </div>
 
-    <!-- MODAL 4: MANAGE GROUPS & COURSES -->
+    <!-- OTHER MODALS (groups, add student, confirm, wheel, dice, timer) -->
     <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -470,7 +470,6 @@
                 <span>Gestión de Cursos y Grupos</span>
             </h3>
 
-            <!-- Add new group form -->
             <div class="flex gap-2 mb-4 bg-slate-900 p-2 rounded-2xl border border-white/10">
                 <input type="text" id="new-group-input" placeholder="Nombre de nuevo grupo (Ej. 1101)" class="flex-grow bg-transparent px-2 text-xs text-white placeholder-slate-500 focus:outline-none">
                 <button onclick="addNewGroup()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition">
@@ -478,14 +477,10 @@
                 </button>
             </div>
 
-            <!-- List of available groups -->
-            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container">
-                <!-- Injected dynamically -->
-            </div>
+            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container"></div>
         </div>
     </div>
 
-    <!-- MODAL 5: ADD NEW STUDENT MODAL -->
     <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -500,7 +495,6 @@
         </div>
     </div>
 
-    <!-- MODAL 6: CONFIRMATION MODAL (NO ALERT/CONFIRM) -->
     <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
@@ -519,7 +513,6 @@
         </div>
     </div>
 
-    <!-- MODALS: RULETA, DADO & CRONÓMETRO -->
     <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -707,7 +700,7 @@
             dbState.googleScriptUrl = url;
             localStorage.setItem('fantasyclass_alm_google_url', url);
             saveDatabase();
-            
+
             const badgeText = document.getElementById('drive-status-text');
             if (url) {
                 badgeText.innerText = "Google Drive Activo";
@@ -740,7 +733,7 @@
 
         function exportCurrentClassExcel() {
             const students = dbState.classes[currentClassKey] || [];
-            
+
             const summaryRows = students.map((s, idx) => {
                 const obsCount = (s.history || []).filter(h => h.type === 'negative').length;
                 const positiveCount = (s.history || []).filter(h => h.type === 'positive').length;
@@ -854,7 +847,7 @@
                 "Puntos XP": student.xp || 0,
                 "Total Registros": studentHistory.length
             }];
-            
+
             const wsSummary = XLSX.utils.json_to_sheet(summaryData);
             const wsStudent = XLSX.utils.json_to_sheet(historyRows);
 
@@ -867,6 +860,7 @@
 
         function toggleExportMenu() {
             const menu = document.getElementById('export-dropdown');
+            if (!menu) return;
             menu.classList.toggle('hidden');
         }
 
@@ -1044,6 +1038,29 @@
             });
         }
 
+        // helper: choose avatar gradient by initial
+        function avatarGradientFor(name) {
+            if (!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
+            const initial = name.trim().charAt(0).toUpperCase();
+            const codes = initial.charCodeAt(0);
+            const idx = (codes % 10); // 10 palettes
+            const palettes = [
+                ['#0b2540','#07213a'],
+                ['#2b0f3a','#3b1b59'],
+                ['#243b2e','#0f2b2a'],
+                ['#3b2336','#231026'],
+                ['#2c3e50','#0f2540'],
+                ['#3b2b0f','#4a350f'],
+                ['#2b2540','#1b2b4a'],
+                ['#40302b','#2d241f'],
+                ['#24304a','#18203a'],
+                ['#25322b','#17221a']
+            ];
+            const p = palettes[idx];
+            return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+        }
+
+        // RENDER STUDENT GRID — updated to new card layout and avatar colors
         function renderStudentGrid() {
             const container = document.getElementById('students-grid');
             if (!container) return;
@@ -1072,52 +1089,47 @@
                 const obsCount = periodStats.history.filter(h => h.type === 'negative').length;
 
                 const card = document.createElement('div');
-                card.className = "glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group";
+                card.className = "student-card";
+
+                // avatar gradient
+                const avatarBg = avatarGradientFor(student.name);
 
                 card.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40">
-                                NIVEL ${periodStats.level}
-                            </span>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="text-emerald-400 font-bold"><i class="fa-solid fa-plus text-[10px]"></i> ${periodStats.xp} pts</span>
-                                <span class="text-slate-500">|</span>
-                                <span class="text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> ${obsCount}</span>
-                                <button onclick="deleteStudent('${student.id}')" class="ml-1 text-slate-500 hover:text-rose-400 text-xs transition" title="Eliminar Estudiante">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="level-badge">NIVEL ${periodStats.level}</div>
+                    <div class="meta-right">
+                        <div style="color:#34d399;font-weight:800;">+${periodStats.xp} pts</div>
+                        <div style="width:8px"></div>
+                        <div style="color:#fb7185;font-weight:700;">${obsCount}</div>
+                        <button onclick="deleteStudent('${student.id}')" title="Eliminar" style="background:transparent;border:0;color:rgba(255,255,255,0.28);margin-left:6px;cursor:pointer;">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
 
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
-                                <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-display font-black text-amber-300 text-sm">
-                                    ${student.name.charAt(0)}
-                                </div>
-                            </div>
-                            <div class="overflow-hidden">
-                                <h4 class="font-display font-bold text-xs text-white truncate group-hover:text-amber-300 transition">${student.name}</h4>
-                                <p class="text-[10px] text-slate-400 truncate">Grado ${currentClassKey} • ${currentPeriod}</p>
-                            </div>
+                    <div class="row-top">
+                        <div class="avatar" style="background: ${avatarBg};">${student.name.charAt(0).toUpperCase()}</div>
+                        <div style="flex:1;min-width:0;">
+                            <h4 title="${student.name}">${student.name}</h4>
+                            <p class="sub">Grado ${currentClassKey} • ${currentPeriod}</p>
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-white/10">
-                        <button onclick="openAwardModal('${student.id}', 'positive')" class="py-1.5 px-1.5 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
-                            <i class="fa-solid fa-plus text-[9px]"></i>
-                            <span>Mérito</span>
-                        </button>
-                        <button onclick="openAwardModal('${student.id}', 'negative')" class="py-1.5 px-1.5 rounded-xl bg-colegio-red/80 hover:bg-colegio-red text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
-                            <i class="fa-solid fa-minus text-[9px]"></i>
-                            <span>Falta</span>
-                        </button>
-                        <button onclick="openHistoryModal('${student.id}')" class="py-1.5 px-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[11px] transition flex items-center justify-center gap-1 border border-white/10">
-                            <i class="fa-solid fa-folder-open text-[9px]"></i>
-                            <span>Ficha</span>
-                        </button>
+                    <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;">
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div style="font-size:12px;color:var(--muted);">● ${selectedValueTag}</div>
+                            <div style="font-size:12px;color:var(--muted);">ID: ${student.id}</div>
+                        </div>
+                        <div style="display:flex;gap:8px;align-items:center;">
+                            <div class="small-icon" title="Nivel">Lv</div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-green" onclick="openAwardModal('${student.id}','positive')"><i class="fa-solid fa-plus"></i> Mérito</button>
+                        <button class="btn btn-red" onclick="openAwardModal('${student.id}','negative')"><i class="fa-solid fa-minus"></i> Falta</button>
+                        <button class="btn btn-blue" onclick="openHistoryModal('${student.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
                     </div>
                 `;
+
                 container.appendChild(card);
             });
 
@@ -1171,8 +1183,8 @@
             if (!student) return;
 
             document.getElementById('history-student-name').innerText = student.name;
-            document.getElementById('history-student-avatar').innerText = student.name.charAt(0);
-            
+            document.getElementById('history-student-avatar').innerText = student.name.charAt(0).toUpperCase();
+
             const stats = calculateStudentStatsForPeriod(student);
             document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
             document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h => h.type === 'negative').length}`;
@@ -1221,7 +1233,7 @@
             const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
 
             if (!student.history) student.history = [];
-            
+
             const newEntry = {
                 id: Date.now(),
                 timestamp: new Date().toLocaleString('es-CO'),
