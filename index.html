@@ -1598,5 +1598,294 @@ window.openManageGroupsModal = openGroupsModal;
   window.openInstitutionEditor = openInstitutionEditor;
 })();
 </script>
+  <!-- PARCHE ÚNICO: asegurar acciones de Herramientas->Grupos, Clases->Grados y edición header -->
+<script>
+(function ALM_EnsureMenusAndActions(){
+  const STORAGE_KEY = 'fantasyclass_alm_db';
+  const toast = (msg, type='info', t=3000) => {
+    if(typeof showToast === 'function') return showToast(msg,type,t);
+    try{ console.log(`[${type}] ${msg}`); } catch(e){}
+    // fallback
+    // alert(msg); // avoid noisy alerts
+  };
+
+  const callIfFunc = (name, ...args) => {
+    try { if(typeof window[name] === 'function') return window[name](...args); } catch(e){ console.warn('callIfFunc error', name, e); }
+    return null;
+  };
+
+  const ensureSave = () => {
+    if(typeof saveDB === 'function') { try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } }
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); } catch(e) { console.warn('localStorage save failed', e); }
+  };
+
+  // Open groups management modal (tries various names, falls back to showing modals)
+  function openGroupsManagement(){
+    if(callIfFunc('openGroupsModal')) return;
+    if(callIfFunc('openManageGroupsModal')) return;
+    if(callIfFunc('openGroups')) return;
+    // Try showing manage modal if present
+    if(document.getElementById('manage-groups-modal')) { showModal('manage-groups-modal'); return; }
+    if(document.getElementById('groups-modal')) { showModal('groups-modal'); return; }
+    toast('No se encontró modal de gestión de Grupos', 'warn');
+  }
+
+  // Open institution editor (use existing openInstitutionModal if present)
+  function openInstitutionEditor(){
+    if(callIfFunc('openInstitutionModal')) return;
+    // fallback prompts
+    try {
+      const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      const inst = parsed.institution || {};
+      const name = prompt('Nombre de la aplicación', inst.appName || document.title || '');
+      if(name === null) return;
+      const subtitle = prompt('Subtítulo / Institución', inst.subtitle || '');
+      if(subtitle === null) return;
+      const logoText = prompt('Texto corto (logo)', inst.logoText || (document.querySelector('.brand .logo')?.innerText || 'ALM'));
+      if(logoText === null) return;
+      parsed.institution = { appName: name, subtitle, logoText };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      // apply to DOM
+      document.title = name;
+      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]');
+      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child');
+      const logoEl = document.querySelector('.brand .logo');
+      if(titleEl) titleEl.innerText = name;
+      if(subtitleEl) subtitleEl.innerText = subtitle;
+      if(logoEl) logoEl.innerText = logoText.slice(0,4);
+      toast('Ajustes guardados', 'success');
+    } catch(e){ console.warn(e); toast('Error guardando ajustes', 'err'); }
+  }
+
+  // Create grade/group/distribute functions (use existing if present, else implement)
+  function createGrade(name){
+    if(!name) return toast('Nombre de grado requerido','warn');
+    if(typeof window.createGrade === 'function'){ try{ return window.createGrade(name); }catch(e){} }
+    db.classes = db.classes || {};
+    db.groups = db.groups || {};
+    if(db.classes[name]) return toast('Grado ya existe','warn');
+    db.classes[name] = [];
+    db.groups[name] = {};
+    ensureSave();
+    // update UI
+    callIfFunc('populateClassSelect'); callIfFunc('renderStudents'); callIfFunc('renderGroups');
+    toast('Grado creado: ' + name, 'success');
+  }
+
+  function createGroup(grade, groupName, persistent=false){
+    if(typeof window.createGroup === 'function'){ try{ return window.createGroup(groupName); }catch(e){} }
+    if(!grade) grade = currentClass;
+    if(!grade) return toast('Selecciona un grado','warn');
+    db.groups = db.groups || {};
+    db.groups[grade] = db.groups[grade] || {};
+    if(db.groups[grade][groupName]) return toast('Grupo ya existe','warn');
+    db.groups[grade][groupName] = [];
+    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; db.groupsMeta[grade][groupName] = { persistent: !!persistent };
+    ensureSave();
+    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns'); toast('Grupo creado', 'success');
+  }
+
+  function deleteGradePrompt(grade){
+    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
+    if(!grade) return toast('Selecciona un grado','warn');
+    showConfirm('Eliminar grado','Eliminar grado '+grade+' y todos sus datos?', ()=>{
+      if(db.classes && db.classes[grade]) delete db.classes[grade];
+      if(db.groups && db.groups[grade]) delete db.groups[grade];
+      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade];
+      ensureSave();
+      callIfFunc('populateClassSelect'); callIfFunc('renderStudents'); callIfFunc('renderGroups');
+      toast('Grado eliminado: ' + grade, 'success');
+    });
+  }
+
+  function deleteGroupPrompt(grade, groupName){
+    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
+    if(!grade) return toast('Selecciona grado','warn');
+    if(!groupName){
+      const glist = Object.keys((db.groups && db.groups[grade])||{});
+      if(!glist.length) return toast('No hay grupos en este grado','warn');
+      groupName = prompt('Escribe el nombre exacto del grupo a eliminar. Grupos: '+glist.join(', '));
+      if(!groupName) return;
+    }
+    if(!db.groups || !db.groups[grade] || !db.groups[grade][groupName]) return toast('Grupo no encontrado','err');
+    showConfirm('Eliminar grupo', 'Eliminar grupo '+groupName+' en '+grade+'?', ()=>{
+      delete db.groups[grade][groupName];
+      if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade][groupName];
+      ensureSave();
+      callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
+      toast('Grupo eliminado', 'success');
+    });
+  }
+
+  function distributeByNumber(grade, n, persistent=false){
+    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
+    if(!grade) return toast('Selecciona grado','warn');
+    n = parseInt(n);
+    if(!n || n<1) return toast('Número inválido','warn');
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    if(!ids.length) return toast('No hay estudiantes','warn');
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
+    ids.forEach((id, idx)=>{ const g = `Grupo ${ (idx % n) + 1 }`; db.groups[grade][g].push(id); });
+    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
+    ensureSave();
+    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
+    toast('Distribución completada','success');
+  }
+
+  function distributeBySize(grade, size, persistent=false){
+    if(!grade) grade = currentClass || document.getElementById('class-select')?.value;
+    if(!grade) return toast('Selecciona grado','warn');
+    size = parseInt(size);
+    if(!size || size < 1) return toast('Tamaño inválido','warn');
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    if(!ids.length) return toast('No hay estudiantes','warn');
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    // remove previous Grupo * to avoid collisions
+    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
+    let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx,idx+size); idx+=size; g++; }
+    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
+    ensureSave();
+    callIfFunc('renderGroups'); callIfFunc('renderGroupsColumns');
+    toast('Distribución por tamaño completada','success');
+  }
+
+  // Wire up menu buttons (search by text, case-insensitive)
+  function bindMenuButton(menuId, labelRegex, handler){
+    const menu = document.getElementById(menuId);
+    if(!menu) return;
+    const panel = menu.querySelector('.menu-panel');
+    if(!panel) return;
+    // try to find existing button with label matching regex
+    const btn = Array.from(panel.querySelectorAll('button')).find(b => labelRegex.test(b.textContent.trim().toLowerCase()));
+    if(btn){
+      btn.addEventListener('click', (e)=>{ e.stopPropagation(); handler(e); });
+      btn.style.cursor = 'pointer';
+    } else {
+      // create one
+      const newBtn = document.createElement('button');
+      newBtn.innerHTML = labelRegex.source.includes('grup') ? '<i class="fa-solid fa-users"></i> Grupos' : '<i class="fa-solid fa-layer-group"></i> Grados';
+      newBtn.addEventListener('click', (e)=>{ e.stopPropagation(); handler(e); });
+      panel.appendChild(newBtn);
+    }
+  }
+
+  // Bind "Grupos" under Herramientas
+  bindMenuButton('menu-tools', /grupos|grupo|grup/i, openGroupsManagement);
+
+  // Bind "Grados" under Clases to open groups modal (and "Borrar grado" to prompt delete)
+  bindMenuButton('menu-classes', /grado|grados|grados/i, openGroupsManagement);
+  bindMenuButton('menu-classes', /borrar grado|eliminar grado|borrar/i, () => {
+    // open a prompt to delete (use our deleteGradePrompt wrapper)
+    const g = document.getElementById('class-select')?.value || currentClass;
+    if(!g) return toast('Selecciona un grado primero','warn');
+    deleteGradePrompt(g);
+  });
+
+  // Also ensure header edit button exists and works
+  (function ensureHeaderEdit(){
+    const brand = document.querySelector('.brand');
+    if(!brand) return;
+    if(brand.querySelector('.header-edit-btn')) return;
+    const btn = document.createElement('button');
+    btn.className = 'header-edit-btn';
+    btn.style.cssText = 'margin-left:8px;background:transparent;border:1px solid rgba(255,255,255,0.06);color:inherit;padding:6px 8px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-weight:700;';
+    btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openInstitutionEditor(); });
+    // attach
+    const textual = brand.querySelector('div:nth-child(2)');
+    if(textual) textual.appendChild(btn); else brand.appendChild(btn);
+    // dblclick title -> open editor
+    const titleEl = brand.querySelector('div:nth-child(2) > div:first-child') || brand.querySelector('div[style*="font-weight:900"]');
+    if(titleEl){ titleEl.style.cursor='pointer'; titleEl.addEventListener('dblclick', openInstitutionEditor); }
+  })();
+
+  // Ensure that if groups modal exists with inputs/buttons, they call our robust functions
+  function wireModalButtons(){
+    // If the patch-panel buttons exist (ids from previous patches), wire them
+    const elCreateGrade = document.getElementById('patch-create-grade');
+    if(elCreateGrade) elCreateGrade.addEventListener('click', ()=> {
+      const name = (document.getElementById('patch-new-grade')?.value||'').trim();
+      if(!name) return toast('Escribe nombre de grado','warn');
+      createGrade(name);
+    });
+    const elDeleteGrade = document.getElementById('patch-delete-grade');
+    if(elDeleteGrade) elDeleteGrade.addEventListener('click', ()=> {
+      const sel = document.getElementById('patch-grade-select'); const grade = sel?.value || currentClass;
+      if(!grade) return toast('Selecciona grado', 'warn');
+      deleteGradePrompt(grade);
+    });
+    const elCreateGroup = document.getElementById('patch-create-group');
+    if(elCreateGroup) elCreateGroup.addEventListener('click', ()=> {
+      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
+      const gn = (document.getElementById('patch-new-group')?.value||'').trim();
+      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
+      if(!gn) return toast('Escribe nombre de grupo','warn');
+      createGroup(grade, gn, persistent);
+    });
+    const elDeleteGroup = document.getElementById('patch-delete-group');
+    if(elDeleteGroup) elDeleteGroup.addEventListener('click', ()=> {
+      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
+      const name = prompt('Escribe el nombre exacto del grupo a eliminar');
+      if(name) deleteGroupPrompt(grade, name);
+    });
+    const elDistribNum = document.getElementById('patch-distribute-by-number');
+    if(elDistribNum) elDistribNum.addEventListener('click', ()=> {
+      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
+      const n = parseInt(document.getElementById('patch-dist-num')?.value);
+      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
+      distributeByNumber(grade, n, persistent);
+    });
+    const elDistribSize = document.getElementById('patch-distribute-by-size');
+    if(elDistribSize) elDistribSize.addEventListener('click', ()=> {
+      const grade = document.getElementById('patch-grade-select')?.value || currentClass;
+      const size = parseInt(document.getElementById('patch-dist-size')?.value);
+      const persistent = !!document.getElementById('patch-reino-toggle')?.checked;
+      distributeBySize(grade, size, persistent);
+    });
+
+    // Also wire main modal buttons if they exist with text "Crear grado" etc.
+    const groupsModal = document.getElementById('groups-modal') || document.getElementById('manage-groups-modal');
+    if(groupsModal){
+      const panel = groupsModal.querySelector('.modal');
+      if(panel){
+        // find buttons by text and attach fallback handlers if they don't have one
+        Array.from(panel.querySelectorAll('button')).forEach(btn => {
+          const txt = (btn.textContent||'').toLowerCase();
+          if(/crear grado|crear grado/i.test(txt) && !btn.dataset.patched){
+            btn.addEventListener('click', (e) => {
+              const name = prompt('Nombre grado (ej. 805)');
+              if(name) createGrade(name.trim());
+            });
+            btn.dataset.patched = '1';
+          }
+          if(/crear grupo|nuevo grupo/i.test(txt) && !btn.dataset.patched){
+            btn.addEventListener('click', (e) => {
+              const name = prompt('Nombre grupo (ej. Grupo A)');
+              const grade = document.getElementById('class-select')?.value || currentClass;
+              if(name) createGroup(grade, name.trim(), false);
+            });
+            btn.dataset.patched = '1';
+          }
+        });
+      }
+    }
+  }
+
+  // Run wiring now and also after a short delay (in case DOM is created later)
+  try { wireModalButtons(); } catch(e){ console.warn(e); }
+  setTimeout(wireModalButtons, 600);
+  setTimeout(wireModalButtons, 1600);
+
+  // expose for debug/testing
+  window.__alm_patch = {
+    openGroupsManagement, openInstitutionEditor, createGrade, createGroup, deleteGradePrompt, deleteGroupPrompt, distributeByNumber, distributeBySize
+  };
+
+  toast('Parche de acciones aplicado — prueba Herramientas→Grupos y Clases→Grados', 'info', 2400);
+})();
+</script>
 </body>
 </html>
