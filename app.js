@@ -1,17 +1,21 @@
-function cambiarPestaña(pestaña) {
-  document.querySelectorAll('.tab-content').forEach(tab => {
-    tab.classList.remove('active-tab');
-  });
+// Datos iniciales de ejemplo
+const data = {
+    estudiantes: [
+        { id: 1, nombre: "Germán Velandia", nivel: 1, xp: 0 },
+        { id: 2, nombre: "Estudiante 2", nivel: 1, xp: 0 }
+    ]
+};
 
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.remove('active');
-  });
-
-  if (pestaña === 'rpg') {
-    document.getElementById('sec-rpg').classList.add('active-tab');
-    event.target.classList.add('active');
-  } else if (pestaña === 'observador') {
-    document.getElementById('sec-observador').classList.add('active-tab');
-    event.target.classList.add('active');
-  }
+// Función para pintar la grilla
+function renderGrid() {
+    const grid = document.getElementById('students-grid');
+    grid.innerHTML = data.estudiantes.map(e => `
+        <div class="glass p-4 rounded-3xl card-hover">
+            <h3 class="font-bold text-white">${e.nombre}</h3>
+            <p class="text-amber-400 text-xs">Nivel ${e.level} | XP: ${e.xp}</p>
+        </div>
+    `).join('');
 }
+
+// Inicializar
+document.addEventListener('DOMContentLoaded', renderGrid);
