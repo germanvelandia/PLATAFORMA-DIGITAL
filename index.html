@@ -2194,5 +2194,390 @@ window.openManageGroupsModal = openGroupsModal;
 })();
 </script>
 <!-- /PARCHE GM UI -->
+  <!-- PARCHE: Ficha mejorada con 4 paneles (Personal, Actas, Observador, Gamificación) -->
+<style>
+  /* Compact tabbed layout for ficha */
+  .ficha-tabs { display:flex; gap:8px; margin-bottom:10px; flex-wrap:wrap }
+  .ficha-tab { padding:8px 12px; border-radius:8px; cursor:pointer; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); font-weight:800 }
+  .ficha-tab.active{ background:linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01)); box-shadow:0 8px 30px rgba(0,0,0,0.5) }
+  .ficha-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .ficha-panel { background: #fff; color:#111; padding:10px; border-radius:10px; max-height:420px; overflow:auto; border:1px solid rgba(0,0,0,0.06) }
+  .ficha-panel.small { font-size:13px; color:#333 }
+  .ficha-row { display:flex; gap:8px; margin-bottom:8px; align-items:center }
+  .ficha-row label{ width:130px; font-weight:700; color:#444 }
+  .ficha-input, .ficha-select, .ficha-textarea { width:100%; padding:8px; border-radius:8px; border:1px solid #e6e6e6 }
+  .ficha-student-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px }
+  .acta-item, .obs-item { padding:8px; border-radius:8px; background:#f7f7f7; margin-bottom:8px; border:1px solid #e6e6e6 }
+  .badge { display:inline-block; padding:4px 8px; border-radius:999px; background:#eef2ff; color:#3730a3; font-weight:700; margin-right:6px; font-size:12px }
+  @media(max-width:900px){ .ficha-grid{ grid-template-columns:1fr } }
+</style>
+
+<script>
+(function enhanceFicha(){
+  // helpers
+  const STORAGE_KEY = typeof STORAGE_KEY !== 'undefined' ? STORAGE_KEY : 'fantasyclass_alm_db';
+  const toast = (m,t=2000) => { if(typeof showToast==='function'){ showToast(m,'success',t); } else console.log(m); };
+  function persist(){ if(typeof saveDB==='function'){ try{ saveDB(); return; }catch(e){ console.warn(e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); } }
+
+  // Build the UI inside #ficha-modal .modal.white (replace existing inner content)
+  function buildFichaUI(){
+    const modal = document.getElementById('ficha-modal');
+    if(!modal) return;
+    const container = modal.querySelector('.modal');
+    if(!container) return;
+    // keep close button, clear rest
+    const closeBtn = container.querySelector('.close-btn');
+    container.innerHTML = '';
+    if(closeBtn) container.appendChild(closeBtn);
+
+    // Header area (avatar/name)
+    const header = document.createElement('div');
+    header.style.display='flex'; header.style.alignItems='center'; header.style.gap='12px'; header.style.marginBottom='8px';
+    header.innerHTML = `
+      <div id="ficha-avatar-large" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
+      <div style="flex:1">
+        <div id="ficha-name-large" style="font-weight:900;color:#111;font-size:18px">Nombre</div>
+        <div id="ficha-sub" style="color:#666">Ficha • <span id="ficha-period"></span></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" id="ficha-save-all">Guardar todo</div>
+        <div class="btn" id="ficha-export">Exportar</div>
+      </div>
+    `;
+    container.appendChild(header);
+
+    // Tabs
+    const tabs = document.createElement('div'); tabs.className='ficha-tabs';
+    ['Personal / Contacto','Actas / Reuniones','Observador Convivencial','Gamificación'].forEach((t,i)=>{
+      const b = document.createElement('div'); b.className='ficha-tab'; b.innerText = t; b.dataset.idx = i;
+      b.addEventListener('click', ()=> switchTab(i));
+      tabs.appendChild(b);
+    });
+    container.appendChild(tabs);
+
+    // Grid with 2 columns but we will show only the active tab's panels
+    const gridWrap = document.createElement('div'); gridWrap.className='ficha-grid'; gridWrap.style.marginTop='10px';
+    // Panel 0: Personal / Contacto
+    const pPersonal = document.createElement('div'); pPersonal.className='ficha-panel small'; pPersonal.id='ficha-panel-personal';
+    pPersonal.innerHTML = `
+      <div style="font-weight:800;margin-bottom:8px">Datos Personales y de Contacto</div>
+      <div class="ficha-row"><label>Nombre completo</label><input id="f_nombre" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Documento</label><input id="f_documento" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Curso / Grupo</label><input id="f_grupo" class="ficha-input" readonly /></div>
+      <div class="ficha-row"><label>Fecha de nacimiento</label><input id="f_fnac" type="date" class="ficha-input" /></div>
+      <div class="ficha-row"><label>EPS</label><input id="f_eps" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Grupo Sanguíneo / RH</label><input id="f_sangre" class="ficha-input" /></div>
+
+      <hr style="margin:8px 0">
+
+      <div style="font-weight:800;margin-bottom:8px">Contacto de Acudientes</div>
+      <div class="ficha-row"><label>Padre / Madre / Acudiente</label><input id="f_acudiente" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Teléfono principal</label><input id="f_tel" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Teléfono emergencia</label><input id="f_tel_emerg" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Correo</label><input id="f_email" class="ficha-input" /></div>
+    `;
+
+    // Panel 1: Actas / Reuniones
+    const pActas = document.createElement('div'); pActas.className='ficha-panel small'; pActas.id='ficha-panel-actas';
+    pActas.innerHTML = `
+      <div style="font-weight:800;margin-bottom:8px">Registro de Actas y Reuniones</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="acta-fecha" type="date" class="ficha-input" style="width:160px">
+        <select id="acta-motivo" class="ficha-select" style="width:180px">
+          <option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option>
+        </select>
+      </div>
+      <div style="margin-bottom:8px"><textarea id="acta-resumen" class="ficha-textarea" rows="3" placeholder="Resumen y apreciaciones..."></textarea></div>
+      <div style="margin-bottom:8px"><textarea id="acta-compromisos" class="ficha-textarea" rows="2" placeholder="Compromisos / Intervenciones..."></textarea></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px"><label style="width:auto">Firma/Conformidad</label><select id="acta-firma" class="ficha-select" style="width:160px"><option>Conforme</option><option>No conforme</option></select></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="acta-add">Agregar acta</button></div>
+      <hr style="margin:8px 0">
+      <div id="actas-list"></div>
+    `;
+
+    // Panel 2: Observador Convivencial
+    const pObs = document.createElement('div'); pObs.className='ficha-panel small'; pObs.id='ficha-panel-obs';
+    pObs.innerHTML = `
+      <div style="font-weight:800;margin-bottom:8px">Observador Convivencial</div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input id="obs-fecha" type="date" class="ficha-input" style="width:160px">
+        <select id="obs-tipo" class="ficha-select" style="width:180px">
+          <option>Incidente</option><option>Observación</option><option>Reporte</option>
+        </select>
+        <select id="obs-clasif" class="ficha-select" style="width:160px">
+          <option>Leve</option><option>Moderada</option><option>Grave</option>
+        </select>
+      </div>
+      <div style="margin-bottom:8px"><textarea id="obs-desc" class="ficha-textarea" rows="3" placeholder="Descripción de la situación / novedades..."></textarea></div>
+      <div style="margin-bottom:8px"><textarea id="obs-descargo" class="ficha-textarea" rows="2" placeholder="Descargos del estudiante..."></textarea></div>
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+        <label style="width:auto">Estado seguimiento</label>
+        <select id="obs-estado" class="ficha-select" style="width:180px"><option>En proceso</option><option>Cerrado</option><option>Derivado</option></select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="obs-add">Agregar registro</button></div>
+      <hr style="margin:8px 0">
+      <div id="obs-list"></div>
+    `;
+
+    // Panel 3: Gamificación
+    const pGame = document.createElement('div'); pGame.className='ficha-panel small'; pGame.id='ficha-panel-game';
+    pGame.innerHTML = `
+      <div style="font-weight:800;margin-bottom:8px">Elementos Gamificados</div>
+      <div class="ficha-row"><label>Nivel RPG</label><input id="game-level" class="ficha-input" /></div>
+      <div class="ficha-row"><label>XP</label><input id="game-xp" type="number" class="ficha-input" /></div>
+      <div class="ficha-row"><label>HP</label><input id="game-hp" type="number" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Clan / Equipo</label><input id="game-clan" class="ficha-input" /></div>
+      <div class="ficha-row"><label>Insignias</label><input id="game-badges" class="ficha-input" placeholder="Separadas por comas" /></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px"><button class="btn" id="game-save">Guardar gamificación</button></div>
+    `;
+
+    // Append panels (arrange visually small)
+    gridWrap.appendChild(pPersonal);
+    gridWrap.appendChild(pActas);
+    gridWrap.appendChild(pObs);
+    gridWrap.appendChild(pGame);
+
+    container.appendChild(gridWrap);
+
+    // footer: small history quick view (existing history)
+    const footer = document.createElement('div'); footer.style.marginTop='10px';
+    footer.innerHTML = `<div style="font-weight:800;margin-bottom:6px">Historial rápido</div><div id="ficha-quick-history" style="max-height:120px;overflow:auto;background:#fff;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)"></div>`;
+    container.appendChild(footer);
+
+    // activate first tab
+    switchTab(0);
+
+    // Wire actions
+    document.getElementById('ficha-save-all').addEventListener('click', saveAllFromUI);
+    document.getElementById('ficha-export').addEventListener('click', ()=> { if(typeof exportSingleStudentExcel==='function') exportSingleStudentExcel(); else toast('Función export no disponible'); });
+
+    document.getElementById('acta-add').addEventListener('click', addActaFromUI);
+    document.getElementById('obs-add').addEventListener('click', addObsFromUI);
+    document.getElementById('game-save').addEventListener('click', saveGamificationFromUI);
+  }
+
+  // switch tab
+  function switchTab(idx){
+    const tabs = document.querySelectorAll('.ficha-tab'); tabs.forEach(t=>t.classList.remove('active'));
+    if(tabs[idx]) tabs[idx].classList.add('active');
+    const panels = ['ficha-panel-personal','ficha-panel-actas','ficha-panel-obs','ficha-panel-game'];
+    panels.forEach((id,i)=> {
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.style.display = (i===idx)?'block':'none';
+    });
+  }
+
+  // Open enhanced ficha for a student id (overrides previous openFicha)
+  function openFichaEnhanced(id){
+    // find student object
+    const gradeKey = currentClass || document.getElementById('class-select')?.value;
+    let student = null; let gradeFound = null;
+    if(!id){
+      toast('ID de estudiante requerido','warn'); return;
+    }
+    // search across classes in db
+    for(const g of Object.keys(db.classes||{})){
+      const s = (db.classes[g]||[]).find(x=>x.id===id);
+      if(s){ student = s; gradeFound = g; break; }
+    }
+    if(!student) { alert('Estudiante no encontrado'); return; }
+    // build UI if not present
+    buildFichaUI();
+
+    // populate header
+    document.getElementById('ficha-avatar-large').innerText = student.name.charAt(0);
+    document.getElementById('ficha-name-large').innerText = student.name;
+    document.getElementById('ficha-period').innerText = document.getElementById('period-select')?.value || '';
+
+    // Fill personal fields (safe defaults)
+    document.getElementById('f_nombre').value = student.name || '';
+    document.getElementById('f_documento').value = student.document || (student.doc || '') ;
+    document.getElementById('f_grupo').value = gradeFound + ' / ' + ( findStudentGroup(gradeFound, student.id) || '-' );
+    document.getElementById('f_fnac').value = student.birthdate || student.fnac || '';
+    document.getElementById('f_eps').value = student.eps || '';
+    document.getElementById('f_sangre').value = student.sangre || '';
+    document.getElementById('f_acudiente').value = (student.acudiente && student.acudiente.name) || student.acudiente || '';
+    document.getElementById('f_tel').value = (student.acudiente && student.acudiente.phone) || student.phone || '';
+    document.getElementById('f_tel_emerg').value = student.phone_emerg || '';
+    document.getElementById('f_email').value = student.email || '';
+
+    // Actas: ensure array
+    student.actas = student.actas || [];
+    renderActas(student.actas);
+
+    // Observador
+    student.observador = student.observador || [];
+    renderObs(student.observador);
+
+    // Gamificacion fields
+    student.gamification = student.gamification || {};
+    document.getElementById('game-level').value = student.gamification.level || (student.level || 1);
+    document.getElementById('game-xp').value = student.gamification.xp || (student.xp || 0);
+    document.getElementById('game-hp').value = student.gamification.hp || (student.hp || 5);
+    document.getElementById('game-clan').value = student.gamification.clan || (student.clan || '');
+    document.getElementById('game-badges').value = (student.gamification.badges && student.gamification.badges.join(', ')) || ((student.badges||[]).join(', ')) || '';
+
+    // quick history (use existing history field)
+    const histEl = document.getElementById('ficha-quick-history'); histEl.innerHTML = '';
+    const hist = student.history || [];
+    if(!hist.length) histEl.innerHTML = '<div class="small" style="color:#666">Sin registros</div>';
+    else hist.slice(0,8).forEach(h=>{ const d = document.createElement('div'); d.style.padding='6px'; d.style.borderBottom='1px solid #eee'; d.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div>`; histEl.appendChild(d); });
+
+    // expose current student id for save operations
+    window.__ficha_current_student = student.id;
+    window.__ficha_current_grade = gradeFound;
+
+    // render groups and students for assignment if manage modal exists (we use same db)
+    // (populate grade select in the modal builder in case needed)
+    // also populate gm-* panels if present
+    if(document.getElementById('gm-grade-select')){
+      // sync the manage modal grade select if it's visible
+      const sel = document.getElementById('gm-grade-select');
+      populateGMGradeSelectIfPresent(sel);
+    }
+
+    showModal('ficha-modal');
+  }
+
+  // helper to find which group student belongs to in a grade
+  function findStudentGroup(grade, sid){
+    const groups = (db.groups && db.groups[grade]) ? db.groups[grade] : {};
+    for(const g of Object.keys(groups||{})){
+      if(groups[g].includes(sid)) return g;
+    }
+    return null;
+  }
+
+  // render actas
+  function renderActas(list){
+    const el = document.getElementById('actas-list'); if(!el) return; el.innerHTML='';
+    if(!list.length) { el.innerHTML = '<div class="small" style="color:#666">Sin actas</div>'; return; }
+    list.slice().reverse().forEach(a=>{
+      const d = document.createElement('div'); d.className='acta-item';
+      d.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#666">${a.firma||''}</div></div><div style="margin-top:6px">${a.resumen}</div><div style="margin-top:6px;color:#444">${a.compromisos||''}</div>`;
+      el.appendChild(d);
+    });
+  }
+  // render observador
+  function renderObs(list){
+    const el = document.getElementById('obs-list'); if(!el) return; el.innerHTML='';
+    if(!list.length){ el.innerHTML = '<div class="small" style="color:#666">Sin registros</div>'; return; }
+    list.slice().reverse().forEach(o=>{
+      const d = document.createElement('div'); d.className='obs-item';
+      d.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:800">${o.tipo} • ${o.fecha}</div><div style="color:#666">${o.clasif||''}</div></div><div style="margin-top:6px">${o.desc}</div><div style="margin-top:6px;color:#444">Descargo: ${o.descargo||''}</div><div style="margin-top:6px;color:#333">Estado: ${o.estado||''}</div>`;
+      el.appendChild(d);
+    });
+  }
+
+  // Add acta from UI
+  function addActaFromUI(){
+    const sid = window.__ficha_current_student;
+    if(!sid) return toast('Ficha no cargada','warn');
+    const student = findStudentById(sid);
+    if(!student) return toast('Estudiante no hallado','err');
+    const fecha = document.getElementById('acta-fecha').value || new Date().toLocaleDateString();
+    const motivo = document.getElementById('acta-motivo').value || 'Otro';
+    const resumen = document.getElementById('acta-resumen').value || '';
+    const compromisos = document.getElementById('acta-compromisos').value || '';
+    const firma = document.getElementById('acta-firma').value || '';
+    student.actas = student.actas || [];
+    student.actas.push({ id:Date.now(), fecha, motivo, resumen, compromisos, firma });
+    persist(); renderActas(student.actas);
+    // clear inputs
+    document.getElementById('acta-resumen').value=''; document.getElementById('acta-compromisos').value='';
+    toast('Acta agregada','success');
+  }
+
+  // Add observador
+  function addObsFromUI(){
+    const sid = window.__ficha_current_student;
+    if(!sid) return toast('Ficha no cargada','warn');
+    const student = findStudentById(sid);
+    if(!student) return toast('Estudiante no hallado','err');
+    const fecha = document.getElementById('obs-fecha').value || new Date().toLocaleDateString();
+    const tipo = document.getElementById('obs-tipo').value || 'Observación';
+    const clasif = document.getElementById('obs-clasif').value || '';
+    const desc = document.getElementById('obs-desc').value || '';
+    const descargo = document.getElementById('obs-descargo').value || '';
+    const estado = document.getElementById('obs-estado').value || 'En proceso';
+    student.observador = student.observador || [];
+    student.observador.push({ id:Date.now(), fecha, tipo, clasif, desc, descargo, estado });
+    persist(); renderObs(student.observador);
+    document.getElementById('obs-desc').value=''; document.getElementById('obs-descargo').value='';
+    toast('Registro convivencial agregado','success');
+  }
+
+  // Save gamification
+  function saveGamificationFromUI(){
+    const sid = window.__ficha_current_student; if(!sid) return toast('Ficha no cargada','warn');
+    const student = findStudentById(sid); if(!student) return toast('Estudiante no hallado','err');
+    student.gamification = student.gamification || {};
+    student.gamification.level = document.getElementById('game-level').value || student.gamification.level || student.level;
+    student.gamification.xp = parseInt(document.getElementById('game-xp').value) || 0;
+    student.gamification.hp = parseInt(document.getElementById('game-hp').value) || student.gamification.hp || HP_MAX;
+    student.gamification.clan = document.getElementById('game-clan').value || '';
+    const badgesRaw = (document.getElementById('game-badges').value || '').trim();
+    student.gamification.badges = badgesRaw ? badgesRaw.split(',').map(s=>s.trim()).filter(Boolean) : [];
+    // reflect in main fields too
+    student.level = parseInt(student.gamification.level) || student.level;
+    student.xp = parseInt(student.gamification.xp) || student.xp;
+    student.hp = parseInt(student.gamification.hp) || student.hp;
+    persist(); toast('Gamificación guardada','success'); renderStudentGrid && renderStudentGrid();
+  }
+
+  // Save personal & contact info
+  function savePersonalFromUI(){
+    const sid = window.__ficha_current_student; if(!sid) return toast('Ficha no cargada','warn');
+    const student = findStudentById(sid); if(!student) return toast('Estudiante no hallado','err');
+    student.name = document.getElementById('f_nombre').value || student.name;
+    student.document = document.getElementById('f_documento').value || student.document;
+    student.birthdate = document.getElementById('f_fnac').value || student.birthdate;
+    student.eps = document.getElementById('f_eps').value || student.eps;
+    student.sangre = document.getElementById('f_sangre').value || student.sangre;
+    // contact
+    student.acudiente = student.acudiente || {};
+    const ac = document.getElementById('f_acudiente').value || '';
+    const tel = document.getElementById('f_tel').value || '';
+    const tem = document.getElementById('f_tel_emerg').value || '';
+    const em = document.getElementById('f_email').value || '';
+    // store as object for clarity
+    student.acudiente = { name: ac, phone: tel, email: em };
+    student.phone_emerg = tem;
+    persist(); toast('Datos personales guardados','success'); renderStudentGrid && renderStudentGrid();
+  }
+
+  // Save all (calls personal + gamification)
+  function saveAllFromUI(){
+    savePersonalFromUI();
+    saveGamificationFromUI();
+    // actas and obs are saved individually when added
+    toast('Ficha guardada','success');
+  }
+
+  // utility find student
+  function findStudentById(id){
+    for(const g of Object.keys(db.classes || {})){
+      const s = (db.classes[g]||[]).find(x=>x.id===id);
+      if(s) return s;
+    }
+    return null;
+  }
+
+  // small helper to sync manage groups modal if exists
+  function populateGMGradeSelectIfPresent(sel){
+    if(!sel) return;
+    sel.innerHTML = '';
+    Object.keys(db.classes || {}).forEach(k => { const o=document.createElement('option'); o.value=k; o.textContent=`Grado ${k} (${(db.classes[k]||[]).length})`; sel.appendChild(o); });
+    if(currentClass) sel.value = currentClass;
+  }
+
+  // Expose enhanced opener and override existing openFicha
+  window.openFicha = openFichaEnhanced;
+  // also expose function name to revert if needed
+  window.openFichaEnhanced = openFichaEnhanced;
+
+})();
+</script>
 </body>
 </html>
