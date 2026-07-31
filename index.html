@@ -1,627 +1,598 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FantasyClass Convivencial — ALM</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FantasyClass Convivencial — ALM</title>
 
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script>
-  tailwind.config = { theme: { extend: { colors: { colegio: { blue:'#1e3a8a', red:'#dc2626', gold:'#f59e0b' } }, fontFamily: { sans:['Inter','sans-serif'], display:['Outfit','sans-serif'] } } } };
-</script>
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            colegio: { blue: '#1e3a8a', red: '#dc2626', gold: '#f59e0b', dark: '#0f172a' }
+          },
+          fontFamily: { sans: ['Inter','sans-serif'], display: ['Outfit','sans-serif'] }
+        }
+      }
+    }
+  </script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Fonts & Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <!-- XLSX & confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
-<style>
-/* reset + tokens */
-*{box-sizing:border-box} html,body{height:100%} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
-:root{--muted:#9aa7b6;--glass:border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
-button,input,select,textarea{font-family:inherit;color:inherit}
-button{cursor:pointer}
+  <style>
+    /* minimal reset + tokens */
+    *,*::before,*::after{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
+    :root{--muted:#9aa7b6;--glass-border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
+    button,input,select,textarea{font-family:inherit;color:inherit}
+    button{cursor:pointer}
 
-/* header */
-header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 18px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:80}
-.header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
-.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    /* header */
+    header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:80}
+    .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
+    .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700}
+    .chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
 
-/* chips */
-.chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700}
-.chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
+    .dropdown{position:relative}
+    .dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,#071726,#05101a);border:1px solid var(--glass-border);padding:6px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);min-width:220px;z-index:90}
+    .dropdown-menu button{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:transparent;color:inherit;border:0;width:100%;text-align:left}
 
-/* dropdowns */
-.dropdown{position:relative}
-.dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,#071726,#05101a);border:1px solid rgba(255,255,255,0.04);padding:6px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);min-width:220px;z-index:90;}
-.dropdown-menu button{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:transparent;color:inherit;border:0;width:100%;text-align:left}
+    main{max-width:1200px;margin:18px auto;padding:0 20px 60px}
 
-/* main layout */
-main{max-width:1200px;margin:18px auto;padding:0 18px 80px}
+    .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
+    .metric{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.007));border:1px solid var(--glass-border)}
+    .metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
+    .metric .value{font-weight:900;color:#9ff9c6}
 
-/* metrics */
-.metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
-.metric{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.007));border:1px solid rgba(255,255,255,0.03)}
-.metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
-.metric .value{font-weight:900;color:#9ff9c6}
+    .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:12px}
+    .control-panel .left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+    .control-panel input, .control-panel select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:inherit}
 
-/* control panel */
-.control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:12px}
-.control-panel .left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
-.control-panel input, .control-panel select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:inherit}
+    #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+    .card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);position:relative}
+    .card:hover{transform:translateY(-4px);transition:all .18s ease}
+    .avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900}
+    .level{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.35);color:var(--accent-gold);font-weight:800}
 
-/* student grid & card */
-#students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
-.card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);position:relative}
-.card:hover{transform:translateY(-4px);transition:all .18s ease}
-.avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900}
-.level{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.35);color:var(--accent-gold);font-weight:800}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    .btn{padding:8px 12px;border-radius:10px;font-weight:800;color:#fff}
+    .btn.green{background:linear-gradient(180deg,#10b981,#059669)}
+    .btn.red{background:linear-gradient(180deg,#ef4444,#dc2626)}
+    .btn.blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
 
-/* actions */
-.actions{display:flex;gap:8px;margin-top:12px}
-.btn{padding:8px 12px;border-radius:10px;font-weight:800;color:#fff}
-.btn.green{background:linear-gradient(180deg,#10b981,#059669)}
-.btn.red{background:linear-gradient(180deg,#ef4444,#dc2626)}
-.btn.blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
+    .group-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
 
-/* groups list */
-.group-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+    /* Modals: ensure hidden modals truly hidden */
+    .modal-hidden { display: none !important; pointer-events: none !important; }
+    [data-modal] { pointer-events: auto; }
+    .modal-center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
+    .modal-panel{background:linear-gradient(180deg,rgba(15,23,34,0.95),rgba(9,12,18,0.95));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);max-height:90vh;overflow:auto}
 
-/* modals */
-.modal-hidden{display:none}
-.modal-center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:100}
-.modal-panel{background:linear-gradient(180deg,rgba(15,23,34,0.95),rgba(9,12,18,0.95));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);max-height:90vh;overflow:auto}
-
-/* small responsive */
-@media(max-width:1000px){.metrics{grid-template-columns:repeat(3,1fr)}}
-@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}.avatar{width:48px;height:48px}}
-</style>
+    @media(max-width:1000px){.metrics{grid-template-columns:repeat(3,1fr)}}
+    @media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}.avatar{width:48px;height:48px}}
+  </style>
 </head>
 <body>
 
-<header class="glass-panel">
-  <div class="header-inner">
-    <div class="brand">
-      <div class="logo">ALM</div>
-      <div>
-        <div style="font-weight:800">FantasyClass Convivencial <span style="background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:8px;margin-left:8px;color:#ffd88a;font-weight:900">ALM</span></div>
-        <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</div>
+  <header class="glass-panel">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">ALM</div>
+        <div>
+          <div style="font-weight:800">FantasyClass Convivencial <span style="background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:8px;margin-left:8px;color:#ffd88a;font-weight:900">ALM</span></div>
+          <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
+
+        <div class="chip"><i class="fa-solid fa-calendar-days"></i>
+          <select id="period-select" onchange="switchPeriod(this.value)">
+            <option value="ALL">Todo el Año</option>
+            <option value="P1" selected>Periodo 1</option>
+            <option value="P2">Periodo 2</option>
+            <option value="P3">Periodo 3</option>
+            <option value="P4">Periodo 4</option>
+          </select>
+        </div>
+
+        <div class="chip"><i class="fa-solid fa-users"></i>
+          <select id="class-select" onchange="switchClass(this.value)"></select>
+        </div>
+
+        <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
+
+        <div class="dropdown">
+          <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px"></i></button>
+          <div id="tools-dropdown" class="dropdown-menu" aria-hidden="true">
+            <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i><span> Ruleta Aleatoria</span></button>
+            <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i><span> Cronómetro</span></button>
+            <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i><span> Dado</span></button>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+          <div id="export-dropdown" class="dropdown-menu" aria-hidden="true">
+            <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual</button>
+            <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos</button>
+          </div>
+        </div>
       </div>
     </div>
+  </header>
 
-    <div class="controls">
-      <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
+  <main>
+    <div class="metrics">
+      <div class="metric"><div class="icon">🐘</div><div><div class="label">Responsabilidad</div><div id="badge-count-Responsabilidad" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🦁</div><div><div class="label">Respeto</div><div id="badge-count-Respeto" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🐪</div><div><div class="label">Confianza</div><div id="badge-count-Confianza" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">❤️</div><div><div class="label">Empatía</div><div id="badge-count-Empatía" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">⚖️</div><div><div class="label">Justicia</div><div id="badge-count-Justicia" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🛡️</div><div><div class="label">Ciudadanía</div><div id="badge-count-Ciudadanía" class="value">0 pts</div></div></div>
+    </div>
 
-      <div class="chip"><i class="fa-solid fa-calendar-days"></i>
-        <select id="period-select" onchange="switchPeriod(this.value)">
-          <option value="ALL">Todo el Año</option>
-          <option value="P1" selected>Periodo 1</option>
-          <option value="P2">Periodo 2</option>
-          <option value="P3">Periodo 3</option>
-          <option value="P4">Periodo 4</option>
+    <div class="control-panel">
+      <div class="left">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+        <input id="student-search-input" type="text" placeholder="Buscar estudiante por nombre..." onkeyup="renderStudentGrid()">
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="sort-select" onchange="renderStudentGrid()">
+          <option value="name">Nombre (A-Z)</option>
+          <option value="level">Mayor Nivel</option>
+          <option value="xp">Más Puntos</option>
+          <option value="obs">Más Observaciones</option>
         </select>
-      </div>
-
-      <div class="chip"><i class="fa-solid fa-users"></i>
-        <select id="class-select" onchange="switchClass(this.value)"></select>
-      </div>
-
-      <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
-
-      <div class="dropdown">
-        <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px"></i></button>
-        <div id="tools-dropdown" class="dropdown-menu" aria-hidden="true">
-          <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i><span> Ruleta Aleatoria</span></button>
-          <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i><span> Cronómetro</span></button>
-          <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i><span> Dado</span></button>
-        </div>
-      </div>
-
-      <div class="dropdown">
-        <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
-        <div id="export-dropdown" class="dropdown-menu" aria-hidden="true">
-          <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual</button>
-          <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos</button>
-        </div>
+        <button class="btn green" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Añadir Estudiante</button>
       </div>
     </div>
 
-  </div>
-</header>
+    <div id="students-grid"></div>
+  </main>
 
-<main>
-  <div class="metrics">
-    <div class="metric"><div class="icon">🐘</div><div><div class="label">Responsabilidad</div><div id="badge-count-Responsabilidad" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🦁</div><div><div class="label">Respeto</div><div id="badge-count-Respeto" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🐪</div><div><div class="label">Confianza</div><div id="badge-count-Confianza" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">❤️</div><div><div class="label">Empatía</div><div id="badge-count-Empatía" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">⚖️</div><div><div class="label">Justicia</div><div id="badge-count-Justicia" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🛡️</div><div><div class="label">Ciudadanía</div><div id="badge-count-Ciudadanía" class="value">0 pts</div></div></div>
-  </div>
+  <!-- MODALS (with data-modal) -->
 
-  <div class="control-panel">
-    <div class="left">
-      <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
-      <input id="student-search-input" type="text" placeholder="Buscar estudiante por nombre..." onkeyup="renderStudentGrid()">
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="sort-select" onchange="renderStudentGrid()" class="mr-2">
-        <option value="name">Nombre (A-Z)</option>
-        <option value="level">Mayor Nivel</option>
-        <option value="xp">Más Puntos</option>
-        <option value="obs">Más Observaciones</option>
-      </select>
-      <button class="btn green" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Añadir Estudiante</button>
-    </div>
-  </div>
-
-  <div id="students-grid"></div>
-</main>
-
-<!-- ============ MODALES ============ -->
-
-<!-- FICHA modal (modal-only; no form in main) -->
-<div id="history-modal" class="modal-center modal-hidden">
-  <div class="modal-panel modal-panel" style="width:100%;max-width:980px;">
-    <button style="position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted)" onclick="closeHistoryModal()">✕</button>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a);width:56px;height:56px;border-radius:10px">A</div>
-      <div style="flex:1">
-        <div id="history-student-name" style="font-weight:800;font-size:16px">Nombre Estudiante</div>
-        <div style="color:var(--muted)">Ficha del Observador Convivencial • <span id="history-period-label">P1</span></div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <button class="btn green" onclick="exportSingleStudentExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
-      </div>
-    </div>
-
-    <!-- botones mérito / falta con explicación breve -->
-    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <button id="btn-type-positive" class="btn green" onclick="setEntryType('positive'); showEntryHelp('positive')"><i class="fa-solid fa-thumbs-up"></i> Mérito (+XP)</button>
-      <button id="btn-type-negative" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)" onclick="setEntryType('negative'); showEntryHelp('negative')"><i class="fa-solid fa-triangle-exclamation"></i> Observación (-HP)</button>
-      <div id="entry-help" style="margin-left:12px;color:var(--muted);font-weight:600"></div>
-    </div>
-
-    <label style="font-weight:800;color:var(--muted);margin-bottom:8px">Pilar</label>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="glass-pill" onclick="selectValueCategory('Responsabilidad')">🐘 Responsabilidad</button>
-      <button class="glass-pill" onclick="selectValueCategory('Respeto')">🦁 Respeto</button>
-      <button class="glass-pill" onclick="selectValueCategory('Confianza')">🐪 Confianza</button>
-      <button class="glass-pill" onclick="selectValueCategory('Empatía')">❤️ Empatía</button>
-      <button class="glass-pill" onclick="selectValueCategory('Justicia')">⚖️ Justicia</button>
-      <button class="glass-pill" onclick="selectValueCategory('Ciudadanía')">🛡️ Ciudadanía</button>
-    </div>
-
-    <div style="display:flex;gap:12px;margin-bottom:12px">
-      <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica..." style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)"></textarea>
-      <div style="width:140px;display:flex;flex-direction:column;gap:8px">
-        <label style="color:var(--muted)">Puntos</label>
-        <input id="point-magnitude-input" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:transparent">
-        <button class="btn green" onclick="saveStudentEntry()">Guardar</button>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Puntos Mérito</div><div id="history-stat-positive" style="font-weight:800;color:#34d399">0 pts</div></div>
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Observaciones</div><div id="history-stat-negative" style="font-weight:800;color:#fb7185">0</div></div>
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Nivel RPG</div><div id="history-stat-level" style="font-weight:800;color:#f59e0b">Nivel 1</div></div>
-    </div>
-
-    <div id="history-entries-container" style="display:flex;flex-direction:column;gap:8px"></div>
-  </div>
-</div>
-
-<!-- Drive modal -->
-<div id="drive-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:640px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeDriveModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
-    <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook para enviar registros automáticamente.</p>
-    <input id="drive-webhook-url" placeholder="https://docs.google.com/forms/..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-    <div style="display:flex;gap:8px">
-      <button class="btn green" onclick="saveDriveSettings()">Guardar Configuración</button>
-      <button class="btn" onclick="testDriveConnection()">Probar Envío</button>
-    </div>
-  </div>
-</div>
-
-<!-- Groups modal -->
-<div id="manage-groups-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:720px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeManageGroupsModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
-
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input id="new-group-input" placeholder="Nombre de nuevo grupo (Ej. 1101)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <button class="btn blue" onclick="addNewGroup()">Crear</button>
-    </div>
-
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <input id="dist-size" type="number" min="1" placeholder="Tamaño grupo" style="width:140px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <button class="btn green" onclick="distributeGroupsByNumber()">Distribuir por número</button>
-      <button class="btn blue" onclick="distributeGroupsBySize()">Distribuir por tamaño</button>
-    </div>
-
-    <div id="groups-list-container" style="max-height:280px;overflow:auto"></div>
-  </div>
-</div>
-
-<!-- Add student modal -->
-<div id="add-student-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeAddStudentModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
-    <p style="color:var(--muted);margin-bottom:8px">Se agregará al curso <strong id="add-student-course-name">801</strong></p>
-    <input id="new-student-name-input" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-    <button class="btn green" style="width:100%" onclick="confirmAddNewStudent()">Guardar Estudiante</button>
-  </div>
-</div>
-
-<!-- Confirm modal -->
-<div id="confirm-dialog-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-    <h3 id="confirm-title" style="font-weight:800">¿Estás seguro?</h3>
-    <p id="confirm-message" style="color:var(--muted);margin-bottom:12px">Esta acción no se puede deshacer.</p>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button id="confirm-action-btn" class="btn red">Eliminar</button>
-      <button class="btn" onclick="closeConfirmModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Rouleta modal -->
-<div id="roulette-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:520px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeRouletteModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
-    <div id="roulette-display" style="padding:20px;border-radius:8px;background:linear-gradient(180deg,#06121a,#041018);font-weight:900">¡Presiona Girar!</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn blue" onclick="startRoulette()">Girar</button>
-      <button class="btn" onclick="stopRoulette()">Detener</button>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
-      <label style="color:var(--muted)">Velocidad</label>
-      <input id="roulette-speed" type="range" min="1" max="50" value="20" style="width:240px">
-    </div>
-  </div>
-</div>
-
-<!-- Timer modal -->
-<div id="timer-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeTimerModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
-    <div id="timer-display" style="font-weight:900;font-size:42px;color:#f59e0b;margin-bottom:12px">05:00</div>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button class="btn green" onclick="toggleTimer()">Iniciar</button>
-      <button class="btn" onclick="resetTimer()">Reset</button>
-    </div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn" onclick="setTimerMinutes(1)">1m</button>
-      <button class="btn" onclick="setTimerMinutes(5)">5m</button>
-      <button class="btn" onclick="setTimerMinutes(10)">10m</button
-      >
-    </div>
-  </div>
-</div>
-
-<!-- Dice modal -->
-<div id="dice-modal" class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:320px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeDiceModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-dice"></i> Dado</h3>
-    <div id="dice-display" style="font-size:72px;margin:16px">🎲</div>
-    <button class="btn red" onclick="rollDice()">Lanzar Dado</button>
-  </div>
-</div>
-
-<script>
-/* ---------- Data & state ---------- */
-const DEFAULT_ROSTERS = {
-  "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
-  "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia","Jobsanim susana Colina calles","Luisa Alejandra Díaz Yepes (802)","Matias Escobar flores","Dilan David Garcia Leal 802","Héctor Garzón Ramirez","ANGEL DANIEL GONZALEZ (802)","Sharol Dayana Gutierrez Téllez","Karol Dayana Hueso Pulido","Claudia Gabriela Leiva Gomez","Holman Esneyder Mena Mosquera","Sara Gisell Neira Pardo(802)","Dyland Alejandro Nieto (802)","Sara Ocampo Isaza","María Fernanda Orozco Diaz 802","Juan Esteban Orozco Higuita","María Fernanda Osorio huérfano","ZARA VALENTINA PEDRAZA ZAMORA","Sharith Liceth Riascos Conrado","Maria Victoria Rodriguez Moreno","Sara Valentina Rodriguez Ocampo","David Santiago Rodríguez Ortiz","Danna Valeria Rojas Florez(802)","Valery Maria Romero Capera","Angel David Saavedra Peñuela","María Fernanda Saenz Fresneda","Alisson Geraldine Sanabria Bernal","Darly maryori Solano cubides","DYLAN SEBASTIAN SOLIS HERNANDEZ","MARIA JOSE TORO RUIZ (802)"],
-  /* ... include rest as before ... */
-};
-let currentClassKey = "801";
-let currentPeriod = "P1";
-let selectedStudentId = null;
-let activeEntryType = 'positive';
-let selectedValueTag = 'Responsabilidad';
-let dbState = { classes: {}, googleScriptUrl: '' };
-
-/* ---------- Persistence & init ---------- */
-function initDatabase(){
-  const stored = localStorage.getItem('fantasyclass_alm_db');
-  if(stored){ try{ dbState = JSON.parse(stored); }catch(e){ dbState = { classes:{}, googleScriptUrl:'' }; } }
-  if(!dbState.classes) dbState.classes = {};
-  Object.keys(DEFAULT_ROSTERS).forEach(classKey=>{
-    if(!dbState.classes[classKey] || dbState.classes[classKey].length === 0){
-      dbState.classes[classKey] = DEFAULT_ROSTERS[classKey].map((name,idx)=>({ id:`${classKey}_${idx+1}`, name, xp:0, level:1, history:[] }));
-    }
-  });
-  saveDatabase(); updateClassSelectOptions(); renderGroupsList();
-}
-
-function saveDatabase(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState)); }
-
-/* ---------- Class select / period ---------- */
-function updateClassSelectOptions(){
-  const select = document.getElementById('class-select'); if(!select) return;
-  const prev = select.value;
-  select.innerHTML = '';
-  Object.keys(dbState.classes).forEach(cKey=>{
-    const opt = document.createElement('option'); opt.value = cKey; opt.textContent = `Grado ${cKey} (${dbState.classes[cKey].length} Est.)`; select.appendChild(opt);
-  });
-  if(prev && dbState.classes[prev]) currentClassKey = prev;
-  else if(!dbState.classes[currentClassKey]) currentClassKey = Object.keys(dbState.classes)[0];
-  select.value = currentClassKey;
-  renderStudentGrid(); updateGlobalMetrics();
-}
-function switchClass(newClass){ if(!dbState.classes[newClass]) return; currentClassKey = newClass; document.getElementById('class-select').value = newClass; renderStudentGrid(); updateGlobalMetrics(); }
-function switchPeriod(p){ currentPeriod = p; document.getElementById('period-select').value = p; renderStudentGrid(); updateGlobalMetrics(); }
-
-/* ---------- Export & tools dropdowns ---------- */
-function toggleExportMenu(){ const m=document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-function toggleToolsMenu(){ const m=document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-document.addEventListener('click', (e)=>{ const em=document.getElementById('export-dropdown'), tb=document.querySelector('.dropdown .chip'); if(em && em.style.display==='block' && !em.contains(e.target) && !tb.contains(e.target)) em.style.display='none'; const t=document.getElementById('tools-dropdown'), tb2=document.querySelector('.dropdown > .chip'); if(t && t.style.display==='block' && !t.contains(e.target) && !tb2.contains(e.target)) t.style.display='none'; });
-
-/* ---------- Drive ---------- */
-function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || ''; document.getElementById('drive-modal').classList.remove('modal-hidden'); }
-function closeDriveModal(){ document.getElementById('drive-modal').classList.add('modal-hidden'); }
-function saveDriveSettings(){ dbState.googleScriptUrl = document.getElementById('drive-webhook-url').value.trim(); saveDatabase(); if(dbState.googleScriptUrl) document.getElementById('drive-status-text').innerText = 'Google Drive Activo'; closeDriveModal(); }
-function testDriveConnection(){ alert('Prueba de envío realizada (modo no-cors).'); }
-
-/* ---------- Exports (XLSX) ---------- */
-function exportCurrentClassExcel(){ /* same logic: build summaryRows/historyRows and writeFile */ 
-  const students = dbState.classes[currentClassKey] || [];
-  const summary = students.map((s,i)=>({ "N°":i+1, "ID":s.id, "Nombre":s.name, "Grado":currentClassKey, "Nivel":s.level||1, "Puntos":s.xp||0 }));
-  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(summary),`Curso ${currentClassKey}`); XLSX.writeFile(wb, `Reporte_${currentClassKey}.xlsx`); toggleExportMenu();
-}
-function exportAllClassesMasterExcel(){ /* similar */ alert('Export master (demo)'); toggleExportMenu(); }
-function exportSingleStudentExcel(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante para exportar'); /* implement as before */ alert('Export ficha (demo)'); }
-
-/* ---------- Groups: create, distribute ---------- */
-function renderGroupsList(){
-  const c = document.getElementById('groups-list-container'); if(!c) return; c.innerHTML='';
-  Object.keys(dbState.classes).forEach(k=>{
-    const div=document.createElement('div'); div.className='group-item';
-    const count = dbState.classes[k].length;
-    div.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${k}')"><strong>Grado ${k}</strong> <span style="color:var(--muted)">(${count} estudiantes)</span></div>
-      <div style="display:flex;gap:8px"><button class="btn" onclick="exportGroup('${k}')">Export</button><button class="btn red" onclick="deleteGroup('${k}')">🗑</button></div>`;
-    c.appendChild(div);
-  });
-}
-function addNewGroup(){ const name = document.getElementById('new-group-input').value.trim().toUpperCase(); if(!name) return alert('Escribe nombre'); if(dbState.classes[name]) return alert('Grupo existe'); dbState.classes[name]=[]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); }
-function deleteGroup(key){ showConfirmModal('Eliminar grupo',`Eliminar ${key}?`, ()=>{ delete dbState.classes[key]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); }); }
-function exportGroup(key){ currentClassKey = key; exportCurrentClassExcel(); }
-
-/* distribute: by number of groups or by size */
-function distributeGroupsByNumber(){
-  const n = parseInt(document.getElementById('dist-number').value);
-  if(!n || n < 1) return alert('Ingresa número de grupos');
-  const students = dbState.classes[currentClassKey] ? [...dbState.classes[currentClassKey]] : [];
-  if(!students.length) return alert('No hay estudiantes');
-  shuffleArray(students);
-  const groups = {};
-  for(let i=0;i<n;i++) groups[`G${i+1}`]=[];
-  for(let i=0;i<students.length;i++){ groups[`G${(i % n)+1}`].push(students[i]); }
-  // create new group keys (append)
-  Object.keys(groups).forEach(g=>{
-    const key = `${currentClassKey}_${g}`;
-    dbState.classes[key] = groups[g].map((name,idx)=>({ id:`${key}_${idx+1}`, name, xp:0, level:1, history:[] }));
-  });
-  saveDatabase(); updateClassSelectOptions(); renderGroupsList(); alert('Distribución completada');
-}
-function distributeGroupsBySize(){
-  const size = parseInt(document.getElementById('dist-size').value);
-  if(!size || size < 1) return alert('Ingresa tamaño de grupo');
-  const students = dbState.classes[currentClassKey] ? [...dbState.classes[currentClassKey]] : [];
-  if(!students.length) return alert('No hay estudiantes');
-  shuffleArray(students);
-  let gidx=1; for(let i=0;i<students.length;i+=size){
-    const slice=students.slice(i,i+size); const key = `${currentClassKey}_G${gidx}`;
-    dbState.classes[key] = slice.map((name,idx)=>({ id:`${key}_${idx+1}`, name, xp:0, level:1, history:[] })); gidx++;
-  }
-  saveDatabase(); updateClassSelectOptions(); renderGroupsList(); alert('Distribución por tamaño completada');
-}
-function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-/* ---------- Students add / list / delete ---------- */
-function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('modal-hidden'); }
-function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('modal-hidden'); }
-function confirmAddNewStudent(){
-  const name = document.getElementById('new-student-name-input').value.trim(); if(!name) return alert('Escribe nombre');
-  if(!dbState.classes[currentClassKey]) dbState.classes[currentClassKey]=[];
-  const id = `${currentClassKey}_${Date.now()}`;
-  dbState.classes[currentClassKey].push({ id, name, xp:0, level:1, history:[] });
-  saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); alert('Estudiante agregado correctamente.');
-}
-
-/* ---------- Stats / card rendering ---------- */
-function calculateStudentStatsForPeriod(student){
-  let hist = student.history || [];
-  if(currentPeriod !== 'ALL') hist = hist.filter(h=>h.period===currentPeriod||!h.period);
-  let xp = 0; const badges={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  hist.forEach(h=>{ if(h.type==='positive'){ xp += (h.magnitude||1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag]+= (h.magnitude||1); }});
-  const level = Math.floor(xp/20)+1; return { xp, level, badges, history:hist };
-}
-function updateGlobalMetrics(){
-  const students = dbState.classes[currentClassKey] || [];
-  const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  students.forEach(s=>{ const st = calculateStudentStatsForPeriod(s); Object.keys(totals).forEach(k=>totals[k]+=st.badges[k]||0); });
-  Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-count-'+k); if(el) el.innerText = `${totals[k]} pts`; });
-}
-
-function avatarGradientFor(name){
-  if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
-  const idx = name.trim().charCodeAt(0)%10;
-  const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-  return `linear-gradient(135deg, ${palettes[idx][0]}, ${palettes[idx][1]})`;
-}
-
-function renderStudentGrid(){
-  const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
-  const students = dbState.classes[currentClassKey] || [];
-  const q = (document.getElementById('student-search-input').value||'').toLowerCase();
-  const sort = document.getElementById('sort-select').value;
-  let filtered = students.filter(s=>s.name.toLowerCase().includes(q));
-  if(sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
-  else if(sort==='level' || sort==='xp') filtered.sort((a,b)=> (b.xp||0)-(a.xp||0));
-  else if(sort==='obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length)-((a.history||[]).filter(h=>h.type==='negative').length));
-  filtered.forEach(s=>{
-    const st = calculateStudentStatsForPeriod(s);
-    const card = document.createElement('div'); card.className='card';
-    card.innerHTML = `
-      <div class="level">NIV ${st.level}</div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="avatar" style="background:${avatarGradientFor(s.name)};min-width:56px">${s.name.charAt(0)}</div>
+  <div id="history-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:980px;">
+      <button style="position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted)" onclick="closeHistoryModal()">✕</button>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a);width:56px;height:56px;border-radius:10px">A</div>
         <div style="flex:1">
-          <div style="font-weight:800">${s.name}</div>
-          <div style="color:var(--muted)">Grado ${currentClassKey} • ${currentPeriod}</div>
+          <div id="history-student-name" style="font-weight:800;font-size:16px">Nombre Estudiante</div>
+          <div style="color:var(--muted)">Ficha del Observador Convivencial • <span id="history-period-label">P1</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <button class="btn green" onclick="exportSingleStudentExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-        <button class="btn green" onclick="openAwardQuick('${s.id}','positive')"><i class="fa-solid fa-plus"></i> Mérito</button>
-        <button class="btn red" onclick="openAwardQuick('${s.id}','negative')"><i class="fa-solid fa-minus"></i> Falta</button>
-        <button class="btn blue" onclick="openHistoryModal('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <button id="btn-type-positive" class="btn green" onclick="setEntryType('positive'); showEntryHelp('positive')"><i class="fa-solid fa-thumbs-up"></i> Mérito (+XP)</button>
+        <button id="btn-type-negative" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)" onclick="setEntryType('negative'); showEntryHelp('negative')"><i class="fa-solid fa-triangle-exclamation"></i> Observación (-HP)</button>
+        <div id="entry-help" style="margin-left:12px;color:var(--muted);font-weight:600"></div>
       </div>
-    `;
-    container.appendChild(card);
-  });
-  updateGlobalMetrics();
-}
 
-/* ---------- Ficha modal logic ---------- */
-function openHistoryModal(studentId){
-  selectedStudentId = studentId;
-  const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId);
-  if(!st) return alert('Estudiante no encontrado');
-  document.getElementById('history-student-name').innerText = st.name;
-  document.getElementById('history-student-avatar').innerText = st.name.charAt(0);
-  document.getElementById('history-period-label').innerText = currentPeriod;
-  const stats = calculateStudentStatsForPeriod(st);
-  document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
-  document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
-  document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
-  activeEntryType = 'positive'; setEntryType('positive'); selectedValueTag='Responsabilidad';
-  document.getElementById('entry-note-input').value=''; document.getElementById('point-magnitude-input').value=1;
-  renderHistoryList(st);
-  document.getElementById('history-modal').classList.remove('modal-hidden');
-}
-function closeHistoryModal(){ document.getElementById('history-modal').classList.add('modal-hidden'); }
-function openAwardQuick(studentId,type){ selectedStudentId=studentId; activeEntryType = (type==='positive') ? 'positive' : 'negative'; setEntryType(activeEntryType); openHistoryModal(studentId); }
-function setEntryType(t){ activeEntryType=t; document.getElementById('btn-type-positive').style.opacity = t==='positive' ? '1' : '0.6'; document.getElementById('btn-type-negative').style.opacity = t==='negative' ? '1' : '0.6'; }
+      <label style="font-weight:800;color:var(--muted);margin-bottom:8px">Pilar</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="glass-pill" onclick="selectValueCategory('Responsabilidad')">🐘 Responsabilidad</button>
+        <button class="glass-pill" onclick="selectValueCategory('Respeto')">🦁 Respeto</button>
+        <button class="glass-pill" onclick="selectValueCategory('Confianza')">🐪 Confianza</button>
+        <button class="glass-pill" onclick="selectValueCategory('Empatía')">❤️ Empatía</button>
+        <button class="glass-pill" onclick="selectValueCategory('Justicia')">⚖️ Justicia</button>
+        <button class="glass-pill" onclick="selectValueCategory('Ciudadanía')">🛡️ Ciudadanía</button>
+      </div>
 
-/* show short help for Merit/Falta */
-function showEntryHelp(type){
-  const el = document.getElementById('entry-help');
-  if(type==='positive') el.innerText = 'Mérito: acción de buen desempeño convivencial (reconocer conducta positiva).';
-  else el.innerText = 'Observación: falta o comportamiento que requiere corrección pedagógica.';
-  setTimeout(()=>{ el.innerText = ''; }, 6000);
-}
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica..." style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)"></textarea>
+        <div style="width:140px;display:flex;flex-direction:column;gap:8px">
+          <label style="color:var(--muted)">Puntos</label>
+          <input id="point-magnitude-input" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:transparent">
+          <button class="btn green" onclick="saveStudentEntry()">Guardar</button>
+        </div>
+      </div>
 
-/* render history entries */
-function renderHistoryList(student){
-  const container = document.getElementById('history-entries-container'); if(!container) return;
-  const arr = (student.history||[]);
-  if(!arr.length){ container.innerHTML = `<div style="color:var(--muted);text-align:center;padding:16px">Sin registros en el observador todavía.</div>`; return; }
-  container.innerHTML = arr.map(h=>`<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.type==='positive'?`+${h.magnitude} XP`:'OBSERVACIÓN'}</div><div style="color:var(--muted)">${h.timestamp}</div></div><div style="margin-top:6px">${h.valueTag} — ${h.note}</div></div>`).join('');
-}
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Puntos Mérito</div><div id="history-stat-positive" style="font-weight:800;color:#34d399">0 pts</div></div>
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Observaciones</div><div id="history-stat-negative" style="font-weight:800;color:#fb7185">0</div></div>
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Nivel RPG</div><div id="history-stat-level" style="font-weight:800;color:#f59e0b">Nivel 1</div></div>
+      </div>
 
-/* save entry */
-function saveStudentEntry(){
-  if(!selectedStudentId) return alert('Abre la ficha de un estudiante');
-  const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId);
-  if(!student) return alert('Estudiante no encontrado');
-  const note = document.getElementById('entry-note-input').value.trim() || 'Registro';
-  const magnitude = parseInt(document.getElementById('point-magnitude-input').value)||1;
-  const entry = { id:Date.now(), timestamp: new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag: selectedValueTag, magnitude, note };
-  student.history.unshift(entry);
-  if(activeEntryType==='positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20)+1; try{ confetti({particleCount:40,spread:50}); }catch(e){} }
-  saveDatabase(); renderHistoryList(student); renderStudentGrid(); alert('Registro guardado');
-}
+      <div id="history-entries-container" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+  </div>
 
-/* add quick note */
-function addDirectTeacherNote(){ const t=document.getElementById('direct-teacher-note')?.value || ''; if(!t || !selectedStudentId) return; const st=(dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId); if(!st) return; st.history.unshift({id:Date.now(),timestamp:new Date().toLocaleString('es-CO'),period:currentPeriod,type:'positive',valueTag:'Seguimiento',magnitude:1,note:t}); saveDatabase(); renderHistoryList(st); renderStudentGrid(); alert('Nota añadida'); }
+  <div id="drive-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:640px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeDriveModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
+      <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
+      <input id="drive-webhook-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
+      <div style="display:flex;gap:8px">
+        <button class="btn green" onclick="saveDriveSettings()">Guardar Configuración</button>
+        <button class="btn" onclick="testDriveConnection()">Probar Envío</button>
+      </div>
+    </div>
+  </div>
 
-/* delete student */
-function deleteStudent(id){ const st=(dbState.classes[currentClassKey]||[]).find(s=>s.id===id); if(!st) return; showConfirmModal('Eliminar estudiante',`Eliminar a ${st.name}?`, ()=>{ dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(x=>x.id!==id); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); }); }
+  <div id="manage-groups-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:720px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeManageGroupsModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
 
-/* confirm modal */
-let confirmCb=null;
-function showConfirmModal(title,msg,cb){ document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-message').innerText = msg; confirmCb=cb; document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirmModal(); }; document.getElementById('confirm-dialog-modal').classList.remove('modal-hidden'); }
-function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('modal-hidden'); }
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="new-group-input" placeholder="Nombre de nuevo grupo (Ej. 1101)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <button class="btn blue" onclick="addNewGroup()">Crear</button>
+      </div>
 
-/* ---------- Roulette (with WebAudio ticks) ---------- */
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-function playTick(freq=800,dur=0.02,vol=0.06){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }
-function playWin(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <input id="dist-size" type="number" min="1" placeholder="Tamaño grupo" style="width:140px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <button class="btn green" onclick="distributeGroupsByNumber()">Distribuir por número</button>
+        <button class="btn blue" onclick="distributeGroupsBySize()">Distribuir por tamaño</button>
+      </div>
 
-let rouletteInterval=null, rouletteNames=[], rouletteIndex=0, rouletteRunning=false;
-function openRouletteModal(){ rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!' : 'No hay estudiantes'; document.getElementById('roulette-modal').classList.remove('modal-hidden'); }
-function closeRouletteModal(){ stopRoulette(); document.getElementById('roulette-modal').classList.add('modal-hidden'); }
+      <div id="groups-list-container" style="max-height:280px;overflow:auto"></div>
+    </div>
+  </div>
 
-function startRoulette(){
-  if(rouletteRunning) return;
-  rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name);
-  if(!rouletteNames.length) return alert('No hay estudiantes');
-  rouletteRunning=true; rouletteIndex=Math.floor(Math.random()*rouletteNames.length);
-  let speed = parseInt(document.getElementById('roulette-speed').value||20); let interval = Math.max(20,200 - speed*3);
-  let cycles = 0;
-  rouletteInterval = setInterval(()=>{
-    rouletteIndex = (rouletteIndex + 1) % rouletteNames.length;
-    document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
-    playTick(500+Math.random()*400,0.02);
-    cycles++;
-    if(cycles>40){ clearInterval(rouletteInterval); slowdownRoulette(); }
-  }, interval);
-}
-function slowdownRoulette(){
-  let steps=12; let step=0;
-  function tickSlow(){
-    step++;
-    rouletteIndex = (rouletteIndex+1)%rouletteNames.length;
-    document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
-    playTick(500+step*30,0.02);
-    if(step<steps) setTimeout(tickSlow,80+step*40);
-    else { rouletteRunning=false; playWin(); // open ficha for selected name
-      const selectedName = rouletteNames[rouletteIndex];
-      const st = (dbState.classes[currentClassKey]||[]).find(s=>s.name===selectedName);
-      if(st) openHistoryModal(st.id); else alert('Seleccionado: '+selectedName);
+  <div id="add-student-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeAddStudentModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
+      <p style="color:var(--muted);margin-bottom:8px">Se agregará al curso <strong id="add-student-course-name">801</strong></p>
+      <input id="new-student-name-input" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
+      <button class="btn green" style="width:100%" onclick="confirmAddNewStudent()">Guardar Estudiante</button>
+    </div>
+  </div>
+
+  <div id="confirm-dialog-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
+      <h3 id="confirm-title" style="font-weight:800">¿Estás seguro?</h3>
+      <p id="confirm-message" style="color:var(--muted);margin-bottom:12px">Esta acción no se puede deshacer.</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="confirm-action-btn" class="btn red">Eliminar</button>
+        <button class="btn" onclick="closeConfirmModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="roulette-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:520px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeRouletteModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
+      <div id="roulette-display" style="padding:20px;border-radius:8px;background:linear-gradient(180deg,#06121a,#041018);font-weight:900">¡Presiona Girar!</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn blue" onclick="startRoulette()">Girar</button>
+        <button class="btn" onclick="stopRoulette()">Detener</button>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
+        <label style="color:var(--muted)">Velocidad</label>
+        <input id="roulette-speed" type="range" min="1" max="50" value="20" style="width:240px">
+      </div>
+    </div>
+  </div>
+
+  <div id="timer-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeTimerModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
+      <div id="timer-display" style="font-weight:900;font-size:42px;color:#f59e0b;margin-bottom:12px">05:00</div>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button class="btn green" onclick="toggleTimer()">Iniciar</button>
+        <button class="btn" onclick="resetTimer()">Reset</button>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn" onclick="setTimerMinutes(1)">1m</button>
+        <button class="btn" onclick="setTimerMinutes(5)">5m</button>
+        <button class="btn" onclick="setTimerMinutes(10)">10m</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="dice-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:320px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeDiceModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-dice"></i> Dado</h3>
+      <div id="dice-display" style="font-size:72px;margin:16px">🎲</div>
+      <button class="btn red" onclick="rollDice()">Lanzar Dado</button>
+    </div>
+  </div>
+
+  <!-- MAIN JS (logic: roster, UI, exports, groups, roulette, timer, dice) -->
+  <script>
+    /* ---------- Data & state ---------- */
+    const DEFAULT_ROSTERS = {
+      "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
+      "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia","Jobsanim susana Colina calles","Luisa Alejandra Díaz Yepes (802)","Matias Escobar flores","Dilan David Garcia Leal 802","Héctor Garzón Ramirez","ANGEL DANIEL GONZALEZ (802)","Sharol Dayana Gutierrez Téllez","Karol Dayana Hueso Pulido","Claudia Gabriela Leiva Gomez","Holman Esneyder Mena Mosquera","Sara Gisell Neira Pardo(802)","Dyland Alejandro Nieto (802)","Sara Ocampo Isaza","María Fernanda Orozco Diaz 802","Juan Esteban Orozco Higuita","María Fernanda Osorio huérfano","ZARA VALENTINA PEDRAZA ZAMORA","Sharith Liceth Riascos Conrado","Maria Victoria Rodriguez Moreno","Sara Valentina Rodriguez Ocampo","David Santiago Rodríguez Ortiz","Danna Valeria Rojas Florez(802)","Valery Maria Romero Capera","Angel David Saavedra Peñuela","María Fernanda Saenz Fresneda","Alisson Geraldine Sanabria Bernal","Darly maryori Solano cubides","DYLAN SEBASTIAN SOLIS HERNANDEZ","MARIA JOSE TORO RUIZ (802)"],
+      /* Añade las demás listas completas aquí si las necesitas */
+    };
+
+    let currentClassKey = "801";
+    let currentPeriod = "P1";
+    let selectedStudentId = null;
+    let activeEntryType = 'positive';
+    let selectedValueTag = 'Responsabilidad';
+    let dbState = { classes: {}, googleScriptUrl: '' };
+
+    /* ---------- Persistence & init ---------- */
+    function initDatabase(){
+      const stored = localStorage.getItem('fantasyclass_alm_db');
+      if (stored) {
+        try { dbState = JSON.parse(stored); } catch(e) { dbState = { classes: {}, googleScriptUrl: '' }; }
+      }
+      if (!dbState.classes) dbState.classes = {};
+      Object.keys(DEFAULT_ROSTERS).forEach(classKey => {
+        if (!dbState.classes[classKey] || dbState.classes[classKey].length === 0) {
+          dbState.classes[classKey] = DEFAULT_ROSTERS[classKey].map((name, index) => ({ id: `${classKey}_${index + 1}`, name, xp: 0, level: 1, history: [] }));
+        }
+      });
+      saveDatabase();
+      updateClassSelectOptions();
+      renderGroupsList();
     }
-  }
-  tickSlow();
-}
-function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval=null; } rouletteRunning=false; }
+    function saveDatabase(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState)); }
 
-/* ---------- Timer ---------- */
-let timerSeconds = 300; let timerInterval=null;
-function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); document.getElementById('timer-modal').classList.remove('modal-hidden'); }
-function closeTimerModal(){ document.getElementById('timer-modal').classList.add('modal-hidden'); if(timerInterval) clearInterval(timerInterval); timerInterval=null; }
-function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-function toggleTimer(){
-  if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; }
-  else { document.querySelector('#timer-modal .btn.green').innerText='Pausar'; timerInterval = setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; timerFinished(); } },1000); }
-}
-function resetTimer(){ timerSeconds=300; document.getElementById('timer-display').innerText=formatTime(timerSeconds); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } }
-function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
-function timerFinished(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440,audioCtx.currentTime+0.5); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),700); alert('Tiempo terminado'); }
+    /* ---------- Class select / period ---------- */
+    function updateClassSelectOptions(){
+      const select = document.getElementById('class-select'); if(!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      Object.keys(dbState.classes).forEach(cKey => {
+        const opt = document.createElement('option'); opt.value = cKey; opt.textContent = `Grado ${cKey} (${dbState.classes[cKey].length} Est.)`; select.appendChild(opt);
+      });
+      if (prev && dbState.classes[prev]) currentClassKey = prev;
+      else if (!dbState.classes[currentClassKey]) currentClassKey = Object.keys(dbState.classes)[0];
+      select.value = currentClassKey;
+      renderStudentGrid(); updateGlobalMetrics();
+    }
+    function switchClass(newClass){ if(!dbState.classes[newClass]) return; currentClassKey = newClass; document.getElementById('class-select').value = newClass; renderStudentGrid(); updateGlobalMetrics(); }
+    function switchPeriod(p){ currentPeriod = p; document.getElementById('period-select').value = p; renderStudentGrid(); updateGlobalMetrics(); }
 
-/* ---------- Dice ---------- */
-function openDiceModal(){ document.getElementById('dice-modal').classList.remove('modal-hidden'); }
-function closeDiceModal(){ document.getElementById('dice-modal').classList.add('modal-hidden'); }
-function rollDice(){ const r=Math.floor(Math.random()*6)+1; document.getElementById('dice-display').innerText = r; playTick(300 + r*40,0.08,0.08); }
+    /* ---------- Export & tools dropdown ---------- */
+    function toggleExportMenu(){ const m=document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
+    function toggleToolsMenu(){ const m=document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
+    document.addEventListener('click', (e)=>{
+      const em=document.getElementById('export-dropdown'), tb=document.querySelector('.export-menu > button');
+      if (em && em.style.display==='block' && !em.contains(e.target) && !tb?.contains(e.target)) em.style.display='none';
+      const t=document.getElementById('tools-dropdown'), tb2=document.querySelector('.dropdown > .chip');
+      if (t && t.style.display==='block' && !t.contains(e.target) && !tb2?.contains(e.target)) t.style.display='none';
+    });
 
-/* ---------- Utils ---------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  initDatabase(); renderStudentGrid(); document.getElementById('period-select').value=currentPeriod; document.getElementById('class-select').value=currentClassKey;
-  const saved = localStorage.getItem('fantasyclass_alm_google_url'); if(saved) document.getElementById('drive-status-text').innerText='Google Drive Activo';
-});
-</script>
+    /* ---------- Drive ---------- */
+    function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url') || ''; document.getElementById('drive-modal').classList.remove('modal-hidden'); }
+    function closeDriveModal(){ document.getElementById('drive-modal').classList.add('modal-hidden'); }
+    function saveDriveSettings(){ dbState.googleScriptUrl = document.getElementById('drive-webhook-url').value.trim(); localStorage.setItem('fantasyclass_alm_google_url', dbState.googleScriptUrl); saveDatabase(); if(dbState.googleScriptUrl) document.getElementById('drive-status-text').innerText = 'Google Drive Activo'; closeDriveModal(); }
+    function testDriveConnection(){ alert('Prueba de envío (no-cors).'); }
+
+    /* ---------- Exports (XLSX) ---------- */
+    function exportCurrentClassExcel(){ const students = dbState.classes[currentClassKey] || []; const rows = students.map((s,i)=>({ "N°":i+1, "ID Estudiante":s.id, "Nombre Estudiante":s.name, "Grado":currentClassKey, "Nivel RPG":s.level||1, "Puntos XP Total":s.xp||0 })); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso ${currentClassKey}`); XLSX.writeFile(wb, `FantasyClass_Reporte_Grado_${currentClassKey}.xlsx`); toggleExportMenu(); }
+    function exportAllClassesMasterExcel(){ alert('Export master (demo)'); toggleExportMenu(); }
+    function exportSingleStudentExcel(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante para exportar'); alert('Export ficha (demo)'); }
+
+    /* ---------- Groups ---------- */
+    function renderGroupsList(){
+      const container = document.getElementById('groups-list-container'); if(!container) return; container.innerHTML = '';
+      Object.keys(dbState.classes).forEach(k=>{
+        const count = dbState.classes[k].length;
+        const div = document.createElement('div'); div.className = 'group-item';
+        div.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${k}')"><strong>Grado ${k}</strong> <span style="color:var(--muted)">(${count} estudiantes)</span></div>
+                         <div style="display:flex;gap:8px"><button class="btn" onclick="exportGroup('${k}')">Export</button><button class="btn red" onclick="deleteGroup('${k}')">🗑</button></div>`;
+        container.appendChild(div);
+      });
+    }
+    function addNewGroup(){ const name = document.getElementById('new-group-input').value.trim().toUpperCase(); if(!name) return alert('Escribe nombre'); if(dbState.classes[name]) return alert('Grupo existe'); dbState.classes[name]=[]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); }
+    function deleteGroup(key){ showConfirmModal('Eliminar grupo', `Eliminar ${key}?`, ()=>{ delete dbState.classes[key]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); }); }
+    function exportGroup(key){ currentClassKey = key; exportCurrentClassExcel(); }
+    function distributeGroupsByNumber(){ const n=parseInt(document.getElementById('dist-number').value); if(!n || n<1) return alert('Ingresa número de grupos'); const students = dbState.classes[currentClassKey] ? [...dbState.classes[currentClassKey]] : []; if(!students.length) return alert('No hay estudiantes'); shuffleArray(students); const groups={}; for(let i=0;i<n;i++) groups[`G${i+1}`]=[]; for(let i=0;i<students.length;i++) groups[`G${(i%n)+1}`].push(students[i]); Object.keys(groups).forEach(g=>{ const key = `${currentClassKey}_${g}`; dbState.classes[key] = groups[g].map((name,idx)=>({ id:`${key}_${idx+1}`, name, xp:0, level:1, history:[] })); }); saveDatabase(); updateClassSelectOptions(); renderGroupsList(); alert('Distribución completada'); }
+    function distributeGroupsBySize(){ const size=parseInt(document.getElementById('dist-size').value); if(!size || size<1) return alert('Ingresa tamaño de grupo'); const students = dbState.classes[currentClassKey] ? [...dbState.classes[currentClassKey]] : []; if(!students.length) return alert('No hay estudiantes'); shuffleArray(students); let gidx=1; for(let i=0;i<students.length;i+=size){ const slice=students.slice(i,i+size); const key = `${currentClassKey}_G${gidx}`; dbState.classes[key] = slice.map((name,idx)=>({ id:`${key}_${idx+1}`, name, xp:0, level:1, history:[] })); gidx++; } saveDatabase(); updateClassSelectOptions(); renderGroupsList(); alert('Distribución por tamaño completada'); }
+    function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+    /* ---------- Student add / list / delete ---------- */
+    function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('modal-hidden'); }
+    function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('modal-hidden'); }
+    function confirmAddNewStudent(){ const name=document.getElementById('new-student-name-input').value.trim(); if(!name) return alert('Escribe nombre'); if(!dbState.classes[currentClassKey]) dbState.classes[currentClassKey]=[]; const id=`${currentClassKey}_${Date.now()}`; dbState.classes[currentClassKey].push({ id, name, xp:0, level:1, history:[] }); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); alert('Estudiante agregado correctamente.'); }
+
+    /* ---------- Stats & rendering ---------- */
+    function calculateStudentStatsForPeriod(student){
+      let hist = student.history || [];
+      if (currentPeriod !== 'ALL') hist = hist.filter(h => h.period === currentPeriod || !h.period);
+      let xp = 0; const badges={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+      hist.forEach(h=>{ if(h.type==='positive'){ xp += (h.magnitude||1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag] += (h.magnitude||1); }});
+      const level = Math.floor(xp/20) + 1; return { xp, level, badges, history: hist };
+    }
+    function updateGlobalMetrics(){
+      const students = dbState.classes[currentClassKey] || []; const totals={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+      students.forEach(s=>{ const st = calculateStudentStatsForPeriod(s); Object.keys(totals).forEach(k=>totals[k]+=st.badges[k]||0); });
+      Object.keys(totals).forEach(k=>{ const el=document.getElementById(`badge-count-${k}`); if(el) el.innerText = `${totals[k]} pts`; });
+    }
+    function avatarGradientFor(name){ if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)'; const idx = name.trim().charCodeAt(0)%10; const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']]; const p=palettes[idx]; return `linear-gradient(135deg, ${p[0]}, ${p[1]})`; }
+
+    function renderStudentGrid(){
+      const container=document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
+      const students = dbState.classes[currentClassKey] || []; const q=(document.getElementById('student-search-input').value||'').toLowerCase().trim(); const sort=document.getElementById('sort-select').value;
+      let filtered = students.filter(s=>s.name.toLowerCase().includes(q));
+      if(sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(sort==='level' || sort==='xp') filtered.sort((a,b)=> (b.xp||0)-(a.xp||0));
+      else if(sort==='obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length)-((a.history||[]).filter(h=>h.type==='negative').length));
+      filtered.forEach(s=>{
+        const st = calculateStudentStatsForPeriod(s);
+        const card=document.createElement('div'); card.className='card';
+        card.innerHTML = `<div class="level">NIV ${st.level}</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="avatar" style="background:${avatarGradientFor(s.name)};min-width:56px">${s.name.charAt(0)}</div>
+            <div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">Grado ${currentClassKey} • ${currentPeriod}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+            <button class="btn green" onclick="openAwardQuick('${s.id}','positive')"><i class="fa-solid fa-plus"></i> Mérito</button>
+            <button class="btn red" onclick="openAwardQuick('${s.id}','negative')"><i class="fa-solid fa-minus"></i> Falta</button>
+            <button class="btn blue" onclick="openHistoryModal('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+          </div>`;
+        container.appendChild(card);
+      });
+      updateGlobalMetrics();
+    }
+
+    /* ---------- Ficha modal ---------- */
+    function openHistoryModal(studentId){
+      selectedStudentId = studentId;
+      const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId); if(!st) return alert('Estudiante no encontrado');
+      document.getElementById('history-student-name').innerText = st.name; document.getElementById('history-student-avatar').innerText = st.name.charAt(0); document.getElementById('history-period-label').innerText = currentPeriod;
+      const stats = calculateStudentStatsForPeriod(st);
+      document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
+      document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
+      document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
+      activeEntryType='positive'; setEntryType('positive'); selectedValueTag='Responsabilidad';
+      document.getElementById('entry-note-input').value=''; document.getElementById('point-magnitude-input').value=1;
+      renderHistoryList(st);
+      document.getElementById('history-modal').classList.remove('modal-hidden');
+      setTimeout(()=>document.getElementById('entry-note-input')?.focus(), 200);
+    }
+    function closeHistoryModal(){ document.getElementById('history-modal').classList.add('modal-hidden'); }
+    function openAwardQuick(studentId,type){ selectedStudentId=studentId; activeEntryType=(type==='positive')?'positive':'negative'; setEntryType(activeEntryType); openHistoryModal(studentId); }
+    function setEntryType(t){ activeEntryType=t; document.getElementById('btn-type-positive').style.opacity = t==='positive' ? '1' : '0.6'; document.getElementById('btn-type-negative').style.opacity = t==='negative' ? '1' : '0.6'; }
+    function showEntryHelp(type){ const el=document.getElementById('entry-help'); if(type==='positive') el.innerText='Mérito: reconocer acciones de buen desempeño convivencial.'; else el.innerText='Observación: registrar faltas o comportamientos a corregir.'; setTimeout(()=>el.innerText='',6000); }
+
+    function selectValueCategory(val){ selectedValueTag = val; alert('Pilar: '+val); }
+    function renderHistoryList(student){ const container=document.getElementById('history-entries-container'); if(!container) return; const arr=student.history||[]; if(!arr.length){ container.innerHTML=`<div style="color:var(--muted);text-align:center;padding:16px">Sin registros en el observador todavía.</div>`; return; } container.innerHTML = arr.map(h=>`<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.type==='positive'?`+${h.magnitude} XP`:'OBSERVACIÓN'}</div><div style="color:var(--muted)">${h.timestamp}</div></div><div style="margin-top:6px">${h.valueTag} — ${h.note}</div></div>`).join(''); }
+    function saveStudentEntry(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante'); const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId); if(!student) return alert('Estudiante no encontrado'); const note = document.getElementById('entry-note-input').value.trim() || 'Registro'; const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1; const entry = { id:Date.now(), timestamp:new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag:selectedValueTag, magnitude, note }; student.history.unshift(entry); if(activeEntryType==='positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20) + 1; try{ confetti({ particleCount:40, spread:50 }); }catch(e){} } if(dbState.googleScriptUrl){ try{ const url=dbState.googleScriptUrl; if(url.includes('docs.google.com/forms')){ const fd=new FormData(); fd.append('entry.1', currentClassKey); fd.append('entry.2', student.name); fd.append('entry.3', activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)'); fd.append('entry.4', selectedValueTag); fd.append('entry.5', magnitude); fd.append('entry.6', note); fetch(url,{method:'POST',mode:'no-cors',body:fd}); } else { fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso:currentClassKey,estudiante:student.name,tipo:activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)',pilar:selectedValueTag,puntos:magnitude,nota:note})}); } }catch(e){console.warn('Drive sync failed',e);} } saveDatabase(); renderHistoryList(student); renderStudentGrid(); alert('Registro guardado'); }
+
+    function addDirectTeacherNote(){ const t = (document.getElementById('direct-teacher-note')?.value||'').trim(); if(!t || !selectedStudentId) return; const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId); if(!st) return; st.history.unshift({id:Date.now(),timestamp:new Date().toLocaleString('es-CO'),period:currentPeriod,type:'positive',valueTag:'Seguimiento',magnitude:1,note:t}); saveDatabase(); renderHistoryList(st); renderStudentGrid(); document.getElementById('direct-teacher-note').value=''; alert('Nota añadida'); }
+
+    function deleteStudent(id){ const st=(dbState.classes[currentClassKey]||[]).find(s=>s.id===id); if(!st) return; showConfirmModal('Eliminar estudiante', `Eliminar a ${st.name}?`, ()=>{ dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(x=>x.id!==id); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); }); }
+
+    /* ---------- Confirm modal ---------- */
+    let confirmCb=null;
+    function showConfirmModal(title,msg,cb){ document.getElementById('confirm-title').innerText=title; document.getElementById('confirm-message').innerText=msg; confirmCb=cb; document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirmModal(); }; document.getElementById('confirm-dialog-modal').classList.remove('modal-hidden'); }
+    function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('modal-hidden'); }
+
+    /* ---------- Roulette (WebAudio ticks) ---------- */
+    const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    function playTick(freq=800,dur=0.02,vol=0.06){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }
+    function playWin(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }
+
+    let rouletteInterval=null, rouletteNames=[], rouletteIndex=0, rouletteRunning=false;
+    function openRouletteModal(){ rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!' : 'No hay estudiantes'; document.getElementById('roulette-modal').classList.remove('modal-hidden'); }
+    function closeRouletteModal(){ stopRoulette(); document.getElementById('roulette-modal').classList.add('modal-hidden'); }
+    function startRoulette(){
+      if(rouletteRunning) return; rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); if(!rouletteNames.length) return alert('No hay estudiantes'); rouletteRunning=true; rouletteIndex=Math.floor(Math.random()*rouletteNames.length);
+      let speed = parseInt(document.getElementById('roulette-speed').value||20); let interval = Math.max(20,200 - speed*3); let cycles=0;
+      rouletteInterval = setInterval(()=>{ rouletteIndex=(rouletteIndex+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex]; playTick(500+Math.random()*400,0.02); cycles++; if(cycles>40){ clearInterval(rouletteInterval); slowdownRoulette(); } }, interval);
+    }
+    function slowdownRoulette(){
+      let steps=12, step=0;
+      function tickSlow(){ step++; rouletteIndex=(rouletteIndex+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex]; playTick(500+step*30,0.02); if(step<steps) setTimeout(tickSlow,80+step*40); else { rouletteRunning=false; playWin(); const selectedName = rouletteNames[rouletteIndex]; const st = (dbState.classes[currentClassKey]||[]).find(s=>s.name===selectedName); if(st) openHistoryModal(st.id); else alert('Seleccionado: '+selectedName); } }
+      tickSlow();
+    }
+    function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval=null; } rouletteRunning=false; }
+
+    /* ---------- Timer ---------- */
+    let timerSeconds = 300, timerInterval=null;
+    function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); document.getElementById('timer-modal').classList.remove('modal-hidden'); }
+    function closeTimerModal(){ document.getElementById('timer-modal').classList.add('modal-hidden'); if(timerInterval) clearInterval(timerInterval); timerInterval=null; }
+    function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+    function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } else { document.querySelector('#timer-modal .btn.green').innerText='Pausar'; timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText=formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; timerFinished(); } },1000); } }
+    function resetTimer(){ timerSeconds=300; document.getElementById('timer-display').innerText=formatTime(timerSeconds); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } }
+    function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+    function timerFinished(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440,audioCtx.currentTime+0.5); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),700); alert('Tiempo terminado'); }
+
+    /* ---------- Dice ---------- */
+    function openDiceModal(){ document.getElementById('dice-modal').classList.remove('modal-hidden'); }
+    function closeDiceModal(){ document.getElementById('dice-modal').classList.add('modal-hidden'); }
+    function rollDice(){ const r=Math.floor(Math.random()*6)+1; document.getElementById('dice-display').innerText = r; playTick(300 + r*40,0.08,0.08); }
+
+    /* ---------- Init ---------- */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      initDatabase(); renderStudentGrid();
+      document.getElementById('period-select').value = currentPeriod;
+      document.getElementById('class-select').value = currentClassKey;
+      const saved = localStorage.getItem('fantasyclass_alm_google_url'); if(saved) document.getElementById('drive-status-text').innerText = 'Google Drive Activo';
+    });
+  </script>
+
+  <!-- ---------- Modal manager: ensures only one modal visible, closes others, stops processes ---------- -->
+  <script>
+    (function(){
+      // On load, ensure all data-modal elements are hidden
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-modal]').forEach(m => {
+          if (!m.classList.contains('modal-hidden')) m.classList.add('modal-hidden');
+          // close on click outside internal panel
+          m.addEventListener('click', (ev) => {
+            if (ev.target === m) {
+              closeModalByElement(m);
+            }
+          });
+        });
+        enforceSingleModal();
+      });
+
+      function closeModalByElement(modalEl){
+        modalEl.classList.add('modal-hidden');
+        const id = modalEl.id;
+        if (id === 'roulette-modal') {
+          try { stopRoulette(); } catch(e){}
+        }
+        if (id === 'timer-modal') {
+          try { if (typeof timerInterval !== 'undefined' && timerInterval) { clearInterval(timerInterval); timerInterval = null; } } catch(e){}
+        }
+        // add other modal-specific cleanup if needed
+      }
+
+      function enforceSingleModal(){
+        const modals = Array.from(document.querySelectorAll('[data-modal]'));
+        const visibles = modals.filter(m => !m.classList.contains('modal-hidden'));
+        if (visibles.length > 1) {
+          visibles.slice(0, visibles.length - 1).forEach(m => closeModalByElement(m));
+        }
+      }
+
+      const observer = new MutationObserver((mutations) => {
+        let changed = false;
+        for (const mu of mutations) {
+          if (mu.type === 'attributes' && mu.attributeName === 'class' && mu.target.hasAttribute('data-modal')) changed = true;
+        }
+        if (changed) enforceSingleModal();
+      });
+      document.querySelectorAll('[data-modal]').forEach(m => observer.observe(m, { attributes: true }));
+
+      // periodic enforcement as safety net
+      setInterval(enforceSingleModal, 300);
+
+      // expose openModal/closeModal for consistent usage
+      window.openModal = function(id){
+        document.querySelectorAll('[data-modal]').forEach(m=>{
+          if (m.id !== id) closeModalByElement(m);
+        });
+        const el = document.getElementById(id);
+        if (el) {
+          el.classList.remove('modal-hidden');
+          enforceSingleModal();
+          const focusEl = el.querySelector('textarea, input, button');
+          if (focusEl) focusEl.focus();
+        }
+      };
+      window.closeModal = function(id){
+        const el = document.getElementById(id);
+        if (el) closeModalByElement(el);
+      };
+    })();
+  </script>
 </body>
 </html>
