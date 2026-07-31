@@ -39,7 +39,7 @@
     button,input,select,textarea{font-family:inherit;color:inherit}
     button{cursor:pointer}
 
-    /* Header */
+    /* header */
     header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:90}
     .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;gap:12px;align-items:center}
@@ -83,14 +83,10 @@
     .modal-center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:110}
     .modal-panel{background:linear-gradient(180deg,rgba(15,23,34,0.95),rgba(9,12,18,0.95));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);max-height:90vh;overflow:auto}
 
-/* Big roulette display style */
-#roulette-display { font-weight:900; font-size:34px; height:140px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); color:#fff; }
-
-/* Big timer display */
-#timer-display { font-weight:900; font-size:48px; color:#f59e0b; }
-
-/* Big dice display */
-#dice-display { font-weight:900; font-size:64px; height:120px; width:120px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); margin:12px auto; }
+    /* Big roulette & timer & dice */
+    #roulette-display { font-weight:900; font-size:34px; height:160px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); color:#fff; }
+    #timer-display { font-weight:900; font-size:48px; color:#f59e0b; }
+    #dice-display { font-weight:900; font-size:64px; height:120px; width:120px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); margin:12px auto; }
 
     @media(max-width:1000px){.metrics{grid-template-columns:repeat(3,1fr)}}
     @media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}.avatar{width:48px;height:48px}}
@@ -98,781 +94,636 @@
 </head>
 <body>
 
-<header class="glass-panel">
-  <div class="header-inner">
-    <div class="brand">
-      <div class="logo">ALM</div>
-      <div>
-        <div style="font-weight:800">FantasyClass Convivencial <span style="background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:8px;margin-left:8px;color:#ffd88a;font-weight:900">ALM</span></div>
-        <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</div>
+  <header class="glass-panel">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="logo">ALM</div>
+        <div>
+          <div style="font-weight:800">FantasyClass Convivencial <span style="background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:8px;margin-left:8px;color:#ffd88a;font-weight:900">ALM</span></div>
+          <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</div>
+        </div>
+      </div>
+
+      <div class="controls">
+        <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
+
+        <div class="chip"><i class="fa-solid fa-calendar-days"></i>
+          <select id="period-select" onchange="switchPeriod(this.value)">
+            <option value="ALL">Todo el Año</option>
+            <option value="P1" selected>Periodo 1</option>
+            <option value="P2">Periodo 2</option>
+            <option value="P3">Periodo 3</option>
+            <option value="P4">Periodo 4</option>
+          </select>
+        </div>
+
+        <div class="chip"><i class="fa-solid fa-users"></i>
+          <select id="class-select" onchange="switchClass(this.value)"></select>
+        </div>
+
+        <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
+
+        <div class="dropdown">
+          <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px"></i></button>
+          <div id="tools-dropdown" class="dropdown-menu" aria-hidden="true">
+            <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i><span> Ruleta Aleatoria</span></button>
+            <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i><span> Cronómetro</span></button>
+            <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i><span> Dado</span></button>
+          </div>
+        </div>
+
+        <div class="dropdown">
+          <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+          <div id="export-dropdown" class="dropdown-menu" aria-hidden="true">
+            <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual</button>
+            <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos</button>
+          </div>
+        </div>
       </div>
     </div>
+  </header>
 
-    <div class="controls">
-      <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
+  <main>
+    <div class="metrics">
+      <div class="metric"><div class="icon">🐘</div><div><div class="label">Responsabilidad</div><div id="badge-count-Responsabilidad" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🦁</div><div><div class="label">Respeto</div><div id="badge-count-Respeto" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🐪</div><div><div class="label">Confianza</div><div id="badge-count-Confianza" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">❤️</div><div><div class="label">Empatía</div><div id="badge-count-Empatía" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">⚖️</div><div><div class="label">Justicia</div><div id="badge-count-Justicia" class="value">0 pts</div></div></div>
+      <div class="metric"><div class="icon">🛡️</div><div><div class="label">Ciudadanía</div><div id="badge-count-Ciudadanía" class="value">0 pts</div></div></div>
+    </div>
 
-      <div class="chip"><i class="fa-solid fa-calendar-days"></i>
-        <select id="period-select" onchange="switchPeriod(this.value)">
-          <option value="ALL">Todo el Año</option>
-          <option value="P1" selected>Periodo 1</option>
-          <option value="P2">Periodo 2</option>
-          <option value="P3">Periodo 3</option>
-          <option value="P4">Periodo 4</option>
+    <div class="control-panel">
+      <div class="left">
+        <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
+        <input id="student-search-input" type="text" placeholder="Buscar estudiante por nombre..." onkeyup="renderStudentGrid()">
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <select id="sort-select" onchange="renderStudentGrid()">
+          <option value="name">Nombre (A-Z)</option>
+          <option value="level">Mayor Nivel</option>
+          <option value="xp">Más Puntos</option>
+          <option value="obs">Más Observaciones</option>
         </select>
+        <button class="btn green" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Añadir Estudiante</button>
       </div>
+    </div>
 
-      <div class="chip"><i class="fa-solid fa-users"></i>
-        <select id="class-select" onchange="switchClass(this.value)"></select>
-      </div>
+    <div id="students-grid"></div>
+  </main>
 
-      <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
+  <!-- =================== MODALES =================== -->
 
-      <div class="dropdown">
-        <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px"></i></button>
-        <div id="tools-dropdown" class="dropdown-menu" aria-hidden="true">
-          <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i><span> Ruleta Aleatoria</span></button>
-          <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i><span> Cronómetro</span></button>
-          <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i><span> Dado</span></button>
+  <!-- FICHA -->
+  <div id="history-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:980px;">
+      <button style="position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted)" onclick="closeHistoryModal()">✕</button>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a);width:56px;height:56px;border-radius:10px">A</div>
+        <div style="flex:1">
+          <div id="history-student-name" style="font-weight:800;font-size:16px">Nombre Estudiante</div>
+          <div style="color:var(--muted)">Ficha del Observador Convivencial • <span id="history-period-label">P1</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+          <button class="btn green" onclick="exportSingleStudentExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
         </div>
       </div>
 
-      <div class="dropdown">
-        <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
-        <div id="export-dropdown" class="dropdown-menu" aria-hidden="true">
-          <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual</button>
-          <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos</button>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <button id="btn-type-positive" class="btn green" onclick="setEntryType('positive'); showEntryHelp('positive')"><i class="fa-solid fa-thumbs-up"></i> Mérito (+XP)</button>
+        <button id="btn-type-negative" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)" onclick="setEntryType('negative'); showEntryHelp('negative')"><i class="fa-solid fa-triangle-exclamation"></i> Observación (-HP)</button>
+        <div id="entry-help" style="margin-left:12px;color:var(--muted);font-weight:600"></div>
+      </div>
+
+      <label style="font-weight:800;color:var(--muted);margin-bottom:8px">Pilar</label>
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <button class="glass-pill" onclick="selectValueCategory('Responsabilidad')">🐘 Responsabilidad</button>
+        <button class="glass-pill" onclick="selectValueCategory('Respeto')">🦁 Respeto</button>
+        <button class="glass-pill" onclick="selectValueCategory('Confianza')">🐪 Confianza</button>
+        <button class="glass-pill" onclick="selectValueCategory('Empatía')">❤️ Empatía</button>
+        <button class="glass-pill" onclick="selectValueCategory('Justicia')">⚖️ Justicia</button>
+        <button class="glass-pill" onclick="selectValueCategory('Ciudadanía')">🛡️ Ciudadanía</button>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-bottom:12px">
+        <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica..." style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)"></textarea>
+        <div style="width:140px;display:flex;flex-direction:column;gap:8px">
+          <label style="color:var(--muted)">Puntos</label>
+          <input id="point-magnitude-input" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:transparent">
+          <button class="btn green" onclick="saveStudentEntry()">Guardar</button>
         </div>
       </div>
-    </div>
-  </div>
-</header>
 
-<main>
-  <div class="metrics">
-    <div class="metric"><div class="icon">🐘</div><div><div class="label">Responsabilidad</div><div id="badge-count-Responsabilidad" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🦁</div><div><div class="label">Respeto</div><div id="badge-count-Respeto" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🐪</div><div><div class="label">Confianza</div><div id="badge-count-Confianza" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">❤️</div><div><div class="label">Empatía</div><div id="badge-count-Empatía" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">⚖️</div><div><div class="label">Justicia</div><div id="badge-count-Justicia" class="value">0 pts</div></div></div>
-    <div class="metric"><div class="icon">🛡️</div><div><div class="label">Ciudadanía</div><div id="badge-count-Ciudadanía" class="value">0 pts</div></div></div>
-  </div>
-
-  <div class="control-panel">
-    <div class="left">
-      <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
-      <input id="student-search-input" type="text" placeholder="Buscar estudiante por nombre..." onkeyup="renderStudentGrid()">
-    </div>
-    <div style="display:flex;gap:8px;align-items:center">
-      <select id="sort-select" onchange="renderStudentGrid()">
-        <option value="name">Nombre (A-Z)</option>
-        <option value="level">Mayor Nivel</option>
-        <option value="xp">Más Puntos</option>
-        <option value="obs">Más Observaciones</option>
-      </select>
-      <button class="btn green" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Añadir Estudiante</button>
-    </div>
-  </div>
-
-  <div id="students-grid"></div>
-</main>
-
-<!-- ========== MODALES ========== -->
-
-<!-- FICHA modal -->
-<div id="history-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:980px;">
-    <button style="position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted)" onclick="closeHistoryModal()">✕</button>
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-      <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a);width:56px;height:56px;border-radius:10px">A</div>
-      <div style="flex:1">
-        <div id="history-student-name" style="font-weight:800;font-size:16px">Nombre Estudiante</div>
-        <div style="color:var(--muted)">Ficha del Observador Convivencial • <span id="history-period-label">P1</span></div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Puntos Mérito</div><div id="history-stat-positive" style="font-weight:800;color:#34d399">0 pts</div></div>
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Observaciones</div><div id="history-stat-negative" style="font-weight:800;color:#fb7185">0</div></div>
+        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Nivel RPG</div><div id="history-stat-level" style="font-weight:800;color:#f59e0b">Nivel 1</div></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-        <button class="btn green" onclick="exportSingleStudentExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
-      </div>
-    </div>
 
-    <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
-      <button id="btn-type-positive" class="btn green" onclick="setEntryType('positive'); showEntryHelp('positive')"><i class="fa-solid fa-thumbs-up"></i> Mérito (+XP)</button>
-      <button id="btn-type-negative" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)" onclick="setEntryType('negative'); showEntryHelp('negative')"><i class="fa-solid fa-triangle-exclamation"></i> Observación (-HP)</button>
-      <div id="entry-help" style="margin-left:12px;color:var(--muted);font-weight:600"></div>
-    </div>
-
-    <label style="font-weight:800;color:var(--muted);margin-bottom:8px">Pilar</label>
-    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="glass-pill" onclick="selectValueCategory('Responsabilidad')">🐘 Responsabilidad</button>
-      <button class="glass-pill" onclick="selectValueCategory('Respeto')">🦁 Respeto</button>
-      <button class="glass-pill" onclick="selectValueCategory('Confianza')">🐪 Confianza</button>
-      <button class="glass-pill" onclick="selectValueCategory('Empatía')">❤️ Empatía</button>
-      <button class="glass-pill" onclick="selectValueCategory('Justicia')">⚖️ Justicia</button>
-      <button class="glass-pill" onclick="selectValueCategory('Ciudadanía')">🛡️ Ciudadanía</button>
-    </div>
-
-    <div style="display:flex;gap:12px;margin-bottom:12px">
-      <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica..." style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)"></textarea>
-      <div style="width:140px;display:flex;flex-direction:column;gap:8px">
-        <label style="color:var(--muted)">Puntos</label>
-        <input id="point-magnitude-input" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:transparent">
-        <button class="btn green" onclick="saveStudentEntry()">Guardar</button>
-      </div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Puntos Mérito</div><div id="history-stat-positive" style="font-weight:800;color:#34d399">0 pts</div></div>
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Observaciones</div><div id="history-stat-negative" style="font-weight:800;color:#fb7185">0</div></div>
-      <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Nivel RPG</div><div id="history-stat-level" style="font-weight:800;color:#f59e0b">Nivel 1</div></div>
-    </div>
-
-    <div id="history-entries-container" style="display:flex;flex-direction:column;gap:8px"></div>
-  </div>
-</div>
-
-<!-- DRIVE modal -->
-<div id="drive-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:640px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeDriveModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
-    <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
-    <input id="drive-webhook-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-    <div style="display:flex;gap:8px">
-      <button class="btn green" onclick="saveDriveSettings()">Guardar Configuración</button>
-      <button class="btn" onclick="testDriveConnection()">Probar Envío</button>
+      <div id="history-entries-container" style="display:flex;flex-direction:column;gap:8px"></div>
     </div>
   </div>
-</div>
 
-<!-- GROUPS modal (crear grado + crear grupo dentro del grado actual) -->
-<div id="manage-groups-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:760px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeManageGroupsModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
-
-    <div style="display:flex;gap:8px;margin-bottom:10px">
-      <input id="new-grade-input" placeholder="Nombre nuevo grado (ej. 805)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <button class="btn blue" onclick="createGrade()">Crear Grado</button>
-    </div>
-
-    <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-      <input id="new-subgroup-input" placeholder="Nombre nuevo grupo (ej. Grupo A)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <button class="btn green" onclick="createGroupInCurrentGrade()">Crear Grupo en Grado Actual</button>
-    </div>
-
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-      <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <input id="dist-size" type="number" min="1" placeholder="Tamaño grupo" style="width:140px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <button class="btn" onclick="distributeGroupsByNumber()">Distribuir por número</button>
-      <button class="btn" onclick="distributeGroupsBySize()">Distribuir por tamaño</button>
-    </div>
-
-    <div id="groups-list-container" style="max-height:320px;overflow:auto"></div>
-  </div>
-</div>
-
-<!-- Add student modal -->
-<div id="add-student-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeAddStudentModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
-    <p style="color:var(--muted);margin-bottom:8px">Se agregará al curso <strong id="add-student-course-name">801</strong></p>
-    <input id="new-student-name-input" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-    <button class="btn green" style="width:100%" onclick="confirmAddNewStudent()">Guardar Estudiante</button>
-  </div>
-</div>
-
-<!-- Confirm modal -->
-<div id="confirm-dialog-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-    <h3 id="confirm-title" style="font-weight:800">¿Estás seguro?</h3>
-    <p id="confirm-message" style="color:var(--muted);margin-bottom:12px">Esta acción no se puede deshacer.</p>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button id="confirm-action-btn" class="btn red">Eliminar</button>
-      <button class="btn" onclick="closeConfirmModal()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Roulette modal (bigger central display) -->
-<div id="roulette-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:640px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeRouletteModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
-    <div id="roulette-display" style="font-size:36px;height:180px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);color:#fff;margin-bottom:10px">¡Presiona Girar!</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn blue" onclick="startRoulette()">Girar</button>
-      <button class="btn" onclick="stopRoulette()">Detener</button>
-    </div>
-    <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
-      <label style="color:var(--muted)">Velocidad</label>
-      <input id="roulette-speed" type="range" min="1" max="50" value="20" style="width:300px">
-    </div>
-  </div>
-</div>
-
-<!-- Timer modal (manual input) -->
-<div id="timer-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeTimerModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
-
-    <div id="timer-display" style="font-weight:900;font-size:48px;color:#f59e0b;margin-bottom:12px">05:00</div>
-
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-      <button class="btn green" onclick="toggleTimer()">Iniciar</button>
-      <button class="btn" onclick="resetTimer()">Reset</button>
-    </div>
-
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-      <button class="btn" onclick="setTimerMinutes(1)">1m</button>
-      <button class="btn" onclick="setTimerMinutes(5)">5m</button>
-      <button class="btn" onclick="setTimerMinutes(10)">10m</button>
-    </div>
-
-    <div style="margin-top:8px">
-      <label style="display:block;color:var(--muted);margin-bottom:6px">Establecer tiempo manual (mm:ss o minutos)</label>
-      <div style="display:flex;gap:8px;justify-content:center">
-        <input id="timer-manual-input" placeholder="Ej. 3:30 o 5" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);width:160px">
-        <button class="btn" onclick="applyManualTimer()">Set</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Dice modal (custom dice) -->
-<div id="dice-modal" data-modal class="modal-center modal-hidden">
-  <div class="modal-panel" style="width:100%;max-width:360px;text-align:center">
-    <button style="position:absolute;right:18px;top:18px" onclick="closeDiceModal()">✕</button>
-    <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-dice"></i> Dado</h3>
-
-    <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
-      <label style="color:var(--muted)">Cantidad</label>
-      <input id="dice-count" type="number" min="1" max="10" value="1" style="width:60px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      <label style="color:var(--muted)">Caras</label>
-      <input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-    </div>
-
-    <div id="dice-display">🎲</div>
-
-    <div id="dice-detail" style="color:var(--muted);margin-bottom:8px"></div>
-
-    <button class="btn red" onclick="rollDice()">Lanzar Dado</button>
-  </div>
-</div>
-
-<script>
-/* ------------- DATA & STATE ------------- */
-const DEFAULT_ROSTERS = {
-  "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
-  "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia","Jobsanim susana Colina calles","Luisa Alejandra Díaz Yepes (802)","Matias Escobar flores","Dilan David Garcia Leal 802","Héctor Garzón Ramirez","ANGEL DANIEL GONZALEZ (802)","Sharol Dayana Gutierrez Téllez","Karol Dayana Hueso Pulido","Claudia Gabriela Leiva Gomez","Holman Esneyder Mena Mosquera","Sara Gisell Neira Pardo(802)","Dyland Alejandro Nieto (802)","Sara Ocampo Isaza","María Fernanda Orozco Diaz 802","Juan Esteban Orozco Higuita","María Fernanda Osorio huérfano","ZARA VALENTINA PEDRAZA ZAMORA","Sharith Liceth Riascos Conrado","Maria Victoria Rodriguez Moreno","Sara Valentina Rodriguez Ocampo","David Santiago Rodríguez Ortiz","Danna Valeria Rojas Florez(802)","Valery Maria Romero Capera","Angel David Saavedra Peñuela","María Fernanda Saenz Fresneda","Alisson Geraldine Sanabria Bernal","Darly maryori Solano cubides","DYLAN SEBASTIAN SOLIS HERNANDEZ","MARIA JOSE TORO RUIZ (802)"],
-  /* Si quieres, agrega aquí el resto de grados completos */
-};
-
-let currentClassKey = "801";
-let currentPeriod = "P1";
-let selectedStudentId = null;
-let activeEntryType = 'positive';
-let selectedValueTag = 'Responsabilidad';
-let dbState = { classes: {}, groups: {}, googleScriptUrl: '' };
-
-/* ------------- Persistence & Init ------------- */
-function initDatabase(){
-  const stored = localStorage.getItem('fantasyclass_alm_db');
-  if(stored){ try{ dbState = JSON.parse(stored); }catch(e){ dbState = { classes:{}, groups:{}, googleScriptUrl:'' }; } }
-  if(!dbState.classes) dbState.classes = {};
-  if(!dbState.groups) dbState.groups = {};
-  Object.keys(DEFAULT_ROSTERS).forEach(classKey=>{
-    if(!dbState.classes[classKey] || dbState.classes[classKey].length === 0){
-      dbState.classes[classKey] = DEFAULT_ROSTERS[classKey].map((name, index) => ({ id: `${classKey}_${index+1}`, name, xp:0, level:1, history:[] }));
-    }
-    if(!dbState.groups[classKey]) dbState.groups[classKey] = {}; // groups container per grade
-  });
-  saveDatabase();
-  updateClassSelectOptions();
-  renderGroupsList();
-}
-
-function saveDatabase(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState)); }
-
-/* ------------- Class select / period ------------- */
-function updateClassSelectOptions(){
-  const select = document.getElementById('class-select'); if(!select) return;
-  const prev = select.value;
-  select.innerHTML = '';
-  Object.keys(dbState.classes).forEach(cKey => {
-    const opt = document.createElement('option'); opt.value = cKey; opt.textContent = `Grado ${cKey} (${dbState.classes[cKey].length} Est.)`; select.appendChild(opt);
-  });
-  if(prev && dbState.classes[prev]) currentClassKey = prev;
-  else if(!dbState.classes[currentClassKey]) currentClassKey = Object.keys(dbState.classes)[0] || currentClassKey;
-  select.value = currentClassKey;
-  renderStudentGrid(); updateGlobalMetrics();
-}
-function switchClass(newClass){ if(!dbState.classes[newClass]) return; currentClassKey = newClass; document.getElementById('class-select').value = newClass; renderStudentGrid(); updateGlobalMetrics(); }
-function switchPeriod(p){ currentPeriod = p; document.getElementById('period-select').value = p; renderStudentGrid(); updateGlobalMetrics(); }
-
-/* ------------- Exports & tools dropdown ------------- */
-function toggleExportMenu(){ const m=document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-function toggleToolsMenu(){ const m=document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-document.addEventListener('click',(e)=>{
-  const em=document.getElementById('export-dropdown'), tb=document.querySelector('.export-menu > button');
-  if(em && em.style.display==='block' && !em.contains(e.target) && !tb?.contains(e.target)) em.style.display='none';
-  const t=document.getElementById('tools-dropdown'), tb2=document.querySelector('.dropdown > .chip');
-  if(t && t.style.display==='block' && !t.contains(e.target) && !tb2?.contains(e.target)) t.style.display='none';
-});
-
-/* ------------- Drive ------------- */
-function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url') || ''; document.getElementById('drive-modal').classList.remove('modal-hidden'); }
-function closeDriveModal(){ document.getElementById('drive-modal').classList.add('modal-hidden'); }
-function saveDriveSettings(){ dbState.googleScriptUrl = document.getElementById('drive-webhook-url').value.trim(); localStorage.setItem('fantasyclass_alm_google_url', dbState.googleScriptUrl); saveDatabase(); if(dbState.googleScriptUrl) document.getElementById('drive-status-text').innerText='Google Drive Activo'; closeDriveModal(); }
-function testDriveConnection(){ alert('Prueba de envío (modo no-cors).'); }
-
-/* ------------- Exports (simplified) ------------- */
-function exportCurrentClassExcel(){ const students = dbState.classes[currentClassKey] || []; const rows = students.map((s,i)=>({ "N°":i+1,"ID Estudiante":s.id,"Nombre Estudiante":s.name,"Grado":currentClassKey,"Nivel RPG":s.level||1,"Puntos XP Total":s.xp||0 })); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso ${currentClassKey}`); XLSX.writeFile(wb, `FantasyClass_Reporte_${currentClassKey}.xlsx`); toggleExportMenu(); }
-function exportAllClassesMasterExcel(){ alert('Export master (demo)'); toggleExportMenu(); }
-function exportSingleStudentExcel(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante para exportar'); alert('Export ficha (demo)'); }
-
-/* ------------- Groups (grades & subgroups) ------------- */
-function createGrade(){
-  const key = document.getElementById('new-grade-input').value.trim();
-  if(!key) return alert('Escribe el nombre del grado (ej. 805)');
-  if(dbState.classes[key]) return alert('El grado ya existe');
-  dbState.classes[key] = []; dbState.groups[key] = {}; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); document.getElementById('new-grade-input').value=''; alert('Grado creado: '+key);
-}
-/* CREATE GRADE (dejé igual pero añado defensa extra) */
-function createGrade(){
-  const keyInput = document.getElementById('new-grade-input');
-  const key = (keyInput?.value || '').trim();
-  if(!key) return alert('Escribe el nombre del grado (ej. 805)');
-  if(dbState.classes[key]) return alert('El grado ya existe');
-  // crear grado vacío y su contenedor de grupos
-  dbState.classes[key] = [];
-  dbState.groups[key] = dbState.groups[key] || {};
-  saveDatabase();
-  updateClassSelectOptions();
-  renderGroupsList();
-  keyInput.value = '';
-  alert('Grado creado: ' + key);
-}
-
-/* CREATE GROUP: ahora usa el grado seleccionado en el selector (más robusto) */
-function createGroupInCurrentGrade(){
-  // tomar el grado desde el select por si currentClassKey no está actualizado
-  const gradeSelect = document.getElementById('class-select');
-  const grade = (gradeSelect?.value) || currentClassKey || '';
-  if(!grade) return alert('No se ha seleccionado un grado válido.');
-
-  const gname = (document.getElementById('new-subgroup-input')?.value || '').trim();
-  if(!gname) return alert('Escribe nombre del grupo (ej. Grupo A)');
-
-  // asegurar estructura
-  dbState.groups = dbState.groups || {};
-  dbState.groups[grade] = dbState.groups[grade] || {};
-
-  if(dbState.groups[grade][gname]) return alert('El grupo ya existe en este grado.');
-
-  // Guarda la lista vacía de integrantes (nombres) — puedes cambiar a IDs si prefieres
-  dbState.groups[grade][gname] = [];
-
-  saveDatabase();
-  renderGroupsList();
-  document.getElementById('new-subgroup-input').value = '';
-  alert(`Grupo "${gname}" creado en Grado ${grade}`);
-}
-
-/* RENDER GROUPS LIST: muestra grados y sus subgrupos (y recuentos) */
-function renderGroupsList(){
-  const container = document.getElementById('groups-list-container');
-  if(!container) return;
-  container.innerHTML = '';
-
-  // lista de grados (ordenada)
-  const grades = Object.keys(dbState.classes || {}).sort();
-
-  grades.forEach(gradeKey => {
-    const students = dbState.classes[gradeKey] || [];
-    const gradeWrap = document.createElement('div');
-    gradeWrap.style.marginBottom = '12px';
-
-    // Header del grado con acciones
-    const header = document.createElement('div');
-    header.className = 'group-item';
-    header.innerHTML = `
-      <div style="cursor:pointer" onclick="switchClass('${gradeKey}')">
-        <strong>Grado ${gradeKey}</strong> <span style="color:var(--muted)">(${students.length} estudiantes)</span>
-      </div>
+  <!-- DRIVE -->
+  <div id="drive-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:640px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeDriveModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
+      <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
+      <input id="drive-webhook-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
       <div style="display:flex;gap:8px">
-        <button class="btn" onclick="exportGroup('${gradeKey}')">Export</button>
-        <button class="btn red" onclick="deleteGrade('${gradeKey}')">🗑</button>
+        <button class="btn green" onclick="saveDriveSettings()">Guardar Configuración</button>
+        <button class="btn" onclick="testDriveConnection()">Probar Envío</button>
       </div>
-    `;
-    gradeWrap.appendChild(header);
+    </div>
+  </div>
 
-    // Subgrupos dentro del grado
-    const groupsFor = (dbState.groups && dbState.groups[gradeKey]) ? dbState.groups[gradeKey] : {};
-    const groupKeys = Object.keys(groupsFor);
+  <!-- GROUPS & GRADES -->
+  <div id="manage-groups-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:760px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeManageGroupsModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
 
-    if(groupKeys.length === 0){
-      const emptyNote = document.createElement('div');
-      emptyNote.style.padding = '8px 12px';
-      emptyNote.style.color = 'var(--muted)';
-      emptyNote.innerText = 'No hay subgrupos creados en este grado.';
-      gradeWrap.appendChild(emptyNote);
-    } else {
-      const list = document.createElement('div');
-      list.style.padding = '8px 12px';
-      list.style.display = 'grid';
-      list.style.gridTemplateColumns = 'repeat(auto-fill,minmax(180px,1fr))';
-      list.style.gap = '8px';
-
-      groupKeys.forEach(gk => {
-        const members = groupsFor[gk] || [];
-        const card = document.createElement('div');
-        card.style.padding = '10px';
-        card.style.borderRadius = '8px';
-        card.style.background = 'rgba(255,255,255,0.02)';
-        card.style.display = 'flex';
-        card.style.flexDirection = 'column';
-        card.style.gap = '8px';
-        card.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="font-weight:700">${gk}</div>
-            <div style="color:var(--muted)">${members.length} integrantes</div>
-          </div>
-          <div style="display:flex;gap:6px;justify-content:flex-end">
-            <button class="btn" onclick="exportSubgroup('${gradeKey}','${gk}')">Export</button>
-            <button class="btn red" onclick="deleteSubgroup('${gradeKey}','${gk}')">Eliminar</button>
-          </div>
-        `;
-        list.appendChild(card);
-      });
-
-      gradeWrap.appendChild(list);
-    }
-
-    container.appendChild(gradeWrap);
-  });
-}
-
-/* Helpers: eliminar grade y subgrupo, exportar subgrupo */
-function deleteGrade(gradeKey){
-  showConfirmModal('Eliminar Grado', `Eliminar el grado ${gradeKey} con todos sus datos?`, ()=>{
-    delete dbState.classes[gradeKey];
-    if(dbState.groups && dbState.groups[gradeKey]) delete dbState.groups[gradeKey];
-    saveDatabase();
-    updateClassSelectOptions();
-    renderGroupsList();
-  });
-}
-
-function deleteSubgroup(gradeKey, subgroupName){
-  showConfirmModal('Eliminar Grupo', `Eliminar el grupo "${subgroupName}" en ${gradeKey}?`, ()=>{
-    if(dbState.groups && dbState.groups[gradeKey]){
-      delete dbState.groups[gradeKey][subgroupName];
-      saveDatabase();
-      renderGroupsList();
-    }
-  });
-}
-
-function exportGroup(gradeKey){
-  currentClassKey = gradeKey;
-  exportCurrentClassExcel();
-}
-
-/* Export para subgrupo (genera xlsx con los nombres de los miembros si existen) */
-function exportSubgroup(gradeKey, subgroupName){
-  const groupsFor = dbState.groups && dbState.groups[gradeKey] ? dbState.groups[gradeKey] : {};
-  const members = groupsFor[subgroupName] || [];
-  const rows = members.length ? members.map((name,i)=>({ 'N°': i+1, 'Nombre': name, 'Grado': gradeKey, 'Grupo': subgroupName })) : [{ 'Mensaje': 'Sin miembros en este subgrupo' }];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${gradeKey}_${subgroupName}`);
-  XLSX.writeFile(wb, `Grupo_${gradeKey}_${subgroupName}.xlsx`);
-}
-function createGroupInCurrentGrade(){
-  const gname = document.getElementById('new-subgroup-input').value.trim();
-  if(!gname) return alert('Escribe nombre del grupo');
-  if(!dbState.groups[currentClassKey]) dbState.groups[currentClassKey] = {};
-  if(dbState.groups[currentClassKey][gname]) return alert('El grupo ya existe en este grado');
-  dbState.groups[currentClassKey][gname] = []; saveDatabase(); renderGroupsList(); document.getElementById('new-subgroup-input').value=''; alert('Grupo creado en '+currentClassKey+': '+gname);
-}
-
-function renderGroupsList(){
-  const c = document.getElementById('groups-list-container'); if(!c) return; c.innerHTML='';
-  Object.keys(dbState.classes).forEach(k=>{
-    const count = dbState.classes[k].length;
-    const wrapper = document.createElement('div'); wrapper.style.marginBottom='10px';
-    const header = document.createElement('div'); header.className='group-item';
-    header.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${k}')"><strong>Grado ${k}</strong> <span style="color:var(--muted)">(${count} estudiantes)</span></div>
-                        <div style="display:flex;gap:8px"><button class="btn" onclick="exportGroup('${k}')">Export</button><button class="btn red" onclick="deleteGrade('${k}')">🗑</button></div>`;
-    wrapper.appendChild(header);
-    // render subgroups if exist
-    const groupsFor = dbState.groups[k] || {};
-    const keys = Object.keys(groupsFor);
-    if(keys.length){
-      const ul = document.createElement('div'); ul.style.padding='8px 12px';
-      keys.forEach(g=>{
-        const size = groupsFor[g].length;
-        const div = document.createElement('div'); div.style.display='flex'; div.style.justifyContent='space-between'; div.style.padding='6px 8px';
-        div.innerHTML = `<div style="font-weight:700">${g}</div><div style="color:var(--muted)">${size} integrantes</div>`;
-        ul.appendChild(div);
-      });
-      wrapper.appendChild(ul);
-    }
-    c.appendChild(wrapper);
-  });
-}
-
-function deleteGrade(k){
-  showConfirmModal('Eliminar Grado', `Eliminar el grado ${k} con todos sus datos?`, ()=>{ delete dbState.classes[k]; delete dbState.groups[k]; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); });
-}
-function exportGroup(k){ currentClassKey = k; exportCurrentClassExcel(); }
-
-/* distribute: will put groups under dbState.groups[currentClassKey] */
-function distributeGroupsByNumber(){
-  const n = parseInt(document.getElementById('dist-number').value);
-  if(!n || n<1) return alert('Ingresa número de grupos');
-  const students = (dbState.classes[currentClassKey] || []).map(s=>s.name);
-  if(!students.length) return alert('No hay estudiantes');
-  const shuffled = shuffleArray([...students]);
-  const groups = {};
-  for(let i=0;i<n;i++) groups[`Grupo ${i+1}`]=[];
-  for(let i=0;i<shuffled.length;i++) groups[`Grupo ${(i % n)+1}`].push(shuffled[i]);
-  dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
-  Object.keys(groups).forEach(g=>{
-    dbState.groups[currentClassKey][g] = groups[g]; // store names
-  });
-  saveDatabase(); renderGroupsList(); alert('Distribución completada (por número)');
-}
-
-function distributeGroupsBySize(){
-  const size = parseInt(document.getElementById('dist-size').value);
-  if(!size || size<1) return alert('Ingresa tamaño de grupo');
-  const students = (dbState.classes[currentClassKey] || []).map(s=>s.name);
-  if(!students.length) return alert('No hay estudiantes');
-  const shuffled = shuffleArray([...students]);
-  dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
-  let gidx=1;
-  for(let i=0;i<shuffled.length;i+=size){
-    const slice = shuffled.slice(i,i+size);
-    dbState.groups[currentClassKey][`Grupo ${gidx}`] = slice;
-    gidx++;
-  }
-  saveDatabase(); renderGroupsList(); alert('Distribución por tamaño completada');
-}
-
-function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-/* ------------- Students add / list / delete ------------- */
-function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('modal-hidden'); }
-function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('modal-hidden'); }
-function confirmAddNewStudent(){ const name = document.getElementById('new-student-name-input').value.trim(); if(!name) return alert('Escribe el nombre'); if(!dbState.classes[currentClassKey]) dbState.classes[currentClassKey]=[]; const id = `${currentClassKey}_${Date.now()}`; dbState.classes[currentClassKey].push({ id, name, xp:0, level:1, history:[] }); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); alert('Estudiante agregado correctamente.'); }
-
-/* ------------- Stats & render ------------- */
-function calculateStudentStatsForPeriod(student){
-  let filtered = student.history || [];
-  if(currentPeriod !== 'ALL') filtered = filtered.filter(h=>h.period===currentPeriod || !h.period);
-  let xp=0; const badges={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  filtered.forEach(h=>{ if(h.type==='positive'){ xp += (h.magnitude||1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag] += (h.magnitude||1); }});
-  const level = Math.floor(xp/20)+1;
-  return { xp, level, badges, history: filtered };
-}
-
-function updateGlobalMetrics(){
-  const students = dbState.classes[currentClassKey] || [];
-  const totals={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  students.forEach(s=>{ const st = calculateStudentStatsForPeriod(s); Object.keys(totals).forEach(k=>totals[k]+=st.badges[k]||0); });
-  Object.keys(totals).forEach(k=>{ const el = document.getElementById(`badge-count-${k}`); if(el) el.innerText = `${totals[k]} pts`; });
-}
-
-function avatarGradientFor(name){
-  if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
-  const idx = name.trim().charCodeAt(0) % 10;
-  const palettes = [['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-  const p = palettes[idx];
-  return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
-}
-
-function renderStudentGrid(){
-  const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
-  const students = dbState.classes[currentClassKey] || [];
-  const q = (document.getElementById('student-search-input').value||'').toLowerCase().trim();
-  const sort = document.getElementById('sort-select').value;
-  let filtered = students.filter(s=>s.name.toLowerCase().includes(q));
-  if(sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
-  else if(sort==='level' || sort==='xp') filtered.sort((a,b)=> (b.xp||0) - (a.xp||0));
-  else if(sort==='obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length)-((a.history||[]).filter(h=>h.type==='negative').length));
-  filtered.forEach(s=>{
-    const st = calculateStudentStatsForPeriod(s);
-    const card = document.createElement('div'); card.className='card';
-    card.innerHTML = `<div class="level">NIV ${st.level}</div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="avatar" style="background:${avatarGradientFor(s.name)};min-width:56px">${s.name.charAt(0)}</div>
-        <div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">Grado ${currentClassKey} • ${currentPeriod}</div></div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input id="new-grade-input" placeholder="Nombre nuevo grado (ej. 805)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <button class="btn blue" onclick="createGrade()">Crear Grado</button>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
-        <button class="btn green" onclick="openAwardQuick('${s.id}','positive')"><i class="fa-solid fa-plus"></i> Mérito</button>
-        <button class="btn red" onclick="openAwardQuick('${s.id}','negative')"><i class="fa-solid fa-minus"></i> Falta</button>
-        <button class="btn blue" onclick="openHistoryModal('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
-      </div>`;
-    container.appendChild(card);
-  });
-  updateGlobalMetrics();
-}
 
-/* ------------- Ficha modal ------------- */
-function openHistoryModal(studentId){
-  selectedStudentId = studentId;
-  const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId);
-  if(!st) return alert('Estudiante no encontrado');
-  document.getElementById('history-student-name').innerText = st.name;
-  document.getElementById('history-student-avatar').innerText = st.name.charAt(0);
-  document.getElementById('history-period-label').innerText = currentPeriod;
-  const stats = calculateStudentStatsForPeriod(st);
-  document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
-  document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
-  document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
-  activeEntryType='positive'; setEntryType('positive'); selectedValueTag='Responsabilidad';
-  document.getElementById('entry-note-input').value=''; document.getElementById('point-magnitude-input').value=1;
-  renderHistoryList(st);
-  document.getElementById('history-modal').classList.remove('modal-hidden');
-  setTimeout(()=>document.getElementById('entry-note-input')?.focus(),200);
-}
-function closeHistoryModal(){ document.getElementById('history-modal').classList.add('modal-hidden'); }
-function openAwardQuick(studentId,type){ selectedStudentId=studentId; activeEntryType=(type==='positive')?'positive':'negative'; setEntryType(activeEntryType); openHistoryModal(studentId); }
-function setEntryType(t){ activeEntryType=t; document.getElementById('btn-type-positive').style.opacity = t==='positive' ? '1' : '0.6'; document.getElementById('btn-type-negative').style.opacity = t==='negative' ? '1' : '0.6'; }
-function showEntryHelp(type){ const el=document.getElementById('entry-help'); if(type==='positive') el.innerText='Mérito: reconocer acciones de buen desempeño convivencial.'; else el.innerText='Observación: registrar faltas o comportamientos a corregir.'; setTimeout(()=>el.innerText='',6000); }
-function selectValueCategory(val){ selectedValueTag = val; alert('Pilar seleccionado: '+val); }
-function renderHistoryList(student){ const container=document.getElementById('history-entries-container'); if(!container) return; const arr=student.history||[]; if(!arr.length){ container.innerHTML=`<div style="color:var(--muted);text-align:center;padding:16px">Sin registros en el observador todavía.</div>`; return; } container.innerHTML = arr.map(h=>`<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.type==='positive'?`+${h.magnitude} XP`:'OBSERVACIÓN'}</div><div style="color:var(--muted)">${h.timestamp}</div></div><div style="margin-top:6px">${h.valueTag} — ${h.note}</div></div>`).join(''); }
-function saveStudentEntry(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante'); const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId); if(!student) return alert('Estudiante no encontrado'); const note = document.getElementById('entry-note-input').value.trim() || 'Registro'; const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1; const entry = { id:Date.now(), timestamp:new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag: selectedValueTag, magnitude, note }; student.history.unshift(entry); if(activeEntryType==='positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20) + 1; try{ confetti({ particleCount:40, spread:50 }); }catch(e){} } if(dbState.googleScriptUrl){ try{ const url=dbState.googleScriptUrl; if(url.includes('docs.google.com/forms')){ const fd=new FormData(); fd.append('entry.1', currentClassKey); fd.append('entry.2', student.name); fd.append('entry.3', activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)'); fd.append('entry.4', selectedValueTag); fd.append('entry.5', magnitude); fd.append('entry.6', note); fetch(url,{method:'POST',mode:'no-cors',body:fd}); } else { fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso:currentClassKey,estudiante:student.name,tipo:activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)',pilar:selectedValueTag,puntos:magnitude,nota:note})}); } }catch(e){console.warn('Drive sync failed',e);} } saveDatabase(); renderHistoryList(student); renderStudentGrid(); alert('Registro guardado'); }
+      <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
+        <input id="new-subgroup-input" placeholder="Nombre nuevo grupo (ej. Grupo A)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <button class="btn green" onclick="createGroupInCurrentGrade()">Crear Grupo en Grado Actual</button>
+      </div>
 
-/* ------------- Confirm modal ------------- */
-let confirmCb=null;
-function showConfirmModal(title,msg,cb){ document.getElementById('confirm-title').innerText=title; document.getElementById('confirm-message').innerText=msg; confirmCb=cb; document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirmModal(); }; document.getElementById('confirm-dialog-modal').classList.remove('modal-hidden'); }
-function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('modal-hidden'); }
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+        <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <input id="dist-size" type="number" min="1" placeholder="Tamaño grupo" style="width:140px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <button class="btn" onclick="distributeGroupsByNumber()">Distribuir por número</button>
+        <button class="btn" onclick="distributeGroupsBySize()">Distribuir por tamaño</button>
+      </div>
 
-/* ------------- Ruleta (big central display) ------------- */
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-function playTick(freq=800,dur=0.02,vol=0.06){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }
-function playWin(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }
+      <div id="groups-list-container" style="max-height:320px;overflow:auto"></div>
+    </div>
+  </div>
 
-let rouletteInterval=null, rouletteNames=[], rouletteIndex=0, rouletteRunning=false;
-function openRouletteModal(){ rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!' : 'No hay estudiantes'; document.getElementById('roulette-modal').classList.remove('modal-hidden'); }
-function closeRouletteModal(){ stopRoulette(); document.getElementById('roulette-modal').classList.add('modal-hidden'); }
-function startRoulette(){
-  if(rouletteRunning) return; rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); if(!rouletteNames.length) return alert('No hay estudiantes');
-  rouletteRunning=true; rouletteIndex = Math.floor(Math.random()*rouletteNames.length);
-  let speed = parseInt(document.getElementById('roulette-speed').value||20); let interval = Math.max(20,200 - speed*3); let cycles = 0;
-  rouletteInterval = setInterval(()=>{
-    rouletteIndex = (rouletteIndex+1)%rouletteNames.length;
-    document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
-    playTick(500+Math.random()*400,0.02);
-    cycles++;
-    if(cycles>40){ clearInterval(rouletteInterval); slowdownRoulette(); }
-  }, interval);
-}
-function slowdownRoulette(){
-  let steps=12, step=0;
-  function tickSlow(){
-    step++;
-    rouletteIndex = (rouletteIndex+1)%rouletteNames.length;
-    document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
-    playTick(500+step*30,0.02);
-    if(step<steps) setTimeout(tickSlow,80+step*40);
-    else { rouletteRunning=false; playWin(); const selectedName = rouletteNames[rouletteIndex]; const st = (dbState.classes[currentClassKey]||[]).find(s=>s.name===selectedName); if(st) openHistoryModal(st.id); else alert('Seleccionado: '+selectedName); }
-  }
-  tickSlow();
-}
-function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval=null; } rouletteRunning=false; }
+  <!-- ADD STUDENT -->
+  <div id="add-student-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeAddStudentModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
+      <p style="color:var(--muted);margin-bottom:8px">Se agregará al curso <strong id="add-student-course-name">801</strong></p>
+      <input id="new-student-name-input" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
+      <button class="btn green" style="width:100%" onclick="confirmAddNewStudent()">Guardar Estudiante</button>
+    </div>
+  </div>
 
-/* ------------- Timer (manual input) ------------- */
-let timerSeconds = 300, timerInterval=null;
-function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); document.getElementById('timer-modal').classList.remove('modal-hidden'); }
-function closeTimerModal(){ document.getElementById('timer-modal').classList.add('modal-hidden'); if(timerInterval) clearInterval(timerInterval); timerInterval=null; }
-function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-function applyManualTimer(){
-  const txt = document.getElementById('timer-manual-input').value.trim();
-  if(!txt) return alert('Ingresa tiempo (ej. 3:30 o 5)');
-  if(txt.includes(':')){
-    const parts = txt.split(':').map(p=>parseInt(p));
-    if(parts.length!==2 || isNaN(parts[0]) || isNaN(parts[1])) return alert('Formato inválido mm:ss');
-    timerSeconds = parts[0]*60 + parts[1];
-  } else {
-    const mins = parseInt(txt);
-    if(isNaN(mins)) return alert('Formato inválido');
-    timerSeconds = mins*60;
-  }
-  document.getElementById('timer-display').innerText = formatTime(timerSeconds);
-}
-function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } else { document.querySelector('#timer-modal .btn.green').innerText='Pausar'; timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText=formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; timerFinished(); } },1000); } }
-function resetTimer(){ timerSeconds=300; document.getElementById('timer-display').innerText = formatTime(timerSeconds); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } }
-function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
-function timerFinished(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440,audioCtx.currentTime+0.5); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),700); alert('Tiempo terminado'); }
+  <!-- CONFIRM -->
+  <div id="confirm-dialog-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
+      <h3 id="confirm-title" style="font-weight:800">¿Estás seguro?</h3>
+      <p id="confirm-message" style="color:var(--muted);margin-bottom:12px">Esta acción no se puede deshacer.</p>
+      <div style="display:flex;gap:8px;justify-content:center">
+        <button id="confirm-action-btn" class="btn red">Eliminar</button>
+        <button class="btn" onclick="closeConfirmModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
 
-/* ------------- Dice (custom) ------------- */
-function openDiceModal(){ document.getElementById('dice-modal').classList.remove('modal-hidden'); document.getElementById('dice-display').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
-function closeDiceModal(){ document.getElementById('dice-modal').classList.add('modal-hidden'); }
-function rollDice(){
-  const count = Math.max(1, parseInt(document.getElementById('dice-count').value) || 1);
-  const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value) || 6);
-  const results = [];
-  for(let i=0;i<count;i++) results.push(Math.floor(Math.random()*sides)+1);
-  const sum = results.reduce((a,b)=>a+b,0);
-  // Large display: if single die show face number big; if multiple show sum
-  document.getElementById('dice-display').innerText = (count===1) ? results[0] : sum;
-  document.getElementById('dice-detail').innerText = `Individual: ${results.join(', ')}  —  Suma: ${sum}`;
-  playTick(300 + (sum%10)*40, 0.08, 0.07);
-}
+  <!-- ROULETTE -->
+  <div id="roulette-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:640px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeRouletteModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
+      <div id="roulette-display" style="font-size:36px;height:180px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);color:#fff;margin-bottom:10px">¡Presiona Girar!</div>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn blue" onclick="startRoulette()">Girar</button>
+        <button class="btn" onclick="stopRoulette()">Detener</button>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
+        <label style="color:var(--muted)">Velocidad</label>
+        <input id="roulette-speed" type="range" min="1" max="50" value="20" style="width:300px">
+      </div>
+    </div>
+  </div>
 
-/* ------------- Init ------------- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  initDatabase(); renderStudentGrid();
-  document.getElementById('period-select').value = currentPeriod;
-  document.getElementById('class-select').value = currentClassKey;
-  const saved = localStorage.getItem('fantasyclass_alm_google_url'); if(saved) document.getElementById('drive-status-text').innerText = 'Google Drive Activo';
-});
+  <!-- TIMER -->
+  <div id="timer-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeTimerModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
 
-/* ------------- Modal manager (prevent stacking) ------------- */
-(function(){
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('[data-modal]').forEach(m => {
-      if(!m.classList.contains('modal-hidden')) m.classList.add('modal-hidden');
-      m.addEventListener('click', (ev) => { if(ev.target === m) closeModalByElement(m); });
+      <div id="timer-display" style="font-weight:900;font-size:48px;color:#f59e0b;margin-bottom:12px">05:00</div>
+
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+        <button class="btn green" onclick="toggleTimer()">Iniciar</button>
+        <button class="btn" onclick="resetTimer()">Reset</button>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
+        <button class="btn" onclick="setTimerMinutes(1)">1m</button>
+        <button class="btn" onclick="setTimerMinutes(5)">5m</button>
+        <button class="btn" onclick="setTimerMinutes(10)">10m</button>
+      </div>
+
+      <div style="margin-top:8px">
+        <label style="display:block;color:var(--muted);margin-bottom:6px">Establecer tiempo manual (mm:ss o minutos)</label>
+        <div style="display:flex;gap:8px;justify-content:center">
+          <input id="timer-manual-input" placeholder="Ej. 3:30 o 5" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);width:160px">
+          <button class="btn" onclick="applyManualTimer()">Set</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DICE -->
+  <div id="dice-modal" data-modal class="modal-center modal-hidden">
+    <div class="modal-panel" style="width:100%;max-width:360px;text-align:center">
+      <button style="position:absolute;right:18px;top:18px" onclick="closeDiceModal()">✕</button>
+      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-dice"></i> Dado</h3>
+
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+        <label style="color:var(--muted)">Cantidad</label>
+        <input id="dice-count" type="number" min="1" max="10" value="1" style="width:60px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+        <label style="color:var(--muted)">Caras</label>
+        <input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
+      </div>
+
+      <div id="dice-display">🎲</div>
+      <div id="dice-detail" style="color:var(--muted);margin-bottom:8px"></div>
+      <button class="btn red" onclick="rollDice()">Lanzar Dado</button>
+    </div>
+  </div>
+
+  <!-- =============== LÓGICA JS =============== -->
+  <script>
+    /* ---------- Data & state ---------- */
+    const DEFAULT_ROSTERS = {
+      "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
+      "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia","Jobsanim susana Colina calles","Luisa Alejandra Díaz Yepes (802)","Matias Escobar flores","Dilan David Garcia Leal 802","Héctor Garzón Ramirez","ANGEL DANIEL GONZALEZ (802)","Sharol Dayana Gutierrez Téllez","Karol Dayana Hueso Pulido","Claudia Gabriela Leiva Gomez","Holman Esneyder Mena Mosquera","Sara Gisell Neira Pardo(802)","Dyland Alejandro Nieto (802)","Sara Ocampo Isaza","María Fernanda Orozco Diaz 802","Juan Esteban Orozco Higuita","María Fernanda Osorio huérfano","ZARA VALENTINA PEDRAZA ZAMORA","Sharith Liceth Riascos Conrado","Maria Victoria Rodriguez Moreno","Sara Valentina Rodriguez Ocampo","David Santiago Rodríguez Ortiz","Danna Valeria Rojas Florez(802)","Valery Maria Romero Capera","Angel David Saavedra Peñuela","María Fernanda Saenz Fresneda","Alisson Geraldine Sanabria Bernal","Darly maryori Solano cubides","DYLAN SEBASTIAN SOLIS HERNANDEZ","MARIA JOSE TORO RUIZ (802)"],
+      /* añade los demás si quieres */
+    };
+
+    let currentClassKey = "801";
+    let currentPeriod = "P1";
+    let selectedStudentId = null;
+    let activeEntryType = 'positive';
+    let selectedValueTag = 'Responsabilidad';
+    let dbState = { classes: {}, groups: {}, googleScriptUrl: '' };
+
+    /* ---------- Persistence & Init ---------- */
+    function initDatabase(){
+      const stored = localStorage.getItem('fantasyclass_alm_db');
+      if(stored){ try{ dbState = JSON.parse(stored); }catch(e){ dbState = { classes:{}, groups:{}, googleScriptUrl:'' }; } }
+      if(!dbState.classes) dbState.classes = {};
+      if(!dbState.groups) dbState.groups = {};
+      Object.keys(DEFAULT_ROSTERS).forEach(classKey=>{
+        if(!dbState.classes[classKey] || dbState.classes[classKey].length === 0){
+          dbState.classes[classKey] = DEFAULT_ROSTERS[classKey].map((name, index) => ({ id: `${classKey}_${index+1}`, name, xp:0, level:1, history:[] }));
+        }
+        if(!dbState.groups[classKey]) dbState.groups[classKey] = {};
+      });
+      saveDatabase(); updateClassSelectOptions(); renderGroupsList();
+    }
+
+    function saveDatabase(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState)); }
+
+    /* ---------- Class select / period ---------- */
+    function updateClassSelectOptions(){
+      const select = document.getElementById('class-select'); if(!select) return;
+      const prev = select.value;
+      select.innerHTML = '';
+      Object.keys(dbState.classes).forEach(cKey => {
+        const opt = document.createElement('option'); opt.value = cKey; opt.textContent = `Grado ${cKey} (${dbState.classes[cKey].length} Est.)`; select.appendChild(opt);
+      });
+      if(prev && dbState.classes[prev]) currentClassKey = prev;
+      else if(!dbState.classes[currentClassKey]) currentClassKey = Object.keys(dbState.classes)[0] || currentClassKey;
+      select.value = currentClassKey;
+      renderStudentGrid(); updateGlobalMetrics();
+    }
+    function switchClass(newClass){ if(!dbState.classes[newClass]) return; currentClassKey = newClass; document.getElementById('class-select').value = newClass; renderStudentGrid(); updateGlobalMetrics(); }
+    function switchPeriod(p){ currentPeriod = p; document.getElementById('period-select').value = p; renderStudentGrid(); updateGlobalMetrics(); }
+
+    /* ---------- Exports & dropdowns ---------- */
+    function toggleExportMenu(){ const m=document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
+    function toggleToolsMenu(){ const m=document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
+    document.addEventListener('click',(e)=>{
+      const em=document.getElementById('export-dropdown'), tb=document.querySelector('.export-menu > button');
+      if(em && em.style.display==='block' && !em.contains(e.target) && !tb?.contains(e.target)) em.style.display='none';
+      const t=document.getElementById('tools-dropdown'), tb2=document.querySelector('.dropdown > .chip');
+      if(t && t.style.display==='block' && !t.contains(e.target) && !tb2?.contains(e.target)) t.style.display='none';
     });
-    enforceSingleModal();
-  });
 
-  function closeModalByElement(modalEl){
-    modalEl.classList.add('modal-hidden');
-    const id = modalEl.id;
-    if(id==='roulette-modal'){ try{ stopRoulette(); }catch(e){} }
-    if(id==='timer-modal'){ try{ if(typeof timerInterval!=='undefined' && timerInterval) { clearInterval(timerInterval); timerInterval=null; } }catch(e){} }
-  }
+    /* ---------- Drive ---------- */
+    function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url') || ''; document.getElementById('drive-modal').classList.remove('modal-hidden'); }
+    function closeDriveModal(){ document.getElementById('drive-modal').classList.add('modal-hidden'); }
+    function saveDriveSettings(){ dbState.googleScriptUrl = document.getElementById('drive-webhook-url').value.trim(); localStorage.setItem('fantasyclass_alm_google_url', dbState.googleScriptUrl); saveDatabase(); if(dbState.googleScriptUrl) document.getElementById('drive-status-text').innerText='Google Drive Activo'; closeDriveModal(); }
+    function testDriveConnection(){ alert('Prueba de envío (modo no-cors).'); }
 
-  function enforceSingleModal(){
-    const modals = Array.from(document.querySelectorAll('[data-modal]'));
-    const visibles = modals.filter(m => !m.classList.contains('modal-hidden'));
-    if(visibles.length > 1){
-      visibles.slice(0, visibles.length - 1).forEach(m => closeModalByElement(m));
+    /* ---------- Exports ---------- */
+    function exportCurrentClassExcel(){ const students = dbState.classes[currentClassKey] || []; const rows = students.map((s,i)=>({ "N°":i+1,"ID Estudiante":s.id,"Nombre Estudiante":s.name,"Grado":currentClassKey,"Nivel RPG":s.level||1,"Puntos XP Total":s.xp||0 })); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso ${currentClassKey}`); XLSX.writeFile(wb, `FantasyClass_Reporte_${currentClassKey}.xlsx`); toggleExportMenu(); }
+    function exportAllClassesMasterExcel(){ alert('Export master (demo)'); toggleExportMenu(); }
+    function exportSingleStudentExcel(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante para exportar'); alert('Export ficha (demo)'); }
+
+    /* ---------- Groups & grades (fixed) ---------- */
+    function createGrade(){
+      const keyInput = document.getElementById('new-grade-input');
+      const key = (keyInput?.value || '').trim();
+      if(!key) return alert('Escribe el nombre del grado (ej. 805)');
+      if(dbState.classes[key]) return alert('El grado ya existe');
+      dbState.classes[key] = [];
+      dbState.groups[key] = dbState.groups[key] || {};
+      saveDatabase(); updateClassSelectOptions(); renderGroupsList(); keyInput.value=''; alert('Grado creado: ' + key);
     }
-  }
 
-  const observer = new MutationObserver((mutations) => {
-    let changed=false;
-    for(const mu of mutations){ if(mu.type==='attributes' && mu.attributeName==='class' && mu.target.hasAttribute('data-modal')) changed=true; }
-    if(changed) enforceSingleModal();
-  });
-  document.querySelectorAll('[data-modal]').forEach(m => observer.observe(m, { attributes: true }));
+    function createGroupInCurrentGrade(){
+      const gradeSelect = document.getElementById('class-select');
+      const grade = (gradeSelect?.value) || currentClassKey || '';
+      if(!grade) return alert('No se ha seleccionado un grado válido.');
+      const gname = (document.getElementById('new-subgroup-input')?.value || '').trim();
+      if(!gname) return alert('Escribe nombre del grupo (ej. Grupo A)');
+      dbState.groups = dbState.groups || {};
+      dbState.groups[grade] = dbState.groups[grade] || {};
+      if(dbState.groups[grade][gname]) return alert('El grupo ya existe en este grado.');
+      dbState.groups[grade][gname] = []; // guardar lista de miembros (nombres) vacía
+      saveDatabase(); renderGroupsList(); document.getElementById('new-subgroup-input').value=''; alert(`Grupo "${gname}" creado en Grado ${grade}`);
+    }
 
-  setInterval(enforceSingleModal, 300);
+    function renderGroupsList(){
+      const container = document.getElementById('groups-list-container'); if(!container) return; container.innerHTML='';
+      const grades = Object.keys(dbState.classes || {}).sort();
+      grades.forEach(gradeKey=>{
+        const students = dbState.classes[gradeKey] || [];
+        const gradeWrap = document.createElement('div'); gradeWrap.style.marginBottom='12px';
+        const header = document.createElement('div'); header.className='group-item';
+        header.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${gradeKey}')"><strong>Grado ${gradeKey}</strong> <span style="color:var(--muted)">(${students.length} estudiantes)</span></div>
+                            <div style="display:flex;gap:8px"><button class="btn" onclick="exportGroup('${gradeKey}')">Export</button><button class="btn red" onclick="deleteGrade('${gradeKey}')">🗑</button></div>`;
+        gradeWrap.appendChild(header);
 
-  window.openModal = function(id){
-    document.querySelectorAll('[data-modal]').forEach(m => { if(m.id !== id) closeModalByElement(m); });
-    const el = document.getElementById(id);
-    if(el){ el.classList.remove('modal-hidden'); enforceSingleModal(); const focusEl = el.querySelector('textarea,input,button'); if(focusEl) focusEl.focus(); }
-  };
+        const groupsFor = (dbState.groups && dbState.groups[gradeKey]) ? dbState.groups[gradeKey] : {};
+        const groupKeys = Object.keys(groupsFor);
+        if(groupKeys.length === 0){
+          const emptyNote = document.createElement('div'); emptyNote.style.padding='8px 12px'; emptyNote.style.color='var(--muted)'; emptyNote.innerText='No hay subgrupos creados en este grado.';
+          gradeWrap.appendChild(emptyNote);
+        } else {
+          const list = document.createElement('div'); list.style.padding='8px 12px'; list.style.display='grid'; list.style.gridTemplateColumns='repeat(auto-fill,minmax(180px,1fr))'; list.style.gap='8px';
+          groupKeys.forEach(gk=>{
+            const members = groupsFor[gk] || [];
+            const card = document.createElement('div'); card.style.padding='10px'; card.style.borderRadius='8px'; card.style.background='rgba(255,255,255,0.02)'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='8px';
+            card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${gk}</div><div style="color:var(--muted)">${members.length} integrantes</div></div>
+                              <div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn" onclick="exportSubgroup('${gradeKey}','${gk}')">Export</button><button class="btn red" onclick="deleteSubgroup('${gradeKey}','${gk}')">Eliminar</button></div>`;
+            list.appendChild(card);
+          });
+          gradeWrap.appendChild(list);
+        }
+        container.appendChild(gradeWrap);
+      });
+    }
 
-  window.closeModal = function(id){ const el = document.getElementById(id); if(el) closeModalByElement(el); };
-})();
+    function deleteGrade(gradeKey){
+      showConfirmModal('Eliminar Grado', `Eliminar el grado ${gradeKey} con todos sus datos?`, ()=>{
+        delete dbState.classes[gradeKey];
+        if(dbState.groups && dbState.groups[gradeKey]) delete dbState.groups[gradeKey];
+        saveDatabase(); updateClassSelectOptions(); renderGroupsList();
+      });
+    }
 
-</script>
+    function deleteSubgroup(gradeKey, subgroupName){
+      showConfirmModal('Eliminar Grupo', `Eliminar el grupo "${subgroupName}" en ${gradeKey}?`, ()=>{
+        if(dbState.groups && dbState.groups[gradeKey]){
+          delete dbState.groups[gradeKey][subgroupName];
+          saveDatabase(); renderGroupsList();
+        }
+      });
+    }
+
+    function exportGroup(gradeKey){ currentClassKey = gradeKey; exportCurrentClassExcel(); }
+
+    function exportSubgroup(gradeKey, subgroupName){
+      const groupsFor = dbState.groups && dbState.groups[gradeKey] ? dbState.groups[gradeKey] : {};
+      const members = groupsFor[subgroupName] || [];
+      const rows = members.length ? members.map((name,i)=>({ 'N°': i+1, 'Nombre': name, 'Grado': gradeKey, 'Grupo': subgroupName })) : [{ 'Mensaje': 'Sin miembros en este subgrupo' }];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${gradeKey}_${subgroupName}`);
+      XLSX.writeFile(wb, `Grupo_${gradeKey}_${subgroupName}.xlsx`);
+    }
+
+    function distributeGroupsByNumber(){
+      const n = parseInt(document.getElementById('dist-number').value);
+      if(!n || n < 1) return alert('Ingresa número de grupos');
+      const students = (dbState.classes[currentClassKey] || []).map(s=>s.name);
+      if(!students.length) return alert('No hay estudiantes en el grado seleccionado');
+      const shuffled = shuffleArray([...students]);
+      const groups = {};
+      for(let i=0;i<n;i++) groups[`Grupo ${i+1}`] = [];
+      for(let i=0;i<shuffled.length;i++) groups[`Grupo ${(i % n) + 1}`].push(shuffled[i]);
+      dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
+      Object.keys(groups).forEach(g => dbState.groups[currentClassKey][g] = groups[g]);
+      saveDatabase(); renderGroupsList(); alert('Distribución completada (por número)');
+    }
+
+    function distributeGroupsBySize(){
+      const size = parseInt(document.getElementById('dist-size').value);
+      if(!size || size < 1) return alert('Ingresa tamaño de grupo');
+      const students = (dbState.classes[currentClassKey] || []).map(s=>s.name);
+      if(!students.length) return alert('No hay estudiantes en el grado seleccionado');
+      const shuffled = shuffleArray([...students]);
+      dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
+      let gidx = 1;
+      for(let i=0;i<shuffled.length;i+=size){
+        const slice = shuffled.slice(i, i+size);
+        dbState.groups[currentClassKey][`Grupo ${gidx}`] = slice;
+        gidx++;
+      }
+      saveDatabase(); renderGroupsList(); alert('Distribución por tamaño completada');
+    }
+
+    function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+    /* ---------- Students ---------- */
+    function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; document.getElementById('add-student-modal').classList.remove('modal-hidden'); }
+    function closeAddStudentModal(){ document.getElementById('add-student-modal').classList.add('modal-hidden'); }
+    function confirmAddNewStudent(){ const name = document.getElementById('new-student-name-input').value.trim(); if(!name) return alert('Escribe el nombre'); if(!dbState.classes[currentClassKey]) dbState.classes[currentClassKey]=[]; const id = `${currentClassKey}_${Date.now()}`; dbState.classes[currentClassKey].push({ id, name, xp:0, level:1, history:[] }); saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); alert('Estudiante agregado correctamente.'); }
+
+    /* ---------- Stats & render ---------- */
+    function calculateStudentStatsForPeriod(student){
+      let filtered = student.history || [];
+      if(currentPeriod !== 'ALL') filtered = filtered.filter(h => h.period === currentPeriod || !h.period);
+      let xp = 0; const badges={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+      filtered.forEach(h=>{ if(h.type==='positive'){ xp += (h.magnitude||1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag] += (h.magnitude||1); }});
+      const level = Math.floor(xp/20)+1;
+      return { xp, level, badges, history: filtered };
+    }
+
+    function updateGlobalMetrics(){
+      const students = dbState.classes[currentClassKey] || [];
+      const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+      students.forEach(s=>{ const st = calculateStudentStatsForPeriod(s); Object.keys(totals).forEach(k=>totals[k]+=st.badges[k]||0); });
+      Object.keys(totals).forEach(k=>{ const el=document.getElementById(`badge-count-${k}`); if(el) el.innerText = `${totals[k]} pts`; });
+    }
+
+    function avatarGradientFor(name){
+      if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
+      const idx = name.trim().charCodeAt(0) % 10;
+      const palettes = [['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
+      const p = palettes[idx];
+      return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+    }
+
+    function renderStudentGrid(){
+      const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
+      const students = dbState.classes[currentClassKey] || [];
+      const q = (document.getElementById('student-search-input').value||'').toLowerCase().trim();
+      const sort = document.getElementById('sort-select').value;
+      let filtered = students.filter(s=>s.name.toLowerCase().includes(q));
+      if(sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
+      else if(sort==='level' || sort==='xp') filtered.sort((a,b)=> (b.xp||0) - (a.xp||0));
+      else if(sort==='obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length)-((a.history||[]).filter(h=>h.type==='negative').length));
+      filtered.forEach(s=>{
+        const st = calculateStudentStatsForPeriod(s);
+        const card = document.createElement('div'); card.className='card';
+        card.innerHTML = `<div class="level">NIV ${st.level}</div>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="avatar" style="background:${avatarGradientFor(s.name)};min-width:56px">${s.name.charAt(0)}</div>
+            <div style="flex:1"><div style="font-weight:800">${s.name}</div><div style="color:var(--muted)">Grado ${currentClassKey} • ${currentPeriod}</div></div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
+            <button class="btn green" onclick="openAwardQuick('${s.id}','positive')"><i class="fa-solid fa-plus"></i> Mérito</button>
+            <button class="btn red" onclick="openAwardQuick('${s.id}','negative')"><i class="fa-solid fa-minus"></i> Falta</button>
+            <button class="btn blue" onclick="openHistoryModal('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+          </div>`;
+        container.appendChild(card);
+      });
+      updateGlobalMetrics();
+    }
+
+    /* ---------- Ficha ---------- */
+    function openHistoryModal(studentId){
+      selectedStudentId = studentId;
+      const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId);
+      if(!st) return alert('Estudiante no encontrado');
+      document.getElementById('history-student-name').innerText = st.name;
+      document.getElementById('history-student-avatar').innerText = st.name.charAt(0);
+      document.getElementById('history-period-label').innerText = currentPeriod;
+      const stats = calculateStudentStatsForPeriod(st);
+      document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
+      document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
+      document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
+      activeEntryType='positive'; setEntryType('positive'); selectedValueTag='Responsabilidad';
+      document.getElementById('entry-note-input').value=''; document.getElementById('point-magnitude-input').value=1;
+      renderHistoryList(st);
+      document.getElementById('history-modal').classList.remove('modal-hidden');
+      setTimeout(()=>document.getElementById('entry-note-input')?.focus(),200);
+    }
+    function closeHistoryModal(){ document.getElementById('history-modal').classList.add('modal-hidden'); }
+    function openAwardQuick(studentId,type){ selectedStudentId=studentId; activeEntryType=(type==='positive')?'positive':'negative'; setEntryType(activeEntryType); openHistoryModal(studentId); }
+    function setEntryType(t){ activeEntryType=t; document.getElementById('btn-type-positive').style.opacity = t==='positive' ? '1' : '0.6'; document.getElementById('btn-type-negative').style.opacity = t==='negative' ? '1' : '0.6'; }
+    function showEntryHelp(type){ const el=document.getElementById('entry-help'); if(type==='positive') el.innerText='Mérito: reconocer acciones de buen desempeño convivencial.'; else el.innerText='Observación: registrar faltas o comportamientos a corregir.'; setTimeout(()=>el.innerText='',6000); }
+    function selectValueCategory(val){ selectedValueTag = val; alert('Pilar seleccionado: '+val); }
+    function renderHistoryList(student){ const container=document.getElementById('history-entries-container'); if(!container) return; const arr=student.history||[]; if(!arr.length){ container.innerHTML=`<div style="color:var(--muted);text-align:center;padding:16px">Sin registros en el observador todavía.</div>`; return; } container.innerHTML = arr.map(h=>`<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.type==='positive'?`+${h.magnitude} XP`:'OBSERVACIÓN'}</div><div style="color:var(--muted)">${h.timestamp}</div></div><div style="margin-top:6px">${h.valueTag} — ${h.note}</div></div>`).join(''); }
+    function saveStudentEntry(){ if(!selectedStudentId) return alert('Abre la ficha de un estudiante'); const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId); if(!student) return alert('Estudiante no encontrado'); const note = document.getElementById('entry-note-input').value.trim() || 'Registro'; const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1; const entry = { id:Date.now(), timestamp:new Date().toLocaleString('es-CO'), period: currentPeriod === 'ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag: selectedValueTag, magnitude, note }; student.history.unshift(entry); if(activeEntryType==='positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20) + 1; try{ confetti({ particleCount:40, spread:50 }); }catch(e){} } if(dbState.googleScriptUrl){ try{ const url=dbState.googleScriptUrl; if(url.includes('docs.google.com/forms')){ const fd=new FormData(); fd.append('entry.1', currentClassKey); fd.append('entry.2', student.name); fd.append('entry.3', activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)'); fd.append('entry.4', selectedValueTag); fd.append('entry.5', magnitude); fd.append('entry.6', note); fetch(url,{method:'POST',mode:'no-cors',body:fd}); } else { fetch(url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({curso:currentClassKey,estudiante:student.name,tipo:activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)',pilar:selectedValueTag,puntos:magnitude,nota:note})}); } }catch(e){console.warn('Drive sync failed',e);} } saveDatabase(); renderHistoryList(student); renderStudentGrid(); alert('Registro guardado'); }
+
+    /* ---------- Confirm ---------- */
+    let confirmCb=null;
+    function showConfirmModal(title,msg,cb){ document.getElementById('confirm-title').innerText=title; document.getElementById('confirm-message').innerText=msg; confirmCb=cb; document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirmModal(); }; document.getElementById('confirm-dialog-modal').classList.remove('modal-hidden'); }
+    function closeConfirmModal(){ document.getElementById('confirm-dialog-modal').classList.add('modal-hidden'); }
+
+    /* ---------- Roulette (big display) ---------- */
+    const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    function playTick(freq=800,dur=0.02,vol=0.06){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }
+    function playWin(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }
+
+    let rouletteInterval=null, rouletteNames=[], rouletteIndex=0, rouletteRunning=false;
+    function openRouletteModal(){ rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!' : 'No hay estudiantes'; document.getElementById('roulette-modal').classList.remove('modal-hidden'); }
+    function closeRouletteModal(){ stopRoulette(); document.getElementById('roulette-modal').classList.add('modal-hidden'); }
+    function startRoulette(){
+      if(rouletteRunning) return; rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); if(!rouletteNames.length) return alert('No hay estudiantes');
+      rouletteRunning=true; rouletteIndex = Math.floor(Math.random()*rouletteNames.length);
+      let speed = parseInt(document.getElementById('roulette-speed').value||20); let interval = Math.max(20,200 - speed*3); let cycles = 0;
+      rouletteInterval = setInterval(()=>{
+        rouletteIndex = (rouletteIndex+1)%rouletteNames.length;
+        document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
+        playTick(500+Math.random()*400,0.02);
+        cycles++;
+        if(cycles>40){ clearInterval(rouletteInterval); slowdownRoulette(); }
+      }, interval);
+    }
+    function slowdownRoulette(){
+      let steps=12, step=0;
+      function tickSlow(){
+        step++;
+        rouletteIndex = (rouletteIndex+1)%rouletteNames.length;
+        document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex];
+        playTick(500+step*30,0.02);
+        if(step<steps) setTimeout(tickSlow,80+step*40);
+        else { rouletteRunning=false; playWin(); const selectedName = rouletteNames[rouletteIndex]; const st = (dbState.classes[currentClassKey]||[]).find(s=>s.name===selectedName); if(st) openHistoryModal(st.id); else alert('Seleccionado: '+selectedName); }
+      }
+      tickSlow();
+    }
+    function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval=null; } rouletteRunning=false; }
+
+    /* ---------- Timer ---------- */
+    let timerSeconds = 300, timerInterval=null;
+    function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); document.getElementById('timer-modal').classList.remove('modal-hidden'); }
+    function closeTimerModal(){ document.getElementById('timer-modal').classList.add('modal-hidden'); if(timerInterval) clearInterval(timerInterval); timerInterval=null; }
+    function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+    function applyManualTimer(){ const txt = document.getElementById('timer-manual-input').value.trim(); if(!txt) return alert('Ingresa tiempo (ej. 3:30 o 5)'); if(txt.includes(':')){ const parts = txt.split(':').map(p=>parseInt(p)); if(parts.length!==2 || isNaN(parts[0]) || isNaN(parts[1])) return alert('Formato inválido mm:ss'); timerSeconds = parts[0]*60 + parts[1]; } else { const mins = parseInt(txt); if(isNaN(mins)) return alert('Formato inválido'); timerSeconds = mins*60; } document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+    function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } else { document.querySelector('#timer-modal .btn.green').innerText='Pausar'; timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText=formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; timerFinished(); } },1000); } }
+    function resetTimer(){ timerSeconds=300; document.getElementById('timer-display').innerText = formatTime(timerSeconds); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } }
+    function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+    function timerFinished(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440,audioCtx.currentTime+0.5); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),700); alert('Tiempo terminado'); }
+
+    /* ---------- Dice ---------- */
+    function openDiceModal(){ document.getElementById('dice-modal').classList.remove('modal-hidden'); document.getElementById('dice-display').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
+    function closeDiceModal(){ document.getElementById('dice-modal').classList.add('modal-hidden'); }
+    function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value) || 1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value) || 6); const results = []; for(let i=0;i<count;i++) results.push(Math.floor(Math.random()*sides)+1); const sum = results.reduce((a,b)=>a+b,0); document.getElementById('dice-display').innerText = (count===1) ? results[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${results.join(', ')}  —  Suma: ${sum}`; playTick(300 + (sum%10)*40, 0.08, 0.07); }
+
+    /* ---------- Init ---------- */
+    document.addEventListener('DOMContentLoaded', ()=>{
+      initDatabase(); renderStudentGrid(); document.getElementById('period-select').value = currentPeriod; document.getElementById('class-select').value = currentClassKey;
+      const saved = localStorage.getItem('fantasyclass_alm_google_url'); if(saved) document.getElementById('drive-status-text').innerText = 'Google Drive Activo';
+    });
+
+    /* ---------- Modal manager: ensure single modal open ---------- */
+    (function(){
+      document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('[data-modal]').forEach(m => {
+          if(!m.classList.contains('modal-hidden')) m.classList.add('modal-hidden');
+          m.addEventListener('click', (ev) => { if(ev.target === m) closeModalByElement(m); });
+        });
+        enforceSingleModal();
+      });
+
+      function closeModalByElement(modalEl){
+        modalEl.classList.add('modal-hidden');
+        const id = modalEl.id;
+        if(id==='roulette-modal'){ try{ stopRoulette(); }catch(e){} }
+        if(id==='timer-modal'){ try{ if(typeof timerInterval!=='undefined' && timerInterval) { clearInterval(timerInterval); timerInterval=null; } }catch(e){} }
+      }
+
+      function enforceSingleModal(){
+        const modals = Array.from(document.querySelectorAll('[data-modal]'));
+        const visibles = modals.filter(m => !m.classList.contains('modal-hidden'));
+        if(visibles.length > 1){
+          visibles.slice(0, visibles.length - 1).forEach(m => closeModalByElement(m));
+        }
+      }
+
+      const observer = new MutationObserver((mutations) => {
+        let changed=false;
+        for(const mu of mutations){ if(mu.type==='attributes' && mu.attributeName==='class' && mu.target.hasAttribute('data-modal')) changed=true; }
+        if(changed) enforceSingleModal();
+      });
+      document.querySelectorAll('[data-modal]').forEach(m => observer.observe(m, { attributes: true }));
+
+      setInterval(enforceSingleModal, 300);
+
+      window.openModal = function(id){
+        document.querySelectorAll('[data-modal]').forEach(m => { if(m.id !== id) closeModalByElement(m); });
+        const el = document.getElementById(id);
+        if(el){ el.classList.remove('modal-hidden'); enforceSingleModal(); const focusEl = el.querySelector('textarea,input,button'); if(focusEl) focusEl.focus(); }
+      };
+
+      window.closeModal = function(id){ const el = document.getElementById(id); if(el) closeModalByElement(el); };
+    })();
+  </script>
 </body>
 </html>
