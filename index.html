@@ -39,6 +39,10 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
+    <!-- FIREBASE COMPAT SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -81,18 +85,18 @@
             font-family: Arial, sans-serif;
             color: #000;
             background: #fff;
-            padding: 30px;
+            padding: 25px;
         }
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         .pdf-table th, .pdf-table td {
             border: 1px solid #333;
             padding: 6px 8px;
-            font-size: 11px;
+            font-size: 10px;
             text-align: left;
         }
         .pdf-table th {
@@ -103,9 +107,8 @@
 </head>
 <body class="pb-24 text-slate-100 flex flex-col min-h-screen" onclick="closeAllDropdowns(event)">
 
-    <!-- HEADER / BARRA DE NAVEGACIÓN -->
     <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
             
             <!-- BRANDING -->
             <div class="flex items-center gap-3">
@@ -123,13 +126,20 @@
                 </div>
             </div>
 
-            <!-- CONTROLES Y MENÚS DESPLEGABLES -->
+            <!-- CLASS SELECTOR & ACTIONS TOOLBAR -->
             <div class="flex items-center flex-wrap justify-center gap-2">
                 
-                <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-2.5 py-1.5">
-                    <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-1.5"></i>
+                <!-- Google Sync Badge -->
+                <button onclick="openDriveSettingsModal()" id="drive-status-badge" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 transition" title="Configurar conexión directa con Google Drive / Forms / Sheets">
+                    <i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-1.5"></i>
+                    <span id="drive-status-text">Google Forms/Drive Sync</span>
+                </button>
+
+                <!-- Academic Period Selector -->
+                <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-1.5">
+                    <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-2"></i>
                     <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
-                        <option value="ALL" class="bg-slate-900 text-white">Todo el Año</option>
+                        <option value="ALL" class="bg-slate-900 text-white">Todo el Año Lectivo</option>
                         <option value="P1" selected class="bg-slate-900 text-white">Periodo 1</option>
                         <option value="P2" class="bg-slate-900 text-white">Periodo 2</option>
                         <option value="P3" class="bg-slate-900 text-white">Periodo 3</option>
@@ -137,88 +147,65 @@
                     </select>
                 </div>
 
-                <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-2.5 py-1.5">
-                    <i class="fa-solid fa-users text-colegio-gold text-xs mr-1.5"></i>
+                <!-- Select Class Dropdown -->
+                <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5">
+                    <i class="fa-solid fa-users text-colegio-gold text-xs mr-2"></i>
                     <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer">
                     </select>
                 </div>
 
-                <!-- MENÚ HERRAMIENTAS DE AULA -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleMenu(event, 'menu-herramientas')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
-                        <i class="fa-solid fa-toolbox text-amber-400"></i>
-                        <span>Herramientas</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
-                    </button>
-                    <div id="menu-herramientas" class="dropdown-menu hidden absolute right-0 mt-2 w-56 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
-                        <button onclick="openTeamsGeneratorModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-sky-300 font-bold">
-                            <i class="fa-solid fa-users-viewfinder text-sky-400"></i>
-                            <span>Armar Equipos / Clanes</span>
-                        </button>
-                        <button onclick="openWheelModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-purple-300 font-bold">
-                            <i class="fa-solid fa-arrows-spin text-purple-400"></i>
-                            <span>Ruleta con Sonido</span>
-                        </button>
-                        <button onclick="openDiceModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-rose-300 font-bold">
-                            <i class="fa-solid fa-dice text-rose-400"></i>
-                            <span>Dado Virtual</span>
-                        </button>
-                        <button onclick="openTimerModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold">
-                            <i class="fa-solid fa-stopwatch text-amber-400"></i>
-                            <span>Cronómetro</span>
-                        </button>
-                    </div>
-                </div>
+                <!-- MANAGE GROUPS BUTTON -->
+                <button onclick="openManageGroupsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Añadir o eliminar grupos">
+                    <i class="fa-solid fa-layer-group text-indigo-400"></i>
+                    <span class="hidden sm:inline">Grupos</span>
+                </button>
 
-                <!-- MENÚ GESTIÓN -->
+                <!-- EXPORT DROPDOWN MENU -->
                 <div class="relative inline-block text-left">
-                    <button onclick="toggleMenu(event, 'menu-gestion')" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow">
-                        <i class="fa-solid fa-layer-group text-indigo-400"></i>
-                        <span>Gestión</span>
+                    <button onclick="toggleExportMenu()" class="px-2.5 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
+                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                        <span>Exportar Excel</span>
                         <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
                     </button>
-                    <div id="menu-gestion" class="dropdown-menu hidden absolute right-0 mt-2 w-52 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
-                        <button onclick="openManageGroupsModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-indigo-300 font-bold">
-                            <i class="fa-solid fa-folder-plus text-indigo-400"></i>
-                            <span>Crear / Eliminar Cursos</span>
-                        </button>
-                        <button onclick="openAddStudentModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-emerald-300 font-bold">
-                            <i class="fa-solid fa-user-plus text-emerald-400"></i>
-                            <span>Añadir Estudiante</span>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- MENÚ REPORTES -->
-                <div class="relative inline-block text-left">
-                    <button onclick="toggleMenu(event, 'menu-reportes')" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
-                        <i class="fa-solid fa-cloud-arrow-up text-emerald-300"></i>
-                        <span id="drive-status-text">Reportes / Drive</span>
-                        <i class="fa-solid fa-chevron-down text-[10px] ml-1"></i>
-                    </button>
-                    <div id="menu-reportes" class="dropdown-menu hidden absolute right-0 mt-2 w-60 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
-                        <button onclick="openDriveSettingsModal()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-emerald-300 font-bold border-b border-white/10">
-                            <i class="fa-solid fa-link text-emerald-400"></i>
-                            <span>Conectar Google Drive / Forms</span>
-                        </button>
+                    <div id="export-dropdown" class="dropdown-menu hidden absolute right-0 mt-2 w-56 rounded-2xl glass-panel shadow-2xl z-50 border border-white/15 py-2 text-xs">
                         <button onclick="exportCurrentClassExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-slate-200">
                             <i class="fa-solid fa-file-export text-emerald-400"></i>
                             <span>Exportar Curso Actual (.xlsx)</span>
                         </button>
-                        <button onclick="exportAllClassesMasterExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold">
+                        <button onclick="exportAllClassesMasterExcel()" class="w-full text-left px-4 py-2 hover:bg-slate-800 flex items-center gap-2 text-amber-300 font-bold border-t border-white/10">
                             <i class="fa-solid fa-database text-amber-400"></i>
                             <span>Master Todos los Cursos (.xlsx)</span>
                         </button>
                     </div>
                 </div>
 
+                <!-- Quick Action Tools Buttons -->
+                <button onclick="openTeamsGeneratorModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-sky-300 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Armar Equipos de Trabajo">
+                    <i class="fa-solid fa-users-viewfinder text-sky-400"></i>
+                    <span class="hidden sm:inline">Equipos</span>
+                </button>
+
+                <button onclick="openDiceModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-rose-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Tirar Dado Virtual">
+                    <i class="fa-solid fa-dice text-rose-400"></i>
+                    <span class="hidden sm:inline">Dado</span>
+                </button>
+
+                <button onclick="openTimerModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-400 font-bold text-xs rounded-xl transition flex items-center gap-1.5" title="Cronómetro de Clase">
+                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
+                    <span class="hidden sm:inline">Tiempo</span>
+                </button>
+
+                <button onclick="openWheelModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow-md" title="Girar Ruleta de Alumnos">
+                    <i class="fa-solid fa-arrows-spin text-xs"></i>
+                    <span>Ruleta</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full space-y-6">
 
-        <!-- DASHBOARD DE MÉTRICAS -->
+        <!-- DASHBOARD METRICS BAR (6 CHARACTER COUNTS PILLARS) -->
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             <div class="glass-panel p-3 rounded-2xl flex items-center gap-2.5">
                 <div class="text-xl">🐘</div>
@@ -269,7 +256,6 @@
             </div>
         </div>
 
-        <!-- BÚSQUEDA, SELECCIÓN Y ORDENAMIENTO -->
         <div class="glass-panel p-4 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <button onclick="toggleSelectAllStudents()" id="btn-select-all" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-200 font-bold text-xs rounded-xl transition flex items-center gap-1.5">
@@ -279,7 +265,7 @@
 
                 <div class="relative w-full sm:w-72">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="student-search-input" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante..." class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold transition">
+                    <input type="text" id="student-search-input" onkeyup="renderStudentGrid()" placeholder="Buscar estudiante por nombre..." class="w-full bg-slate-900/90 border border-white/10 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold transition">
                 </div>
             </div>
 
@@ -299,8 +285,9 @@
             </div>
         </div>
 
-        <!-- GRILLA DE ESTUDIANTES -->
+        <!-- STUDENTS GRID CONTAINER -->
         <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <!-- Student cards injected dynamically -->
         </div>
     </main>
 
@@ -323,360 +310,7 @@
         </div>
     </div>
 
-    <!-- MODAL PRINCIPAL: HOJA DE VIDA, DATOS PERSONALES, REUNIONES Y OBSERVADOR -->
-    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[92vh] flex flex-col">
-            <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <!-- CABECERA DE LA FICHA -->
-            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-white/10 gap-3">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
-                        <div id="history-student-avatar" class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-xl">
-                            A
-                        </div>
-                    </div>
-                    <div>
-                        <h3 id="history-student-name" class="font-display font-black text-base text-white leading-tight">Nombre Estudiante</h3>
-                        <p id="history-student-subtitle" class="text-xs text-slate-400">Hoja de Vida e Historial Integral — Colegio Alfonso López Michelsen</p>
-                    </div>
-                </div>
-
-                <div class="flex gap-2">
-                    <button onclick="downloadStudentPDF()" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 border border-rose-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Descargar Expediente Completo en PDF">
-                        <i class="fa-solid fa-file-pdf text-rose-200"></i>
-                        <span>Descargar PDF</span>
-                    </button>
-                    <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar Ficha a Excel">
-                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                        <span>Excel</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- PESTAÑAS / TABS DE NAVEGACIÓN DENTRO DE LA FICHA -->
-            <div class="flex gap-2 border-b border-white/10 my-3">
-                <button onclick="switchTab('obs')" id="tab-btn-obs" class="pb-2 px-3 text-xs font-bold text-amber-300 border-b-2 border-amber-400 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-clipboard-list"></i> Observador Convivencial
-                </button>
-                <button onclick="switchTab('meetings')" id="tab-btn-meetings" class="pb-2 px-3 text-xs font-bold text-slate-400 hover:text-white border-b-2 border-transparent transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-comments"></i> Actas / Reuniones
-                </button>
-                <button onclick="switchTab('personal')" id="tab-btn-personal" class="pb-2 px-3 text-xs font-bold text-slate-400 hover:text-white border-b-2 border-transparent transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-id-card"></i> Datos Personales y Contacto
-                </button>
-            </div>
-
-            <!-- SECCIÓN 1: OBSERVADOR CONVIVENCIAL -->
-            <div id="tab-content-obs" class="flex-grow overflow-y-auto space-y-3 pr-1">
-                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
-                            <i class="fa-solid fa-pen-nib"></i> Registrar Situación Convivencial
-                        </span>
-                        <span class="text-[10px] text-slate-400 font-semibold" id="obs-current-date"></span>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Situación / Falta</label>
-                            <select id="obs-type-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
-                                <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve)</option>
-                                <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave)</option>
-                                <option value="Situación Tipo III (Falta Gravísima)">Situación Tipo III (Falta Gravísima)</option>
-                                <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Convivencial</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
-                            <select id="obs-pillar-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
-                                <option value="Responsabilidad">🐘 Responsabilidad</option>
-                                <option value="Respeto">🦁 Respeto</option>
-                                <option value="Confianza">🐪 Confianza</option>
-                                <option value="Empatía">❤️ Empatía</option>
-                                <option value="Justicia">⚖️ Justicia</option>
-                                <option value="Ciudadanía">🛡️ Ciudadanía</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descripción Detallada de los Hechos</label>
-                        <textarea id="obs-detail-input" rows="2" placeholder="Escribe la descripción de la falta o hecho..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descargo del Estudiante (Debido Proceso)</label>
-                            <textarea id="obs-descargo-input" rows="1" placeholder="Versión o descargos del alumno..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Compromisos y Estrategias Pedagógicas</label>
-                            <textarea id="obs-compromiso-input" rows="1" placeholder="Compromiso acordado de mejora o reparación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between pt-1">
-                        <div class="flex items-center gap-3 text-[11px] text-slate-300">
-                            <label class="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" id="obs-firmado-docente" checked class="rounded accent-emerald-500"> Registro Docente
-                            </label>
-                            <label class="flex items-center gap-1 cursor-pointer">
-                                <input type="checkbox" id="obs-firmado-estudiante" checked class="rounded accent-emerald-500"> Firma Estudiante
-                            </label>
-                        </div>
-                        <button onclick="saveFullObservadorEntry()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Guardar en Observador</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="space-y-2" id="history-entries-container"></div>
-            </div>
-
-            <!-- SECCIÓN 2: REGISTRO DE REUNIONES Y CITACIONES -->
-            <div id="tab-content-meetings" class="flex-grow overflow-y-auto space-y-3 pr-1 hidden">
-                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 space-y-3">
-                    <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-handshake-simple"></i> Registrar Nueva Reunión o Citación con Acudiente
-                    </span>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Motivo / Tipo de Reunión</label>
-                            <input type="text" id="meeting-reason-input" placeholder="Ej. Citación por rendimiento o citación convivencial..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Asistente / Acudiente Presente</label>
-                            <input type="text" id="meeting-attendant-input" placeholder="Nombre de quien asistió a la reunión..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Aspectos Tratados / Menciones</label>
-                            <textarea id="meeting-summary-input" rows="2" placeholder="Resumen de lo hablado sobre el estudiante en la reunión..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none"></textarea>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Acuerdos e Intervenciones Establecidas</label>
-                            <textarea id="meeting-agreements-input" rows="2" placeholder="Acuerdos por parte de la familia e institución..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end pt-1">
-                        <button onclick="saveMeetingEntry()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Guardar Acta de Reunión</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="space-y-2" id="meetings-list-container"></div>
-            </div>
-
-            <!-- SECCIÓN 3: DATOS PERSONALES Y CONTACTOS DE EMERGENCIA -->
-            <div id="tab-content-personal" class="flex-grow overflow-y-auto space-y-3 pr-1 hidden">
-                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-4">
-                    <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-address-card"></i> Información Personal y Médica del Estudiante
-                    </h4>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Documento de Identidad (TI / CC)</label>
-                            <input type="text" id="info-doc-input" placeholder="Ej. 1012345678" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha de Nacimiento</label>
-                            <input type="date" id="info-dob-input" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">RH / Grupo Sanguíneo</label>
-                            <select id="info-rh-input" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                                <option value="O+">O+</option>
-                                <option value="O-">O-</option>
-                                <option value="A+">A+</option>
-                                <option value="A-">A-</option>
-                                <option value="B+">B+</option>
-                                <option value="B-">B-</option>
-                                <option value="AB+">AB+</option>
-                                <option value="AB-">AB-</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">EPS / Entidad de Salud</label>
-                            <input type="text" id="info-eps-input" placeholder="Ej. Capital Salud, Capital Salud POS..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Caracterización PIAR / DUA / Inclusión</label>
-                            <input type="text" id="info-piar-input" placeholder="Ej. PIAR Activo / Talentos / N/A" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                    </div>
-
-                    <hr class="border-white/10">
-
-                    <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
-                        <i class="fa-solid fa-phone-flip"></i> Contactos de Emergencia y Acudiente
-                    </h4>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre Acudiente Principal</label>
-                            <input type="text" id="info-guardian-name" placeholder="Nombre completo del acudiente..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Parentesco</label>
-                            <input type="text" id="info-guardian-relation" placeholder="Ej. Madre, Padre, Tía, Abuela..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teléfono Principal Emergencia</label>
-                            <input type="text" id="info-phone1-input" placeholder="Ej. 3001234567" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-amber-300 font-bold focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teléfono Secundario / Respaldo</label>
-                            <input type="text" id="info-phone2-input" placeholder="Ej. 3117654321" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Dirección de Residencia</label>
-                            <input type="text" id="info-address-input" placeholder="Dirección / Barrio..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end pt-2">
-                        <button onclick="savePersonalData()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk"></i>
-                            <span>Guardar Datos Personales y Contactos</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- CONTENEDOR TEMPORAL PARA PDF -->
-    <div id="pdf-export-container" class="hidden"></div>
-
-    <!-- MODAL REGISTRO MASIVO -->
-    <div id="bulk-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
-            <button onclick="closeBulkModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
-                    <i class="fa-solid fa-users-gear text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="font-display font-extrabold text-base text-white">Registro Convivencial Masivo</h3>
-                    <p class="text-xs text-amber-300 font-bold">Se aplicará a <span id="bulk-modal-count">0</span> estudiantes seleccionados</p>
-                </div>
-            </div>
-
-            <div class="space-y-3 mb-5">
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Clasificación / Tipo de Situación</label>
-                    <select id="bulk-type-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
-                        <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Grupal (+XP)</option>
-                        <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve Grupal)</option>
-                        <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave Grupal)</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
-                    <select id="bulk-pillar-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
-                        <option value="Responsabilidad">🐘 Responsabilidad</option>
-                        <option value="Respeto">🦁 Respeto</option>
-                        <option value="Confianza">🐪 Confianza</option>
-                        <option value="Empatía">❤️ Empatía</option>
-                        <option value="Justicia">⚖️ Justicia</option>
-                        <option value="Ciudadanía">🛡️ Ciudadanía</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Detalle / Nota Pedagógica Grupal</label>
-                    <textarea id="bulk-note-input" rows="2" placeholder="Escribe el motivo del mérito o la falta grupal..." class="w-full bg-slate-900 border border-white/10 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
-                </div>
-
-                <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-white/10">
-                    <span class="text-xs font-bold text-slate-300">Puntos a aplicar por estudiante:</span>
-                    <input type="number" id="bulk-magnitude-input" min="1" max="10" value="1" class="w-16 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-xs text-center font-bold text-amber-300">
-                </div>
-            </div>
-
-            <button onclick="confirmApplyBulkAction()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check-double"></i>
-                <span>Aplicar a Todos los Seleccionados</span>
-            </button>
-        </div>
-    </div>
-
-    <!-- MODAL GENERADOR EQUIPOS -->
-    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
-        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
-            <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="flex items-center gap-3 mb-4">
-                <div class="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
-                    <i class="fa-solid fa-users-viewfinder text-xl"></i>
-                </div>
-                <div>
-                    <h3 class="font-display font-extrabold text-base text-white">Generador de Equipos de Trabajo</h3>
-                    <p class="text-xs text-sky-300 font-bold">Divide dinámicamente a los estudiantes del grado actual</p>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900 p-3 rounded-2xl border border-white/10 mb-4 text-xs">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Criterio de División</label>
-                    <select id="team-mode-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-white font-bold focus:outline-none">
-                        <option value="size">Por nº de estudiantes por grupo</option>
-                        <option value="count">Por nº total de grupos</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cantidad / Valor</label>
-                    <input type="number" id="team-value-input" min="1" max="50" value="4" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-center text-amber-300 font-bold focus:outline-none">
-                </div>
-                <div class="flex items-end">
-                    <button onclick="generateTeams()" class="w-full py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-extrabold rounded-xl shadow transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-shuffle"></i>
-                        <span>Generar Equipos</span>
-                    </button>
-                </div>
-            </div>
-
-            <div id="teams-results-container" class="flex-grow overflow-y-auto space-y-3 pr-1 min-h-[200px] border border-white/10 rounded-2xl p-3 bg-slate-950/50">
-                <p class="text-center text-xs text-slate-500 py-10">Haz clic en "Generar Equipos" para organizar al curso automáticamente.</p>
-            </div>
-
-            <div class="flex gap-2 mt-4 pt-3 border-t border-white/10">
-                <button onclick="copyTeamsToClipboard()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-copy text-amber-400"></i>
-                    <span>Copiar Texto</span>
-                </button>
-                <button onclick="exportTeamsExcel()" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
-                    <span>Exportar a Excel (.xlsx)</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL REGISTRO RÁPIDO -->
+    <!-- MODAL 1: AWARD MERIT / REGISTER INCIDENT -->
     <div id="award-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeAwardModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -748,12 +382,365 @@
 
             <button onclick="saveStudentEntry()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
                 <i class="fa-solid fa-floppy-disk"></i>
-                <span>Guardar Registro</span>
+                <span>Guardar Registro en Observador y Nube</span>
             </button>
         </div>
     </div>
 
-    <!-- MODAL DRIVE SETTINGS -->
+    <!-- MODAL 2: STUDENT OBSERVADOR & HISTORY SHEET (3 PESTAÑAS) -->
+    <div id="history-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-4xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[92vh] flex flex-col">
+            <button onclick="closeHistoryModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- CABECERA DE LA FICHA -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-3 border-b border-white/10 gap-3">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
+                        <div id="history-student-avatar" class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-xl">
+                            A
+                        </div>
+                    </div>
+                    <div>
+                        <h3 id="history-student-name" class="font-display font-black text-base text-white leading-tight">Nombre Estudiante</h3>
+                        <p id="history-student-subtitle" class="text-xs text-slate-400">Hoja de Vida e Historial Integral — Colegio Alfonso López Michelsen</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-2">
+                    <button onclick="downloadStudentPDF()" class="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 border border-rose-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Descargar Expediente Completo en PDF">
+                        <i class="fa-solid fa-file-pdf text-rose-200"></i>
+                        <span>Descargar PDF</span>
+                    </button>
+                    <button onclick="exportSingleStudentExcel()" class="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 border border-emerald-400/40 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 shadow" title="Exportar Ficha a Excel (.xlsx)">
+                        <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                        <span>Excel</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABS DE NAVEGACIÓN DENTRO DE LA FICHA -->
+            <div class="flex gap-2 border-b border-white/10 my-3">
+                <button onclick="switchTab('obs')" id="tab-btn-obs" class="pb-2 px-3 text-xs font-bold text-amber-300 border-b-2 border-amber-400 transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-clipboard-list"></i> Observador Convivencial
+                </button>
+                <button onclick="switchTab('meetings')" id="tab-btn-meetings" class="pb-2 px-3 text-xs font-bold text-slate-400 hover:text-white border-b-2 border-transparent transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-comments"></i> Actas / Reuniones
+                </button>
+                <button onclick="switchTab('personal')" id="tab-btn-personal" class="pb-2 px-3 text-xs font-bold text-slate-400 hover:text-white border-b-2 border-transparent transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-id-card"></i> Datos Personales y Contacto
+                </button>
+            </div>
+
+            <!-- PESTAÑA 1: OBSERVADOR CONVIVENCIAL -->
+            <div id="tab-content-obs" class="flex-grow overflow-y-auto space-y-3 pr-1">
+                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                            <i class="fa-solid fa-pen-nib"></i> Registrar Anotación Convivencial
+                        </span>
+                        <span class="text-[10px] text-slate-400 font-semibold" id="obs-current-date"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Situación / Falta</label>
+                            <select id="obs-type-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
+                                <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve)</option>
+                                <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave)</option>
+                                <option value="Situación Tipo III (Falta Gravísima)">Situación Tipo III (Falta Gravísima)</option>
+                                <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Convivencial</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
+                            <select id="obs-pillar-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold focus:outline-none">
+                                <option value="Responsabilidad">🐘 Responsabilidad</option>
+                                <option value="Respeto">🦁 Respeto</option>
+                                <option value="Confianza">🐪 Confianza</option>
+                                <option value="Empatía">❤️ Empatía</option>
+                                <option value="Justicia">⚖️ Justicia</option>
+                                <option value="Ciudadanía">🛡️ Ciudadanía</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descripción Detallada de los Hechos</label>
+                        <textarea id="obs-detail-input" rows="2" placeholder="Escribe la descripción de la falta o hecho..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Descargo del Estudiante (Debido Proceso)</label>
+                            <textarea id="obs-descargo-input" rows="1" placeholder="Versión o descargos del alumno..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Compromisos y Estrategias Pedagógicas</label>
+                            <textarea id="obs-compromiso-input" rows="1" placeholder="Compromiso acordado de mejora o reparación..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white placeholder-slate-500 focus:outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1">
+                        <div class="flex items-center gap-3 text-[11px] text-slate-300">
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="obs-firmado-docente" checked class="rounded accent-emerald-500"> Registro Docente
+                            </label>
+                            <label class="flex items-center gap-1 cursor-pointer">
+                                <input type="checkbox" id="obs-firmado-estudiante" checked class="rounded accent-emerald-500"> Firma Estudiante
+                            </label>
+                        </div>
+                        <button onclick="saveFullObservadorEntry()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Guardar en Observador</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2" id="history-entries-container"></div>
+            </div>
+
+            <!-- PESTAÑA 2: REUNIONES / ACTAS -->
+            <div id="tab-content-meetings" class="flex-grow overflow-y-auto space-y-3 pr-1 hidden">
+                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-3.5 space-y-3">
+                    <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                        <i class="fa-solid fa-handshake-simple"></i> Registrar Nueva Reunión o Citación con Acudiente
+                    </span>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Motivo / Tipo de Reunión</label>
+                            <input type="text" id="meeting-reason-input" placeholder="Ej. Citación por rendimiento o citación convivencial..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Asistente / Acudiente Presente</label>
+                            <input type="text" id="meeting-attendant-input" placeholder="Nombre de quien asistió a la reunión..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Aspectos Tratados / Menciones</label>
+                            <textarea id="meeting-summary-input" rows="2" placeholder="Resumen de lo hablado sobre el estudiante en la reunión..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none"></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Acuerdos e Intervenciones Establecidas</label>
+                            <textarea id="meeting-agreements-input" rows="2" placeholder="Acuerdos por parte de la familia e institución..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-1">
+                        <button onclick="saveMeetingEntry()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Guardar Acta de Reunión</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-2" id="meetings-list-container"></div>
+            </div>
+
+            <!-- PESTAÑA 3: DATOS PERSONALES -->
+            <div id="tab-content-personal" class="flex-grow overflow-y-auto space-y-3 pr-1 hidden">
+                <div class="bg-slate-900/90 border border-white/10 rounded-2xl p-4 space-y-4">
+                    <h4 class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-address-card"></i> Información Personal y Médica del Estudiante
+                    </h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Documento de Identidad (TI / CC)</label>
+                            <input type="text" id="info-doc-input" placeholder="Ej. 1012345678" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fecha de Nacimiento</label>
+                            <input type="date" id="info-dob-input" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">RH / Grupo Sanguíneo</label>
+                            <select id="info-rh-input" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                                <option value="O+">O+</option>
+                                <option value="O-">O-</option>
+                                <option value="A+">A+</option>
+                                <option value="A-">A-</option>
+                                <option value="B+">B+</option>
+                                <option value="B-">B-</option>
+                                <option value="AB+">AB+</option>
+                                <option value="AB-">AB-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">EPS / Entidad de Salud</label>
+                            <input type="text" id="info-eps-input" placeholder="Ej. Capital Salud..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Caracterización PIAR / DUA / Inclusión</label>
+                            <input type="text" id="info-piar-input" placeholder="Ej. PIAR Activo / Talentos / N/A" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <hr class="border-white/10">
+
+                    <h4 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-phone-flip"></i> Contactos de Emergencia y Acudiente
+                    </h4>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nombre Acudiente Principal</label>
+                            <input type="text" id="info-guardian-name" placeholder="Nombre completo del acudiente..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Parentesco</label>
+                            <input type="text" id="info-guardian-relation" placeholder="Ej. Madre, Padre, Tía, Abuela..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teléfono Principal Emergencia</label>
+                            <input type="text" id="info-phone1-input" placeholder="Ej. 3001234567" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-amber-300 font-bold focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Teléfono Secundario / Respaldo</label>
+                            <input type="text" id="info-phone2-input" placeholder="Ej. 3117654321" class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Dirección de Residencia</label>
+                            <input type="text" id="info-address-input" placeholder="Dirección / Barrio..." class="w-full bg-slate-800 border border-white/10 rounded-xl p-2 text-xs text-white focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end pt-2">
+                        <button onclick="savePersonalData()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs rounded-xl shadow transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            <span>Guardar Datos Personales y Contactos</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR TEMPORAL PARA GENERACIÓN Y DESCARGA DEL PDF -->
+    <div id="pdf-export-container" class="hidden"></div>
+
+    <!-- MODAL PARA APLICACIÓN DE ACCIÓN MASIVA -->
+    <div id="bulk-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 relative border border-white/20 shadow-2xl">
+            <button onclick="closeBulkModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400">
+                    <i class="fa-solid fa-users-gear text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-base text-white">Registro Convivencial Masivo</h3>
+                    <p class="text-xs text-amber-300 font-bold">Se aplicará a <span id="bulk-modal-count">0</span> estudiantes seleccionados</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 mb-5">
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Clasificación / Tipo de Situación</label>
+                    <select id="bulk-type-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
+                        <option value="Reconocimiento / Mérito">Reconocimiento / Mérito Grupal (+XP)</option>
+                        <option value="Situación Tipo I (Falta Leve)">Situación Tipo I (Falta Leve Grupal)</option>
+                        <option value="Situación Tipo II (Falta Grave)">Situación Tipo II (Falta Grave Grupal)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Pilar Valor / Character Counts</label>
+                    <select id="bulk-pillar-select" class="w-full bg-slate-900 border border-white/10 rounded-xl px-2.5 py-2 text-xs text-white font-semibold focus:outline-none">
+                        <option value="Responsabilidad">🐘 Responsabilidad</option>
+                        <option value="Respeto">🦁 Respeto</option>
+                        <option value="Confianza">🐪 Confianza</option>
+                        <option value="Empatía">❤️ Empatía</option>
+                        <option value="Justicia">⚖️ Justicia</option>
+                        <option value="Ciudadanía">🛡️ Ciudadanía</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] font-bold text-slate-400 uppercase mb-1">Detalle / Nota Pedagógica Grupal</label>
+                    <textarea id="bulk-note-input" rows="2" placeholder="Escribe el motivo del mérito o la falta grupal..." class="w-full bg-slate-900 border border-white/10 rounded-xl p-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-colegio-gold"></textarea>
+                </div>
+
+                <div class="flex items-center justify-between bg-slate-900 p-3 rounded-xl border border-white/10">
+                    <span class="text-xs font-bold text-slate-300">Puntos a aplicar por estudiante:</span>
+                    <input type="number" id="bulk-magnitude-input" min="1" max="10" value="1" class="w-16 bg-slate-800 border border-white/10 rounded-lg px-2 py-1 text-xs text-center font-bold text-amber-300">
+                </div>
+            </div>
+
+            <button onclick="confirmApplyBulkAction()" class="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check-double"></i>
+                <span>Aplicar a Todos los Seleccionados</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL GENERADOR DE EQUIPOS / CLANES DE TRABAJO -->
+    <div id="teams-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel w-full max-w-2xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] flex flex-col">
+            <button onclick="closeTeamsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <div class="flex items-center gap-3 mb-4">
+                <div class="w-10 h-10 rounded-2xl bg-sky-500/20 border border-sky-500/30 flex items-center justify-center text-sky-400">
+                    <i class="fa-solid fa-users-viewfinder text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-extrabold text-base text-white">Generador de Equipos de Trabajo</h3>
+                    <p class="text-xs text-sky-300 font-bold">Divide dinámicamente a los estudiantes del grado actual</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-900 p-3 rounded-2xl border border-white/10 mb-4 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Criterio de División</label>
+                    <select id="team-mode-select" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-white font-bold focus:outline-none">
+                        <option value="size">Por nº de estudiantes por grupo</option>
+                        <option value="count">Por nº total de grupos</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Cantidad / Valor</label>
+                    <input type="number" id="team-value-input" min="1" max="50" value="4" class="w-full bg-slate-800 border border-white/10 rounded-xl px-2.5 py-1.5 text-center text-amber-300 font-bold focus:outline-none">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="generateTeams()" class="w-full py-2 bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 text-white font-extrabold rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-shuffle"></i>
+                        <span>Generar Equipos</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="teams-results-container" class="flex-grow overflow-y-auto space-y-3 pr-1 min-h-[200px] border border-white/10 rounded-2xl p-3 bg-slate-950/50">
+                <p class="text-center text-xs text-slate-500 py-10">Haz clic en "Generar Equipos" para organizar al curso automáticamente.</p>
+            </div>
+
+            <div class="flex gap-2 mt-4 pt-3 border-t border-white/10">
+                <button onclick="copyTeamsToClipboard()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-white/10 transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-copy text-amber-400"></i>
+                    <span>Copiar Texto</span>
+                </button>
+                <button onclick="exportTeamsExcel()" class="flex-1 py-2 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-file-excel text-emerald-300"></i>
+                    <span>Exportar a Excel (.xlsx)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: GOOGLE DRIVE / FORMS AUTOMATIC SYNC SETTINGS -->
     <div id="drive-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xl rounded-3xl p-6 relative border border-white/20 shadow-2xl max-h-[90vh] overflow-y-auto">
             <button onclick="closeDriveModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -766,8 +753,19 @@
                 </div>
                 <div>
                     <h3 class="font-display font-extrabold text-base text-white">Conexión con Google Drive mediante Formularios</h3>
-                    <p class="text-xs text-emerald-300 font-bold">Guarda automáticamente cada falta/mérito en Drive</p>
+                    <p class="text-xs text-emerald-300 font-bold">¡Sin necesidad de programar ni usar Apps Script!</p>
                 </div>
+            </div>
+
+            <div class="bg-slate-900 p-3 rounded-2xl border border-white/10 text-xs space-y-3 mb-4">
+                <p class="font-bold text-amber-300"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> ¿Cómo funciona la conexión con Google Forms?</p>
+                <ol class="list-decimal list-inside space-y-1.5 text-slate-300 text-[11px]">
+                    <li>Crea un **Formulario de Google** en tu Drive con estas preguntas breves: 
+                        <span class="text-slate-400 italic">(Curso, Estudiante, Tipo, Pilar, Puntos, Observación)</span>.
+                    </li>
+                    <li>En el formulario, ve a la pestaña **Respuestas** y haz clic en **"Vincular con Hoja de cálculo"**.</li>
+                    <li>Pega la URL de tu formulario o enlace de respuesta abajo.</li>
+                </ol>
             </div>
 
             <div class="space-y-3 mb-5">
@@ -788,7 +786,7 @@
         </div>
     </div>
 
-    <!-- MODAL GESTIÓN CURSOS -->
+    <!-- MODAL 4: MANAGE GROUPS & COURSES -->
     <div id="manage-groups-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl">
             <button onclick="closeManageGroupsModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -803,15 +801,16 @@
             <div class="flex gap-2 mb-4 bg-slate-900 p-2 rounded-2xl border border-white/10">
                 <input type="text" id="new-group-input" placeholder="Nombre de nuevo grupo (Ej. 1101)" class="flex-grow bg-transparent px-2 text-xs text-white placeholder-slate-500 focus:outline-none">
                 <button onclick="addNewGroup()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition">
-                    Crear Grupo
+                    Crear
                 </button>
             </div>
 
-            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container"></div>
+            <div class="max-h-60 overflow-y-auto space-y-1.5 pr-1" id="groups-list-container">
+            </div>
         </div>
     </div>
 
-    <!-- MODAL NUEVO ESTUDIANTE -->
+    <!-- MODAL 5: ADD NEW STUDENT MODAL -->
     <div id="add-student-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeAddStudentModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -826,7 +825,7 @@
         </div>
     </div>
 
-    <!-- MODAL CONFIRMACIÓN -->
+    <!-- MODAL 6: CONFIRMATION MODAL -->
     <div id="confirm-dialog-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <div class="w-12 h-12 rounded-2xl bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3 text-xl">
@@ -836,7 +835,7 @@
             <p id="confirm-message" class="text-xs text-slate-400 mb-5 leading-relaxed">Esta acción no se puede deshacer.</p>
             <div class="flex gap-2">
                 <button id="confirm-action-btn" class="flex-1 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition">
-                    Aceptar
+                    Eliminar
                 </button>
                 <button onclick="closeConfirmModal()" class="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl transition">
                     Cancelar
@@ -845,23 +844,22 @@
         </div>
     </div>
 
-    <!-- MODAL RULETA -->
+    <!-- MODALS: RULETA, DADO & CRONÓMETRO -->
     <div id="wheel-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-md rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeWheelModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
                 <i class="fa-solid fa-xmark"></i>
             </button>
             <h3 class="font-display font-extrabold text-base text-white mb-4">Ruleta de Selección Aleatoria</h3>
-            <div id="wheel-display" class="w-full h-32 bg-slate-900 border border-amber-500/40 rounded-2xl flex items-center justify-center font-display font-black text-xl text-amber-300 p-4 mb-4 shadow-inner">
+            <div id="wheel-display" class="w-full h-32 bg-slate-900 border border-amber-500/40 rounded-2xl flex items-center justify-center font-display font-black text-xl text-amber-300 p-4 mb-4">
                 ¡Presiona Girar!
             </div>
-            <button id="spin-wheel-btn" onclick="spinStudentWheel()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-                <i class="fa-solid fa-arrows-spin"></i> Girar Ruleta (Con Sonido)
+            <button id="spin-wheel-btn" onclick="spinStudentWheel()" class="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-sm rounded-xl shadow-lg transition">
+                <i class="fa-solid fa-arrows-spin mr-2"></i> Girar Ruleta (Con Sonido)
             </button>
         </div>
     </div>
 
-    <!-- MODAL DADO -->
     <div id="dice-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeDiceModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -877,7 +875,6 @@
         </div>
     </div>
 
-    <!-- MODAL CRONÓMETRO -->
     <div id="timer-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
         <div class="glass-panel w-full max-w-xs rounded-3xl p-6 relative border border-white/20 shadow-2xl text-center">
             <button onclick="closeTimerModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center border border-white/10 transition">
@@ -903,8 +900,8 @@
         </div>
     </div>
 
-    <!-- LÓGICA DE PROGRAMACIÓN COMPLETA -->
     <script>
+        // DEFAULT ROSTERS FOR ALL GRADES
         const DEFAULT_ROSTERS = {
             "801": ["Jhanair Cantillo buelvas", "Emily Alejandra Carabali calvo", "Johan Alejandro Carrillo Daza", "Nataly Gisseth Carvajal Alba", "JUAN ESTEBAN CUERVO HERRERA", "Sara Sofía Galeano Vargas", "MELANY GARCIA GIRALDO", "HELEN GONZALEZ YAYA", "JULIAN GONZALEZ (801)", "ALISON MARIA GRACIA CULMA", "CAMILA ANDREA HERRERA ALVAREZ", "Alan Felipe Llanos Hernandez", "JHAN VALENTIN LOPEZ VALENCIA", "Mariany Marquez Lizo", "OMAR OSPINO BANDERAS", "Saira Palacios Riaño", "johan sebastian pardo niño (801)", "GENESIS VALENTINA POLO MERIÑO", "Sebastián Alberto Portillo colmenares", "Jhoel Riaño Garzón", "ALISSON RIVEROS (801)", "Samantha Rodríguez Moreno", "DANNA RODRIGUEZ NAVARRO", "Lina Sofia Rojas Salamanca", "Miguel Ruiz (801)", "YUNAISIS SALGADO CASTRO", "Nathaly Solano Torres", "Cindylorena Tellez(801)", "Fernanda Tenorio quiñones", "SAMUEL ALEJANDRO TINOCO PINZON", "NICOOL SARA VASQUEZ URREA", "GREYSMAR ZUÑIGA VITORINO"],
             "802": ["MARYIS CAMILA AREVALO (802)", "Emanuel Buitrago (802)", "Elisabeth Carmona Gracia", "Jobsanim susana Colina calles", "Luisa Alejandra Díaz Yepes (802)", "Matias Escobar flores", "Dilan David Garcia Leal 802", "Héctor Garzón Ramirez", "ANGEL DANIEL GONZALEZ (802)", "Sharol Dayana Gutierrez Téllez", "Karol Dayana Hueso Pulido", "Claudia Gabriela Leiva Gomez", "Holman Esneyder Mena Mosquera", "Sara Gisell Neira Pardo(802)", "Dyland Alejandro Nieto (802)", "Sara Ocampo Isaza", "María Fernanda Orozco Diaz 802", "Juan Esteban Orozco Higuita", "María Fernanda Osorio huérfano", "ZARA VALENTINA PEDRAZA ZAMORA", "Sharith Liceth Riascos Conrado", "Maria Victoria Rodriguez Moreno", "Sara Valentina Rodriguez Ocampo", "David Santiago Rodríguez Ortiz", "Danna Valeria Rojas Florez(802)", "Valery Maria Romero Capera", "Angel David Saavedra Peñuela", "María Fernanda Saenz Fresneda", "Alisson Geraldine Sanabria Bernal", "Darly maryori Solano cubides", "DYLAN SEBASTIAN SOLIS HERNANDEZ", "MARIA JOSE TORO RUIZ (802)"],
@@ -919,6 +916,15 @@
             "1003": ["Laura Estefania Arenas Real", "OMAR BUITRAGO PEREZ", "MAICOL ANDRES CAMACHO BARRERA", "Steeven Daniel Cantero Geney", "Andrea Camila Cudris (1003)", "DANIELA SOFIA GARCERA GONZALEZ", "KEVIN SANTIAGO GARCIA RAMIREZ", "Laura Giron (1003)", "ANGIE KATHERINE GODOY LOPEZ", "Jhonatan Gonzalez 1003", "Sara González 1003", "DANNA GABRIELA GONZALEZ LOPEZ", "URIEL STEVEN GUTIERREZ GALINDO", "David Santiago Herrera Sanabria", "Nicolás Holguín Amador", "ANGIE JULIETH JIMENEZ LUMBA", "AURA CRISTINA MARQUEZ PINTO", "MAURA VALERIA MARTINEZ ACOSTA", "BREYNER MARTINEZ MONSALVE", "JONATHAN DAVID MARTINEZ TELLEZ", "Sara sofia Matiz Sandoval", "DANYERY NATALIA MORENO PIRATOBA", "Sara Milena Murillo Cifuentes", "Valery Ximena Ochoa farigua", "DANNA GABRIELA OSORIO VARGAS", "BRANDON JAVIER OSORIO VELASQUEZ", "sara camila Patino Orjuela", "SARA ISABEL PEREA RAMIREZ", "melany ramos1003", "Alejandro Reyes pinzón", "DANNA KAMILA RODRIGUEZ ACOSTA", "Maria Alejandra Romero Díaz", "SARA VALENTINA SAENZ GARCIA", "DANIEL ALEJANDRO SUAREZ GALINDO", "Yulian Santiago Torres Arevalo", "ISABELLA TORRES VERGARA", "LAURA VIVIANA VASQUEZ BUSTOS", "Duban Stiver Velasco (1003)", "JOSETT JAIR ZAMORA AMANTE"]
         };
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGjUdnghS8bMwu3T5zDR0FgOAIOsjKaDY",
+            authDomain: "fantasyclass-alm.firebaseapp.com",
+            projectId: "fantasyclass-alm",
+            storageBucket: "fantasyclass-alm.firebasestorage.app",
+            messagingSenderId: "197366368735",
+            appId: "1:197366368735:web:aff964290af5d93eae1c6a"
+        };
+
         let currentClassKey = "801";
         let currentPeriod = "P1";
         let selectedStudentId = null;
@@ -926,6 +932,7 @@
         let activeEntryType = 'positive';
         let selectedValueTag = 'Responsabilidad';
         let dbState = { classes: {}, googleScriptUrl: '' };
+        let firestoreDb = null;
         let confirmCallback = null;
         let generatedTeamsData = [];
 
@@ -968,21 +975,11 @@
             } catch(e) {}
         }
 
-        function toggleMenu(event, menuId) {
-            event.stopPropagation();
-            const targetMenu = document.getElementById(menuId);
-            const allMenus = document.querySelectorAll('.dropdown-menu');
-            
-            allMenus.forEach(menu => {
-                if (menu !== targetMenu) menu.classList.add('hidden');
-            });
-
-            if (targetMenu) targetMenu.classList.toggle('hidden');
-        }
-
         function closeAllDropdowns(event) {
-            const allMenus = document.querySelectorAll('.dropdown-menu');
-            allMenus.forEach(menu => menu.classList.add('hidden'));
+            const menu = document.getElementById('export-dropdown');
+            if (menu && !event.target.closest('#export-dropdown') && !event.target.closest('button[onclick="toggleExportMenu()"]')) {
+                menu.classList.add('hidden');
+            }
         }
 
         function switchTab(tabKey) {
@@ -1027,6 +1024,14 @@
 
         function saveDatabase() {
             localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState));
+            if (firestoreDb) {
+                try {
+                    firestoreDb.collection("cursos").doc(currentClassKey).set({
+                        estudiantes: dbState.classes[currentClassKey],
+                        updatedAt: new Date().toISOString()
+                    }, { merge: true });
+                } catch(e) {}
+            }
         }
 
         function updateClassSelectOptions() {
@@ -1057,7 +1062,11 @@
                     formData.append('entry.5', entryData.puntos || 0);
                     formData.append('entry.6', entryData.nota || '');
 
-                    fetch(url, { method: 'POST', mode: 'no-cors', body: formData });
+                    fetch(url, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formData
+                    });
                 } else {
                     fetch(url, {
                         method: 'POST',
@@ -1090,7 +1099,7 @@
             if (url) {
                 badgeText.innerText = "Google Drive Activo";
             } else {
-                badgeText.innerText = "Reportes / Drive";
+                badgeText.innerText = "Google Forms/Drive Sync";
             }
             closeDriveModal();
         }
@@ -1222,6 +1231,446 @@
             alertModal("Acción Masiva Completada", `Se aplicó la anotación a ${count} estudiantes correctamente.`);
         }
 
+        function exportCurrentClassExcel() {
+            const students = dbState.classes[currentClassKey] || [];
+            
+            const summaryRows = students.map((s, idx) => {
+                const obsCount = (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                const positiveCount = (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length;
+                return {
+                    "N°": idx + 1,
+                    "ID Estudiante": s.id,
+                    "Nombre Estudiante": s.name,
+                    "Grado": currentClassKey,
+                    "Nivel RPG": s.level || 1,
+                    "Puntos XP Total": s.xp || 0,
+                    "Méritos (+XP)": positiveCount,
+                    "Observaciones (-HP)": obsCount
+                };
+            });
+
+            const historyRows = [];
+            students.forEach(s => {
+                if (!s.history || s.history.length === 0) {
+                    historyRows.push({
+                        "Grado": currentClassKey,
+                        "ID Estudiante": s.id,
+                        "Nombre Estudiante": s.name,
+                        "Fecha y Hora": "Sin registros",
+                        "Periodo": currentPeriod,
+                        "Tipo Evento": "Sin anotaciones",
+                        "Pilar Character Counts": "N/A",
+                        "Puntos": 0,
+                        "Anotación Observador": "Sin novedades convivenciales registradas"
+                    });
+                } else {
+                    s.history.forEach(h => {
+                        historyRows.push({
+                            "Grado": currentClassKey,
+                            "ID Estudiante": s.id,
+                            "Nombre Estudiante": s.name,
+                            "Fecha y Hora": h.timestamp || '',
+                            "Periodo": h.period || 'P1',
+                            "Tipo Evento": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
+                            "Pilar Character Counts": h.valueTag || 'Convivencia',
+                            "Puntos": h.magnitude || 1,
+                            "Detalle Hechos": h.note || '',
+                            "Descargo Estudiante": h.descargo || '',
+                            "Compromisos": h.compromiso || ''
+                        });
+                    });
+                }
+            });
+
+            const wb = XLSX.utils.book_new();
+            const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
+            const wsHistory = XLSX.utils.json_to_sheet(historyRows);
+
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Consolidado " + currentClassKey);
+            XLSX.utils.book_append_sheet(wb, wsHistory, "Bitácora Detallada Alumnos");
+
+            XLSX.writeFile(wb, `FantasyClass_Reporte_Grado_${currentClassKey}_ALM.xlsx`);
+            toggleExportMenu();
+        }
+
+        function exportAllClassesMasterExcel() {
+            const wb = XLSX.utils.book_new();
+
+            Object.keys(dbState.classes).forEach(cKey => {
+                const students = dbState.classes[cKey] || [];
+                const rows = students.map((s, idx) => ({
+                    "N°": idx + 1,
+                    "Nombre Estudiante": s.name,
+                    "Grado": cKey,
+                    "Nivel RPG": s.level || 1,
+                    "Puntos XP": s.xp || 0,
+                    "Méritos": (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length,
+                    "Observaciones": (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length
+                }));
+                const ws = XLSX.utils.json_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, `Curso ${cKey}`);
+            });
+
+            XLSX.writeFile(wb, `FantasyClass_Master_TodosLosCursos_ALM.xlsx`);
+            toggleExportMenu();
+        }
+
+        function exportSingleStudentExcel() {
+            if (!selectedStudentId) return;
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
+            if (!student) return;
+
+            const studentHistory = student.history || [];
+            const historyRows = studentHistory.map(h => ({
+                "Fecha y Hora": h.timestamp || '',
+                "Periodo Lectivo": h.period || 'P1',
+                "Tipo de Situación": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
+                "Pilar Valor": h.valueTag || 'Convivencia',
+                "Puntos Impacto": h.magnitude || 1,
+                "Descripción de los Hechos": h.note || '',
+                "Descargo del Estudiante": h.descargo || '',
+                "Compromisos y Acuerdos": h.compromiso || ''
+            }));
+
+            if (historyRows.length === 0) {
+                historyRows.push({
+                    "Fecha y Hora": "N/A",
+                    "Periodo Lectivo": currentPeriod,
+                    "Tipo de Situación": "Sin anotaciones",
+                    "Pilar Valor": "N/A",
+                    "Puntos Impacto": 0,
+                    "Descripción de los Hechos": "Sin eventos registrados en el observador."
+                });
+            }
+
+            const wb = XLSX.utils.book_new();
+            const summaryData = [{
+                "Nombre Estudiante": student.name,
+                "Grado": currentClassKey,
+                "Nivel RPG": student.level || 1,
+                "Puntos XP": student.xp || 0,
+                "Total Registros": studentHistory.length
+            }];
+            
+            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
+            const wsStudent = XLSX.utils.json_to_sheet(historyRows);
+
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Ficha Estudiante");
+            XLSX.utils.book_append_sheet(wb, wsStudent, "Historial Observador");
+
+            const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
+            XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
+        }
+
+        function toggleExportMenu() {
+            const menu = document.getElementById('export-dropdown');
+            menu.classList.toggle('hidden');
+        }
+
+        function openAddStudentModal() {
+            document.getElementById('add-student-course-name').innerText = currentClassKey;
+            document.getElementById('new-student-name-input').value = '';
+            document.getElementById('add-student-modal').classList.remove('hidden');
+        }
+
+        function closeAddStudentModal() {
+            document.getElementById('add-student-modal').classList.add('hidden');
+        }
+
+        function confirmAddNewStudent() {
+            const input = document.getElementById('new-student-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const students = dbState.classes[currentClassKey] || [];
+            students.push({
+                id: `${currentClassKey}_${Date.now()}`,
+                name: name,
+                xp: 0,
+                level: 1,
+                history: [],
+                meetings: [],
+                personalData: {}
+            });
+
+            saveDatabase();
+            updateClassSelectOptions();
+            renderStudentGrid();
+            closeAddStudentModal();
+        }
+
+        function deleteStudent(studentId) {
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
+            if (!student) return;
+
+            showConfirmModal(
+                "Eliminar Estudiante",
+                `¿Deseas eliminar permanentemente a "${student.name}" del grado ${currentClassKey}?`,
+                () => {
+                    dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(s => s.id !== studentId);
+                    saveDatabase();
+                    updateClassSelectOptions();
+                    renderStudentGrid();
+                }
+            );
+        }
+
+        function openManageGroupsModal() {
+            renderGroupsList();
+            document.getElementById('manage-groups-modal').classList.remove('hidden');
+        }
+
+        function closeManageGroupsModal() {
+            document.getElementById('manage-groups-modal').classList.add('hidden');
+        }
+
+        function renderGroupsList() {
+            const container = document.getElementById('groups-list-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.keys(dbState.classes).forEach(cKey => {
+                const count = dbState.classes[cKey].length;
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-white/10 text-xs";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-extrabold text-amber-300">Grado ${cKey}</span>
+                        <span class="text-[10px] text-slate-400 ml-2">(${count} estudiantes)</span>
+                    </div>
+                    <button onclick="deleteGroup('${cKey}')" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg transition" title="Eliminar este grupo completo">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function addNewGroup() {
+            const input = document.getElementById('new-group-input');
+            const groupName = input.value.trim().toUpperCase();
+            if (!groupName) return;
+
+            if (dbState.classes[groupName]) {
+                alertModal("Grupo Existente", "Este grado o grupo ya existe.");
+                return;
+            }
+
+            dbState.classes[groupName] = [];
+            input.value = '';
+            saveDatabase();
+            updateClassSelectOptions();
+            renderGroupsList();
+            switchClass(groupName);
+        }
+
+        function deleteGroup(groupKey) {
+            showConfirmModal(
+                "Eliminar Grupo Completo",
+                `¿Estás seguro de eliminar todo el grupo "${groupKey}" con sus estudiantes?`,
+                () => {
+                    delete dbState.classes[groupKey];
+                    saveDatabase();
+                    const keys = Object.keys(dbState.classes);
+                    if (keys.length > 0) {
+                        currentClassKey = keys[0];
+                    }
+                    updateClassSelectOptions();
+                    renderGroupsList();
+                    renderStudentGrid();
+                }
+            );
+        }
+
+        function showConfirmModal(title, message, onConfirm) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            confirmCallback = onConfirm;
+            document.getElementById('confirm-action-btn').onclick = () => {
+                if (confirmCallback) confirmCallback();
+                closeConfirmModal();
+            };
+            document.getElementById('confirm-dialog-modal').classList.remove('hidden');
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirm-dialog-modal').classList.add('hidden');
+        }
+
+        function alertModal(title, message) {
+            document.getElementById('confirm-title').innerText = title;
+            document.getElementById('confirm-message').innerText = message;
+            document.getElementById('confirm-action-btn').onclick = closeConfirmModal;
+            document.getElementById('confirm-dialog-modal').classList.remove('hidden');
+        }
+
+        function calculateStudentStatsForPeriod(student) {
+            let filteredHistory = student.history || [];
+            if (currentPeriod !== 'ALL') {
+                filteredHistory = filteredHistory.filter(h => h.period === currentPeriod || !h.period);
+            }
+
+            let xp = 0;
+            let badges = { Responsabilidad: 0, Respeto: 0, Confianza: 0, Empatía: 0, Justicia: 0, Ciudadanía: 0 };
+
+            filteredHistory.forEach(h => {
+                const isPositive = h.type === 'positive' || (h.situationType && h.situationType.includes('Reconocimiento'));
+                if (isPositive) {
+                    xp += (h.magnitude || 1);
+                    if (h.valueTag && badges[h.valueTag] !== undefined) {
+                        badges[h.valueTag] += (h.magnitude || 1);
+                    }
+                }
+            });
+
+            const level = Math.floor(xp / 20) + 1;
+            return { xp, level, badges, history: filteredHistory };
+        }
+
+        function updateGlobalMetrics() {
+            const students = dbState.classes[currentClassKey] || [];
+            let totals = { Responsabilidad: 0, Respeto: 0, Confianza: 0, Empatía: 0, Justicia: 0, Ciudadanía: 0 };
+
+            students.forEach(s => {
+                const stats = calculateStudentStatsForPeriod(s);
+                Object.keys(totals).forEach(k => {
+                    totals[k] += stats.badges[k] || 0;
+                });
+            });
+
+            Object.keys(totals).forEach(k => {
+                const el = document.getElementById(`badge-count-${k}`);
+                if (el) el.innerText = `${totals[k]} pts`;
+            });
+        }
+
+        function renderStudentGrid() {
+            const container = document.getElementById('students-grid');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const students = dbState.classes[currentClassKey] || [];
+            const query = document.getElementById('student-search-input')?.value.toLowerCase().trim() || '';
+            const sortBy = document.getElementById('sort-select')?.value || 'name';
+
+            let filtered = students.filter(s => s.name.toLowerCase().includes(query));
+
+            if (sortBy === 'name') {
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+            } else if (sortBy === 'level' || sortBy === 'xp') {
+                filtered.sort((a, b) => (b.xp || 0) - (a.xp || 0));
+            } else if (sortBy === 'obs') {
+                filtered.sort((a, b) => {
+                    const obsA = (a.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                    const obsB = (b.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                    return obsB - obsA;
+                });
+            }
+
+            filtered.forEach(student => {
+                const periodStats = calculateStudentStatsForPeriod(student);
+                const obsCount = periodStats.history.filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
+                const isChecked = selectedStudentIdsSet.has(student.id);
+
+                const card = document.createElement('div');
+                card.className = `glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group ${isChecked ? 'ring-2 ring-amber-400 bg-slate-900/95' : ''}`;
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-300">
+                                <input type="checkbox" onchange="toggleSelectStudent('${student.id}')" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500 cursor-pointer">
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40">
+                                    NIVEL ${periodStats.level}
+                                </span>
+                            </label>
+                            <div class="flex items-center gap-1.5 text-xs">
+                                <span class="text-emerald-400 font-bold"><i class="fa-solid fa-plus text-[10px]"></i> ${periodStats.xp} pts</span>
+                                <span class="text-slate-500">|</span>
+                                <span class="text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> ${obsCount}</span>
+                                <button onclick="deleteStudent('${student.id}')" class="ml-1 text-slate-500 hover:text-rose-400 text-xs transition" title="Eliminar Estudiante">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
+                                <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-display font-black text-amber-300 text-sm">
+                                    ${student.name.charAt(0)}
+                                </div>
+                            </div>
+                            <div class="overflow-hidden">
+                                <h4 class="font-display font-bold text-xs text-white truncate group-hover:text-amber-300 transition">${student.name}</h4>
+                                <p class="text-[10px] text-slate-400 truncate">Grado ${currentClassKey} • ${currentPeriod}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-white/10">
+                        <button onclick="openAwardModal('${student.id}', 'positive')" class="py-1.5 px-1.5 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
+                            <i class="fa-solid fa-plus text-[9px]"></i>
+                            <span>Mérito</span>
+                        </button>
+                        <button onclick="openAwardModal('${student.id}', 'negative')" class="py-1.5 px-1.5 rounded-xl bg-colegio-red/80 hover:bg-colegio-red text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
+                            <i class="fa-solid fa-minus text-[9px]"></i>
+                            <span>Falta</span>
+                        </button>
+                        <button onclick="openHistoryModal('${student.id}')" class="py-1.5 px-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[11px] transition flex items-center justify-center gap-1 border border-white/10">
+                            <i class="fa-solid fa-folder-open text-[9px]"></i>
+                            <span>Ficha</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            updateGlobalMetrics();
+        }
+
+        function switchClass(newClassKey) {
+            currentClassKey = newClassKey;
+            selectedStudentIdsSet.clear();
+            updateBulkActionBar();
+            document.getElementById('class-select').value = newClassKey;
+            renderStudentGrid();
+        }
+
+        function switchPeriod(newPeriod) {
+            currentPeriod = newPeriod;
+            renderStudentGrid();
+        }
+
+        function setEntryType(type) {
+            activeEntryType = type;
+            const btnPos = document.getElementById('btn-type-positive');
+            const btnNeg = document.getElementById('btn-type-negative');
+            if (type === 'positive') {
+                btnPos.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md";
+                btnNeg.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
+            } else {
+                btnNeg.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 bg-red-600 text-white shadow-md";
+                btnPos.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
+            }
+        }
+
+        function selectValueCategory(val) {
+            selectedValueTag = val;
+        }
+
+        function openAwardModal(studentId, type) {
+            selectedStudentId = studentId;
+            setEntryType(type);
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
+            if (!student) return;
+            document.getElementById('modal-student-name').innerText = student.name;
+            document.getElementById('award-modal').classList.remove('hidden');
+        }
+
+        function closeAwardModal() {
+            document.getElementById('award-modal').classList.add('hidden');
+        }
+
         function openHistoryModal(studentId) {
             selectedStudentId = studentId;
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
@@ -1230,7 +1679,7 @@
             document.getElementById('history-student-name').innerText = student.name;
             document.getElementById('history-student-avatar').innerText = student.name.charAt(0);
             document.getElementById('obs-current-date').innerText = new Date().toLocaleDateString('es-CO');
-
+            
             const pData = student.personalData || {};
             document.getElementById('info-doc-input').value = pData.doc || '';
             document.getElementById('info-dob-input').value = pData.dob || '';
@@ -1431,6 +1880,50 @@
             alertModal("Datos Guardados", "Se han actualizado los datos personales y contactos de emergencia.");
         }
 
+        function saveStudentEntry() {
+            if (!selectedStudentId) return;
+            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
+            if (!student) return;
+
+            const note = document.getElementById('entry-note-input').value.trim() || 'Registro de convivencia';
+            const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
+
+            if (!student.history) student.history = [];
+            
+            const newEntry = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('es-CO'),
+                period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
+                type: activeEntryType,
+                situationType: activeEntryType === 'positive' ? 'Reconocimiento / Mérito' : 'Situación Tipo I (Falta Leve)',
+                valueTag: selectedValueTag,
+                magnitude: magnitude,
+                note: note
+            };
+
+            student.history.unshift(newEntry);
+
+            if (activeEntryType === 'positive') {
+                student.xp = (student.xp || 0) + magnitude;
+                student.level = Math.floor(student.xp / 20) + 1;
+                try { confetti({ particleCount: 40, spread: 50, origin: { y: 0.7 } }); } catch(e){}
+            }
+
+            postToGoogleDriveSheet({
+                curso: currentClassKey,
+                estudiante: student.name,
+                tipo: activeEntryType === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
+                pilar: selectedValueTag,
+                puntos: magnitude,
+                nota: note
+            });
+
+            saveDatabase();
+            closeAwardModal();
+            renderStudentGrid();
+            document.getElementById('entry-note-input').value = '';
+        }
+
         function downloadStudentPDF() {
             if (!selectedStudentId) return;
             const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
@@ -1562,483 +2055,6 @@
             html2pdf().set(opt).from(element).save();
         }
 
-        function exportSingleStudentExcel() {
-            if (!selectedStudentId) return;
-            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-            if (!student) return;
-
-            const studentHistory = student.history || [];
-            const historyRows = studentHistory.map(h => ({
-                "Fecha y Hora": h.timestamp || '',
-                "Periodo Lectivo": h.period || 'P1',
-                "Tipo de Situación": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
-                "Pilar Valor": h.valueTag || 'Convivencia',
-                "Puntos Impacto": h.magnitude || 1,
-                "Descripción de los Hechos": h.note || '',
-                "Descargo del Estudiante": h.descargo || '',
-                "Compromisos y Acuerdos": h.compromiso || ''
-            }));
-
-            if (historyRows.length === 0) {
-                historyRows.push({
-                    "Fecha y Hora": "N/A",
-                    "Periodo Lectivo": currentPeriod,
-                    "Tipo de Situación": "Sin anotaciones",
-                    "Pilar Valor": "N/A",
-                    "Puntos Impacto": 0,
-                    "Descripción de los Hechos": "Sin eventos registrados en el observador."
-                });
-            }
-
-            const wb = XLSX.utils.book_new();
-            const summaryData = [{
-                "Nombre Estudiante": student.name,
-                "Grado": currentClassKey,
-                "Nivel RPG": student.level || 1,
-                "Puntos XP": student.xp || 0,
-                "Total Registros": studentHistory.length
-            }];
-            
-            const wsSummary = XLSX.utils.json_to_sheet(summaryData);
-            const wsStudent = XLSX.utils.json_to_sheet(historyRows);
-
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Ficha Estudiante");
-            XLSX.utils.book_append_sheet(wb, wsStudent, "Historial Observador");
-
-            const cleanName = student.name.replace(/[^a-zA-Z0-9]/g, '_');
-            XLSX.writeFile(wb, `Ficha_Observador_${cleanName}_Grado_${currentClassKey}.xlsx`);
-        }
-
-        function exportCurrentClassExcel() {
-            const students = dbState.classes[currentClassKey] || [];
-            const summaryRows = students.map((s, idx) => {
-                const obsCount = (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
-                const positiveCount = (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length;
-                return {
-                    "N°": idx + 1,
-                    "ID Estudiante": s.id,
-                    "Nombre Estudiante": s.name,
-                    "Grado": currentClassKey,
-                    "Nivel RPG": s.level || 1,
-                    "Puntos XP Total": s.xp || 0,
-                    "Méritos (+XP)": positiveCount,
-                    "Observaciones (-HP)": obsCount
-                };
-            });
-
-            const historyRows = [];
-            students.forEach(s => {
-                if (!s.history || s.history.length === 0) {
-                    historyRows.push({
-                        "Grado": currentClassKey,
-                        "ID Estudiante": s.id,
-                        "Nombre Estudiante": s.name,
-                        "Fecha y Hora": "Sin registros",
-                        "Periodo": currentPeriod,
-                        "Tipo Evento": "Sin anotaciones",
-                        "Pilar Character Counts": "N/A",
-                        "Puntos": 0,
-                        "Anotación Observador": "Sin novedades convivenciales registradas"
-                    });
-                } else {
-                    s.history.forEach(h => {
-                        historyRows.push({
-                            "Grado": currentClassKey,
-                            "ID Estudiante": s.id,
-                            "Nombre Estudiante": s.name,
-                            "Fecha y Hora": h.timestamp || '',
-                            "Periodo": h.period || 'P1',
-                            "Tipo Evento": h.situationType || (h.type === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)'),
-                            "Pilar Character Counts": h.valueTag || 'Convivencia',
-                            "Puntos": h.magnitude || 1,
-                            "Detalle Hechos": h.note || '',
-                            "Descargo Estudiante": h.descargo || '',
-                            "Compromisos": h.compromiso || ''
-                        });
-                    });
-                }
-            });
-
-            const wb = XLSX.utils.book_new();
-            const wsSummary = XLSX.utils.json_to_sheet(summaryRows);
-            const wsHistory = XLSX.utils.json_to_sheet(historyRows);
-
-            XLSX.utils.book_append_sheet(wb, wsSummary, "Consolidado " + currentClassKey);
-            XLSX.utils.book_append_sheet(wb, wsHistory, "Bitácora Detallada Alumnos");
-
-            XLSX.writeFile(wb, `FantasyClass_Reporte_Grado_${currentClassKey}_ALM.xlsx`);
-        }
-
-        function exportAllClassesMasterExcel() {
-            const wb = XLSX.utils.book_new();
-
-            Object.keys(dbState.classes).forEach(cKey => {
-                const students = dbState.classes[cKey] || [];
-                const rows = students.map((s, idx) => ({
-                    "N°": idx + 1,
-                    "Nombre Estudiante": s.name,
-                    "Grado": cKey,
-                    "Nivel RPG": s.level || 1,
-                    "Puntos XP": s.xp || 0,
-                    "Méritos": (s.history || []).filter(h => h.type === 'positive' || h.situationType?.includes('Reconocimiento')).length,
-                    "Observaciones": (s.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length
-                }));
-                const ws = XLSX.utils.json_to_sheet(rows);
-                XLSX.utils.book_append_sheet(wb, ws, `Curso ${cKey}`);
-            });
-
-            XLSX.writeFile(wb, `FantasyClass_Master_TodosLosCursos_ALM.xlsx`);
-        }
-
-        function openAddStudentModal() {
-            document.getElementById('add-student-course-name').innerText = currentClassKey;
-            document.getElementById('new-student-name-input').value = '';
-            document.getElementById('add-student-modal').classList.remove('hidden');
-        }
-
-        function closeAddStudentModal() {
-            document.getElementById('add-student-modal').classList.add('hidden');
-        }
-
-        function confirmAddNewStudent() {
-            const input = document.getElementById('new-student-name-input');
-            const name = input.value.trim();
-            if (!name) return;
-
-            if (!dbState.classes[currentClassKey]) dbState.classes[currentClassKey] = [];
-
-            dbState.classes[currentClassKey].push({
-                id: `${currentClassKey}_${Date.now()}`,
-                name: name,
-                xp: 0,
-                level: 1,
-                history: [],
-                meetings: [],
-                personalData: {}
-            });
-
-            saveDatabase();
-            updateClassSelectOptions();
-            renderStudentGrid();
-            closeAddStudentModal();
-        }
-
-        function deleteStudent(studentId) {
-            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
-            if (!student) return;
-
-            showConfirmModal(
-                "Eliminar Estudiante",
-                `¿Deseas eliminar permanentemente a "${student.name}" del grado ${currentClassKey}?`,
-                () => {
-                    dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(s => s.id !== studentId);
-                    saveDatabase();
-                    updateClassSelectOptions();
-                    renderStudentGrid();
-                }
-            );
-        }
-
-        function openManageGroupsModal() {
-            renderGroupsList();
-            document.getElementById('manage-groups-modal').classList.remove('hidden');
-        }
-
-        function closeManageGroupsModal() {
-            document.getElementById('manage-groups-modal').classList.add('hidden');
-        }
-
-        function renderGroupsList() {
-            const container = document.getElementById('groups-list-container');
-            if (!container) return;
-            container.innerHTML = '';
-
-            Object.keys(dbState.classes).forEach(cKey => {
-                const count = dbState.classes[cKey].length;
-                const div = document.createElement('div');
-                div.className = "flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-white/10 text-xs";
-                div.innerHTML = `
-                    <div>
-                        <span class="font-extrabold text-amber-300">Grado ${cKey}</span>
-                        <span class="text-[10px] text-slate-400 ml-2">(${count} estudiantes)</span>
-                    </div>
-                    <button onclick="deleteGroup('${cKey}')" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-slate-800 hover:bg-slate-700 rounded-lg transition" title="Eliminar este grupo completo">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        function addNewGroup() {
-            const input = document.getElementById('new-group-input');
-            const groupName = input.value.trim().toUpperCase();
-            if (!groupName) return;
-
-            if (dbState.classes[groupName]) {
-                alertModal("Grupo Existente", "Este grado o grupo ya existe.");
-                return;
-            }
-
-            dbState.classes[groupName] = [];
-            input.value = '';
-            saveDatabase();
-            updateClassSelectOptions();
-            renderGroupsList();
-            switchClass(groupName);
-        }
-
-        function deleteGroup(groupKey) {
-            showConfirmModal(
-                "Eliminar Grupo Completo",
-                `¿Estás seguro de eliminar todo el grupo "${groupKey}" con sus estudiantes?`,
-                () => {
-                    delete dbState.classes[groupKey];
-                    saveDatabase();
-                    const keys = Object.keys(dbState.classes);
-                    if (keys.length > 0) {
-                        currentClassKey = keys[0];
-                    }
-                    updateClassSelectOptions();
-                    renderGroupsList();
-                    renderStudentGrid();
-                }
-            );
-        }
-
-        function showConfirmModal(title, message, onConfirm) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-message').innerText = message;
-            confirmCallback = onConfirm;
-            document.getElementById('confirm-action-btn').onclick = () => {
-                if (confirmCallback) confirmCallback();
-                closeConfirmModal();
-            };
-            document.getElementById('confirm-dialog-modal').classList.remove('hidden');
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirm-dialog-modal').classList.add('hidden');
-        }
-
-        function alertModal(title, message) {
-            document.getElementById('confirm-title').innerText = title;
-            document.getElementById('confirm-message').innerText = message;
-            document.getElementById('confirm-action-btn').onclick = closeConfirmModal;
-            document.getElementById('confirm-dialog-modal').classList.remove('hidden');
-        }
-
-        function calculateStudentStatsForPeriod(student) {
-            let filteredHistory = student.history || [];
-            if (currentPeriod !== 'ALL') {
-                filteredHistory = filteredHistory.filter(h => h.period === currentPeriod || !h.period);
-            }
-
-            let xp = 0;
-            let badges = { Responsabilidad: 0, Respeto: 0, Confianza: 0, Empatía: 0, Justicia: 0, Ciudadanía: 0 };
-
-            filteredHistory.forEach(h => {
-                const isPositive = h.type === 'positive' || (h.situationType && h.situationType.includes('Reconocimiento'));
-                if (isPositive) {
-                    xp += (h.magnitude || 1);
-                    if (h.valueTag && badges[h.valueTag] !== undefined) {
-                        badges[h.valueTag] += (h.magnitude || 1);
-                    }
-                }
-            });
-
-            const level = Math.floor(xp / 20) + 1;
-            return { xp, level, badges, history: filteredHistory };
-        }
-
-        function updateGlobalMetrics() {
-            const students = dbState.classes[currentClassKey] || [];
-            let totals = { Responsabilidad: 0, Respeto: 0, Confianza: 0, Empatía: 0, Justicia: 0, Ciudadanía: 0 };
-
-            students.forEach(s => {
-                const stats = calculateStudentStatsForPeriod(s);
-                Object.keys(totals).forEach(k => {
-                    totals[k] += stats.badges[k] || 0;
-                });
-            });
-
-            Object.keys(totals).forEach(k => {
-                const el = document.getElementById(`badge-count-${k}`);
-                if (el) el.innerText = `${totals[k]} pts`;
-            });
-        }
-
-        function renderStudentGrid() {
-            const container = document.getElementById('students-grid');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const students = dbState.classes[currentClassKey] || [];
-            const query = document.getElementById('student-search-input')?.value.toLowerCase().trim() || '';
-            const sortBy = document.getElementById('sort-select')?.value || 'name';
-
-            let filtered = students.filter(s => s.name.toLowerCase().includes(query));
-
-            if (sortBy === 'name') {
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-            } else if (sortBy === 'level' || sortBy === 'xp') {
-                filtered.sort((a, b) => (b.xp || 0) - (a.xp || 0));
-            } else if (sortBy === 'obs') {
-                filtered.sort((a, b) => {
-                    const obsA = (a.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
-                    const obsB = (b.history || []).filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
-                    return obsB - obsA;
-                });
-            }
-
-            filtered.forEach(student => {
-                const periodStats = calculateStudentStatsForPeriod(student);
-                const obsCount = periodStats.history.filter(h => h.type === 'negative' || h.situationType?.includes('Situación')).length;
-                const isChecked = selectedStudentIdsSet.has(student.id);
-
-                const card = document.createElement('div');
-                card.className = `glass-panel p-4 rounded-3xl card-hover flex flex-col justify-between relative overflow-hidden group ${isChecked ? 'ring-2 ring-amber-400 bg-slate-900/95' : ''}`;
-
-                card.innerHTML = `
-                    <div>
-                        <div class="flex items-center justify-between mb-2">
-                            <label class="flex items-center gap-1.5 cursor-pointer text-xs font-bold text-slate-300">
-                                <input type="checkbox" onchange="toggleSelectStudent('${student.id}')" ${isChecked ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500 cursor-pointer">
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40">
-                                    NIVEL ${periodStats.level}
-                                </span>
-                            </label>
-                            <div class="flex items-center gap-1.5 text-xs">
-                                <span class="text-emerald-400 font-bold"><i class="fa-solid fa-plus text-[10px]"></i> ${periodStats.xp} pts</span>
-                                <span class="text-slate-500">|</span>
-                                <span class="text-red-400 font-bold"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> ${obsCount}</span>
-                                <button onclick="deleteStudent('${student.id}')" class="ml-1 text-slate-500 hover:text-rose-400 text-xs transition" title="Eliminar Estudiante">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center gap-3 mb-3">
-                            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 shadow-md flex-shrink-0">
-                                <div class="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center font-display font-black text-amber-300 text-sm">
-                                    ${student.name.charAt(0)}
-                                </div>
-                            </div>
-                            <div class="overflow-hidden">
-                                <h4 class="font-display font-bold text-xs text-white truncate group-hover:text-amber-300 transition">${student.name}</h4>
-                                <p class="text-[10px] text-slate-400 truncate">Grado ${currentClassKey} • ${currentPeriod}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-3 gap-1.5 pt-2 border-t border-white/10">
-                        <button onclick="openAwardModal('${student.id}', 'positive')" class="py-1.5 px-1.5 rounded-xl bg-emerald-600/80 hover:bg-emerald-500 text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
-                            <i class="fa-solid fa-plus text-[9px]"></i>
-                            <span>Mérito</span>
-                        </button>
-                        <button onclick="openAwardModal('${student.id}', 'negative')" class="py-1.5 px-1.5 rounded-xl bg-colegio-red/80 hover:bg-colegio-red text-white font-bold text-[11px] transition flex items-center justify-center gap-1 shadow">
-                            <i class="fa-solid fa-minus text-[9px]"></i>
-                            <span>Falta</span>
-                        </button>
-                        <button onclick="openHistoryModal('${student.id}')" class="py-1.5 px-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-sky-300 font-bold text-[11px] transition flex items-center justify-center gap-1 border border-white/10">
-                            <i class="fa-solid fa-folder-open text-[9px]"></i>
-                            <span>Ficha</span>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-
-            updateGlobalMetrics();
-        }
-
-        function switchClass(newClassKey) {
-            currentClassKey = newClassKey;
-            selectedStudentIdsSet.clear();
-            updateBulkActionBar();
-            document.getElementById('class-select').value = newClassKey;
-            renderStudentGrid();
-        }
-
-        function switchPeriod(newPeriod) {
-            currentPeriod = newPeriod;
-            renderStudentGrid();
-        }
-
-        function setEntryType(type) {
-            activeEntryType = type;
-            const btnPos = document.getElementById('btn-type-positive');
-            const btnNeg = document.getElementById('btn-type-negative');
-            if (type === 'positive') {
-                btnPos.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 bg-emerald-600 text-white shadow-md";
-                btnNeg.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
-            } else {
-                btnNeg.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 bg-red-600 text-white shadow-md";
-                btnPos.className = "py-2 rounded-xl font-bold text-xs transition flex items-center justify-center gap-1.5 text-slate-400 hover:text-white";
-            }
-        }
-
-        function selectValueCategory(val) {
-            selectedValueTag = val;
-        }
-
-        function openAwardModal(studentId, type) {
-            selectedStudentId = studentId;
-            setEntryType(type);
-            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === studentId);
-            if (!student) return;
-            document.getElementById('modal-student-name').innerText = student.name;
-            document.getElementById('award-modal').classList.remove('hidden');
-        }
-
-        function closeAwardModal() {
-            document.getElementById('award-modal').classList.add('hidden');
-        }
-
-        function saveStudentEntry() {
-            if (!selectedStudentId) return;
-            const student = (dbState.classes[currentClassKey] || []).find(s => s.id === selectedStudentId);
-            if (!student) return;
-
-            const note = document.getElementById('entry-note-input').value.trim() || 'Registro convivencial rápido';
-            const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
-
-            if (!student.history) student.history = [];
-            
-            const newEntry = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('es-CO'),
-                period: currentPeriod === 'ALL' ? 'P1' : currentPeriod,
-                type: activeEntryType,
-                situationType: activeEntryType === 'positive' ? 'Reconocimiento / Mérito' : 'Situación Tipo I (Falta Leve)',
-                valueTag: selectedValueTag,
-                magnitude: magnitude,
-                note: note
-            };
-
-            student.history.unshift(newEntry);
-
-            if (activeEntryType === 'positive') {
-                student.xp = (student.xp || 0) + magnitude;
-                student.level = Math.floor(student.xp / 20) + 1;
-                try { confetti({ particleCount: 40, spread: 50 }); } catch(e){}
-            }
-
-            postToGoogleDriveSheet({
-                curso: currentClassKey,
-                estudiante: student.name,
-                tipo: activeEntryType === 'positive' ? 'Mérito (+XP)' : 'Observación (-HP)',
-                pilar: selectedValueTag,
-                puntos: magnitude,
-                nota: note
-            });
-
-            saveDatabase();
-            closeAwardModal();
-            renderStudentGrid();
-            document.getElementById('entry-note-input').value = '';
-        }
-
         // GENERADOR DE EQUIPOS
         function openTeamsGeneratorModal() {
             document.getElementById('teams-modal').classList.remove('hidden');
@@ -2138,16 +2154,11 @@
             XLSX.writeFile(wb, `Grupos_Trabajo_Grado_${currentClassKey}.xlsx`);
         }
 
-        // RULETA
         function openWheelModal() { document.getElementById('wheel-modal').classList.remove('hidden'); }
         function closeWheelModal() { document.getElementById('wheel-modal').classList.add('hidden'); }
-        
         function spinStudentWheel() {
             const students = dbState.classes[currentClassKey] || [];
-            if (students.length === 0) {
-                document.getElementById('wheel-display').innerText = "Sin estudiantes";
-                return;
-            }
+            if (students.length === 0) return;
 
             const btn = document.getElementById('spin-wheel-btn');
             btn.disabled = true;
@@ -2178,7 +2189,6 @@
             step();
         }
 
-        // DADO
         function openDiceModal() { document.getElementById('dice-modal').classList.remove('hidden'); }
         function closeDiceModal() { document.getElementById('dice-modal').classList.add('hidden'); }
         function rollDice() {
@@ -2192,7 +2202,6 @@
             }, 80);
         }
 
-        // CRONÓMETRO
         let timerSeconds = 300;
         let timerInterval = null;
         function openTimerModal() { document.getElementById('timer-modal').classList.remove('hidden'); }
@@ -2233,7 +2242,7 @@
             document.getElementById('timer-toggle-btn').innerText = "Iniciar";
         }
 
-        // INICIALIZACIÓN
+        // INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
             initDatabase();
             renderStudentGrid();
