@@ -3095,5 +3095,362 @@ window.openManageGroupsModal = openGroupsModal;
   setTimeout(()=>{ wireButtons(); }, 500);
 })();
 </script>
+  <!-- PARCHE: Ficha reorganizada y botón Guardar (compacta, 2 columnas + secciones) -->
+<style>
+  /* Scoped styles para la ficha mejorada */
+  #enh-ficha .ef-header{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+  #enh-ficha .ef-avatar{width:64px;height:64px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:900}
+  #enh-ficha .ef-title{font-weight:900;font-size:18px}
+  #enh-ficha .ef-sub{color:#666}
+  #enh-ficha .ef-grid{display:grid;grid-template-columns:1fr 360px;gap:12px}
+  #enh-ficha .ef-panel{background:#fff;padding:12px;border-radius:10px;border:1px solid #eee;max-height:520px;overflow:auto}
+  #enh-ficha .ef-row{display:flex;gap:8px;margin-bottom:8px}
+  #enh-ficha .ef-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6;box-sizing:border-box}
+  #enh-ficha .ef-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:8px}
+  #enh-ficha .ef-section-title{font-weight:800;margin-bottom:8px}
+  #enh-ficha .ef-collapsible{background:#fafafa;padding:8px;border-radius:8px;border:1px solid #f0f0f0;margin-top:8px}
+  @media(max-width:900px){ #enh-ficha .ef-grid{grid-template-columns:1fr} }
+</style>
+
+<script>
+(function injectEnhancedFicha(){
+  const STORAGE_KEY = 'fantasyclass_alm_db';
+  const HP_DEFAULT = 5;
+  const getById = id => document.getElementById(id);
+  const toast = (msg, type='info') => { if(typeof showToast === 'function') showToast(msg,type,2500); else console.log('[toast]',type,msg); };
+  const persist = () => { if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed', e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('localStorage write failed', e); } };
+
+  // find ficha modal & content container
+  function findModal(){ return document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]') || null; }
+  function findModalContent(modal){
+    if(!modal) return null;
+    return modal.querySelector('.modal.white') || modal.querySelector('.modal') || modal;
+  }
+
+  function buildUI(){
+    const modal = findModal();
+    if(!modal) { console.warn('[enh-ficha] modal not found'); return; }
+    const content = findModalContent(modal);
+    if(!content) { console.warn('[enh-ficha] modal content not found'); return; }
+    // prevent duplicate injection
+    if(content.querySelector('#enh-ficha')) return;
+
+    // preserve close button
+    const closeBtn = content.querySelector('.close-btn');
+    content.innerHTML = '';
+    if(closeBtn) content.appendChild(closeBtn);
+
+    // main structure
+    const html = `
+      <div id="enh-ficha">
+        <div class="ef-header">
+          <div class="ef-avatar" id="ef-avatar">A</div>
+          <div style="flex:1">
+            <div class="ef-title" id="ef-name">Nombre Estudiante</div>
+            <div class="ef-sub" id="ef-sub">Ficha • <span id="ef-period"></span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
+            <div style="display:flex;gap:8px">
+              <button class="btn" id="ef-save-global">Guardar y cerrar</button>
+              <button class="btn" id="ef-export">Exportar XLSX</button>
+            </div>
+            <div style="font-size:12px;color:var(--muted)">Última modificación: <span id="ef-last-mod">—</span></div>
+          </div>
+        </div>
+
+        <div class="ef-grid">
+          <div class="ef-panel" id="ef-left">
+            <div class="ef-section-title">1 • Datos personales y contacto</div>
+            <div class="ef-row"><input id="ef_name" class="ef-input" placeholder="Nombre completo"></div>
+            <div class="ef-row"><input id="ef_doc" class="ef-input" placeholder="Documento"></div>
+            <div class="ef-row"><input id="ef_course" class="ef-input" placeholder="Curso (ej. 801)" readonly><input id="ef_group" class="ef-input" placeholder="Grupo" readonly></div>
+            <div class="ef-row"><input id="ef_birth" type="date" class="ef-input"></div>
+            <div class="ef-row"><input id="ef_eps" class="ef-input" placeholder="EPS"><input id="ef_blood" class="ef-input" placeholder="Grupo sanguíneo / RH"></div>
+            <div style="height:8px"></div>
+            <div class="ef-section-title">Contacto de acudientes</div>
+            <div class="ef-row"><input id="ef_parent" class="ef-input" placeholder="Nombres acudientes"></div>
+            <div class="ef-row"><input id="ef_phone" class="ef-input" placeholder="Teléfono principal"><input id="ef_phone_emerg" class="ef-input" placeholder="Teléfono emergencia"></div>
+            <div class="ef-row"><input id="ef_email" class="ef-input" placeholder="Correo electrónico"></div>
+          </div>
+
+          <div>
+            <div class="ef-panel" id="ef-right-top">
+              <div class="ef-section-title">4 • Gamificación / RPG</div>
+              <div class="ef-row"><input id="ef_level" class="ef-input" placeholder="Nivel" style="width:100px"><input id="ef_xp" class="ef-input" placeholder="XP" style="width:140px" type="number"><input id="ef_hp" class="ef-input" placeholder="HP" style="width:100px" type="number"></div>
+              <div class="ef-row"><input id="ef_clan" class="ef-input" placeholder="Clan / Equipo"></div>
+              <div class="ef-row"><input id="ef_badges" class="ef-input" placeholder="Insignias (coma-sep.)"></div>
+              <div class="ef-actions"><button class="btn" id="ef-save-game">Guardar gamificación</button></div>
+            </div>
+
+            <div class="ef-panel ef-collapsible" id="ef-actas">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="ef-section-title">2 • Actas y reuniones</div>
+                <div style="display:flex;gap:6px">
+                  <input id="ef_acta_fecha" type="date" class="ef-input" style="width:160px">
+                  <select id="ef_acta_motivo" class="ef-input" style="width:140px"><option>Académico</option><option>Convivencial</option><option>Administrativo</option><option>Otro</option></select>
+                  <button class="btn" id="ef-acta-add">Agregar</button>
+                </div>
+              </div>
+              <textarea id="ef_acta_resumen" class="ef-input" rows="3" placeholder="Resumen / descargos..."></textarea>
+              <textarea id="ef_acta_compromisos" class="ef-input" rows="2" placeholder="Compromisos / intervenciones..."></textarea>
+              <div id="ef-actas-list" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+            </div>
+
+            <div class="ef-panel ef-collapsible" id="ef-obs" style="margin-top:12px">
+              <div style="display:flex;justify-content:space-between;align-items:center">
+                <div class="ef-section-title">3 • Observador convivencial</div>
+                <div style="display:flex;gap:6px">
+                  <input id="ef_obs_fecha" type="date" class="ef-input" style="width:140px">
+                  <select id="ef_obs_tipo" class="ef-input" style="width:140px"><option>Incidente</option><option>Observación</option><option>Reporte</option></select>
+                  <button class="btn" id="ef-obs-add">Agregar</button>
+                </div>
+              </div>
+              <select id="ef_obs_clasif" class="ef-input"><option>Leve</option><option>Moderada</option><option>Grave</option></select>
+              <textarea id="ef_obs_desc" class="ef-input" rows="3" placeholder="Descripción..."></textarea>
+              <textarea id="ef_obs_descargo" class="ef-input" rows="2" placeholder="Descargos..."></textarea>
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+                <select id="ef_obs_estado" class="ef-input" style="width:160px"><option>En proceso</option><option>Cerrado</option><option>Derivado</option></select>
+              </div>
+              <div id="ef-obs-list" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+            </div>
+
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="ef-panel">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:800">Historial</div>
+              <div style="color:var(--muted)">Últimos 10 registros</div>
+            </div>
+            <div id="ef-history" style="margin-top:8px;max-height:160px;overflow:auto"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    content.insertAdjacentHTML('beforeend', html);
+
+    // Attach handlers
+    content.querySelector('#ef-save-global').addEventListener('click', ()=>{
+      const id = (document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]'))?.dataset.currentStudent;
+      if(!id) { toast('Abre una ficha primero','warn'); return; }
+      saveFicha(id);
+      hideModal && hideModal('ficha-modal');
+    });
+    content.querySelector('#ef-export').addEventListener('click', ()=> { if(typeof exportSingleStudentExcel==='function') exportSingleStudentExcel(); else toast('Export no disponible','warn'); });
+
+    content.querySelector('#ef-save-game').addEventListener('click', ()=>{
+      const id = (document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]'))?.dataset.currentStudent;
+      if(!id) return toast('Abre ficha primero','warn');
+      saveGamification(id);
+    });
+
+    content.querySelector('#ef-acta-add').addEventListener('click', ()=>{
+      const id = (document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]'))?.dataset.currentStudent;
+      if(!id) return toast('Abre ficha primero','warn');
+      addActa(id);
+    });
+
+    content.querySelector('#ef-obs-add').addEventListener('click', ()=>{
+      const id = (document.getElementById('ficha-modal') || document.querySelector('[id*="ficha-modal"]'))?.dataset.currentStudent;
+      if(!id) return toast('Abre ficha primero','warn');
+      addObservacion(id);
+    });
+
+    // allow collapsing panels by clicking their title (simple)
+    Array.from(content.querySelectorAll('.ef-panel .ef-section-title')).forEach(h => {
+      h.style.cursor = 'default';
+    });
+
+    console.log('[enh-ficha] UI injected');
+  } // buildUI
+
+  // helpers to find student
+  function findStudent(studentId){
+    if(!studentId) return null;
+    for(const k of Object.keys(db.classes || {})){
+      const s = (db.classes[k]||[]).find(x=>x.id===studentId);
+      if(s) return { student: s, grade: k };
+    }
+    return null;
+  }
+
+  // render lists
+  function renderActasList(student, containerId='ef-actas-list'){
+    const cont = document.getElementById(containerId);
+    if(!cont) return;
+    cont.innerHTML = '';
+    const arr = student.actas || [];
+    if(!arr.length){ cont.innerHTML = '<div style="color:#666">Sin actas</div>'; return; }
+    arr.slice().reverse().forEach(a=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${a.motivo} • ${a.fecha}</div><div style="color:#444">${a.resumen}</div><div style="color:#666">${a.compromisos||''}</div>`;
+      cont.appendChild(node);
+    });
+  }
+  function renderObsList(student, containerId='ef-obs-list'){
+    const cont = document.getElementById(containerId);
+    if(!cont) return;
+    cont.innerHTML = '';
+    const arr = student.observador || [];
+    if(!arr.length){ cont.innerHTML = '<div style="color:#666">Sin registros</div>'; return; }
+    arr.slice().reverse().forEach(o=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${o.tipo} • ${o.fecha} • ${o.clasif||''}</div><div style="color:#444">${o.desc}</div><div style="color:#666">Descargo: ${o.descargo||''} — Estado: ${o.estado||''}</div>`;
+      cont.appendChild(node);
+    });
+  }
+  function renderHistory(student){
+    const cont = document.getElementById('ef-history') || document.getElementById('ficha-history');
+    if(!cont) return;
+    cont.innerHTML = '';
+    const arr = student.history || [];
+    if(!arr.length) { cont.innerHTML = '<div style="color:#666">Sin historial</div>'; return; }
+    arr.slice().reverse().slice(0,10).forEach(h=>{
+      const node = document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee';
+      node.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div>`;
+      cont.appendChild(node);
+    });
+  }
+
+  // Add acta
+  function addActa(studentId){
+    const found = findStudent(studentId);
+    if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.actas = s.actas || [];
+    const fecha = document.getElementById('ef_acta_fecha')?.value || new Date().toLocaleDateString();
+    const motivo = document.getElementById('ef_acta_motivo')?.value || 'Otro';
+    const resumen = document.getElementById('ef_acta_resumen')?.value || '';
+    const compromisos = document.getElementById('ef_acta_compromisos')?.value || '';
+    s.actas.push({ id: Date.now(), fecha, motivo, resumen, compromisos });
+    persist();
+    renderActasList(s);
+    document.getElementById('ef_acta_resumen') && (document.getElementById('ef_acta_resumen').value='');
+    document.getElementById('ef_acta_compromisos') && (document.getElementById('ef_acta_compromisos').value='');
+    toast('Acta agregada','success');
+  }
+
+  // Add observacion
+  function addObservacion(studentId){
+    const found = findStudent(studentId);
+    if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.observador = s.observador || [];
+    const fecha = document.getElementById('ef_obs_fecha')?.value || new Date().toLocaleDateString();
+    const tipo = document.getElementById('ef_obs_tipo')?.value || 'Observación';
+    const clasif = document.getElementById('ef_obs_clasif')?.value || '';
+    const desc = document.getElementById('ef_obs_desc')?.value || '';
+    const descargo = document.getElementById('ef_obs_descargo')?.value || '';
+    const estado = document.getElementById('ef_obs_estado')?.value || 'En proceso';
+    s.observador.push({ id: Date.now(), fecha, tipo, clasif, desc, descargo, estado });
+    persist();
+    renderObsList(s);
+    document.getElementById('ef_obs_desc') && (document.getElementById('ef_obs_desc').value='');
+    document.getElementById('ef_obs_descargo') && (document.getElementById('ef_obs_descargo').value='');
+    toast('Registro guardado','success');
+  }
+
+  // Save gamification
+  function saveGamification(studentId){
+    const found = findStudent(studentId);
+    if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.gamification = s.gamification || {};
+    s.gamification.level = document.getElementById('ef_level')?.value || s.gamification.level || s.level;
+    s.gamification.xp = parseInt(document.getElementById('ef_xp')?.value) || s.gamification.xp || s.xp || 0;
+    s.gamification.hp = parseInt(document.getElementById('ef_hp')?.value) || s.gamification.hp || s.hp || HP_DEFAULT;
+    s.gamification.clan = document.getElementById('ef_clan')?.value || s.gamification.clan || '';
+    s.gamification.badges = (document.getElementById('ef_badges')?.value || '').split(',').map(x=>x.trim()).filter(Boolean);
+    // reflect main values
+    s.level = parseInt(s.gamification.level) || s.level;
+    s.xp = parseInt(s.gamification.xp) || s.xp;
+    s.hp = parseInt(s.gamification.hp) || s.hp;
+    persist();
+    toast('Gamificación guardada','success');
+    if(typeof renderStudentGrid === 'function') renderStudentGrid();
+  }
+
+  // Global save: personal + call gamification save (and refresh)
+  function saveFicha(studentId){
+    const found = findStudent(studentId);
+    if(!found) return toast('Estudiante no encontrado','err');
+    const s = found.student;
+    s.name = document.getElementById('ef_name')?.value || s.name;
+    s.document = document.getElementById('ef_doc')?.value || s.document;
+    s.birthdate = document.getElementById('ef_birth')?.value || s.birthdate;
+    s.eps = document.getElementById('ef_eps')?.value || s.eps;
+    s.sangre = document.getElementById('ef_blood')?.value || s.sangre;
+    s.acudiente = { name: document.getElementById('ef_parent')?.value || '', phone: document.getElementById('ef_phone')?.value || '', emerg: document.getElementById('ef_phone_emerg')?.value || '', email: document.getElementById('ef_email')?.value || '' };
+    // gamification
+    saveGamification(studentId);
+    persist();
+    // update last modified time
+    const last = new Date().toLocaleString();
+    const lastEl = document.getElementById('ef-last-mod'); if(lastEl) lastEl.innerText = last;
+    toast('Ficha guardada','success');
+    if(typeof renderStudentGrid === 'function') renderStudentGrid();
+  }
+
+  // Fill the enhanced UI when openFicha is called
+  function fillEnhanced(studentId){
+    buildUI();
+    const found = findStudent(studentId);
+    if(!found) { toast('Estudiante no encontrado','err'); return; }
+    const s = found.student;
+    document.getElementById('ef-avatar') && (document.getElementById('ef-avatar').innerText = (s.name||' ')[0]||'A');
+    document.getElementById('ef-name') && (document.getElementById('ef-name').innerText = s.name || '');
+    document.getElementById('ef-period') && (document.getElementById('ef-period').innerText = document.getElementById('period-select')?.value || '');
+    document.getElementById('ef_name') && (document.getElementById('ef_name').value = s.name || '');
+    document.getElementById('ef_doc') && (document.getElementById('ef_doc').value = s.document || s.doc || '');
+    // find grade & group
+    let gradeFound = '';
+    for(const g of Object.keys(db.classes||{})){ if((db.classes[g]||[]).find(x=>x.id===s.id)){ gradeFound = g; break; } }
+    document.getElementById('ef_course') && (document.getElementById('ef_course').value = gradeFound || '');
+    const grp = (db.groups && db.groups[gradeFound]) ? (Object.keys(db.groups[gradeFound]).find(g=>db.groups[gradeFound][g].includes(s.id)) || '') : '';
+    document.getElementById('ef_group') && (document.getElementById('ef_group').value = grp);
+    document.getElementById('ef_birth') && (document.getElementById('ef_birth').value = s.birthdate || s.fnac || '');
+    document.getElementById('ef_eps') && (document.getElementById('ef_eps').value = s.eps || '');
+    document.getElementById('ef_blood') && (document.getElementById('ef_blood').value = s.sangre || '');
+    document.getElementById('ef_parent') && (document.getElementById('ef_parent').value = (s.acudiente && (s.acudiente.name || s.acudiente)) || '');
+    document.getElementById('ef_phone') && (document.getElementById('ef_phone').value = (s.acudiente && s.acudiente.phone) || s.phone || '');
+    document.getElementById('ef_phone_emerg') && (document.getElementById('ef_phone_emerg').value = s.phone_emerg || '');
+    document.getElementById('ef_email') && (document.getElementById('ef_email').value = s.email || '');
+
+    // gamification
+    s.gamification = s.gamification || {};
+    document.getElementById('ef_level') && (document.getElementById('ef_level').value = s.gamification.level || s.level || '');
+    document.getElementById('ef_xp') && (document.getElementById('ef_xp').value = s.gamification.xp || s.xp || 0);
+    document.getElementById('ef_hp') && (document.getElementById('ef_hp').value = s.gamification.hp || s.hp || HP_DEFAULT);
+    document.getElementById('ef_clan') && (document.getElementById('ef_clan').value = s.gamification.clan || s.clan || '');
+    document.getElementById('ef_badges') && (document.getElementById('ef_badges').value = (s.gamification.badges||[]).join(', ') || (s.badges||[]).join(', '));
+
+    // lists
+    renderActasList(s);
+    renderObsList(s);
+    renderHistory(s);
+
+    // set modal current student id for save
+    const modal = findModal();
+    if(modal) modal.dataset.currentStudent = s.id;
+  }
+
+  // override existing openFicha to call fillEnhanced after opening modal
+  const origOpenFicha = window.openFicha;
+  window.openFicha = function(id){
+    try{ if(typeof origOpenFicha === 'function') origOpenFicha(id); } catch(e){ /* ignore */ }
+    setTimeout(()=> fillEnhanced(id), 120);
+  };
+
+  // Expose public functions
+  window.saveFicha = saveFicha;
+  window.addActaToFicha = addActa;
+  window.addObservacionToFicha = addObservacion;
+  window.saveGamification = saveGamification;
+
+  // build UI immediately (so elements exist for handlers when modal opens)
+  document.addEventListener('DOMContentLoaded', ()=> buildUI());
+})();
+</script>
 </body>
 </html>
