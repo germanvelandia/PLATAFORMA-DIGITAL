@@ -5,122 +5,83 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FantasyClass Convivencial — ALM</title>
 
-  <!-- Tailwind (opcional) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            colegio: { blue: '#1e3a8a', red: '#dc2626', gold: '#f59e0b', dark: '#0f172a' }
-          },
-          fontFamily: { sans: ['Inter','sans-serif'], display: ['Outfit','sans-serif'] }
-        }
-      }
-    }
-  </script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+  <!-- Simple styles (no external frameworks required) -->
   <style>
-    /* Reset / tokens */
-    *,*::before,*::after{box-sizing:border-box}
-    html,body{height:100%}
-    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,#071122 0%,#0b1724 100%);color:#e6eef6;-webkit-font-smoothing:antialiased}
-    :root{--muted:#9aa7b6;--glass-border:rgba(255,255,255,0.04);--accent-green:#10b981;--accent-red:#ef4444;--accent-gold:#f59e0b}
-    button,input,select,textarea{font-family:inherit;color:inherit}
-    button{cursor:pointer}
-
-    /* Header */
-    header.glass-panel{background:linear-gradient(180deg,rgba(6,11,18,0.92),rgba(8,14,22,0.92));padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;z-index:90}
-    .header-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    :root{
+      --bg:#08121a; --panel:#0f1720; --muted:#9aa7b6; --accent:#10b981; --danger:#ef4444; --gold:#f59e0b;
+      --white:#ffffff;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#051016);color:#e6eef6;min-height:100vh}
+    header{background:linear-gradient(180deg,#07121a,#061019);padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);position:sticky;top:0;z-index:60}
+    .container{max-width:1120px;margin:0 auto;padding:16px}
+    .header-row{display:flex;align-items:center;gap:12px;justify-content:space-between}
     .brand{display:flex;gap:12px;align-items:center}
-    .logo{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a;background:linear-gradient(135deg,#0f172a,#122033)}
+    .logo{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#0f172a,#122033);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--gold)}
     .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    .chip{display:flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);font-weight:700}
-    .chip.green{background:linear-gradient(180deg,#064e3b,#065f46);color:#e6fff3}
+    .chip{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700}
+    select.muted{color:var(--muted);background:transparent;border:0;font-weight:800}
+    main{max-width:1120px;margin:18px auto;padding:0 16px 60px}
+    .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:12px}
+    .metric{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;background:rgba(255,255,255,0.01);border-radius:10px;border:1px solid rgba(255,255,255,0.03);margin-bottom:12px}
+    .control-left{display:flex;gap:8px;align-items:center}
+    .control-left input{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:inherit}
+    #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 
-    .dropdown{position:relative}
-    .dropdown-menu{display:none;position:absolute;right:0;top:calc(100% + 8px);background:linear-gradient(180deg,#071726,#05101a);border:1px solid var(--glass-border);padding:6px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);min-width:220px;z-index:100}
-    .dropdown-menu button{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:transparent;color:inherit;border:0;width:100%;text-align:left}
-
-    /* Make period select text muted color (not white) */
-    #period-select, #class-select { color: var(--muted); background: transparent; border: none; font-weight:800; }
-    #period-select option, #class-select option { color: #fff; background: #0b1724; }
-
-    main{max-width:1200px;margin:18px auto;padding:0 20px 80px}
-
-    .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:14px}
-    .metric{display:flex;gap:10px;align-items:center;padding:12px;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.007));border:1px solid var(--glass-border)}
-    .metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:800}
-    .metric .value{font-weight:900;color:#9ff9c6}
-
-    .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:12px}
-    .control-panel .left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
-    .control-panel input, .control-panel select{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;color:inherit}
-
-    #students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
-    .card{background:linear-gradient(180deg,rgba(12,18,26,0.75),rgba(7,12,18,0.65));border-radius:12px;padding:14px;border:1px solid rgba(255,255,255,0.03);position:relative}
-    .card:hover{transform:translateY(-4px);transition:all .18s ease}
-    .avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900}
-    .level{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.35);color:var(--accent-gold);font-weight:800}
-
-    .actions{display:flex;gap:8px;margin-top:12px}
-    .btn{padding:8px 12px;border-radius:10px;font-weight:800;color:#fff}
-    .btn.green{background:linear-gradient(180deg,#10b981,#059669)}
-    .btn.red{background:linear-gradient(180deg,#ef4444,#dc2626)}
-    .btn.blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
-
-    .group-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.02);margin-bottom:8px}
+    .card{background:linear-gradient(180deg,rgba(12,18,26,0.85),rgba(7,12,18,0.65));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);position:relative;overflow:hidden}
+    .card .row{display:flex;gap:10px;align-items:center}
+    .avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;background:linear-gradient(135deg,#0b2540,#07213a);color:#ffd88a}
+    .hp-wrap{margin-top:8px}
+    .hp-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+    .hp-fill{height:100%;background:linear-gradient(90deg,var(--danger),var(--gold));width:100%}
+    .card .actions{display:flex;gap:8px;margin-top:8px;justify-content:flex-end}
 
     /* Modals */
-    .modal-hidden { display: none !important; pointer-events: none !important; }
-    [data-modal] { pointer-events: auto; }
-    .modal-center{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:110}
-    .modal-panel{background:linear-gradient(180deg,rgba(15,23,34,0.95),rgba(9,12,18,0.95));border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,0.04);max-height:90vh;overflow:auto}
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;padding:12px;z-index:120}
+    .modal{background:var(--panel);padding:16px;border-radius:12px;max-height:90vh;overflow:auto;width:100%;max-width:980px;border:1px solid rgba(255,255,255,0.04)}
+    .modal.white{background:#ffffff;color:#111}
+    .modal h3{margin:0 0 12px 0}
+    .modal .row{display:flex;gap:8px}
+    .modal .input{padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:#f7f7f7}
+    .small{font-size:13px;color:var(--muted)}
 
-    /* Icon grid inside ficha */
-    .icon-grid{display:grid;grid-template-columns:repeat(5,60px);gap:12px;justify-content:center;padding:12px}
-    .icon-btn{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.04);background:transparent;color:var(--muted);cursor:pointer}
-    .icon-btn.selected{box-shadow:0 8px 20px rgba(0,0,0,0.45);border-color:rgba(255,255,255,0.06);color:#fff}
-    .icon-btn.positive{background:rgba(16,185,129,0.06);color:#10b981;border-color:rgba(16,185,129,0.12)}
-    .icon-btn.negative{background:rgba(239,68,68,0.06);color:#ef4444;border-color:rgba(239,68,68,0.12)}
+    /* Icon grid in ficha */
+    .icon-grid{display:grid;grid-template-columns:repeat(5,64px);gap:10px;justify-content:center;margin:12px 0}
+    .icon-btn{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:transparent;border:2px solid rgba(0,0,0,0.06);cursor:pointer}
+    .icon-btn.positive{border-color:rgba(16,185,129,0.12);color:var(--accent)}
+    .icon-btn.negative{border-color:rgba(239,68,68,0.12);color:var(--danger)}
+    .icon-btn.selected{box-shadow:0 8px 30px rgba(0,0,0,0.2)}
 
-    /* XP / ORO badges */
-    .stat-row{display:flex;gap:14px;align-items:center;justify-content:center;margin-top:12px}
-    .stat-pill{display:flex;align-items:center;gap:10px;padding:12px 18px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.03)}
-    .stat-pill .value{font-weight:900;font-size:20px}
+    /* Groups modal columns for drag & drop */
+    .groups-area{display:flex;gap:12px;align-items:flex-start}
+    .group-col{min-width:200px;max-width:260px;background:rgba(255,255,255,0.02);padding:8px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+    .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:6px;cursor:grab}
 
-    /* Big roulette/timer/dice styles */
-    #roulette-display { font-weight:900; font-size:34px; height:160px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); color:#fff; }
-    #timer-display { font-weight:900; font-size:48px; color:#f59e0b; }
-    #dice-display { font-weight:900; font-size:64px; height:120px; width:120px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:linear-gradient(180deg,#06121a,#041018); margin:12px auto; }
-
-    @media(max-width:1000px){.metrics{grid-template-columns:repeat(3,1fr)}}
-    @media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}.avatar{width:48px;height:48px}}
+    .btn{padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700}
+    .btn.danger{background:linear-gradient(180deg,var(--danger),#c0392b);color:white;border:none}
+    .hidden{display:none}
+    @media(max-width:900px){ .icon-grid{grid-template-columns:repeat(4,64px)} .groups-area{flex-direction:column} }
   </style>
 </head>
 <body>
-
-  <header class="glass-panel">
-    <div class="header-inner">
+  <header>
+    <div class="container header-row">
       <div class="brand">
         <div class="logo">ALM</div>
         <div>
-          <div style="font-weight:800">FantasyClass Convivencial <span style="background:rgba(245,158,11,0.08);padding:2px 8px;border-radius:8px;margin-left:8px;color:#ffd88a;font-weight:900">ALM</span></div>
-          <div style="font-size:12px;color:var(--muted)">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</div>
+          <div style="font-weight:900">FantasyClass Convivencial</div>
+          <div class="small">Colegio Alfonso López Michelsen</div>
         </div>
       </div>
 
       <div class="controls">
-        <button class="chip" id="drive-status-badge" onclick="openDriveSettingsModal()"><i class="fa-solid fa-cloud-arrow-up"></i><span id="drive-status-text">Google Forms/Drive Sync</span></button>
+        <div class="chip" onclick="openQuickActionModal('positive')">+ Mérito</div>
+        <div class="chip" onclick="openQuickActionModal('negative')">− Falta</div>
 
-        <div class="chip"><i class="fa-solid fa-calendar-days"></i>
-          <select id="period-select" onchange="switchPeriod(this.value)">
+        <div class="chip">
+          <span style="margin-right:6px">Periodo</span>
+          <select id="period-select" class="muted" onchange="switchPeriod(this.value)">
             <option value="ALL">Todo el Año</option>
             <option value="P1" selected>Periodo 1</option>
             <option value="P2">Periodo 2</option>
@@ -129,738 +90,579 @@
           </select>
         </div>
 
-        <div class="chip"><i class="fa-solid fa-users"></i>
-          <select id="class-select" onchange="switchClass(this.value)"></select>
+        <div class="chip">
+          <span style="margin-right:6px">Curso</span>
+          <select id="class-select" class="muted" onchange="switchClass(this.value)"></select>
         </div>
 
-        <button class="chip" onclick="openManageGroupsModal()"><i class="fa-solid fa-layer-group"></i> Grupos</button>
-
-        <div class="dropdown">
-          <button class="chip" onclick="toggleToolsMenu()"><i class="fa-solid fa-wrench"></i> Herramientas <i class="fa-solid fa-chevron-down" style="margin-left:6px"></i></button>
-          <div id="tools-dropdown" class="dropdown-menu" aria-hidden="true">
-            <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i><span> Ruleta Aleatoria</span></button>
-            <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i><span> Cronómetro</span></button>
-            <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i><span> Dado</span></button>
-          </div>
-        </div>
-
-        <div class="dropdown">
-          <button class="chip green" onclick="toggleExportMenu()"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
-          <div id="export-dropdown" class="dropdown-menu" aria-hidden="true">
-            <button onclick="exportCurrentClassExcel()"><i class="fa-solid fa-file-export"></i> Exportar Curso Actual</button>
-            <button onclick="exportAllClassesMasterExcel()"><i class="fa-solid fa-database"></i> Master Todos los Cursos</button>
-          </div>
-        </div>
+        <div class="chip" onclick="openManageGroupsModal()">Grupos</div>
       </div>
     </div>
   </header>
 
   <main>
-    <div class="metrics">
-      <div class="metric"><div class="icon">🐘</div><div><div class="label">Responsabilidad</div><div id="badge-count-Responsabilidad" class="value">0 pts</div></div></div>
-      <div class="metric"><div class="icon">🦁</div><div><div class="label">Respeto</div><div id="badge-count-Respeto" class="value">0 pts</div></div></div>
-      <div class="metric"><div class="icon">🐪</div><div><div class="label">Confianza</div><div id="badge-count-Confianza" class="value">0 pts</div></div></div>
-      <div class="metric"><div class="icon">❤️</div><div><div class="label">Empatía</div><div id="badge-count-Empatía" class="value">0 pts</div></div></div>
-      <div class="metric"><div class="icon">⚖️</div><div><div class="label">Justicia</div><div id="badge-count-Justicia" class="value">0 pts</div></div></div>
-      <div class="metric"><div class="icon">🛡️</div><div><div class="label">Ciudadanía</div><div id="badge-count-Ciudadanía" class="value">0 pts</div></div></div>
-    </div>
-
-    <div class="control-panel">
-      <div class="left">
-        <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
-        <input id="student-search-input" type="text" placeholder="Buscar estudiante por nombre..." onkeyup="renderStudentGrid()">
+    <div class="container">
+      <div class="metrics" id="metrics-bar">
+        <div class="metric"><div class="small">Responsabilidad</div><div id="badge-Responsabilidad">0</div></div>
+        <div class="metric"><div class="small">Respeto</div><div id="badge-Respeto">0</div></div>
+        <div class="metric"><div class="small">Confianza</div><div id="badge-Confianza">0</div></div>
+        <div class="metric"><div class="small">Empatía</div><div id="badge-Empatía">0</div></div>
+        <div class="metric"><div class="small">Justicia</div><div id="badge-Justicia">0</div></div>
+        <div class="metric"><div class="small">Ciudadanía</div><div id="badge-Ciudadanía">0</div></div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="sort-select" onchange="renderStudentGrid()">
-          <option value="name">Nombre (A-Z)</option>
-          <option value="level">Mayor Nivel</option>
-          <option value="xp">Más Puntos</option>
-          <option value="obs">Más Observaciones</option>
-        </select>
-        <button class="btn green" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Añadir Estudiante</button>
-      </div>
-    </div>
 
-    <div id="students-grid"></div>
+      <div class="control-panel">
+        <div class="control-left">
+          <input id="student-search" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="btn" onclick="openAddStudentModal()">Añadir Estudiante</div>
+        </div>
+      </div>
+
+      <div id="students-grid"></div>
+    </div>
   </main>
 
-  <!-- ============ MODALES ============ -->
+  <!-- Modals -->
 
-  <!-- FICHA modal -->
-  <div id="history-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:980px;">
-      <button style="position:absolute;right:18px;top:18px;background:transparent;border:0;color:var(--muted)" onclick="closeHistoryModal()">✕</button>
-
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <div id="history-student-avatar" class="avatar" style="background:linear-gradient(135deg,#0b2540,#07213a);width:64px;height:64px;border-radius:12px">A</div>
-        <div style="flex:1">
-          <div id="history-student-name" style="font-weight:900;font-size:18px">Nombre Estudiante</div>
-          <div style="color:var(--muted);font-weight:700">Ficha del Observador Convivencial • <span id="history-period-label">P1</span></div>
-        </div>
-
-        <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-end">
-          <button class="btn green" onclick="exportSingleStudentExcel()"><i class="fa-solid fa-file-excel"></i> Exportar Ficha (.xlsx)</button>
-        </div>
+  <!-- Quick action modal -->
+  <div id="quick-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeQuickActionModal()">
+    <div class="modal">
+      <h3 id="quick-title">Acción rápida</h3>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <select id="quick-student-select" style="flex:1"></select>
+        <input id="quick-points" type="number" min="1" max="10" value="1" style="width:80px;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06)">
       </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div class="btn" onclick="applyQuick(true)">Aplicar + Mérito</div>
+        <div class="btn danger" onclick="applyQuick(false)">Aplicar − Falta</div>
+      </div>
+    </div>
+  </div>
 
-      <!-- ICON GRID (pilares / acciones) -->
+  <!-- Add student modal -->
+  <div id="add-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeAddStudentModal()">
+    <div class="modal">
+      <h3>Nuevo estudiante</h3>
+      <input id="new-student-name" class="input" placeholder="Nombre completo" style="width:100%;margin-bottom:8px">
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <div class="btn" onclick="addStudent()">Guardar</div>
+        <div class="btn" onclick="closeAddStudentModal()">Cancelar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ficha modal (white background for readability) -->
+  <div id="ficha-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeFichaModal()">
+    <div class="modal white">
+      <h3 id="ficha-name">Ficha Estudiante</h3>
+
       <div>
-        <label style="font-weight:800;color:var(--muted)">Selecciona acción / pilar</label>
-        <div class="icon-grid" id="ficha-icon-grid">
-          <!-- Buttons created dynamically in JS for maintainability -->
+        <div class="icon-grid" id="ficha-icons"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px">
+        <div style="background:#f3f4f6;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
+          <div style="font-weight:800;color:#111">EXPERIENCIA</div>
+          <div id="ficha-xp" style="font-weight:900">0</div>
+        </div>
+        <div style="background:#fff7ed;padding:10px;border-radius:999px;display:flex;gap:8px;align-items:center">
+          <div style="font-weight:800;color:#111">ORO</div>
+          <div id="ficha-gold" style="font-weight:900">0</div>
         </div>
       </div>
 
-      <!-- XP / ORO pills -->
-      <div class="stat-row">
-        <div class="stat-pill">
-          <div style="display:flex;flex-direction:column">
-            <div style="font-size:12px;color:var(--muted)">EXPERIENCIA</div>
-            <div class="value" id="ficha-xp-value">0</div>
-          </div>
-          <div style="margin-left:8px;color:var(--muted)"><i class="fa-solid fa-user-gear"></i></div>
-        </div>
-
-        <div class="stat-pill">
-          <div style="display:flex;flex-direction:column">
-            <div style="font-size:12px;color:var(--muted)">ORO</div>
-            <div class="value" id="ficha-gold-value">0</div>
-          </div>
-          <div style="margin-left:8px;color:var(--muted)"><i class="fa-solid fa-coins"></i></div>
-        </div>
-      </div>
-
-      <hr style="margin:14px 0;border-color:rgba(255,255,255,0.03)">
-
-      <div style="display:flex;gap:12px;margin-bottom:12px">
-        <textarea id="entry-note-input" rows="3" placeholder="Escribe una observación pedagógica..." style="flex:1;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)"></textarea>
-
+      <div style="display:flex;gap:12px">
+        <textarea id="ficha-note" rows="3" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6" placeholder="Nota..."></textarea>
         <div style="width:180px;display:flex;flex-direction:column;gap:8px">
-          <label style="color:var(--muted)">Tipo</label>
-          <div style="display:flex;gap:8px">
-            <button id="btn-type-positive" class="btn green" onclick="setEntryType('positive')"><i class="fa-solid fa-thumbs-up"></i></button>
-            <button id="btn-type-negative" class="btn" style="background:transparent;border:1px solid rgba(255,255,255,0.05);color:var(--muted)" onclick="setEntryType('negative')"><i class="fa-solid fa-triangle-exclamation"></i></button>
+          <input id="ficha-points" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;border:1px solid #e6e6e6">
+          <div style="display:flex;gap:6px">
+            <div class="btn" onclick="fichaApply(true)">+ Mérito</div>
+            <div class="btn danger" onclick="fichaApply(false)">− Falta</div>
           </div>
-
-          <label style="color:var(--muted)">Puntos</label>
-          <input id="point-magnitude-input" type="number" min="1" max="10" value="1" style="padding:8px;border-radius:8px;text-align:center;border:1px solid rgba(255,255,255,0.04);background:transparent">
-
-          <button class="btn green" onclick="saveStudentEntry()">Guardar</button>
         </div>
       </div>
 
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
-        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Puntos Mérito</div><div id="history-stat-positive" style="font-weight:800;color:#34d399">0 pts</div></div>
-        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Observaciones</div><div id="history-stat-negative" style="font-weight:800;color:#fb7185">0</div></div>
-        <div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center"><div style="color:var(--muted)">Nivel RPG</div><div id="history-stat-level" style="font-weight:800;color:#f59e0b">Nivel 1</div></div>
-      </div>
+      <hr style="margin:12px 0">
 
-      <div id="history-entries-container" style="display:flex;flex-direction:column;gap:8px"></div>
-    </div>
-  </div>
-
-  <!-- DRIVE modal -->
-  <div id="drive-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:640px">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeDriveModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px">Sincronización Automática con Google Drive</h3>
-      <p style="color:var(--muted);margin-bottom:12px">Pega la URL del formulario o webhook de Google Drive/Forms para sincronizar automáticamente.</p>
-      <input id="drive-webhook-url" type="text" placeholder="https://docs.google.com/forms/d/e/.../formResponse" style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-      <div style="display:flex;gap:8px">
-        <button class="btn green" onclick="saveDriveSettings()">Guardar Configuración</button>
-        <button class="btn" onclick="testDriveConnection()">Probar Envío</button>
+      <div id="ficha-history" style="max-height:280px;overflow:auto;background:#fff;padding:8px;border-radius:8px"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <div class="btn" onclick="closeFichaModal()">Cerrar</div>
       </div>
     </div>
   </div>
 
-  <!-- GROUPS modal -->
-  <div id="manage-groups-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:760px">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeManageGroupsModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-layer-group"></i> Gestión de Cursos y Grupos</h3>
+  <!-- Groups modal (drag & drop) -->
+  <div id="groups-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeManageGroupsModal()">
+    <div class="modal" style="max-width:1100px">
+      <h3>Gestión de cursos y grupos</h3>
 
       <div style="display:flex;gap:8px;margin-bottom:10px">
-        <input id="new-grade-input" placeholder="Nombre nuevo grado (ej. 805)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-        <button class="btn blue" onclick="createGrade()">Crear Grado</button>
+        <input id="new-grade" class="input" placeholder="Nuevo grado (ej. 805)">
+        <div class="btn" onclick="createGrade()">Crear grado</div>
+        <input id="new-group-name" class="input" placeholder="Crear grupo (ej. Grupo A)">
+        <div class="btn" onclick="createGroup()">Crear grupo</div>
       </div>
 
       <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center">
-        <input id="new-subgroup-input" placeholder="Nombre nuevo grupo (ej. Grupo A)" style="flex:1;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-        <button class="btn green" onclick="createGroupInCurrentGrade()">Crear Grupo en Grado Actual</button>
+        <input id="dist-num" type="number" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:8px">
+        <input id="dist-size" type="number" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:8px">
+        <div class="btn" onclick="distributeByNumber()">Distribuir por nº</div>
+        <div class="btn" onclick="distributeBySize()">Distribuir por tamaño</div>
+        <div style="margin-left:auto;color:var(--muted)">Grado: <strong id="groups-current-grade"></strong></div>
       </div>
 
-      <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
-        <input id="dist-number" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-        <input id="dist-size" type="number" min="1" placeholder="Tamaño grupo" style="width:140px;padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-        <button class="btn" onclick="distributeGroupsByNumber()">Distribuir por número</button>
-        <button class="btn" onclick="distributeGroupsBySize()">Distribuir por tamaño</button>
-      </div>
+      <div class="groups-area" id="groups-area" style="margin-top:8px"></div>
 
-      <div id="groups-list-container" style="max-height:320px;overflow:auto"></div>
-    </div>
-  </div>
-
-  <!-- ADD STUDENT modal -->
-  <div id="add-student-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:420px">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeAddStudentModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px">Nuevo Estudiante</h3>
-      <p style="color:var(--muted);margin-bottom:8px">Se agregará al curso <strong id="add-student-course-name">801</strong></p>
-      <input id="new-student-name-input" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);margin-bottom:10px">
-      <button class="btn green" style="width:100%" onclick="confirmAddNewStudent()">Guardar Estudiante</button>
-    </div>
-  </div>
-
-  <!-- CONFIRM modal -->
-  <div id="confirm-dialog-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-      <h3 id="confirm-title" style="font-weight:800">¿Estás seguro?</h3>
-      <p id="confirm-message" style="color:var(--muted);margin-bottom:12px">Esta acción no se puede deshacer.</p>
-      <div style="display:flex;gap:8px;justify-content:center">
-        <button id="confirm-action-btn" class="btn red">Eliminar</button>
-        <button class="btn" onclick="closeConfirmModal()">Cancelar</button>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <div class="btn" onclick="closeManageGroupsModal()">Cerrar</div>
       </div>
     </div>
   </div>
 
-  <!-- ROULETTE modal -->
-  <div id="roulette-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:640px;text-align:center">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeRouletteModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-spinner"></i> Ruleta Aleatoria</h3>
-      <div id="roulette-display" style="font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);color:#fff;margin-bottom:10px">¡Presiona Girar!</div>
+  <!-- Confirm modal -->
+  <div id="confirm-modal" class="modal-backdrop hidden" onclick="if(event.target===this) closeConfirm()">
+    <div class="modal" style="max-width:420px;text-align:center">
+      <h3 id="confirm-title">¿Estás seguro?</h3>
+      <p id="confirm-text" class="small"></p>
       <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <button class="btn blue" onclick="startRoulette()">Girar</button>
-        <button class="btn" onclick="stopRoulette()">Detener</button>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center">
-        <label style="color:var(--muted)">Velocidad</label>
-        <input id="roulette-speed" type="range" min="1" max="50" value="20" style="width:300px">
+        <div class="btn danger" id="confirm-yes">Eliminar</div>
+        <div class="btn" onclick="closeConfirm()">Cancelar</div>
       </div>
     </div>
   </div>
 
-  <!-- TIMER modal -->
-  <div id="timer-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:420px;text-align:center">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeTimerModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-stopwatch"></i> Cronómetro</h3>
-      <div id="timer-display" style="font-weight:900;font-size:48px;color:#f59e0b;margin-bottom:12px">05:00</div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-        <button class="btn green" onclick="toggleTimer()">Iniciar</button>
-        <button class="btn" onclick="resetTimer()">Reset</button>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px">
-        <button class="btn" onclick="setTimerMinutes(1)">1m</button>
-        <button class="btn" onclick="setTimerMinutes(5)">5m</button>
-        <button class="btn" onclick="setTimerMinutes(10)">10m</button>
-      </div>
-      <div style="margin-top:8px">
-        <label style="display:block;color:var(--muted);margin-bottom:6px">Establecer tiempo manual (mm:ss o minutos)</label>
-        <div style="display:flex;gap:8px;justify-content:center">
-          <input id="timer-manual-input" placeholder="Ej. 3:30 o 5" style="padding:8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04);width:160px">
-          <button class="btn" onclick="applyManualTimer()">Set</button>
-        </div>
-      </div>
-    </div>
-  </div>
+<script>
+/* ----------------- Data & state ----------------- */
+const DEFAULT_ROSTERS = {
+  "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba"],
+  "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia"]
+};
 
-  <!-- DICE modal -->
-  <div id="dice-modal" data-modal class="modal-center modal-hidden">
-    <div class="modal-panel" style="width:100%;max-width:360px;text-align:center">
-      <button style="position:absolute;right:18px;top:18px" onclick="closeDiceModal()">✕</button>
-      <h3 style="font-weight:800;margin-bottom:8px"><i class="fa-solid fa-dice"></i> Dado</h3>
-      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
-        <label style="color:var(--muted)">Cantidad</label>
-        <input id="dice-count" type="number" min="1" max="10" value="1" style="width:60px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-        <label style="color:var(--muted)">Caras</label>
-        <input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px;padding:6px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.04)">
-      </div>
-      <div id="dice-display">🎲</div>
-      <div id="dice-detail" style="color:var(--muted);margin-bottom:8px"></div>
-      <button class="btn red" onclick="rollDice()">Lanzar Dado</button>
-    </div>
-  </div>
+let db = { classes: {}, groups: {} }; // groups[grade] = { groupName: [studentId,...] }
+let currentGrade = null;
+let selectedStudentId = null;
+const HP_MAX = 5;
 
-  <!-- =============== LÓGICA JS =============== -->
-  <script>
-  /* ---------- Estado inicial y utilidades ---------- */
-  const DEFAULT_ROSTERS = {
-    "801": ["Jhanair Cantillo buelvas","Emily Alejandra Carabali calvo","Johan Alejandro Carrillo Daza","Nataly Gisseth Carvajal Alba","JUAN ESTEBAN CUERVO HERRERA","Sara Sofía Galeano Vargas","MELANY GARCIA GIRALDO","HELEN GONZALEZ YAYA","JULIAN GONZALEZ (801)","ALISON MARIA GRACIA CULMA","CAMILA ANDREA HERRERA ALVAREZ","Alan Felipe Llanos Hernandez","JHAN VALENTIN LOPEZ VALENCIA","Mariany Marquez Lizo","OMAR OSPINO BANDERAS","Saira Palacios Riaño","johan sebastian pardo niño (801)","GENESIS VALENTINA POLO MERIÑO","Sebastián Alberto Portillo colmenares","Jhoel Riaño Garzón","ALISSON RIVEROS (801)","Samantha Rodríguez Moreno","DANNA RODRIGUEZ NAVARRO","Lina Sofia Rojas Salamanca","Miguel Ruiz (801)","YUNAISIS SALGADO CASTRO","Nathaly Solano Torres","Cindylorena Tellez(801)","Fernanda Tenorio quiñones","SAMUEL ALEJANDRO TINOCO PINZON","NICOOL SARA VASQUEZ URREA","GREYSMAR ZUÑIGA VITORINO"],
-    "802": ["MARYIS CAMILA AREVALO (802)","Emanuel Buitrago (802)","Elisabeth Carmona Gracia","Jobsanim susana Colina calles","Luisa Alejandra Díaz Yepes (802)","Matias Escobar flores","Dilan David Garcia Leal 802","Héctor Garzón Ramirez","ANGEL DANIEL GONZALEZ (802)","Sharol Dayana Gutierrez Téllez","Karol Dayana Hueso Pulido","Claudia Gabriela Leiva Gomez","Holman Esneyder Mena Mosquera","Sara Gisell Neira Pardo(802)","Dyland Alejandro Nieto (802)","Sara Ocampo Isaza","María Fernanda Orozco Diaz 802","Juan Esteban Orozco Higuita","María Fernanda Osorio huérfano","ZARA VALENTINA PEDRAZA ZAMORA","Sharith Liceth Riascos Conrado","Maria Victoria Rodriguez Moreno","Sara Valentina Rodriguez Ocampo","David Santiago Rodríguez Ortiz","Danna Valeria Rojas Florez(802)","Valery Maria Romero Capera","Angel David Saavedra Peñuela","María Fernanda Saenz Fresneda","Alisson Geraldine Sanabria Bernal","Darly maryori Solano cubides","DYLAN SEBASTIAN SOLIS HERNANDEZ","MARIA JOSE TORO RUIZ (802)"]
-  };
-
-  let currentClassKey = "801";
-  let currentPeriod = "P1";
-  let selectedStudentId = null;
-  let activeEntryType = 'positive';
-  let selectedValueTag = 'Responsabilidad';
-  let dbState = { classes: {}, groups: {}, googleScriptUrl: '' };
-
-  function saveDatabase(){ localStorage.setItem('fantasyclass_alm_db', JSON.stringify(dbState)); }
-  function loadDatabase(){
-    const stored = localStorage.getItem('fantasyclass_alm_db');
-    if(stored){
-      try{ dbState = JSON.parse(stored); }catch(e){ dbState = { classes:{}, groups:{}, googleScriptUrl: '' }; }
+/* Utilities */
+function save(){ localStorage.setItem('fantasy_db_v1', JSON.stringify(db)); }
+function load(){
+  const s = localStorage.getItem('fantasy_db_v1');
+  if(s){ try{ db = JSON.parse(s); }catch(e){ db = { classes:{}, groups:{} }; } }
+  if(!db.classes) db.classes = {};
+  if(!db.groups) db.groups = {};
+  // populate defaults when missing
+  for(const g of Object.keys(DEFAULT_ROSTERS)){
+    if(!db.classes[g] || db.classes[g].length === 0){
+      db.classes[g] = DEFAULT_ROSTERS[g].map((name,i)=> ({ id: `${g}_${i+1}`, name, xp:0, level:1, hp:HP_MAX, history: [] }));
     }
-    if(!dbState.classes) dbState.classes = {};
-    if(!dbState.groups) dbState.groups = {};
-    // populate missing default rosters
-    Object.keys(DEFAULT_ROSTERS).forEach(grade=>{
-      if(!dbState.classes[grade] || dbState.classes[grade].length===0){
-        dbState.classes[grade] = DEFAULT_ROSTERS[grade].map((name,i)=>({ id:`${grade}_${i+1}`, name, xp:0, level:1, history:[] }));
-      }
-      if(!dbState.groups[grade]) dbState.groups[grade] = {};
-    });
-    saveDatabase();
+    if(!db.groups[g]) db.groups[g] = {};
   }
+  // set currentGrade
+  const grades = Object.keys(db.classes);
+  currentGrade = grades.length ? grades[0] : null;
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-  /* ---------- Initialization ---------- */
-  document.addEventListener('DOMContentLoaded', ()=>{
-    loadDatabase();
-    updateClassSelectOptions();
-    renderGroupsList();
-    renderStudentGrid();
-    buildFichaIconGrid(); // create icon buttons
-    // restore Drive badge
-    const saved = localStorage.getItem('fantasyclass_alm_google_url');
-    if(saved) document.getElementById('drive-status-text').innerText = 'Google Drive Activo';
+/* Init */
+document.addEventListener('DOMContentLoaded', ()=>{
+  load();
+  populateClassSelect();
+  renderStudentGrid();
+  buildFichaIcons();
+});
+
+/* ----------------- Class & UI helpers ----------------- */
+function populateClassSelect(){
+  const sel = document.getElementById('class-select');
+  sel.innerHTML = '';
+  Object.keys(db.classes).forEach(g=>{
+    const opt = document.createElement('option'); opt.value = g; opt.textContent = `Grado ${g} (${db.classes[g].length})`; sel.appendChild(opt);
   });
+  if(currentGrade && db.classes[currentGrade]) sel.value = currentGrade;
+  else { currentGrade = sel.value || Object.keys(db.classes)[0]; sel.value = currentGrade; }
+  document.getElementById('groups-current-grade').innerText = currentGrade || '-';
+}
+function switchClass(val){
+  currentGrade = val;
+  document.getElementById('groups-current-grade').innerText = currentGrade || '-';
+  renderStudentGrid();
+  renderGroupsArea();
+}
 
-  /* ---------- Class select & period ---------- */
-  function updateClassSelectOptions(){
-    const select = document.getElementById('class-select');
-    if(!select) return;
-    const prev = select.value;
-    select.innerHTML = '';
-    Object.keys(dbState.classes).forEach(k=>{
-      const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${dbState.classes[k].length} Est.)`; select.appendChild(opt);
-    });
-    if(prev && dbState.classes[prev]) currentClassKey = prev;
-    else if(!dbState.classes[currentClassKey]) currentClassKey = Object.keys(dbState.classes)[0] || currentClassKey;
-    select.value = currentClassKey;
-    renderStudentGrid(); updateGlobalMetrics();
-  }
-  function switchClass(v){ if(!dbState.classes[v]) return; currentClassKey = v; document.getElementById('class-select').value = v; renderStudentGrid(); updateGlobalMetrics(); }
-  function switchPeriod(v){ currentPeriod = v; document.getElementById('period-select').value = v; renderStudentGrid(); updateGlobalMetrics(); }
-
-  /* ---------- Export helpers / dropdowns ---------- */
-  function toggleExportMenu(){ const m=document.getElementById('export-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-  function toggleToolsMenu(){ const m=document.getElementById('tools-dropdown'); if(!m) return; m.style.display = m.style.display==='block' ? 'none' : 'block'; }
-  document.addEventListener('click', (e)=>{ const t=document.getElementById('tools-dropdown'), tb=document.querySelector('.dropdown > .chip'); if(t && t.style.display==='block' && !t.contains(e.target) && !tb?.contains(e.target)) t.style.display='none'; });
-
-  /* ---------- Drive ---------- */
-  function openDriveSettingsModal(){ document.getElementById('drive-webhook-url').value = dbState.googleScriptUrl || localStorage.getItem('fantasyclass_alm_google_url') || ''; openModal('drive-modal'); }
-  function closeDriveModal(){ closeModal('drive-modal'); }
-  function saveDriveSettings(){ dbState.googleScriptUrl = document.getElementById('drive-webhook-url').value.trim(); localStorage.setItem('fantasyclass_alm_google_url', dbState.googleScriptUrl); saveDatabase(); if(dbState.googleScriptUrl) document.getElementById('drive-status-text').innerText = 'Google Drive Activo'; closeDriveModal(); }
-  function testDriveConnection(){ alert('Prueba de envío (no-cors)'); }
-
-  /* ---------- Exports (simple) ---------- */
-  function exportCurrentClassExcel(){
-    const students = dbState.classes[currentClassKey] || [];
-    const rows = students.map((s,i)=>({ "N°": i+1, "ID Estudiante": s.id, "Nombre Estudiante": s.name, "Grado": currentClassKey, "Nivel RPG": s.level || 1, "Puntos XP": s.xp || 0 }));
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso ${currentClassKey}`); XLSX.writeFile(wb, `Reporte_${currentClassKey}.xlsx`);
-  }
-  function exportAllClassesMasterExcel(){ alert('Export master (demo)'); }
-  function exportSingleStudentExcel(){
-    if(!selectedStudentId) return alert('Abre la ficha de un estudiante para exportar');
-    const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId);
-    if(!student) return alert('Estudiante no encontrado');
-    // build minimal sheet
-    const rows = (student.history||[]).map(h=>({ Fecha:h.timestamp, Tipo:h.type, Pilar:h.valueTag, Puntos:h.magnitude, Nota:h.note }));
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Nombre: student.name, Grado: currentClassKey, XP: student.xp || 0 }]), 'Resumen');
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length ? rows : [{ Info: 'Sin registros' }]), 'Historial');
-    XLSX.writeFile(wb, `Ficha_${student.name.replace(/[^a-z0-9]/gi,'_')}_${currentClassKey}.xlsx`);
-  }
-
-  /* ---------- Groups & grades (fixed, groups store student IDs) ---------- */
-  function createGrade(){
-    const keyInput = document.getElementById('new-grade-input');
-    const key = (keyInput?.value || '').trim();
-    if(!key) return alert('Escribe el nombre del grado (ej. 805)');
-    if(dbState.classes[key]) return alert('El grado ya existe');
-    dbState.classes[key] = [];
-    dbState.groups[key] = dbState.groups[key] || {};
-    saveDatabase(); updateClassSelectOptions(); renderGroupsList(); keyInput.value=''; alert('Grado creado: '+key);
-  }
-
-  function createGroupInCurrentGrade(){
-    const grade = document.getElementById('class-select')?.value || currentClassKey;
-    if(!grade) return alert('No hay grado seleccionado');
-    const gname = (document.getElementById('new-subgroup-input')?.value || '').trim();
-    if(!gname) return alert('Escribe nombre de grupo');
-    dbState.groups = dbState.groups || {};
-    dbState.groups[grade] = dbState.groups[grade] || {};
-    if(dbState.groups[grade][gname]) return alert('El grupo ya existe');
-    dbState.groups[grade][gname] = []; // store IDs
-    saveDatabase(); renderGroupsList(); document.getElementById('new-subgroup-input').value=''; alert('Grupo creado: '+gname+' en '+grade);
-  }
-
-  function renderGroupsList(){
-    const container = document.getElementById('groups-list-container');
-    if(!container) return;
-    container.innerHTML = '';
-    const grades = Object.keys(dbState.classes || {}).sort();
-    grades.forEach(g=>{
-      const students = dbState.classes[g] || [];
-      const header = document.createElement('div'); header.className='group-item';
-      header.innerHTML = `<div style="cursor:pointer" onclick="switchClass('${g}')"><strong>Grado ${g}</strong> <span style="color:var(--muted)">(${students.length} estudiantes)</span></div>
-                          <div style="display:flex;gap:8px"><button class="btn" onclick="exportGroup('${g}')">Export</button><button class="btn red" onclick="deleteGrade('${g}')">🗑</button></div>`;
-      const wrapper = document.createElement('div'); wrapper.style.marginBottom='12px';
-      wrapper.appendChild(header);
-
-      const groupsFor = (dbState.groups && dbState.groups[g]) ? dbState.groups[g] : {};
-      const keys = Object.keys(groupsFor);
-      if(keys.length===0){
-        const note = document.createElement('div'); note.style.padding='8px 12px'; note.style.color='var(--muted)'; note.innerText='No hay subgrupos creados en este grado.';
-        wrapper.appendChild(note);
-      } else {
-        const list = document.createElement('div'); list.style.padding='8px 12px'; list.style.display='grid'; list.style.gridTemplateColumns='repeat(auto-fill,minmax(200px,1fr))'; list.style.gap='8px';
-        keys.forEach(k=>{
-          const members = (dbState.groups[g][k] || []).map(id => {
-            const s = (dbState.classes[g] || []).find(x=>x.id===id);
-            return s ? s.name : id;
-          });
-          const card = document.createElement('div'); card.style.padding='10px'; card.style.borderRadius='8px'; card.style.background='rgba(255,255,255,0.02)';
-          card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${k}</div><div style="color:var(--muted)">${members.length} integrantes</div></div>
-                            <div style="display:flex;gap:6px;justify-content:flex-end;margin-top:6px"><button class="btn" onclick="exportSubgroup('${g}','${k}')">Export</button><button class="btn red" onclick="deleteSubgroup('${g}','${k}')">Eliminar</button></div>`;
-          list.appendChild(card);
-        });
-        wrapper.appendChild(list);
-      }
-      container.appendChild(wrapper);
-    });
-  }
-
-  function deleteGrade(grade){
-    showConfirmModal('Eliminar grado', `Eliminar grado ${grade} y todos sus datos?`, ()=>{
-      delete dbState.classes[grade];
-      if(dbState.groups && dbState.groups[grade]) delete dbState.groups[grade];
-      saveDatabase(); updateClassSelectOptions(); renderGroupsList(); renderStudentGrid();
-    });
-  }
-
-  function deleteSubgroup(grade, subgroup){
-    showConfirmModal('Eliminar subgrupo', `Eliminar "${subgroup}" en ${grade}?`, ()=>{
-      if(dbState.groups && dbState.groups[grade]){ delete dbState.groups[grade][subgroup]; saveDatabase(); renderGroupsList(); }
-    });
-  }
-
-  function exportGroup(grade){ currentClassKey = grade; exportCurrentClassExcel(); }
-
-  function exportSubgroup(grade, subgroup){
-    const ids = (dbState.groups[grade] && dbState.groups[grade][subgroup]) ? dbState.groups[grade][subgroup] : [];
-    const rows = ids.length ? ids.map((id,i)=>{ const s=(dbState.classes[grade]||[]).find(x=>x.id===id); return { 'N°': i+1, 'Nombre': s? s.name : id, 'Grado': grade, 'Grupo': subgroup}; }) : [{ 'Mensaje': 'Sin miembros' }];
-    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`);
-  }
-
-  function distributeGroupsByNumber(){
-    const n = parseInt(document.getElementById('dist-number').value);
-    if(!n || n < 1) return alert('Ingresa número de grupos');
-    const students = (dbState.classes[currentClassKey] || []).map(s=>s.id);
-    if(!students.length) return alert('No hay estudiantes en este grado');
-    const shuffled = shuffleArray([...students]);
-    dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
-    // clear previous auto groups
-    // create groups Grupo 1..n
-    for(let i=1;i<=n;i++) dbState.groups[currentClassKey][`Grupo ${i}`] = [];
-    for(let i=0;i<shuffled.length;i++){
-      const g = `Grupo ${ (i % n) + 1 }`;
-      dbState.groups[currentClassKey][g].push(shuffled[i]);
-    }
-    saveDatabase(); renderGroupsList(); alert('Distribución por número completada');
-  }
-
-  function distributeGroupsBySize(){
-    const size = parseInt(document.getElementById('dist-size').value);
-    if(!size || size < 1) return alert('Ingresa tamaño de grupo');
-    const students = (dbState.classes[currentClassKey] || []).map(s=>s.id);
-    if(!students.length) return alert('No hay estudiantes');
-    const shuffled = shuffleArray([...students]);
-    dbState.groups[currentClassKey] = dbState.groups[currentClassKey] || {};
-    // clear previous auto groups
-    Object.keys(dbState.groups[currentClassKey] || {}).forEach(k=>{
-      if(k.startsWith('Grupo ')) delete dbState.groups[currentClassKey][k];
-    });
-    let gidx = 1;
-    for(let i=0;i<shuffled.length;i+=size){
-      dbState.groups[currentClassKey][`Grupo ${gidx}`] = shuffled.slice(i,i+size);
-      gidx++;
-    }
-    saveDatabase(); renderGroupsList(); alert('Distribución por tamaño completada');
-  }
-
-  function shuffleArray(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-
-  /* ---------- Students: add / delete / render ---------- */
-  function openAddStudentModal(){ document.getElementById('add-student-course-name').innerText = currentClassKey; document.getElementById('new-student-name-input').value=''; openModal('add-student-modal'); }
-  function closeAddStudentModal(){ closeModal('add-student-modal'); }
-  function confirmAddNewStudent(){
-    const name = document.getElementById('new-student-name-input').value.trim();
-    if(!name) return alert('Escribe el nombre');
-    if(!dbState.classes[currentClassKey]) dbState.classes[currentClassKey] = [];
-    const id = `${currentClassKey}_${Date.now()}`;
-    dbState.classes[currentClassKey].push({ id, name, xp:0, level:1, history:[] });
-    saveDatabase(); updateClassSelectOptions(); renderStudentGrid(); closeAddStudentModal(); alert('Estudiante agregado');
-  }
-
-  function renderStudentGrid(){
-    const container = document.getElementById('students-grid'); if(!container) return; container.innerHTML='';
-    const students = dbState.classes[currentClassKey] || [];
-    const q = (document.getElementById('student-search-input').value || '').toLowerCase().trim();
-    const sort = document.getElementById('sort-select').value;
-    let filtered = students.filter(s=>s.name.toLowerCase().includes(q));
-    if(sort==='name') filtered.sort((a,b)=>a.name.localeCompare(b.name));
-    else if(sort==='level' || sort==='xp') filtered.sort((a,b)=> (b.xp||0) - (a.xp||0));
-    else if(sort==='obs') filtered.sort((a,b)=> ((b.history||[]).filter(h=>h.type==='negative').length) - ((a.history||[]).filter(h=>h.type==='negative').length));
-    filtered.forEach(s=>{
-      const st = calculateStudentStatsForPeriod(s);
-      const card = document.createElement('div'); card.className='card';
-      card.innerHTML = `
-        <div class="level">NIV ${st.level}</div>
-        <div style="display:flex;gap:12px;align-items:center">
-          <div class="avatar" style="background:${avatarGradientFor(s.name)};min-width:56px">${s.name.charAt(0)}</div>
-          <div style="flex:1">
-            <div style="font-weight:800">${s.name}</div>
-            <div style="color:var(--muted)">Grado ${currentClassKey} • ${currentPeriod}</div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end">
-            <button class="btn blue" style="padding:6px 8px;font-size:12px" onclick="openHistoryModal('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
-            <button class="btn" style="padding:6px 8px;font-size:12px" onclick="openAssignGroupModal('${s.id}')"><i class="fa-solid fa-users-rectangle"></i> Asignar</button>
-            <button class="btn red" style="padding:6px 8px;font-size:12px" onclick="confirmDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></button>
+/* ----------------- Students grid ----------------- */
+function renderStudentGrid(){
+  const grid = document.getElementById('students-grid'); grid.innerHTML = '';
+  if(!currentGrade) return;
+  const q = (document.getElementById('student-search').value || '').toLowerCase();
+  const list = db.classes[currentGrade] || [];
+  list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
+    const card = document.createElement('div'); card.className = 'card';
+    card.innerHTML = `
+      <div class="row">
+        <div class="avatar">${s.name.charAt(0)}</div>
+        <div style="flex:1">
+          <div style="font-weight:900">${s.name}</div>
+          <div class="small">Nivel ${s.level} • XP: ${s.xp}</div>
+          <div class="hp-wrap">
+            <div class="hp-bar"><div class="hp-fill" style="width:${(s.hp/HP_MAX)*100}%"></div></div>
+            <div class="small" style="margin-top:6px">HP: ${s.hp}/${HP_MAX}</div>
           </div>
         </div>
-      `;
-      container.appendChild(card);
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div class="btn" onclick="openFicha('${s.id}')">Ficha</div>
+          <div class="btn" onclick="openAssignQuick('${s.id}')">Asignar</div>
+          <div class="btn danger" onclick="confirmDeleteStudent('${s.id}')">🗑</div>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+/* ----------------- Add student ----------------- */
+function openAddStudentModal(){ document.getElementById('new-student-name').value=''; document.getElementById('add-modal').classList.remove('hidden'); }
+function closeAddStudentModal(){ document.getElementById('add-modal').classList.add('hidden'); }
+function addStudent(){
+  const name = (document.getElementById('new-student-name').value || '').trim();
+  if(!name) return alert('Escribe nombre');
+  const id = uid();
+  if(!db.classes[currentGrade]) db.classes[currentGrade] = [];
+  db.classes[currentGrade].push({ id, name, xp:0, level:1, hp:HP_MAX, history: [] });
+  save();
+  populateClassSelect(); renderStudentGrid(); renderGroupsArea();
+  closeAddStudentModal();
+}
+
+/* ----------------- Delete student ----------------- */
+function confirmDeleteStudent(id){
+  showConfirm('Eliminar estudiante', '¿Eliminar este estudiante permanentemente?', ()=>{
+    db.classes[currentGrade] = (db.classes[currentGrade] || []).filter(s=>s.id !== id);
+    // remove from groups
+    if(db.groups[currentGrade]) for(const g of Object.keys(db.groups[currentGrade])) db.groups[currentGrade][g] = db.groups[currentGrade][g].filter(x=>x!==id);
+    save(); populateClassSelect(); renderStudentGrid(); renderGroupsArea();
+  });
+}
+
+/* ----------------- Ficha (white modal) ----------------- */
+const FICHA_ICONS = [
+  {key:'Responsabilidad', emoji:'🐘', type:'positive'},
+  {key:'Respeto', emoji:'🦁', type:'positive'},
+  {key:'Confianza', emoji:'🐪', type:'positive'},
+  {key:'Empatía', emoji:'❤️', type:'positive'},
+  {key:'Justicia', emoji:'⚖️', type:'positive'},
+  {key:'Ciudadanía', emoji:'🛡️', type:'positive'},
+  // negatives
+  {key:'Distracción', emoji:'📵', type:'negative'},
+  {key:'No tarea', emoji:'📕', type:'negative'},
+  {key:'Mal comportamiento', emoji:'😡', type:'negative'}
+];
+
+function buildFichaIcons(){
+  const grid = document.getElementById('ficha-icons'); grid.innerHTML = '';
+  FICHA_ICONS.forEach(cfg=>{
+    const b = document.createElement('button');
+    b.className = 'icon-btn ' + (cfg.type==='positive' ? 'positive' : 'negative');
+    b.innerHTML = `<div style="font-size:20px">${cfg.emoji}</div>`;
+    b.title = cfg.key;
+    b.onclick = ()=> {
+      // select visual
+      grid.querySelectorAll('.icon-btn').forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      document.getElementById('ficha-note').placeholder = `${cfg.key} — nota...`;
+      b.dataset.selectedKey = cfg.key;
+      // store selected on modal element
+      document.getElementById('ficha-modal').dataset.selected = cfg.key;
+      document.getElementById('ficha-modal').dataset.selectedType = cfg.type;
+    };
+    grid.appendChild(b);
+  });
+}
+
+function openFicha(studentId){
+  selectedStudentId = studentId;
+  const s = (db.classes[currentGrade] || []).find(x=>x.id === studentId);
+  if(!s) return alert('Estudiante no encontrado');
+  document.getElementById('ficha-name').innerText = s.name;
+  document.getElementById('ficha-xp').innerText = s.xp;
+  document.getElementById('ficha-gold').innerText = s.gold || 0;
+  document.getElementById('ficha-note').value = '';
+  // history
+  renderFichaHistory(s);
+  // clear icon selection
+  document.querySelectorAll('#ficha-icons .icon-btn').forEach(x=>x.classList.remove('selected'));
+  document.getElementById('ficha-modal').dataset.selected = '';
+  document.getElementById('ficha-modal').dataset.selectedType = '';
+  document.getElementById('ficha-modal').classList.remove('hidden');
+}
+function closeFichaModal(){ document.getElementById('ficha-modal').classList.add('hidden'); }
+function renderFichaHistory(student){
+  const c = document.getElementById('ficha-history'); c.innerHTML = '';
+  const arr = student.history || [];
+  if(!arr.length){ c.innerHTML = '<div class="small">Sin registros</div>'; return; }
+  arr.forEach(h=>{
+    const el = document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eee';
+    el.innerHTML = `<div style="font-weight:800">${h.type==='positive'?'+':'-'} ${h.magnitude} • ${h.pilar}</div><div class="small">${h.ts}</div><div style="margin-top:6px">${h.note}</div>`;
+    c.appendChild(el);
+  });
+}
+function fichaApply(isPositive){
+  if(!selectedStudentId) return alert('Abre ficha primero');
+  const s = (db.classes[currentGrade] || []).find(x=>x.id===selectedStudentId);
+  if(!s) return;
+  const points = parseInt(document.getElementById('ficha-points').value) || 1;
+  const pilar = document.getElementById('ficha-modal').dataset.selected || 'Convivencia';
+  const tipo = isPositive ? 'positive' : 'negative';
+  const note = document.getElementById('ficha-note').value || '';
+  const entry = { id: uid(), ts: new Date().toLocaleString(), type: tipo, pilar, magnitude: points, note };
+  s.history = s.history || [];
+  s.history.unshift(entry);
+  if(isPositive){
+    s.xp = (s.xp||0) + points;
+    if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); // restore 1 HP on merit
+  } else {
+    s.hp = Math.max(0, s.hp - points);
+  }
+  // recalc level
+  s.level = Math.floor((s.xp||0)/20) + 1;
+  save();
+  renderFichaHistory(s);
+  renderStudentGrid();
+  document.getElementById('ficha-xp').innerText = s.xp;
+  alert('Registro guardado');
+}
+
+/* ----------------- Quick actions from header ----------------- */
+function openQuickActionModal(type){
+  // populate student select
+  const sel = document.getElementById('quick-student-select'); sel.innerHTML = '';
+  (db.classes[currentGrade] || []).forEach(s=>{
+    const o = document.createElement('option'); o.value = s.id; o.textContent = s.name; sel.appendChild(o);
+  });
+  document.getElementById('quick-points').value = 1;
+  document.getElementById('quick-title').innerText = type==='positive' ? 'Aplicar Mérito' : 'Aplicar Falta';
+  document.getElementById('quick-modal').dataset.type = type;
+  document.getElementById('quick-modal').classList.remove('hidden');
+}
+function closeQuickActionModal(){ document.getElementById('quick-modal').classList.add('hidden'); }
+function applyQuick(isPositive){
+  const sid = document.getElementById('quick-student-select').value;
+  const points = parseInt(document.getElementById('quick-points').value) || 1;
+  const s = (db.classes[currentGrade] || []).find(x=>x.id===sid);
+  if(!s) return alert('Selecciona estudiante');
+  const entry = { id: uid(), ts: new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: 'Rápido', magnitude: points, note: 'Acción rápida' };
+  s.history = s.history || []; s.history.unshift(entry);
+  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); } else { s.hp = Math.max(0, s.hp - points); }
+  s.level = Math.floor((s.xp||0)/20) + 1;
+  save(); renderStudentGrid(); closeQuickActionModal();
+}
+
+/* ----------------- Groups management ----------------- */
+function openManageGroupsModal(){
+  if(!currentGrade) return alert('No hay grado seleccionado');
+  document.getElementById('groups-current-grade').innerText = currentGrade;
+  renderGroupsArea();
+  document.getElementById('groups-modal').classList.remove('hidden');
+}
+function closeManageGroupsModal(){ document.getElementById('groups-modal').classList.add('hidden'); }
+function createGrade(){
+  const name = (document.getElementById('new-grade').value || '').trim();
+  if(!name) return alert('Escribe nombre de grado');
+  if(db.classes[name]) return alert('El grado ya existe');
+  db.classes[name] = []; db.groups[name] = {};
+  save(); populateClassSelect(); renderStudentGrid(); alert('Grado creado: ' + name);
+}
+function createGroup(){
+  const gname = (document.getElementById('new-group-name').value || '').trim();
+  if(!gname) return alert('Escribe nombre de grupo');
+  if(!db.groups[currentGrade]) db.groups[currentGrade] = {};
+  if(db.groups[currentGrade][gname]) return alert('Grupo ya existe');
+  db.groups[currentGrade][gname] = [];
+  save(); renderGroupsArea(); document.getElementById('new-group-name').value='';
+}
+function deleteGroup(grade, group){
+  showConfirm('Eliminar grupo', `Eliminar "${group}" en ${grade}?`, ()=>{
+    delete db.groups[grade][group];
+    save(); renderGroupsArea();
+  });
+}
+function deleteGrade(grade){
+  showConfirm('Eliminar grado', `Eliminar grado ${grade} con todos sus datos?`, ()=>{
+    delete db.classes[grade]; delete db.groups[grade];
+    if(currentGrade === grade) currentGrade = Object.keys(db.classes)[0] || null;
+    save(); populateClassSelect(); renderStudentGrid(); renderGroupsArea();
+  });
+}
+
+/* Drag & Drop for groups */
+function renderGroupsArea(){
+  const area = document.getElementById('groups-area'); area.innerHTML = '';
+  if(!currentGrade) return;
+  // build "Sin asignar" column with students not in any group
+  const allStudents = db.classes[currentGrade] || [];
+  const assigned = new Set();
+  const groups = db.groups[currentGrade] || {};
+  for(const g of Object.keys(groups)) groups[g].forEach(id=>assigned.add(id));
+  const unassigned = allStudents.filter(s=>!assigned.has(s.id));
+
+  // helper to create column
+  function makeCol(title, idKey, members){
+    const col = document.createElement('div'); col.className='group-col';
+    col.dataset.group = idKey;
+    col.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>${title}</strong> ${idKey!=='__unassigned' ? `<button class="btn" onclick="exportSubgroup('${currentGrade}','${idKey}')">Export</button><button class="btn danger" onclick="deleteGroup('${currentGrade}','${idKey}')">Eliminar</button>` : ''}</div>`;
+    const list = document.createElement('div'); list.dataset.target = idKey;
+    list.style.minHeight = '40px';
+    list.ondragover = ev => ev.preventDefault();
+    list.ondrop = ev => {
+      ev.preventDefault();
+      const sid = ev.dataTransfer.getData('text/plain');
+      if(!sid) return;
+      moveStudentToGroup(sid, currentGrade, idKey);
+    };
+    members.forEach(m=>{
+      const el = document.createElement('div'); el.className='member'; el.draggable=true;
+      el.innerText = m.name;
+      el.dataset.sid = m.id;
+      el.ondragstart = ev => { ev.dataTransfer.setData('text/plain', m.id); };
+      // small actions
+      const btns = document.createElement('div'); btns.style.display='flex'; btns.style.gap='6px'; btns.style.marginTop='6px';
+      const btFicha = document.createElement('div'); btFicha.className='btn'; btFicha.style.padding='4px 6px'; btFicha.innerText='Ficha'; btFicha.onclick = ()=> openFicha(m.id);
+      const btDel = document.createElement('div'); btDel.className='btn danger'; btDel.style.padding='4px 6px'; btDel.innerText='Eliminar'; btDel.onclick = ()=> confirmDeleteStudent(m.id);
+      btns.appendChild(btFicha); btns.appendChild(btDel);
+      el.appendChild(btns);
+      list.appendChild(el);
     });
-    updateGlobalMetrics();
+    col.appendChild(list);
+    return col;
   }
 
-  function confirmDeleteStudent(studentId){
-    const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId);
-    if(!st) return alert('Estudiante no encontrado');
-    showConfirmModal('Eliminar estudiante', `Eliminar permanentemente a "${st.name}" del grado ${currentClassKey}?`, ()=>{
-      dbState.classes[currentClassKey] = dbState.classes[currentClassKey].filter(x=>x.id !== studentId);
-      // Also remove from any groups in this grade
-      if(dbState.groups && dbState.groups[currentClassKey]){
-        Object.keys(dbState.groups[currentClassKey]).forEach(g=>{
-          dbState.groups[currentClassKey][g] = (dbState.groups[currentClassKey][g]||[]).filter(id => id !== studentId);
-        });
-      }
-      saveDatabase(); updateClassSelectOptions(); renderGroupsList(); renderStudentGrid();
-    });
+  // unassigned
+  area.appendChild(makeCol('Sin asignar','__unassigned',unassigned));
+  // each subgroup
+  for(const g of Object.keys(groups)){
+    const members = (groups[g]||[]).map(id => db.classes[currentGrade].find(s=>s.id===id)).filter(Boolean);
+    area.appendChild(makeCol(g,g,members));
   }
+}
 
-  /* ---------- Stats & Ficha helpers ---------- */
-  function calculateStudentStatsForPeriod(student){
-    let hist = student.history || [];
-    if(currentPeriod !== 'ALL') hist = hist.filter(h => h.period === currentPeriod || !h.period);
-    let xp = 0; const badges = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-    hist.forEach(h=>{ if(h.type==='positive'){ xp += (h.magnitude||1); if(h.valueTag && badges[h.valueTag]!==undefined) badges[h.valueTag] += (h.magnitude||1); }});
-    const level = Math.floor(xp/20) + 1; return { xp, level, badges, history: hist };
+/* Move student to group (remove from others) */
+function moveStudentToGroup(studentId, grade, groupKey){
+  // remove from all groups in grade
+  const groups = db.groups[grade] || {};
+  for(const g of Object.keys(groups)) groups[g] = groups[g].filter(id=>id!==studentId);
+  // add if not unassigned
+  if(groupKey !== '__unassigned'){
+    groups[groupKey] = groups[groupKey] || [];
+    if(!groups[groupKey].includes(studentId)) groups[groupKey].push(studentId);
   }
-  function updateGlobalMetrics(){
-    const students = dbState.classes[currentClassKey] || []; const totals={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-    students.forEach(s=>{ const st = calculateStudentStatsForPeriod(s); Object.keys(totals).forEach(k=>totals[k]+=st.badges[k]||0); });
-    Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-count-'+k); if(el) el.innerText = `${totals[k]} pts`; });
+  db.groups[grade] = groups;
+  save();
+  renderGroupsArea();
+  renderStudentGrid();
+}
+
+/* Distribute functions */
+function distributeByNumber(){
+  const n = parseInt(document.getElementById('dist-num').value);
+  if(!n || n < 1) return alert('Ingresa número válido');
+  const students = db.classes[currentGrade] || [];
+  if(!students.length) return alert('No hay estudiantes en este grado');
+  const ids = students.map(s=>s.id);
+  // shuffle
+  for(let i = ids.length -1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[currentGrade] = db.groups[currentGrade] || {};
+  // create groups Grupo 1..n
+  for(let i=1;i<=n;i++) db.groups[currentGrade][`Grupo ${i}`]=[];
+  for(let i=0;i<ids.length;i++){
+    const g = `Grupo ${ (i % n) + 1 }`;
+    db.groups[currentGrade][g].push(ids[i]);
   }
-  function avatarGradientFor(name){
-    if(!name) return 'linear-gradient(135deg,#0b2540,#07213a)';
-    const idx = name.trim().charCodeAt(0) % 10;
-    const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-    const p = palettes[idx]; return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+  save(); renderGroupsArea();
+}
+function distributeBySize(){
+  const size = parseInt(document.getElementById('dist-size').value);
+  if(!size || size < 1) return alert('Ingresa tamaño válido');
+  const students = db.classes[currentGrade] || [];
+  if(!students.length) return alert('No hay estudiantes');
+  const ids = students.map(s=>s.id);
+  // shuffle
+  for(let i = ids.length -1; i>0; i--){ const j = Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[currentGrade] = db.groups[currentGrade] || {};
+  // clear previous Grupo * auto groups
+  Object.keys(db.groups[currentGrade]).forEach(k=>{ if(k.startsWith('Grupo ')) delete db.groups[currentGrade][k]; });
+  let idx=0; let g=1;
+  while(idx < ids.length){
+    db.groups[currentGrade][`Grupo ${g}`] = ids.slice(idx, idx+size);
+    idx += size; g++;
   }
+  save(); renderGroupsArea();
+}
 
-  /* ---------- Ficha modal behavior: icons, save ---------- */
-  const FICHA_ICONS = [
-    { key:'Responsabilidad', icon:'🖐️', type:'positive' },
-    { key:'Respeto', icon:'📘', type:'positive' },
-    { key:'Confianza', icon:'😊', type:'positive' },
-    { key:'Empatía', icon:'🤝', type:'positive' },
-    { key:'Justicia', icon:'⚖️', type:'positive' },
-    { key:'Ciudadanía', icon:'⏱️', type:'positive' },
-    // negatives
-    { key:'Falta - Distracción', icon:'📵', type:'negative' },
-    { key:'Falta - No tarea', icon:'📕', type:'negative' },
-    { key:'Falta - Mal comportamiento', icon:'😡', type:'negative' },
-    { key:'Falta - Juego', icon:'🎮', type:'negative' }
-  ];
+/* Export stub (we'll do later) */
+function exportSubgroup(grade, subgroup){
+  alert(`Export: ${grade} / ${subgroup} (funcionalidad pendiente)`);
+}
 
-  function buildFichaIconGrid(){
-    const grid = document.getElementById('ficha-icon-grid'); if(!grid) return;
-    grid.innerHTML = '';
-    FICHA_ICONS.forEach(cfg=>{
-      const btn = document.createElement('button');
-      btn.className = 'icon-btn ' + (cfg.type==='positive' ? 'positive' : 'negative');
-      btn.innerHTML = `<div style="text-align:center;font-size:18px">${cfg.icon}</div>`;
-      btn.title = cfg.key;
-      btn.onclick = () => {
-        // deselect others, select this
-        grid.querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('selected'));
-        btn.classList.add('selected');
-        selectedValueTag = cfg.key;
-        // highlight entry type based on cfg.type
-        setEntryType(cfg.type==='positive' ? 'positive' : 'negative');
-      };
-      grid.appendChild(btn);
-    });
-  }
+/* ----------------- Confirm helper ----------------- */
+let confirmCb = null;
+function showConfirm(title, text, cb){
+  document.getElementById('confirm-title').innerText = title;
+  document.getElementById('confirm-text').innerText = text;
+  confirmCb = cb;
+  document.getElementById('confirm-yes').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirm(); };
+  document.getElementById('confirm-modal').classList.remove('hidden');
+}
+function closeConfirm(){ document.getElementById('confirm-modal').classList.add('hidden'); }
 
-  function openHistoryModal(studentId){
-    selectedStudentId = studentId;
-    const st = (dbState.classes[currentClassKey]||[]).find(s=>s.id===studentId);
-    if(!st) return alert('Estudiante no encontrado');
-    document.getElementById('history-student-name').innerText = st.name;
-    document.getElementById('history-student-avatar').innerText = st.name.charAt(0);
-    document.getElementById('history-period-label').innerText = currentPeriod;
-    const stats = calculateStudentStatsForPeriod(st);
-    document.getElementById('history-stat-positive').innerText = `${stats.xp} pts`;
-    document.getElementById('history-stat-negative').innerText = `${stats.history.filter(h=>h.type==='negative').length}`;
-    document.getElementById('history-stat-level').innerText = `Nivel ${stats.level}`;
-    document.getElementById('ficha-xp-value').innerText = stats.xp;
-    document.getElementById('ficha-gold-value').innerText = 0; // placeholder; you can compute gold if you store it
-    // reset selection in icon grid
-    document.querySelectorAll('#ficha-icon-grid .icon-btn').forEach(b=>b.classList.remove('selected'));
-    selectedValueTag = 'Responsabilidad'; activeEntryType = 'positive';
-    setEntryType('positive');
-    document.getElementById('entry-note-input').value='';
-    document.getElementById('point-magnitude-input').value=1;
-    renderHistoryList(st);
-    openModal('history-modal');
-  }
+/* ----------------- Small helpers ----------------- */
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 
-  function closeHistoryModal(){ closeModal('history-modal'); }
+/* ----------------- Modal management ----------------- */
+function closeAllModals(){ document.querySelectorAll('.modal-backdrop').forEach(m=>m.classList.add('hidden')); }
+function showConfirmDelete(cb){ showConfirm('Confirmar', '¿Confirmas la acción?', cb); }
 
-  function setEntryType(t){
-    activeEntryType = t;
-    document.getElementById('btn-type-positive').style.opacity = t==='positive' ? '1' : '0.6';
-    document.getElementById('btn-type-negative').style.opacity = t==='negative' ? '1' : '0.6';
-  }
+/* ----------------- Assign quick (open groups modal focused to student) ----------------- */
+function openAssignQuick(studentId){
+  openManageGroupsModal();
+  // after small delay, start dragging highlight (not real drag) - instead offer instruction: user drag manually
+  setTimeout(()=>{ alert('Arrastra al estudiante desde la columna "Sin asignar" a un grupo. Si no está en "Sin asignar", úsalo en la lista.'); }, 200);
+}
 
-  function renderHistoryList(student){
-    const container = document.getElementById('history-entries-container'); if(!container) return;
-    const arr = student.history || [];
-    if(!arr.length){ container.innerHTML = `<div style="color:var(--muted);text-align:center;padding:16px">Sin registros en el observador todavía.</div>`; return; }
-    container.innerHTML = arr.map(h=>`<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.02);margin-bottom:6px"><div style="display:flex;justify-content:space-between"><div style="font-weight:700">${h.type==='positive'?`+${h.magnitude} XP`:'OBSERVACIÓN'}</div><div style="color:var(--muted)">${h.timestamp}</div></div><div style="margin-top:6px">${h.valueTag} — ${h.note}</div></div>`).join('');
-  }
+/* ----------------- Simple alerts for now ----------------- */
+function alert(msg){ window.alert(msg); }
 
-  function saveStudentEntry(){
-    if(!selectedStudentId) return alert('Abre la ficha de un estudiante');
-    const student = (dbState.classes[currentClassKey]||[]).find(s=>s.id===selectedStudentId);
-    if(!student) return alert('Estudiante no encontrado');
-    const note = document.getElementById('entry-note-input').value.trim() || 'Registro';
-    const magnitude = parseInt(document.getElementById('point-magnitude-input').value) || 1;
-    const entry = { id: Date.now(), timestamp: new Date().toLocaleString('es-CO'), period: currentPeriod==='ALL' ? 'P1' : currentPeriod, type: activeEntryType, valueTag: selectedValueTag, magnitude, note };
-    student.history.unshift(entry);
-    if(activeEntryType==='positive'){ student.xp = (student.xp||0) + magnitude; student.level = Math.floor(student.xp/20) + 1; try{ confetti({ particleCount:40, spread:50 }); }catch(e){} }
-    // optionally post to drive
-    if(dbState.googleScriptUrl){
-      try{
-        const url = dbState.googleScriptUrl;
-        if(url.includes('docs.google.com/forms')){
-          const fd = new FormData();
-          fd.append('entry.1', currentClassKey);
-          fd.append('entry.2', student.name);
-          fd.append('entry.3', activeEntryType==='positive' ? 'Mérito (+XP)' : 'Observación (-HP)');
-          fd.append('entry.4', selectedValueTag);
-          fd.append('entry.5', magnitude);
-          fd.append('entry.6', note);
-          fetch(url, { method:'POST', mode:'no-cors', body: fd });
-        } else {
-          fetch(url, { method:'POST', mode:'no-cors', headers:{'Content-Type':'application/json'}, body: JSON.stringify({curso:currentClassKey,estudiante:student.name,tipo:activeEntryType==='positive'?'Mérito (+XP)':'Observación (-HP)',pilar:selectedValueTag,puntos:magnitude,nota:note}) });
-        }
-      } catch(e){ console.warn('Drive sync failed', e); }
-    }
-    saveDatabase(); renderHistoryList(student); renderStudentGrid(); alert('Registro guardado');
-  }
+/* ----------------- Save / load wrapper already present - wire UI ----------------- */
+function switchPeriod(v){
+  // already wired on select
+}
 
-  /* ---------- Assign student to group UI (simple) ---------- */
-  function openAssignGroupModal(studentId){
-    // simple prompt: select group from current grade
-    const groupsFor = dbState.groups[currentClassKey] || {};
-    const groupNames = Object.keys(groupsFor);
-    if(groupNames.length===0) return alert('No hay grupos en este grado. Crea uno primero.');
-    const choice = prompt(`Asignar a grupo (escribe nombre exactamente):\n${groupNames.join('\n')}`);
-    if(!choice) return;
-    if(!groupsFor[choice]) return alert('Nombre de grupo inválido');
-    // ensure unique
-    if(groupsFor[choice].indexOf(studentId) === -1) groupsFor[choice].push(studentId);
-    saveDatabase(); renderGroupsList(); alert('Estudiante asignado a '+choice);
-  }
+/* expose some functions to global for inline handlers */
+window.openAddStudentModal = openAddStudentModal;
+window.closeAddStudentModal = closeAddStudentModal;
+window.addStudent = addStudent;
+window.openManageGroupsModal = openManageGroupsModal;
+window.closeManageGroupsModal = closeManageGroupsModal;
+window.createGrade = createGrade;
+window.createGroup = createGroup;
+window.distributeByNumber = distributeByNumber;
+window.distributeBySize = distributeBySize;
+window.openQuickActionModal = openQuickActionModal;
+window.closeQuickActionModal = closeQuickActionModal;
+window.applyQuick = applyQuick;
+window.openFicha = openFicha;
+window.closeFichaModal = closeFichaModal;
+window.renderStudentGrid = renderStudentGrid;
+window.populateClassSelect = populateClassSelect;
+window.switchClass = switchClass;
+window.switchPeriod = switchPeriod;
+window.confirmDeleteStudent = confirmDeleteStudent;
+window.deleteGroup = deleteGroup;
+window.deleteGrade = deleteGrade;
+window.exportSubgroup = exportSubgroup;
 
-  /* ---------- Deleting student handled above (confirmDeleteStudent) ---------- */
-
-  /* ---------- Roulette, Timer, Dice (same as previous implementations) ---------- */
-  const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-  function playTick(freq=800,dur=0.02,vol=0.06){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sine'; o.frequency.value=freq; g.gain.value=vol; o.connect(g); g.connect(audioCtx.destination); o.start(); o.stop(audioCtx.currentTime+dur); }
-  function playWin(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='sawtooth'; o.frequency.setValueAtTime(660,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(880,audioCtx.currentTime+0.25); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),500); }
-
-  let rouletteInterval=null, rouletteNames=[], rouletteIndex=0, rouletteRunning=false;
-  function openRouletteModal(){ rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!' : 'No hay estudiantes'; openModal('roulette-modal'); }
-  function startRoulette(){
-    if(rouletteRunning) return; rouletteNames = (dbState.classes[currentClassKey]||[]).map(s=>s.name); if(!rouletteNames.length) return alert('No hay estudiantes');
-    rouletteRunning=true; rouletteIndex = Math.floor(Math.random()*rouletteNames.length);
-    let speed = parseInt(document.getElementById('roulette-speed').value||20); let interval = Math.max(20,200 - speed*3); let cycles = 0;
-    rouletteInterval = setInterval(()=>{ rouletteIndex = (rouletteIndex+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex]; playTick(500+Math.random()*400,0.02); cycles++; if(cycles>40){ clearInterval(rouletteInterval); slowdownRoulette(); } }, interval);
-  }
-  function slowdownRoulette(){ let steps=12, step=0; function tickSlow(){ step++; rouletteIndex=(rouletteIndex+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[rouletteIndex]; playTick(500+step*30,0.02); if(step<steps) setTimeout(tickSlow,80+step*40); else { rouletteRunning=false; playWin(); const selectedName = rouletteNames[rouletteIndex]; const st = (dbState.classes[currentClassKey]||[]).find(s=>s.name===selectedName); if(st) openHistoryModal(st.id); else alert('Seleccionado: '+selectedName); } } tickSlow(); }
-  function stopRoulette(){ if(rouletteInterval){ clearInterval(rouletteInterval); rouletteInterval=null; } rouletteRunning=false; }
-  function closeRouletteModal(){ stopRoulette(); closeModal('roulette-modal'); }
-
-  let timerSeconds=300, timerInterval=null;
-  function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); openModal('timer-modal'); }
-  function closeTimerModal(){ closeModal('timer-modal'); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
-  function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-  function applyManualTimer(){ const txt = document.getElementById('timer-manual-input').value.trim(); if(!txt) return alert('Ingresa tiempo (ej. 3:30 o 5)'); if(txt.includes(':')){ const parts = txt.split(':').map(p=>parseInt(p)); if(parts.length!==2 || isNaN(parts[0]) || isNaN(parts[1])) return alert('Formato inválido mm:ss'); timerSeconds = parts[0]*60 + parts[1]; } else { const mins = parseInt(txt); if(isNaN(mins)) return alert('Formato inválido'); timerSeconds = mins*60; } document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-  function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } else { document.querySelector('#timer-modal .btn.green').innerText='Pausar'; timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; timerFinished(); } },1000); } }
-  function resetTimer(){ timerSeconds=300; document.getElementById('timer-display').innerText = formatTime(timerSeconds); if(timerInterval){ clearInterval(timerInterval); timerInterval=null; document.querySelector('#timer-modal .btn.green').innerText='Iniciar'; } }
-  function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
-  function timerFinished(){ const o=audioCtx.createOscillator(); const g=audioCtx.createGain(); o.type='triangle'; o.frequency.setValueAtTime(880,audioCtx.currentTime); o.frequency.exponentialRampToValueAtTime(440,audioCtx.currentTime+0.5); g.gain.value=0.12; o.connect(g); g.connect(audioCtx.destination); o.start(); setTimeout(()=>o.stop(),700); alert('Tiempo terminado'); }
-
-  function openDiceModal(){ openModal('dice-modal'); document.getElementById('dice-display').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
-  function closeDiceModal(){ closeModal('dice-modal'); }
-  function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value) || 1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value) || 6); const results = []; for(let i=0;i<count;i++) results.push(Math.floor(Math.random()*sides)+1); const sum = results.reduce((a,b)=>a+b,0); document.getElementById('dice-display').innerText = (count===1) ? results[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${results.join(', ')}  —  Suma: ${sum}`; playTick(300 + (sum%10)*40, 0.08, 0.07); }
-
-  /* ---------- Modal manager (ensure only one open) ---------- */
-  (function(){
-    document.addEventListener('DOMContentLoaded', ()=>{
-      document.querySelectorAll('[data-modal]').forEach(m=>{ if(!m.classList.contains('modal-hidden')) m.classList.add('modal-hidden'); m.addEventListener('click', (e)=>{ if(e.target===m) closeModalByElement(m); }); });
-      enforceSingleModal();
-    });
-    function closeModalByElement(modalEl){
-      modalEl.classList.add('modal-hidden');
-      const id = modalEl.id;
-      if(id==='roulette-modal'){ try{ stopRoulette(); }catch(e){} }
-      if(id==='timer-modal'){ try{ if(typeof timerInterval!=='undefined' && timerInterval){ clearInterval(timerInterval); timerInterval=null; } }catch(e){} }
-    }
-    function enforceSingleModal(){
-      const modals = Array.from(document.querySelectorAll('[data-modal]'));
-      const visibles = modals.filter(m => !m.classList.contains('modal-hidden'));
-      if(visibles.length > 1) visibles.slice(0, visibles.length - 1).forEach(m => closeModalByElement(m));
-    }
-    const observer = new MutationObserver((mutations)=>{
-      let changed=false;
-      for(const mu of mutations) if(mu.type==='attributes' && mu.attributeName==='class' && mu.target.hasAttribute('data-modal')) changed=true;
-      if(changed) enforceSingleModal();
-    });
-    document.querySelectorAll('[data-modal]').forEach(m => observer.observe(m, { attributes: true }));
-    setInterval(enforceSingleModal, 300);
-    window.openModal = function(id){ document.querySelectorAll('[data-modal]').forEach(m=>{ if(m.id !== id) closeModalByElement(m); }); const el=document.getElementById(id); if(el){ el.classList.remove('modal-hidden'); enforceSingleModal(); const focusEl = el.querySelector('textarea,input,button'); if(focusEl) focusEl.focus(); } };
-    window.closeModal = function(id){ const el=document.getElementById(id); if(el) closeModalByElement(el); };
-  })();
-
-  /* ---------- Confirm modal helper ---------- */
-  let confirmCb = null;
-  function showConfirmModal(title,msg,cb){
-    document.getElementById('confirm-title').innerText = title;
-    document.getElementById('confirm-message').innerText = msg;
-    confirmCb = cb;
-    document.getElementById('confirm-action-btn').onclick = ()=>{ if(confirmCb) confirmCb(); closeConfirmModal(); };
-    openModal('confirm-dialog-modal');
-  }
-  function closeConfirmModal(){ closeModal('confirm-dialog-modal'); }
-
-  </script>
+/* Save state when leaving */
+window.addEventListener('beforeunload', ()=> save());
+</script>
 </body>
 </html>
