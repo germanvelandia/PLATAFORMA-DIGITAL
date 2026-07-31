@@ -3,93 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FantasyClass Convivencial</title>
+    <title>FantasyClass Convivencial | ALM</title>
+    <!-- Cargamos Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; font-family: sans-serif; }
+        body { background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%); color: white; min-height: 100vh; }
         .glass { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
     </style>
 </head>
-<body class="p-6">
-    <div id="app" class="max-w-6xl mx-auto">
-        <header class="glass p-6 rounded-3xl mb-6 shadow-xl flex justify-between items-center">
-            <h1 class="text-2xl font-black text-amber-400">FantasyClass ALM</h1>
-            <button id="add-btn" class="bg-emerald-600 px-4 py-2 rounded-xl font-bold text-sm hover:bg-emerald-500 transition">
-                + Añadir Estudiante
-            </button>
+<body class="p-4 md:p-6">
+    
+    <div id="app" class="max-w-7xl mx-auto space-y-6">
+        <!-- HEADER -->
+        <header class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-black text-amber-400">FantasyClass ALM</h1>
+                <p class="text-xs text-slate-400">Panel de Control Convivencial</p>
+            </div>
+            <div id="global-stats" class="flex gap-4">
+                <!-- Aquí irán los 6 pilares de métricas -->
+            </div>
         </header>
 
-        <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Aquí irán los estudiantes -->
+        <!-- GRILLA DE ESTUDIANTES -->
+        <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Las tarjetas de los estudiantes se inyectarán aquí -->
         </div>
     </div>
 
-    <script>
-        // Lógica inicial básica
-        const estudiantes = [
-            { id: 1, nombre: "Ejemplo Estudiante" }
-        ];
-
-        function render() {
-            const grid = document.getElementById('grid');
-            grid.innerHTML = estudiantes.map(e => `
-                <div class="glass p-4 rounded-2xl hover:border-amber-500/50 transition">
-                    <h2 class="font-bold">${e.nombre}</h2>
-                    <button class="mt-2 text-xs bg-sky-600 px-3 py-1 rounded-lg">Ver Ficha</button>
-                </div>
-            `).join('');
-        }
-
-        render();
-    </script>
-    <!-- Modal de Ficha -->
-<div id="modal-ficha" class="fixed inset-0 bg-black/80 hidden flex items-center justify-center p-4 z-50">
-    <div class="glass w-full max-w-2xl rounded-3xl p-6 shadow-2xl flex flex-col max-h-[90vh]">
-        
-        <!-- Header del Modal -->
-        <div class="flex justify-between items-center mb-6">
-            <h2 id="modal-nombre" class="text-xl font-black text-amber-400">Nombre Estudiante</h2>
-            <button onclick="cerrarFicha()" class="text-white hover:text-red-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-        </div>
-
-        <!-- Pestañas (Tabs) -->
-        <div class="flex border-b border-white/10 mb-6">
-            <button onclick="tab('obs')" class="px-4 py-2 border-b-2 border-amber-400 text-amber-400 text-sm font-bold">Observador</button>
-            <button onclick="tab('actas')" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-white text-sm font-bold">Actas/Reuniones</button>
-            <button onclick="tab('datos')" class="px-4 py-2 border-b-2 border-transparent text-slate-400 hover:text-white text-sm font-bold">Datos Personales</button>
-        </div>
-
-        <!-- Contenido -->
-        <div class="flex-grow overflow-y-auto">
-            <div id="view-obs" class="tab-content space-y-4">
-                <p class="text-xs text-slate-400 italic">Aquí irán las faltas, méritos y compromisos.</p>
-            </div>
-            <div id="view-actas" class="tab-content hidden space-y-4">
-                <p class="text-xs text-slate-400 italic">Aquí irán los registros de reuniones con acudientes.</p>
-            </div>
-            <div id="view-datos" class="tab-content hidden space-y-4">
-                <p class="text-xs text-slate-400 italic">Aquí irán los datos personales, RH, EPS y contactos.</p>
-            </div>
-        </div>
-    </div>
-</div>
-    // Abrir modal
-function openFicha(id) {
-    document.getElementById('modal-ficha').classList.remove('hidden');
-    tab('obs'); // Abre por defecto en observador
-}
-
-// Cerrar modal
-function cerrarFicha() {
-    document.getElementById('modal-ficha').classList.add('hidden');
-}
-
-// Cambiar pestañas
-function tab(target) {
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
-    document.getElementById('view-' + target).classList.remove('hidden');
-    
-    // Opcional: Cambiar estilos de botones de pestañas aquí
-}
+    <script src="app.js"></script>
 </body>
 </html>
