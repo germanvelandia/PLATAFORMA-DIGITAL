@@ -1887,5 +1887,312 @@ window.openManageGroupsModal = openGroupsModal;
   toast('Parche de acciones aplicado — prueba Herramientas→Grupos y Clases→Grados', 'info', 2400);
 })();
 </script>
+  <!-- PARCHE: UI mejorada para Manage Groups (grado selector, crear grupos independiente, cuadrícula de estudiantes y asignación) -->
+<script>
+(function installGroupManagerUI(){
+  // Guardado seguro y toasts
+  const STORAGE_KEY = 'fantasyclass_alm_db';
+  const toast = (msg, type='info', t=2500) => { if(typeof showToast === 'function'){ showToast(msg,type,t); } else { console.log(`[${type}] ${msg}`); } };
+  const safeSave = () => { if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB() falló', e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('localStorage save falló', e); } };
+
+  // Find the modal container we will overwrite (non-destructive: only inner html)
+  const modalEl = document.getElementById('manage-groups-modal') || document.getElementById('groups-modal');
+  if(!modalEl){
+    console.warn('[patchGroupUI] No se encontró manage-groups-modal ni groups-modal en el DOM.');
+    return;
+  }
+  const container = modalEl.querySelector('.modal');
+  if(!container){
+    console.warn('[patchGroupUI] No se encontró .modal dentro del modal target.');
+    return;
+  }
+
+  // Build new UI HTML (keeps existing header h3 intact)
+  const patchHTML = `
+    <div id="gm-top" style="margin-bottom:12px;display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="font-weight:800">Grado:</label>
+        <select id="gm-grade-select" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
+        <input id="gm-new-grade" placeholder="Nuevo grado (ej. 805)" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+        <button class="btn" id="gm-create-grade">Crear grado</button>
+        <button class="btn red" id="gm-delete-grade">Eliminar grado</button>
+      </div>
+    </div>
+
+    <div id="gm-group-creator" style="margin-bottom:12px;display:flex;gap:8px;align-items:center">
+      <label style="font-weight:800">Crear grupo (en grado seleccionado):</label>
+      <input id="gm-new-group" placeholder="Nombre grupo (ej. Grupo A)" style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+      <button class="btn" id="gm-create-group">Crear grupo</button>
+      <label style="margin-left:12px;display:flex;align-items:center;gap:6px"><input type="checkbox" id="gm-persistent"> Reinos (persistente)</label>
+    </div>
+
+    <div id="gm-students-panel" style="display:flex;gap:12px;align-items:flex-start">
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">Estudiantes</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="gm-filter" placeholder="Buscar..." style="padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+            <button class="btn" id="gm-select-all">Seleccionar todos</button>
+            <button class="btn ghost" id="gm-clear-selection">Limpiar</button>
+          </div>
+        </div>
+        <div id="gm-student-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;max-height:360px;overflow:auto;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)"></div>
+      </div>
+
+      <div style="width:320px">
+        <div style="font-weight:800;margin-bottom:8px">Grupos en grado <span id="gm-selected-grade-label"></span></div>
+        <div id="gm-groups-list" style="display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto;padding:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent)"></div>
+
+        <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
+          <label style="font-weight:800">Asignar selección a:</label>
+          <select id="gm-assign-select" style="padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></select>
+          <div style="display:flex;gap:8px">
+            <button class="btn" id="gm-assign-btn">Asignar seleccionados</button>
+            <button class="btn ghost" id="gm-unassign-btn">Quitar seleccionados</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px;border-top:1px dashed rgba(255,255,255,0.04);padding-top:10px">
+          <div style="font-weight:800">Distribución rápida</div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="gm-dist-num" type="number" min="1" placeholder="Nº grupos" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+            <button class="btn" id="gm-dist-by-num">Distribuir por nº</button>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="gm-dist-size" type="number" min="1" placeholder="Tamaño" style="width:110px;padding:6px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
+            <button class="btn" id="gm-dist-by-size">Distribuir por tamaño</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Insert UI (replace current modal body content after header h3)
+  const h3 = container.querySelector('h3');
+  if(h3){
+    // remove any previous injected panel to avoid duplicates
+    const old = container.querySelector('#gm-top');
+    if(old) old.remove();
+    h3.insertAdjacentHTML('afterend', patchHTML);
+  } else {
+    container.insertAdjacentHTML('afterbegin', patchHTML);
+  }
+
+  // Helper renderers
+  function populateGradeSelect(){
+    const sel = document.getElementById('gm-grade-select');
+    if(!sel) return;
+    sel.innerHTML = '';
+    Object.keys(db.classes || {}).forEach(k => {
+      const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${(db.classes[k]||[]).length})`; sel.appendChild(opt);
+    });
+    if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+    else sel.value = sel.options[0]?.value || '';
+    document.getElementById('gm-selected-grade-label').innerText = sel.value || '-';
+    // sync with main class-select if present
+    const mainSel = document.getElementById('class-select');
+    if(mainSel) mainSel.value = sel.value;
+  }
+
+  function populateGroupsListAndAssign(){
+    const selGrade = document.getElementById('gm-grade-select').value;
+    const groupsList = document.getElementById('gm-groups-list');
+    const assignSelect = document.getElementById('gm-assign-select');
+    groupsList.innerHTML = ''; assignSelect.innerHTML = '';
+    const groups = (db.groups && db.groups[selGrade]) ? db.groups[selGrade] : {};
+    Object.keys(groups).forEach(g => {
+      const wrapper = document.createElement('div'); wrapper.style.display='flex'; wrapper.style.justifyContent='space-between'; wrapper.style.alignItems='center';
+      const left = document.createElement('div'); left.innerHTML = `<strong>${g}</strong> <div class="small" style="color:var(--muted)">${groups[g].length} integrantes</div>`;
+      const right = document.createElement('div'); right.style.display='flex'; right.style.gap='6px';
+      const btnView = document.createElement('button'); btnView.className='btn ghost'; btnView.innerText='Ver'; btnView.onclick = ()=> {
+        // scroll student grid and highlight group members
+        const grid = document.getElementById('gm-student-grid');
+        grid.querySelectorAll('.member-card').forEach(c => c.classList.remove('member-highlight'));
+        groups[g].forEach(id => {
+          const el = document.querySelector(`.member-card[data-id="${id}"]`);
+          if(el){ el.classList.add('member-highlight'); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+        });
+      };
+      const btnDel = document.createElement('button'); btnDel.className='btn red'; btnDel.innerText='Eliminar'; btnDel.onclick = ()=> {
+        if(!confirm(`Eliminar grupo "${g}" en ${selGrade}?`)) return;
+        delete db.groups[selGrade][g];
+        if(db.groupsMeta && db.groupsMeta[selGrade]) delete db.groupsMeta[selGrade][g];
+        safeSave(); populateGroupsListAndAssign(); renderGroups(); toast('Grupo eliminado','success');
+      };
+      right.appendChild(btnView); right.appendChild(btnDel);
+      wrapper.appendChild(left); wrapper.appendChild(right);
+      groupsList.appendChild(wrapper);
+
+      const opt = document.createElement('option'); opt.value = g; opt.textContent = g; assignSelect.appendChild(opt);
+    });
+    if(assignSelect.options.length===0){ const o = document.createElement('option'); o.value=''; o.textContent='(Sin grupos)'; assignSelect.appendChild(o); }
+  }
+
+  function renderStudentGrid(filter=''){
+    const grid = document.getElementById('gm-student-grid');
+    grid.innerHTML = '';
+    const students = db.classes[document.getElementById('gm-grade-select').value] || [];
+    const q = (filter||'').toLowerCase();
+    students.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
+      const card = document.createElement('div'); card.className = 'member-card'; card.dataset.id = s.id;
+      card.style.padding='8px'; card.style.borderRadius='8px'; card.style.background='rgba(255,255,255,0.02)'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='6px';
+      card.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><input type="checkbox" class="gm-select-checkbox" data-id="${s.id}"><div style="width:40px;height:40px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center;font-weight:900">${s.name.charAt(0)}</div><div style="flex:1"><div style="font-weight:800">${s.name}</div><div class="small" style="color:var(--muted)">ID: ${s.id}</div></div></div>`;
+      grid.appendChild(card);
+    });
+    // style highlight class
+    const style = document.getElementById('gm-patch-styles');
+    if(!style){
+      const st = document.createElement('style'); st.id = 'gm-patch-styles';
+      st.innerHTML = `.member-card.member-highlight{ box-shadow: 0 8px 24px rgba(0,0,0,0.6); border:2px solid rgba(99,102,241,0.2); transform:scale(1.01);} .member-card .gm-select-checkbox{ transform:scale(1.1); }`;
+      document.head.appendChild(st);
+    }
+  }
+
+  // Selection helpers
+  function getSelectedStudentIds(){
+    return Array.from(document.querySelectorAll('.gm-select-checkbox:checked')).map(ch => ch.dataset.id);
+  }
+  function selectAllVisible(){
+    document.querySelectorAll('.gm-select-checkbox').forEach(ch => ch.checked = true);
+  }
+  function clearSelection(){
+    document.querySelectorAll('.gm-select-checkbox').forEach(ch => ch.checked = false);
+    document.querySelectorAll('.member-card').forEach(c => c.classList.remove('member-highlight'));
+  }
+
+  // Assign selected to group
+  function assignSelectedToGroup(){
+    const ids = getSelectedStudentIds();
+    if(!ids.length) return toast('Selecciona al menos 1 estudiante','warn');
+    const groupName = document.getElementById('gm-assign-select').value;
+    const grade = document.getElementById('gm-grade-select').value;
+    if(!groupName) return toast('Selecciona un grupo destino','warn');
+    db.groups = db.groups || {}; db.groups[grade] = db.groups[grade] || {};
+    ids.forEach(id => {
+      // remove from other groups first
+      Object.keys(db.groups[grade]||{}).forEach(g => { db.groups[grade][g] = db.groups[grade][g].filter(x => x !== id); });
+      // add to group
+      if(!db.groups[grade][groupName].includes(id)) db.groups[grade][groupName].push(id);
+    });
+    safeSave(); populateGroupsListAndAssign(); renderStudentGrid(document.getElementById('gm-filter').value||'');
+    toast('Asignación completa','success');
+  }
+
+  function unassignSelectedFromGroup(){
+    const ids = getSelectedStudentIds();
+    if(!ids.length) return toast('Selecciona al menos 1 estudiante','warn');
+    const groupName = document.getElementById('gm-assign-select').value;
+    const grade = document.getElementById('gm-grade-select').value;
+    if(!groupName) return toast('Selecciona el grupo del cual quitar','warn');
+    ids.forEach(id => {
+      if(db.groups && db.groups[grade] && db.groups[grade][groupName]){
+        db.groups[grade][groupName] = db.groups[grade][groupName].filter(x => x !== id);
+      }
+    });
+    safeSave(); populateGroupsListAndAssign(); renderStudentGrid(document.getElementById('gm-filter').value||'');
+    toast('Quitados del grupo','success');
+  }
+
+  // Event wiring
+  // Grade select change
+  document.getElementById('gm-grade-select').addEventListener('change', (e) => {
+    const g = e.target.value; document.getElementById('gm-selected-grade-label').innerText = g; // sync main select if present
+    const main = document.getElementById('class-select'); if(main) main.value = g;
+    populateGroupsListAndAssign();
+    renderStudentGrid(document.getElementById('gm-filter').value||'');
+  });
+
+  // Create/Delete grade
+  document.getElementById('gm-create-grade').addEventListener('click', ()=> {
+    const name = (document.getElementById('gm-new-grade').value||'').trim();
+    if(!name) return toast('Escribe nombre de grado','warn');
+    if(db.classes[name]) return toast('Grado ya existe','warn');
+    db.classes[name] = []; db.groups[name] = {}; safeSave(); populateGradeSelect(); renderStudentGrid(); toast('Grado creado','success');
+    document.getElementById('gm-new-grade').value='';
+  });
+  document.getElementById('gm-delete-grade').addEventListener('click', ()=> {
+    const grade = document.getElementById('gm-grade-select').value;
+    if(!grade) return toast('Selecciona grado','warn');
+    showConfirm('Eliminar grado', `Eliminar grado ${grade} y sus datos?`, ()=>{
+      delete db.classes[grade]; if(db.groups && db.groups[grade]) delete db.groups[grade]; if(db.groupsMeta && db.groupsMeta[grade]) delete db.groupsMeta[grade];
+      safeSave(); populateGradeSelect(); populateGroupsListAndAssign(); renderStudentGrid(); toast('Grado eliminado','success');
+    });
+  });
+
+  // Create group
+  document.getElementById('gm-create-group').addEventListener('click', ()=> {
+    const gname = (document.getElementById('gm-new-group').value||'').trim();
+    const grade = document.getElementById('gm-grade-select').value;
+    const persistent = !!document.getElementById('gm-persistent').checked;
+    if(!gname) return toast('Escribe nombre de grupo','warn');
+    db.groups = db.groups || {}; db.groups[grade] = db.groups[grade] || {};
+    if(db.groups[grade][gname]) return toast('Grupo existe','warn');
+    db.groups[grade][gname] = [];
+    db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; db.groupsMeta[grade][gname] = { persistent: !!persistent };
+    safeSave(); document.getElementById('gm-new-group').value=''; populateGroupsListAndAssign(); toast('Grupo creado','success');
+  });
+
+  // Student search/filter
+  document.getElementById('gm-filter').addEventListener('input', (e) => {
+    renderStudentGrid(e.target.value || '');
+  });
+
+  // Select all / clear
+  document.getElementById('gm-select-all').addEventListener('click', ()=> selectAllVisible());
+  document.getElementById('gm-clear-selection').addEventListener('click', ()=> clearSelection());
+
+  // Assign / Unassign buttons
+  document.getElementById('gm-assign-btn').addEventListener('click', assignSelectedToGroup);
+  document.getElementById('gm-unassign-btn').addEventListener('click', unassignSelectedFromGroup);
+
+  // Distribution
+  document.getElementById('gm-dist-by-num').addEventListener('click', ()=> {
+    const n = parseInt(document.getElementById('gm-dist-num').value);
+    const grade = document.getElementById('gm-grade-select').value;
+    const persistent = !!document.getElementById('gm-persistent').checked;
+    if(!n || n<1) return toast('Número inválido','warn');
+    // use earlier helper if present
+    if(typeof window.distributeByNumber === 'function'){ window.distributeByNumber(); } // existing if patched earlier
+    // else local
+    // shuffle & distribute
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    if(!ids.length) return toast('No hay estudiantes','warn');
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
+    ids.forEach((id, idx) => { const g = `Grupo ${ (idx % n) +1 }`; db.groups[grade][g].push(id); });
+    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
+    safeSave(); populateGroupsListAndAssign(); toast('Distribuido por número','success');
+  });
+
+  document.getElementById('gm-dist-by-size').addEventListener('click', ()=> {
+    const size = parseInt(document.getElementById('gm-dist-size').value);
+    const grade = document.getElementById('gm-grade-select').value;
+    const persistent = !!document.getElementById('gm-persistent').checked;
+    if(!size || size<1) return toast('Tamaño inválido','warn');
+    const ids = (db.classes[grade]||[]).map(s=>s.id);
+    for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+    db.groups[grade] = db.groups[grade] || {};
+    Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
+    let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; }
+    if(persistent){ db.groupsMeta = db.groupsMeta || {}; db.groupsMeta[grade] = db.groupsMeta[grade] || {}; Object.keys(db.groups[grade]).forEach(g => db.groupsMeta[grade][g] = { persistent:true }); }
+    safeSave(); populateGroupsListAndAssign(); toast('Distribuido por tamaño','success');
+  });
+
+  // Initial populate
+  populateGradeSelect();
+  populateGroupsListAndAssign();
+  renderStudentGrid();
+
+  // Ensure external UI refresh functions are called when modal opens (in case modal reconstructed)
+  const origOpenGroups = window.openGroupsModal;
+  window.openGroupsModal = function(){
+    if(typeof origOpenGroups === 'function') origOpenGroups();
+    setTimeout(()=>{ populateGradeSelect(); populateGroupsListAndAssign(); renderStudentGrid(); }, 200);
+  };
+
+})();
+</script>
+<!-- /PARCHE GM UI -->
 </body>
 </html>
