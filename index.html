@@ -1471,5 +1471,132 @@ window.openManageGroupsModal = openGroupsModal;
 })();
 </script>
 <!-- /PARCHE -->
+  <!-- Parche: botón y atajo para editar App name / Institución desde header -->
+<style>
+  .header-edit-btn{
+    margin-left:8px;
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.06);
+    color:inherit;
+    padding:6px 8px;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-weight:700;
+  }
+  .header-edit-btn:hover{ box-shadow: 0 6px 18px rgba(0,0,0,0.45); background:rgba(255,255,255,0.02); }
+</style>
+
+<script>
+(function headerEditPatch(){
+  // utils
+  const STORAGE_KEY = (typeof STORAGE_KEY !== 'undefined') ? STORAGE_KEY : 'fantasyclass_alm_db';
+  const safeSaveDB = () => { if(typeof saveDB === 'function'){ try{ saveDB(); return; }catch(e){ console.warn('saveDB failed',e); } } try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); } };
+  const toast = (msg, type='info', t=2200) => { if(typeof showToast === 'function'){ showToast(msg,type,t); } else console.log(`[${type}] ${msg}`); };
+
+  // Helper to apply institution values to DOM consistently
+  function applyInstitutionToDOM(inst){
+    try{
+      if(!inst) return;
+      if(inst.appName) document.title = inst.appName;
+      // title in header: attempt multiple selectors for compatibility
+      const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]') || document.querySelector('.brand h1') || document.querySelector('.brand .app-title');
+      const subtitleEl = document.querySelector('.brand > div:nth-child(2) > div:last-child') || document.querySelector('.brand .small') || document.querySelector('.brand .subtitle');
+      const logoEl = document.querySelector('.brand .logo');
+      if(titleEl && inst.appName) titleEl.innerText = inst.appName;
+      if(subtitleEl && (inst.subtitle !== undefined)) subtitleEl.innerText = inst.subtitle;
+      if(logoEl && (inst.logoText !== undefined)) logoEl.innerText = inst.logoText;
+    }catch(e){ console.warn('applyInstitutionToDOM error', e); }
+  }
+
+  // Fallback editor (prompts) when modal function not present
+  function fallbackEditInstitution(){
+    try{
+      const curr = (typeof db === 'object' && db.institution) ? db.institution : {};
+      const newApp = prompt('Nombre de la aplicación', curr.appName || (document.title || ''));
+      if(newApp === null) return; // cancel
+      const newSub = prompt('Subtítulo / Nombre de la institución', curr.subtitle || '');
+      if(newSub === null) return;
+      const newLogo = prompt('Texto corto / Logo (2-4 caracteres)', curr.logoText || (document.querySelector('.brand .logo')?.innerText || '').trim());
+      if(newLogo === null) return;
+
+      if(typeof db !== 'object') db = { classes:{}, groups:{}, characters:[], googleScriptUrl:'' };
+      db.institution = db.institution || {};
+      db.institution.appName = newApp.trim();
+      db.institution.subtitle = newSub.trim();
+      db.institution.logoText = newLogo.trim().slice(0,4);
+
+      safeSaveDB();
+      applyInstitutionToDOM(db.institution);
+      toast('Ajustes institucionales guardados', 'success');
+    }catch(e){ console.warn(e); toast('Error guardando ajustes','err'); }
+  }
+
+  // Open modal if exists, else fallback
+  function openInstitutionEditor(){
+    if(typeof openInstitutionModal === 'function'){
+      // prefer existing modal
+      try{ openInstitutionModal(); return; }catch(e){ console.warn('openInstitutionModal failed',e); }
+    }
+    // fallback
+    fallbackEditInstitution();
+  }
+
+  // attach an edit button into the header brand (if not already present)
+  function ensureHeaderEditButton(){
+    const brand = document.querySelector('.brand');
+    if(!brand) return;
+    // avoid duplicate
+    if(brand.querySelector('.header-edit-btn')) return;
+
+    const btn = document.createElement('button');
+    btn.className = 'header-edit-btn';
+    btn.title = 'Editar nombre de la aplicación y datos institucionales';
+    btn.setAttribute('aria-label', 'Editar datos institucionales');
+    btn.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Editar';
+
+    btn.addEventListener('click', (e) => { e.stopPropagation(); openInstitutionEditor(); });
+
+    // place after the brand textual block or at end of brand
+    const textualBlock = brand.querySelector('div:nth-child(2)');
+    if(textualBlock) textualBlock.appendChild(btn);
+    else brand.appendChild(btn);
+  }
+
+  // double-click on title to edit
+  function enableHeaderDblClick(){
+    const titleEl = document.querySelector('.brand > div:nth-child(2) > div:first-child') || document.querySelector('.brand div[style*="font-weight:900"]') || document.querySelector('.brand .app-title');
+    if(!titleEl) return;
+    titleEl.style.cursor = 'pointer';
+    titleEl.title = 'Doble click para editar datos institucionales';
+    titleEl.addEventListener('dblclick', (e) => { e.stopPropagation(); openInstitutionEditor(); });
+  }
+
+  // Apply stored institution values on load (if present)
+  try{
+    if(typeof db === 'object' && db.institution){ applyInstitutionToDOM(db.institution); }
+    else {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw){ try{ const parsed = JSON.parse(raw); if(parsed && parsed.institution) applyInstitutionToDOM(parsed.institution); }catch(e){} }
+    }
+  }catch(e){ console.warn(e); }
+
+  // Initialize UI elements
+  ensureHeaderEditButton();
+  enableHeaderDblClick();
+
+  // If an existing settings button exists elsewhere, ensure it opens modal (idempotent)
+  const toolsPanel = document.querySelector('#menu-tools .menu-panel');
+  if(toolsPanel){
+    const settingsBtn = Array.from(toolsPanel.querySelectorAll('button')).find(b => /ajust/i.test(b.textContent) || /config/i.test(b.textContent) || /cog/i.test(b.innerHTML));
+    if(settingsBtn) settingsBtn.addEventListener('click', (e)=>{ e.stopPropagation(); openInstitutionEditor(); });
+  }
+
+  // expose for debug
+  window.openInstitutionEditor = openInstitutionEditor;
+})();
+</script>
 </body>
 </html>
