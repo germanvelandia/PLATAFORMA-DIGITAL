@@ -73,5 +73,23 @@
         </div>
     </div>
 </div>
+    // Abrir modal
+function openFicha(id) {
+    document.getElementById('modal-ficha').classList.remove('hidden');
+    tab('obs'); // Abre por defecto en observador
+}
+
+// Cerrar modal
+function cerrarFicha() {
+    document.getElementById('modal-ficha').classList.add('hidden');
+}
+
+// Cambiar pestañas
+function tab(target) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+    document.getElementById('view-' + target).classList.remove('hidden');
+    
+    // Opcional: Cambiar estilos de botones de pestañas aquí
+}
 </body>
 </html>
