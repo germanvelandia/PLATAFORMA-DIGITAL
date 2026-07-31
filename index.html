@@ -437,7 +437,156 @@ function createGrade(){
   if(dbState.classes[key]) return alert('El grado ya existe');
   dbState.classes[key] = []; dbState.groups[key] = {}; saveDatabase(); updateClassSelectOptions(); renderGroupsList(); document.getElementById('new-grade-input').value=''; alert('Grado creado: '+key);
 }
+/* CREATE GRADE (dejé igual pero añado defensa extra) */
+function createGrade(){
+  const keyInput = document.getElementById('new-grade-input');
+  const key = (keyInput?.value || '').trim();
+  if(!key) return alert('Escribe el nombre del grado (ej. 805)');
+  if(dbState.classes[key]) return alert('El grado ya existe');
+  // crear grado vacío y su contenedor de grupos
+  dbState.classes[key] = [];
+  dbState.groups[key] = dbState.groups[key] || {};
+  saveDatabase();
+  updateClassSelectOptions();
+  renderGroupsList();
+  keyInput.value = '';
+  alert('Grado creado: ' + key);
+}
 
+/* CREATE GROUP: ahora usa el grado seleccionado en el selector (más robusto) */
+function createGroupInCurrentGrade(){
+  // tomar el grado desde el select por si currentClassKey no está actualizado
+  const gradeSelect = document.getElementById('class-select');
+  const grade = (gradeSelect?.value) || currentClassKey || '';
+  if(!grade) return alert('No se ha seleccionado un grado válido.');
+
+  const gname = (document.getElementById('new-subgroup-input')?.value || '').trim();
+  if(!gname) return alert('Escribe nombre del grupo (ej. Grupo A)');
+
+  // asegurar estructura
+  dbState.groups = dbState.groups || {};
+  dbState.groups[grade] = dbState.groups[grade] || {};
+
+  if(dbState.groups[grade][gname]) return alert('El grupo ya existe en este grado.');
+
+  // Guarda la lista vacía de integrantes (nombres) — puedes cambiar a IDs si prefieres
+  dbState.groups[grade][gname] = [];
+
+  saveDatabase();
+  renderGroupsList();
+  document.getElementById('new-subgroup-input').value = '';
+  alert(`Grupo "${gname}" creado en Grado ${grade}`);
+}
+
+/* RENDER GROUPS LIST: muestra grados y sus subgrupos (y recuentos) */
+function renderGroupsList(){
+  const container = document.getElementById('groups-list-container');
+  if(!container) return;
+  container.innerHTML = '';
+
+  // lista de grados (ordenada)
+  const grades = Object.keys(dbState.classes || {}).sort();
+
+  grades.forEach(gradeKey => {
+    const students = dbState.classes[gradeKey] || [];
+    const gradeWrap = document.createElement('div');
+    gradeWrap.style.marginBottom = '12px';
+
+    // Header del grado con acciones
+    const header = document.createElement('div');
+    header.className = 'group-item';
+    header.innerHTML = `
+      <div style="cursor:pointer" onclick="switchClass('${gradeKey}')">
+        <strong>Grado ${gradeKey}</strong> <span style="color:var(--muted)">(${students.length} estudiantes)</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="exportGroup('${gradeKey}')">Export</button>
+        <button class="btn red" onclick="deleteGrade('${gradeKey}')">🗑</button>
+      </div>
+    `;
+    gradeWrap.appendChild(header);
+
+    // Subgrupos dentro del grado
+    const groupsFor = (dbState.groups && dbState.groups[gradeKey]) ? dbState.groups[gradeKey] : {};
+    const groupKeys = Object.keys(groupsFor);
+
+    if(groupKeys.length === 0){
+      const emptyNote = document.createElement('div');
+      emptyNote.style.padding = '8px 12px';
+      emptyNote.style.color = 'var(--muted)';
+      emptyNote.innerText = 'No hay subgrupos creados en este grado.';
+      gradeWrap.appendChild(emptyNote);
+    } else {
+      const list = document.createElement('div');
+      list.style.padding = '8px 12px';
+      list.style.display = 'grid';
+      list.style.gridTemplateColumns = 'repeat(auto-fill,minmax(180px,1fr))';
+      list.style.gap = '8px';
+
+      groupKeys.forEach(gk => {
+        const members = groupsFor[gk] || [];
+        const card = document.createElement('div');
+        card.style.padding = '10px';
+        card.style.borderRadius = '8px';
+        card.style.background = 'rgba(255,255,255,0.02)';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.gap = '8px';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:700">${gk}</div>
+            <div style="color:var(--muted)">${members.length} integrantes</div>
+          </div>
+          <div style="display:flex;gap:6px;justify-content:flex-end">
+            <button class="btn" onclick="exportSubgroup('${gradeKey}','${gk}')">Export</button>
+            <button class="btn red" onclick="deleteSubgroup('${gradeKey}','${gk}')">Eliminar</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+
+      gradeWrap.appendChild(list);
+    }
+
+    container.appendChild(gradeWrap);
+  });
+}
+
+/* Helpers: eliminar grade y subgrupo, exportar subgrupo */
+function deleteGrade(gradeKey){
+  showConfirmModal('Eliminar Grado', `Eliminar el grado ${gradeKey} con todos sus datos?`, ()=>{
+    delete dbState.classes[gradeKey];
+    if(dbState.groups && dbState.groups[gradeKey]) delete dbState.groups[gradeKey];
+    saveDatabase();
+    updateClassSelectOptions();
+    renderGroupsList();
+  });
+}
+
+function deleteSubgroup(gradeKey, subgroupName){
+  showConfirmModal('Eliminar Grupo', `Eliminar el grupo "${subgroupName}" en ${gradeKey}?`, ()=>{
+    if(dbState.groups && dbState.groups[gradeKey]){
+      delete dbState.groups[gradeKey][subgroupName];
+      saveDatabase();
+      renderGroupsList();
+    }
+  });
+}
+
+function exportGroup(gradeKey){
+  currentClassKey = gradeKey;
+  exportCurrentClassExcel();
+}
+
+/* Export para subgrupo (genera xlsx con los nombres de los miembros si existen) */
+function exportSubgroup(gradeKey, subgroupName){
+  const groupsFor = dbState.groups && dbState.groups[gradeKey] ? dbState.groups[gradeKey] : {};
+  const members = groupsFor[subgroupName] || [];
+  const rows = members.length ? members.map((name,i)=>({ 'N°': i+1, 'Nombre': name, 'Grado': gradeKey, 'Grupo': subgroupName })) : [{ 'Mensaje': 'Sin miembros en este subgrupo' }];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${gradeKey}_${subgroupName}`);
+  XLSX.writeFile(wb, `Grupo_${gradeKey}_${subgroupName}.xlsx`);
+}
 function createGroupInCurrentGrade(){
   const gname = document.getElementById('new-subgroup-input').value.trim();
   if(!gname) return alert('Escribe nombre del grupo');
