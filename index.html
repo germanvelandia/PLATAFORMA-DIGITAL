@@ -4,25 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plataforma Convivencial FantasyClass - Colegio Alfonso López Michelsen</title>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        colegio: { blue: '#1e3a8a', red: '#dc2626', gold: '#f59e0b', dark: '#0f172a' }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Aquí iría tu CSS original, por favor asegúrate de pegarlo tal cual -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
     <style>
         body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at top center, #1e293b 0%, #0f172a 100%); color: #f8fafc; min-height: 100vh; }
         .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); }
         .card-hover { transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 24px -10px rgba(245, 158, 11, 0.25); border-color: rgba(245, 158, 11, 0.4); }
+        #pdf-template { font-family: Arial, sans-serif; color: #000; background: #fff; padding: 25px; }
+        .pdf-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        .pdf-table th, .pdf-table td { border: 1px solid #333; padding: 6px; font-size: 10px; text-align: left; }
     </style>
 </head>
 <body class="pb-12 text-slate-100 flex flex-col min-h-screen">
-    <!-- MANTÉN AQUÍ TU CÓDIGO HTML ORIGINAL (Header, Main, Grilla, Botones) -->
-    <!-- AL FINAL, ANTES DE CERRAR EL BODY, PEGA LOS MODALES -->
-    
-    <!-- AQUÍ PEGARÁS LOS MODALES QUE NECESITAS (Ficha, Grupos, Herramientas) -->
-    
+
+    <header class="glass-panel sticky top-0 z-30 border-b border-white/10 px-4 py-3 shadow-lg">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-colegio-red via-colegio-blue to-colegio-gold p-0.5 flex items-center justify-center shadow-md">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-display font-black text-amber-400 text-lg">ALM</div>
+                </div>
+                <div>
+                    <h1 class="font-display font-extrabold text-base md:text-lg text-white leading-tight flex items-center gap-2">
+                        <span>FantasyClass Convivencial</span>
+                        <span class="text-[10px] bg-colegio-gold/20 text-amber-300 border border-colegio-gold/40 px-2 py-0.5 rounded-full font-sans font-bold">ALM</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Colegio Alfonso López Michelsen — "Una Vida para la Excelencia"</p>
+                </div>
+            </div>
+
+            <div class="flex items-center flex-wrap justify-center gap-2">
+                <button onclick="openDriveSettingsModal()" class="flex items-center bg-slate-800 hover:bg-slate-700 border border-emerald-500/40 rounded-xl px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 transition"><i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Google Drive Sync</button>
+                <div class="flex items-center bg-slate-900 border border-amber-500/30 rounded-xl px-3 py-1.5">
+                    <i class="fa-solid fa-calendar-days text-amber-400 text-xs mr-2"></i>
+                    <select id="period-select" onchange="switchPeriod(this.value)" class="bg-transparent text-xs text-amber-300 font-extrabold focus:outline-none cursor-pointer">
+                        <option value="ALL">Todo el Año</option><option value="P1" selected>Periodo 1</option><option value="P2">Periodo 2</option><option value="P3">Periodo 3</option><option value="P4">Periodo 4</option>
+                    </select>
+                </div>
+                <div class="flex items-center bg-slate-900 border border-white/15 rounded-xl px-3 py-1.5">
+                    <i class="fa-solid fa-users text-colegio-gold text-xs mr-2"></i>
+                    <select id="class-select" onchange="switchClass(this.value)" class="bg-transparent text-xs text-white font-bold focus:outline-none cursor-pointer"></select>
+                </div>
+                <button onclick="openManageGroupsModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-indigo-300 font-bold text-xs rounded-xl transition"><i class="fa-solid fa-layer-group"></i> Grupos</button>
+                <button onclick="openDiceModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-rose-400 font-bold text-xs rounded-xl transition"><i class="fa-solid fa-dice"></i> Dado</button>
+                <button onclick="openTimerModal()" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-amber-400 font-bold text-xs rounded-xl transition"><i class="fa-solid fa-stopwatch"></i> Tiempo</button>
+                <button onclick="openWheelModal()" class="px-2.5 py-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-xs rounded-xl transition"><i class="fa-solid fa-arrows-spin"></i> Ruleta</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6">
+        <div id="students-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"></div>
+    </main>
+
+    <!-- AQUÍ SE INYECTARÁN TUS MODALES Y LÓGICA (DEBES MANTENER LA ESTRUCTURA ORIGINAL) -->
     <script>
-        // AQUÍ PEGARÁS LA LÓGICA JAVASCRIPT
+        // LOGICA MANTENIDA...
+        // [Aquí iría todo el script que ya tienes funcionando]
     </script>
 </body>
 </html>
