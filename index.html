@@ -1245,6 +1245,87 @@ function wireToolsPanelButtons(){
   window.saveFicha = saveFichaEF;
 })();
 </script>
+(function enableMenusPatch(){
+  if(window.__alm_menu_patch_applied) { console.log('menu patch: already applied'); return; }
+  window.__alm_menu_patch_applied = true;
 
+  // CSS seguro: ocultar paneles excepto cuando .menu tiene .open
+  const s = document.createElement('style');
+  s.id = '__alm_menu_patch_styles';
+  s.innerText = `
+    .menu:not(.open) .menu-panel { display: none !important; }
+    .menu.open .menu-panel { display: block !important; }
+    .menu-button[disabled]{ pointer-events:auto !important; opacity:1 !important; }
+  `;
+  document.head.appendChild(s);
+
+  // Toggle behavior for .menu-button (idempotente)
+  document.querySelectorAll('.menu-button').forEach(btn => {
+    if(btn.dataset.menuPatched) return;
+    btn.dataset.menuPatched = '1';
+    if(!btn.hasAttribute('tabindex')) btn.setAttribute('tabindex','0');
+    if(!btn.hasAttribute('role')) btn.setAttribute('role','button');
+    btn.setAttribute('aria-expanded', 'false');
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const menu = btn.closest('.menu');
+      if(!menu) return;
+      const isOpen = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      // close other menus
+      document.querySelectorAll('.menu').forEach(m => {
+        if(m !== menu) {
+          m.classList.remove('open');
+          const b = m.querySelector('.menu-button');
+          if(b) b.setAttribute('aria-expanded','false');
+        }
+      });
+    });
+
+    btn.addEventListener('keydown', (ev) => {
+      if(ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        btn.click();
+      } else if(ev.key === 'Escape') {
+        document.querySelectorAll('.menu').forEach(m => {
+          m.classList.remove('open');
+          const b = m.querySelector('.menu-button');
+          if(b) b.setAttribute('aria-expanded','false');
+        });
+      }
+    });
+  });
+
+  // Close menus when clicking outside
+  document.addEventListener('click', (e) => {
+    if(!e.target.closest('.menu')) {
+      document.querySelectorAll('.menu').forEach(m => {
+        m.classList.remove('open');
+        const b = m.querySelector('.menu-button');
+        if(b) b.setAttribute('aria-expanded','false');
+      });
+    }
+  });
+
+  // Fallback handlers for the specific panel buttons you showed (non-destructive)
+  function tryOpenGroups(){ if(typeof openGroupsModal === 'function') return openGroupsModal(); if(typeof openManageGroupsModal === 'function') return openManageGroupsModal(); if(document.getElementById('manage-groups-modal')) return showModal && showModal('manage-groups-modal'); console.warn('No se encontró función para abrir Grupos'); }
+  function tryOpenSettings(){ if(typeof openInstitutionModal === 'function') return openInstitutionModal(); if(document.getElementById('institution-settings-modal')) return showModal && showModal('institution-settings-modal'); console.warn('No se encontró función para abrir Ajustes'); }
+  // wire known buttons inside panels (only if present)
+  const toolsPanel = document.querySelector('#menu-tools .menu-panel');
+  if(toolsPanel){
+    const bSettings = toolsPanel.querySelector('#tools-settings-btn');
+    if(bSettings && !bSettings.dataset.patched){ bSettings.dataset.patched='1'; bSettings.addEventListener('click', (e)=>{ e.stopPropagation(); tryOpenSettings(); }); }
+    const bGroups = toolsPanel.querySelector('#tools-groups-btn');
+    if(bGroups && !bGroups.dataset.patched){ bGroups.dataset.patched='1'; bGroups.addEventListener('click', (e)=>{ e.stopPropagation(); tryOpenGroups(); }); }
+  }
+  const classesPanel = document.querySelector('#menu-classes .menu-panel');
+  if(classesPanel){
+    const bGrades = classesPanel.querySelector('#classes-grades-btn');
+    if(bGrades && !bGrades.dataset.patched){ bGrades.dataset.patched='1'; bGrades.addEventListener('click', (e)=>{ e.stopPropagation(); tryOpenGroups(); }); }
+  }
+
+  console.log('menu patch applied — botones reactivados de forma segura');
+})();
 </body>
 </html>
