@@ -285,7 +285,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 <!-- Toast container -->
 <div id="toast-container"></div>
 
-<!-- Modals (kept original + cleaned ones) -->
+<!-- Modals etc (kept and updated) -->
 
 <!-- Quick action modal -->
 <div id="quick-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('quick-modal')">
@@ -308,7 +308,6 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   <div class="modal">
     <button class="close-btn" onclick="hideModal('add-student-modal')">✕</button>
     <h3>Nuevo Estudiante</h3>
-    <!-- class="dark-text" aplicado para texto oscuro legible sobre este input -->
     <input id="new-student-name" class="dark-text" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;margin-top:10px">
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
       <div class="btn" onclick="saveNewStudent()">Guardar Estudiante</div>
@@ -317,12 +316,12 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Ficha modal (white) - content will be enhanced by consolidated script -->
+<!-- Ficha modal (white) - enhanced UI will be injected -->
 <div id="ficha-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('ficha-modal')">
   <div class="modal white">
     <button class="close-btn" onclick="hideModal('ficha-modal')">✕</button>
 
-    <!-- preserved minimal header - enhanced UI injected by script -->
+    <!-- preserved minimal header - we will hide it in favor of injection to avoid duplication -->
     <div id="ficha-initial-header" style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
       <div id="history-student-avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
       <div style="flex:1">
@@ -334,6 +333,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
       </div>
     </div>
 
+    <!-- The injected UI will appear after this header. To avoid duplicate name we hide the initial header when injecting. -->
     <label style="font-weight:800;color:#444">Selecciona acción / pilar</label>
     <div id="ficha-icon-grid" class="icon-grid"></div>
 
@@ -368,15 +368,9 @@ main{max-width:1200px;margin:18px auto;padding:18px}
     <button class="close-btn" onclick="hideModal('manage-groups-modal')">✕</button>
     <h3>Gestión de Cursos y Grupos</h3>
 
-    <!-- Group manager UI will be injected/augmented by consolidated script -->
-    <div id="groups-manager-body" style="margin-top:10px">
-      <!-- Top control area (injected) -->
-    </div>
-
+    <div id="groups-manager-body" style="margin-top:10px"></div>
     <div id="groups-list-container" style="margin-top:12px;max-height:240px;overflow:auto"></div>
-
     <hr style="margin:12px 0">
-
     <div id="groups-columns-area" style="margin-top:12px"></div>
   </div>
 </div>
@@ -399,7 +393,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Timer, Roulette, Dice modals (same as original) -->
+<!-- Timer, Roulette, Dice modals (unchanged) -->
 <div id="timer-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('timer-modal')">
   <div class="modal">
     <button class="close-btn" onclick="hideModal('timer-modal')">✕</button>
@@ -706,13 +700,14 @@ function assignQuick(id){
   setTimeout(()=> showToast('Arrastra al estudiante desde "Sin asignar" al grupo', 'info', 3000), 400);
 }
 
-/* ========== FICHA / HISTORY (original core, kept for compatibility) ========== */
+/* ========== FICHA / HISTORY (kept for compatibility) ========== */
 let activeStudentId = null;
 let selectedPilar = '';
 function openFicha(id){
   activeStudentId = id;
   const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
   if(!s) return showToast('Estudiante no encontrado','err');
+  // update preserved minimal header (kept for backward compat) but we'll hide it when injecting EF2
   document.getElementById('history-student-name').innerText = s.name;
   document.getElementById('history-student-avatar').innerText = s.name.charAt(0);
   document.getElementById('history-period-label').innerText = document.getElementById('period-select').value;
@@ -726,6 +721,8 @@ function openFicha(id){
   selectedPilar = '';
   showModal('ficha-modal');
 }
+
+/* Original simple ficha history render (keeps bottom fallback) */
 function renderFichaHistory(s){
   const c = document.getElementById('ficha-history'); if(!c) return;
   c.innerHTML = '';
@@ -1212,7 +1209,7 @@ window.openInstitutionModal = function(){
   setTimeout(()=> { loadStyleControls(); }, 40);
 };
 
-/* ========== CONSOLIDATED: Enhanced Ficha UI injection (REPLACE) ========== */
+/* ========== CONSOLIDATED: Enhanced Ficha UI injection (updated with Gamificación tab + Class Actions) ========== */
 (function enhancedFichaInjection(){
   const HP_DEFAULT = 5;
 
@@ -1231,6 +1228,10 @@ window.openInstitutionModal = function(){
     const content = findModalContent();
     if(!content) return;
     if(content.querySelector('#ef2-ficha')) return; // already injected
+
+    // hide the original minimal header to avoid duplicate name
+    const initialHeader = content.querySelector('#ficha-initial-header');
+    if(initialHeader) initialHeader.style.display = 'none';
 
     const container = document.createElement('div');
     container.id = 'ef2-ficha';
@@ -1259,6 +1260,7 @@ window.openInstitutionModal = function(){
               <div class="ef2-tab active" data-tab="tab-personal">1 • Personal</div>
               <div class="ef2-tab" data-tab="tab-actas">2 • Actas</div>
               <div class="ef2-tab" data-tab="tab-obs">3 • Observador</div>
+              <div class="ef2-tab" data-tab="tab-game">4 • Gamificación</div>
             </div>
 
             <div id="tab-personal" class="ef2-tab-content active">
@@ -1319,30 +1321,81 @@ window.openInstitutionModal = function(){
               <div id="ef2-obs-list" style="margin-top:12px"></div>
             </div>
 
+            <div id="tab-game" class="ef2-tab-content">
+              <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px">
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <div style="font-weight:700">EXPERIENCIA</div><div id="ef2-xp-chip" style="background:#f1f5f9;padding:6px;border-radius:8px;margin-left:6px;font-weight:800">0</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;margin-left:12px">
+                  <div style="font-weight:700">ORO</div><div id="ef2-gold-chip" style="background:#fff7ed;padding:6px;border-radius:8px;margin-left:6px;font-weight:800">0</div>
+                </div>
+              </div>
+
+              <div class="ef2-row" style="align-items:center;margin-bottom:10px">
+                <input id="ef2_level" class="ef2-input" placeholder="Nivel" style="width:96px">
+                <input id="ef2_xp" class="ef2-input" placeholder="XP" type="number" style="width:120px">
+                <input id="ef2_hp" class="ef2-input" placeholder="HP" type="number" style="width:96px">
+              </div>
+
+              <div class="ef2-row">
+                <input id="ef2_clan" class="ef2-input" placeholder="Clan / Equipo">
+              </div>
+              <div class="ef2-row">
+                <input id="ef2_badges" class="ef2-input" placeholder="Insignias (coma-sep.)">
+              </div>
+
+              <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:8px">
+                <button class="ef2-btn primary" id="ef2-save-game">Guardar gamificación</button>
+              </div>
+
+              <hr style="margin:12px 0">
+
+              <div style="font-weight:800;margin-bottom:8px">Validar comportamiento</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <select id="ef2_behavior_select" class="ef2-input" style="flex:1"></select>
+                <input id="ef2_behavior_points" class="ef2-input" type="number" value="1" style="width:90px">
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+                <select id="ef2_behavior_scope" class="ef2-input" style="width:200px">
+                  <option value="student">Estudiante (actual)</option>
+                  <option value="group">Grupo (del estudiante)</option>
+                  <option value="class">Curso completo</option>
+                </select>
+                <div style="flex:1;color:#64748b;font-size:13px">Aplica la validación al alcance seleccionado</div>
+                <button class="ef2-btn primary" id="ef2-apply-behavior">Aplicar</button>
+              </div>
+
+              <div style="font-size:13px;color:#475569">Nota: puedes usar este formulario para validar comportamientos y aplicar puntos a nivel individual, de grupo o del curso.</div>
+            </div>
+
           </div> <!-- card -->
-          
-          <!-- Gamificación compact editable card -->
-          <div class="ef2-card" style="margin-top:12px">
-            <h4>4 • Gamificación / RPG</h4>
-            <div class="ef2-row" style="align-items:center">
-              <input id="ef2_level" class="ef2-input" placeholder="Nivel" style="width:96px">
-              <input id="ef2_xp" class="ef2-input" placeholder="XP" type="number" style="width:120px">
-              <input id="ef2_hp" class="ef2-input" placeholder="HP" type="number" style="width:96px">
-            </div>
-            <div class="ef2-row">
-              <input id="ef2_clan" class="ef2-input" placeholder="Clan / Equipo">
-            </div>
-            <div class="ef2-row">
-              <input id="ef2_badges" class="ef2-input" placeholder="Insignias (coma-sep.)">
-            </div>
-            <div style="display:flex;justify-content:flex-end">
-              <button class="ef2-btn primary" id="ef2-save-game">Guardar gamificación</button>
-            </div>
-          </div>
         </div>
 
         <div class="ef2-right">
           <div class="ef2-card">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <div style="font-weight:800">Panel de Clase</div>
+              <div class="ef2-small">Acciones rápidas</div>
+            </div>
+
+            <!-- Class actions: apply XP / Gold to class or groups -->
+            <div style="margin-top:10px">
+              <div style="font-weight:700;margin-bottom:6px">Acciones de clase</div>
+              <div style="display:flex;gap:8px;margin-bottom:8px">
+                <input id="class-action-points" type="number" value="1" class="ef2-input" style="width:84px">
+                <select id="class-action-target" class="ef2-input" style="flex:1">
+                  <option value="all">Todo el curso</option>
+                  <option value="ungrouped">Sin asignar</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:space-between">
+                <button class="ef2-btn primary" onclick="applyClassAction('xp')">+ XP Clase</button>
+                <button class="ef2-btn" onclick="applyClassAction('gold')">+ Oro Clase</button>
+              </div>
+            </div>
+
+            <hr style="margin:12px 0">
+
             <div style="display:flex;justify-content:space-between;align-items:center">
               <div style="font-weight:800">Resumen</div>
               <div class="ef2-small">Últimos registros</div>
@@ -1359,10 +1412,26 @@ window.openInstitutionModal = function(){
       </div>
     `;
 
-    // insertar después del header inicial si existe
-    const header = content.querySelector('#ficha-initial-header') || content.firstElementChild;
-    if(header) header.insertAdjacentElement('afterend', container);
-    else content.appendChild(container);
+    // insert after initial header (which we hid)
+    content.appendChild(container);
+
+    // fill behavior select with DEFAULT_ICONS + custom characters
+    function rebuildBehaviorSelect(){
+      const sel = container.querySelector('#ef2_behavior_select');
+      if(!sel) return;
+      sel.innerHTML = '';
+      const allBehaviors = DEFAULT_ICONS.map(i => ({ key:i.key, icon:i.icon, type:i.type }));
+      const custom = (db.characters || []).map(c => ({ key:c.name, icon:c.emoji, type:c.type }));
+      const merged = [...allBehaviors, ...custom];
+      merged.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.key;
+        opt.textContent = `${b.icon} ${b.key} (${b.type==='positive'?'+' : '-'})`;
+        opt.dataset.type = b.type;
+        sel.appendChild(opt);
+      });
+    }
+    rebuildBehaviorSelect();
 
     // pestañas
     container.querySelectorAll('.ef2-tab').forEach(tab => {
@@ -1376,7 +1445,7 @@ window.openInstitutionModal = function(){
       });
     });
 
-    // listeners: mantener IDs existentes (ya usados por otras funciones)
+    // listeners: maintain IDs used elsewhere
     container.querySelector('#ef2-save-close').addEventListener('click', ()=>{
       const modal = findModal();
       const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
@@ -1413,9 +1482,42 @@ window.openInstitutionModal = function(){
       if(!sid){ showToast('Abre ficha primero','warn'); return; }
       saveGameEF(sid);
     });
+
+    // apply behavior to scope
+    container.querySelector('#ef2-apply-behavior').addEventListener('click', ()=>{
+      const selected = container.querySelector('#ef2_behavior_select');
+      const points = parseInt(container.querySelector('#ef2_behavior_points').value)||1;
+      const scope = container.querySelector('#ef2_behavior_scope').value;
+      const behavior = selected.value;
+      const type = selected.selectedOptions[0]?.dataset?.type || 'positive';
+      applyBehaviorToScope(behavior, type, points, scope);
+    });
+
+    // class action handlers
+    window.applyClassAction = function(kind){
+      const pts = parseInt(document.getElementById('class-action-points').value) || 1;
+      const target = document.getElementById('class-action-target').value;
+      if(!currentClass) return showToast('Selecciona un grado','warn');
+      let ids = [];
+      if(target === 'all'){ ids = (db.classes[currentClass]||[]).map(s=>s.id); }
+      else if(target === 'ungrouped'){ const groups = db.groups[currentClass] || {}; const assigned = new Set(); Object.keys(groups).forEach(g => (groups[g]||[]).forEach(id => assigned.add(id))); ids = (db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); }
+      if(!ids.length) return showToast('No hay estudiantes objetivos','warn');
+      ids.forEach(id=>{
+        const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
+        if(!s) return;
+        if(kind === 'xp'){ s.xp = (s.xp||0) + pts; s.level = Math.floor((s.xp||0)/20) + 1; }
+        else if(kind === 'gold'){ s.gold = (s.gold||0) + pts; }
+        // add history note for traceability
+        s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'positive', pilar: kind === 'xp' ? 'XP Clase' : 'Oro Clase', magnitude: pts, note: `Aplicado a ${target}` });
+      });
+      saveDB(); renderStudentGrid(); showToast('Acción de clase aplicada','success');
+    };
+
+    // rebuild character/behavior select when characters change (expose function)
+    window.refreshBehaviorSelect = rebuildBehaviorSelect;
   } // end buildEnhancedFichaUI
 
-  // pequeñas funciones de render para listas ya existentes (reutilizan los mismos IDs)
+  // render functions for actas/obs/history re-used from earlier
   function renderActasEF(student){
     const list = document.getElementById('ef2-actas-list'); if(!list) return;
     list.innerHTML = '';
@@ -1552,8 +1654,12 @@ window.openInstitutionModal = function(){
     document.getElementById('ef2-xp-display') && (document.getElementById('ef2-xp-display').innerText = s.xp||0);
     document.getElementById('ef2-hp-display') && (document.getElementById('ef2-hp-display').innerText = s.hp||HP_DEFAULT);
     document.getElementById('ef2-gold-display') && (document.getElementById('ef2-gold-display').innerText = s.gold||0);
+    document.getElementById('ef2-xp-chip') && (document.getElementById('ef2-xp-chip').innerText = s.xp||0);
+    document.getElementById('ef2-gold-chip') && (document.getElementById('ef2-gold-chip').innerText = s.gold||0);
     renderActasEF(s); renderObsEF(s); renderHistoryEF(s);
     const modal = findModal(); if(modal) modal.dataset.currentStudent = s.id;
+    // refresh behavior select (in case characters changed)
+    if(typeof window.refreshBehaviorSelect === 'function') window.refreshBehaviorSelect();
   }
 
   const originalOpenFicha = window.openFicha;
@@ -1563,8 +1669,49 @@ window.openInstitutionModal = function(){
   };
 
   window.saveFicha = saveFichaEF;
-})();
 
+  /* ========== NEW: behavior application logic ========== */
+  window.applyBehaviorToScope = function(behaviorKey, type, points, scope){
+    const modal = findModal();
+    const sid = modal && modal.dataset.currentStudent ? modal.dataset.currentStudent : null;
+    if(!sid) return showToast('Abre la ficha primero','warn');
+
+    const applyToStudent = (id) => {
+      const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
+      if(!s) return;
+      const isPositive = type !== 'negative';
+      s.history = s.history || [];
+      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: `Validación (${scope})` });
+      if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); } else { s.hp = Math.max(0, s.hp - points); }
+      s.level = Math.floor((s.xp||0)/20) + 1;
+    };
+
+    if(scope === 'student'){
+      applyToStudent(sid);
+      showToast(`Comportamiento "${behaviorKey}" aplicado a estudiante`, 'success');
+    } else if(scope === 'group'){
+      // find student's group
+      const grade = currentClass;
+      if(!grade) return showToast('No hay grado seleccionado','warn');
+      const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {};
+      let groupName = '';
+      Object.keys(groupsFor).forEach(g => { if(groupsFor[g].includes(sid)) groupName = g; });
+      if(!groupName) return showToast('El estudiante no pertenece a ningún grupo','warn');
+      const members = groupsFor[groupName] || [];
+      members.forEach(id => applyToStudent(id));
+      showToast(`Comportamiento "${behaviorKey}" aplicado a grupo "${groupName}"`, 'success');
+    } else if(scope === 'class'){
+      const students = db.classes[currentClass] || [];
+      students.forEach(st => applyToStudent(st.id));
+      showToast(`Comportamiento "${behaviorKey}" aplicado a todo el curso`, 'success');
+    }
+    saveDB();
+    renderStudentGrid();
+    // refresh ficha view for current student
+    fillEF2(sid);
+  };
+
+})();
 </script>
 
 </body>
