@@ -85,7 +85,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:8px;cursor:grab}
 
 /* Toasts */
-#toast-container{position:fixed;right:18px;bottom:18px;Display:flex;flex-direction:column;gap:8px;z-index:400}
+#toast-container{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:400}
 .toast{background:rgba(0,0,0,0.8);color:#fff;padding:10px 14px;border-radius:8px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px}
 .toast.success{background:linear-gradient(90deg,var(--accent-green),#059669)}
 .toast.info{background:linear-gradient(90deg,#0ea5e9,#0284c7)}
@@ -96,6 +96,61 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 /* Small utility classes used by injected UIs */
 .member-highlight{ box-shadow: 0 8px 24px rgba(0,0,0,0.6); border:2px solid rgba(99,102,241,0.2); transform:scale(1.01); }
 .small{font-size:13px;color:var(--muted)}
+
+/* ===================== ADDED: Inputs contrast fixes ===================== */
+/* Inputs in dark modals: dark background, light text */
+.modal:not(.white) input,
+.modal:not(.white) textarea,
+.modal:not(.white) select,
+.modal:not(.white) .ef2-input {
+  background: rgba(255,255,255,0.03) !important;
+  color: #e6eef6 !important;
+  border: 1px solid rgba(255,255,255,0.06) !important;
+  padding: 8px !important;
+  border-radius: 8px !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Placeholder in dark modals */
+.modal:not(.white) input::placeholder,
+.modal:not(.white) textarea::placeholder,
+.modal:not(.white) select::placeholder {
+  color: rgba(230,238,246,0.6) !important;
+}
+
+/* Focus state for dark modal inputs */
+.modal:not(.white) input:focus,
+.modal:not(.white) textarea:focus,
+.modal:not(.white) select:focus {
+  outline: none !important;
+  border-color: rgba(14,165,233,0.6) !important;
+  box-shadow: 0 6px 20px rgba(2,6,23,0.45), 0 0 0 4px rgba(14,165,233,0.04) !important;
+}
+
+/* Force dark text on white inputs when needed */
+.modal input.dark-text,
+.modal textarea.dark-text,
+.modal select.dark-text {
+  background: #ffffff !important;
+  color: #222222 !important;
+  border: 3px solid #0b4db8 !important;
+  padding: 10px !important;
+  border-radius: 10px !important;
+}
+
+/* Keep EF2 / white modal inputs as originally intended */
+.ef2-input,
+.modal.white .ef2-input,
+.modal.white input,
+.modal.white textarea,
+.modal.white select {
+  background: #fff;
+  color: #111;
+  border: 1px solid #e6e6e6;
+  padding: 8px;
+  border-radius: 8px;
+}
 </style>
 </head>
 <body>
@@ -212,7 +267,8 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   <div class="modal">
     <button class="close-btn" onclick="hideModal('add-student-modal')">✕</button>
     <h3>Nuevo Estudiante</h3>
-    <input id="new-student-name" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;margin-top:10px">
+    <!-- class="dark-text" aplicado para texto oscuro legible sobre este input -->
+    <input id="new-student-name" class="dark-text" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;margin-top:10px">
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
       <div class="btn" onclick="saveNewStudent()">Guardar Estudiante</div>
       <div class="btn" onclick="hideModal('add-student-modal')">Cancelar</div>
@@ -1259,61 +1315,6 @@ function wireToolsPanelButtons(){
   window.saveFicha = saveFichaEF;
 })();
 </script>
-/* Inputs en modales oscuros: fondo tenue, texto claro y borde visible */
-.modal:not(.white) input,
-.modal:not(.white) textarea,
-.modal:not(.white) select,
-.modal:not(.white) .ef2-input {
-  background: rgba(255,255,255,0.03);
-  color: #e6eef6;
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 8px;
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
 
-/* Placeholder más legible en fondo oscuro */
-.modal:not(.white) input::placeholder,
-.modal:not(.white) textarea::placeholder,
-.modal:not(.white) select::placeholder {
-  color: rgba(230,238,246,0.6);
-}
-
-/* Estado focus más visible */
-.modal:not(.white) input:focus,
-.modal:not(.white) textarea:focus,
-.modal:not(.white) select:focus {
-  outline: none;
-  border-color: rgba(14,165,233,0.6);
-  box-shadow: 0 6px 20px rgba(2,6,23,0.45), 0 0 0 4px rgba(14,165,233,0.04);
-}
-
-/* Mantener la apariencia clara para inputs de la ficha (EF2) que están en panel blanco */
-.ef2-input,
-.modal.white .ef2-input,
-.modal.white input,
-.modal.white textarea,
-.modal.white select {
-  background: #fff;
-  color: #111;
-  border: 1px solid #e6e6e6;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-/* Botones y selects dentro de menú (pequeño ajuste para contraste) */
-.menu-panel button,
-.menu-panel select {
-  background: transparent;
-  color: inherit;
-  border: none;
-  text-align: left;
-}
-  /* Inicio: mejora contraste de inputs en modales / .modal:not(.white) input, .modal:not(.white) textarea, .modal:not(.white) select { background: rgba(255,255,255,0.03) !important; / fondo tenue por defecto / color: #e6eef6 !important; / texto claro por defecto */ border: 1px solid rgba(255,255,255,0.06) !important; padding: 8px !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important; }
-
-/* Si quieres forzar texto oscuro (para inputs con fondo blanco) añade la clase .dark-text / .modal input.dark-text, .modal textarea.dark-text, .modal select.dark-text { background: #ffffff !important; color: #222222 !important; / tono más oscuro para la letra / border: 3px solid #0b4db8 !important; / borde azul similar al que muestras (ajústalo si quieres) */ padding: 10px !important; border-radius: 10px !important; }
-
-/* Placeholder legible / .modal:not(.white) input::placeholder, .modal:not(.white) textarea::placeholder { color: rgba(230,238,246,0.6) !important; } / Fin: mejora contraste de inputs en modales */
 </body>
 </html>
