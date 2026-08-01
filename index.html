@@ -25,7 +25,7 @@ header{background:linear-gradient(180deg,#07121a,#061019);padding:12px;border-bo
 .controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .menu{position:relative}
 .menu-button{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:800;display:flex;gap:8px;align-items:center}
-.menu-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--glass-border);padding:8px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);display:none;min-width:220px;z-index:140}
+.menu-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--glass-border);padding:8px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);display:none;min-width:260px;z-index:140}
 .menu-panel button{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:transparent;border:0;color:inherit;width:100%;text-align:left;cursor:pointer}
 
 /* Mostrar panel cuando el contenedor .menu tiene la clase "open" */
@@ -47,23 +47,48 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .control-panel{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:10px;border:1px solid var(--glass-border);background:linear-gradient(180deg,rgba(255,255,255,0.008),rgba(255,255,255,0.004));margin-bottom:12px}
 .control-left{display:flex;gap:10px;align-items:center}
 .control-left input{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:inherit}
-#students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+#students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px;padding-bottom:28px}
 
-/* Card */
-.card{background:linear-gradient(180deg,rgba(12,18,26,0.85),rgba(7,12,18,0.65));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);position:relative}
-.avatar{width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900}
-.level{position:absolute;left:12px;top:12px;padding:6px 10px;border-radius:999px;background:rgba(0,0,0,0.35);color:var(--accent-gold);font-weight:800}
-.actions{display:flex;gap:8px;margin-top:12px;justify-content:flex-end}
-.btn{padding:8px 12px;border-radius:10px;font-weight:800;color:#fff;cursor:pointer}
-.btn.green{background:linear-gradient(180deg,#10b981,#059669)}
-.btn.red{background:linear-gradient(180deg,#ef4444,#dc2626)}
-.btn.blue{background:linear-gradient(180deg,#0ea5e9,#0284c7)}
-.btn.ghost{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.03);color:var(--muted)}
-.btn.light{background:#f3f4f6;color:#111;border-radius:8px;padding:6px 8px}
+/* New student card style (darker, like image) */
+.student-card {
+  background: linear-gradient(180deg, rgba(8,12,20,0.95), rgba(5,8,12,0.9));
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  color: #e6eef6;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+}
+.student-card .level-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(90deg,#3b2b0f,#6b4b1f);
+  color: #ffd88a;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight:800;
+  font-size:12px;
+}
+.student-card .top-row { display:flex; align-items:center; gap:12px; }
+.student-card .avatar-circle {
+  width:56px; height:56px; border-radius:10px; display:flex;align-items:center;justify-content:center;font-weight:900;
+  background: linear-gradient(135deg,#16243a,#2b1b59);
+  box-shadow: 0 6px 18px rgba(11,22,40,0.6);
+  font-size:20px;
+  color: #ffd88a;
+}
+.student-card .name { font-weight:900; font-size:15px; text-transform:uppercase; }
+.student-card .sub { color: #9aa7b6; font-size:13px; margin-top:4px; }
+.student-card .stats { display:flex; gap:12px; align-items:center; margin-left:auto; font-weight:800; color:#06d6a0; }
+.student-card .stats .neg { color:#ff7b7b; margin-left:8px; font-weight:800; }
+.student-card .card-actions { display:flex; gap:8px; margin-top:12px; }
+.student-card .card-actions .btn { padding:8px 14px; border-radius:10px; font-weight:800; }
+.student-card .btn.ficha { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.03); color: #e6eef6; }
 
 /* HP */
 .hp-wrap{margin-top:8px}
-.hp-bar{height:10px;background:rgba(255,255,255,0.06);border-radius:6px;overflow:hidden}
+.hp-bar{height:8px;background:rgba(255,255,255,0.03);border-radius:6px;overflow:hidden}
 .hp-fill{height:100%;background:linear-gradient(90deg,var(--accent-red),var(--accent-gold));width:100%}
 
 /* Modals */
@@ -72,14 +97,13 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .modal.white{background:#fff;color:#111}
 .close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
 
-/* Ficha icons */
+/* Others kept (icons, groups) */
 .icon-grid{display:grid;grid-template-columns:repeat(5,64px);gap:12px;justify-content:center;margin:12px 0}
 .icon-btn{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid rgba(255,255,255,0.03);cursor:pointer;background:transparent}
 .icon-btn.positive{border-color:rgba(16,185,129,0.12);color:var(--accent-green)}
 .icon-btn.negative{border-color:rgba(239,68,68,0.12);color:var(--accent-red)}
 .icon-btn.selected{box-shadow:0 10px 30px rgba(0,0,0,0.2)}
 
-/* Groups drag & drop */
 .groups-area{display:flex;gap:12px;align-items:flex-start}
 .group-col{min-width:200px;max-width:260px;background:linear-gradient(180deg,rgba(255,255,255,0.01),rgba(255,255,255,0.02));padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
 .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:8px;cursor:grab}
@@ -92,106 +116,31 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .toast.warn{background:linear-gradient(90deg,#f59e0b,#d97706)}
 .toast.err{background:linear-gradient(90deg,var(--accent-red),#c0392b)}
 
-@media(max-width:900px){.metrics{grid-template-columns:repeat(3,1fr)}.icon-grid{grid-template-columns:repeat(4,64px)}.groups-area{flex-direction:column}}
-/* Small utility classes used by injected UIs */
-.member-highlight{ box-shadow: 0 8px 24px rgba(0,0,0,0.6); border:2px solid rgba(99,102,241,0.2); transform:scale(1.01); }
-.small{font-size:13px;color:var(--muted)}
-
-/* ===================== ADDED: Inputs contrast fixes (base) ===================== */
-/* Inputs in dark modals: dark background, light text (base defaults that will be overridden by user style injection) */
-.modal:not(.white) input,
-.modal:not(.white) textarea,
-.modal:not(.white) select,
-.modal:not(.white) .ef2-input {
-  background: rgba(255,255,255,0.03);
-  color: #e6eef6;
-  border: 1px solid rgba(255,255,255,0.06);
-  padding: 8px;
-  border-radius: 8px;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* Placeholder in dark modals */
-.modal:not(.white) input::placeholder,
-.modal:not(.white) textarea::placeholder,
-.modal:not(.white) select::placeholder {
-  color: rgba(230,238,246,0.6);
-}
-
-/* Focus state for dark modal inputs */
-.modal:not(.white) input:focus,
-.modal:not(.white) textarea:focus,
-.modal:not(.white) select:focus {
-  outline: none;
-  border-color: rgba(14,165,233,0.6);
-  box-shadow: 0 6px 20px rgba(2,6,23,0.45), 0 0 0 4px rgba(14,165,233,0.04);
-}
-
-/* Force dark text on white inputs when needed */
-.modal input.dark-text,
-.modal textarea.dark-text,
-.modal select.dark-text {
-  background: #ffffff;
-  color: #222222;
-  border: 3px solid #0b4db8;
-  padding: 10px;
-  border-radius: 10px;
-}
-
-/* Keep EF2 / white modal inputs as originally intended */
-.ef2-input,
-.modal.white .ef2-input,
-.modal.white input,
-.modal.white textarea,
-.modal.white select {
-  background: #fff;
-  color: #111;
-  border: 1px solid #e6e6e6;
-  padding: 8px;
-  border-radius: 8px;
-}
-
-/* ===================== REDESIGN: EF2 tabs & cards ===================== */
+/* EF2 redesign (kept) */
 .ef2-wrap { display:block; gap:14px; }
 .ef2-header { display:flex; align-items:center; gap:12px; margin-bottom:14px; }
 .ef2-avatar { width:72px; height:72px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-weight:900; background:#f3f4f6; color:#111; box-shadow:0 6px 18px rgba(10,10,10,0.06); }
 .ef2-name { font-size:18px; font-weight:800; color:#0f1720; }
 .ef2-sub { color: #475569; font-size:13px; }
 .ef2-grid { display:grid; grid-template-columns:1fr 360px; gap:16px; align-items:start; }
-
-/* Cards */
 .ef2-card { background:#fff; border-radius:12px; padding:12px; border:1px solid #e6e6e6; box-shadow: 0 6px 18px rgba(15,23,34,0.04); }
-.ef2-card h4 { margin:0 0 10px 0; font-size:15px; color:#0f1720; font-weight:800; display:flex;align-items:center;gap:8px; }
 .ef2-row { display:flex; gap:8px; align-items:center; margin-bottom:10px; flex-wrap:wrap; }
 .ef2-input { width:100%; padding:10px; border-radius:8px; border:1px solid #e6e6e6; background:#fff; color:#111; box-sizing:border-box; }
-
-/* Tabs */
 .ef2-tabs { display:flex; gap:8px; margin-bottom:12px; border-bottom:1px solid #eef2f7; padding-bottom:6px; }
 .ef2-tab { padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; color:#475569; background:transparent; border:1px solid transparent; }
 .ef2-tab.active { background:linear-gradient(180deg,#f8fafc,#fff); color:#0f1720; border:1px solid #e6e6e6; box-shadow:0 6px 18px rgba(10,10,10,0.03); }
-
-/* Tab content */
 .ef2-tab-content { display:none; }
 .ef2-tab-content.active { display:block; }
-
-/* Right column specific */
 .ef2-right .ef2-small { color:#64748b; font-size:13px; }
 .ef2-stats { display:flex; gap:8px; margin-bottom:8px; }
 .ef2-stat { background:linear-gradient(180deg,#fff,#f8fafc); border-radius:10px; padding:8px; text-align:center; border:1px solid #eef2f7; flex:1; }
 .ef2-history-list { max-height:240px; overflow:auto; margin-top:8px; }
-
-/* Buttons */
 .ef2-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:10px; }
 .ef2-btn { padding:8px 12px; border-radius:10px; font-weight:700; cursor:pointer; border:1px solid transparent; }
 .ef2-btn.primary { background:linear-gradient(180deg,#0ea5e9,#0284c7); color:#fff; }
 .ef2-btn.ghost { background:transparent; color:#0f1720; border:1px solid #e6e6e6; }
 
-/* Responsive */
-@media (max-width:980px) {
-  .ef2-grid { grid-template-columns: 1fr; }
-  .ef2-avatar{ width:56px;height:56px }
-}
+@media(max-width:980px){ .ef2-grid{ grid-template-columns:1fr } .avatar{width:48px;height:48px} }
 </style>
 </head>
 <body>
@@ -213,6 +162,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
           <button type="button" onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i> Cronómetro</button>
           <button type="button" onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i> Ruleta</button>
           <button type="button" onclick="openDiceModal()"><i class="fa-solid fa-dice"></i> Dado</button>
+          <button type="button" onclick="openClassPanel()"><i class="fa-solid fa-chalkboard-user"></i> Panel de Clase</button>
           <button type="button" id="tools-settings-btn"><i class="fa-solid fa-cog"></i> Ajustes</button>
           <button type="button" id="tools-groups-btn"><i class="fa-solid fa-users"></i> Grupos</button>
         </div>
@@ -285,7 +235,68 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 <!-- Toast container -->
 <div id="toast-container"></div>
 
-<!-- Modals etc (kept and updated) -->
+<!-- Modals (kept original + new class panel) -->
+
+<!-- Class Panel (NEW modal, independent) -->
+<div id="class-panel-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('class-panel-modal')">
+  <div class="modal" style="max-width:1000px">
+    <button class="close-btn" onclick="hideModal('class-panel-modal')">✕</button>
+    <h3 style="margin-top:0">Panel de Clase — Acciones rápidas</h3>
+    <div style="display:flex;gap:12px">
+      <div style="flex:1;max-width:520px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div style="font-weight:800">Selecciona Estudiantes</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn" onclick="classPanelSelectAll(true)">Seleccionar todos</button>
+            <button class="btn ghost" onclick="classPanelSelectAll(false)">Limpiar</button>
+          </div>
+        </div>
+        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px"></div>
+      </div>
+
+      <div style="width:440px">
+        <div style="font-weight:800;margin-bottom:8px">Acción</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="class-panel-action-type" class="ef2-input" style="flex:1">
+            <option value="xp">Experiencia (XP)</option>
+            <option value="gold">Oro</option>
+            <option value="hp">Vida (HP)</option>
+            <option value="pilar">Registrar Pilar / Comportamiento</option>
+          </select>
+          <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:96px">
+        </div>
+
+        <div id="class-panel-pilar-row" style="display:none;margin-bottom:8px">
+          <select id="class-panel-pilar-select" class="ef2-input" style="width:100%"></select>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="class-panel-scope" class="ef2-input" style="flex:1">
+            <option value="selected">A los seleccionados</option>
+            <option value="all">A todo el curso</option>
+            <option value="ungrouped">A sin asignar</option>
+          </select>
+          <select id="class-panel-op" class="ef2-input" style="width:120px">
+            <option value="add">Agregar</option>
+            <option value="sub">Restar</option>
+          </select>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:6px">
+          <button class="btn green" onclick="applyClassPanelAction()">Aplicar acción</button>
+          <button class="btn" onclick="previewClassPanelAction()">Vista previa</button>
+          <div style="flex:1;color:var(--muted);font-size:13px">Se creará un registro en el historial por cada estudiante afectado (si aplica).</div>
+        </div>
+
+        <hr style="margin:8px 0">
+
+        <div style="font-weight:800;margin-bottom:6px">Previsualización</div>
+        <div id="class-panel-preview" style="min-height:80px;color:var(--muted)"></div>
+
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Quick action modal -->
 <div id="quick-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('quick-modal')">
@@ -308,6 +319,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   <div class="modal">
     <button class="close-btn" onclick="hideModal('add-student-modal')">✕</button>
     <h3>Nuevo Estudiante</h3>
+    <!-- class="dark-text" aplicado para texto oscuro legible sobre este input -->
     <input id="new-student-name" class="dark-text" placeholder="Nombre completo..." style="width:100%;padding:10px;border-radius:8px;margin-top:10px">
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:10px">
       <div class="btn" onclick="saveNewStudent()">Guardar Estudiante</div>
@@ -316,12 +328,12 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Ficha modal (white) - enhanced UI will be injected -->
+<!-- Ficha modal (white) - content will be enhanced by consolidated script -->
 <div id="ficha-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('ficha-modal')">
   <div class="modal white">
     <button class="close-btn" onclick="hideModal('ficha-modal')">✕</button>
 
-    <!-- preserved minimal header - we will hide it in favor of injection to avoid duplication -->
+    <!-- preserved minimal header - enhanced UI injected by script -->
     <div id="ficha-initial-header" style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
       <div id="history-student-avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
       <div style="flex:1">
@@ -333,7 +345,6 @@ main{max-width:1200px;margin:18px auto;padding:18px}
       </div>
     </div>
 
-    <!-- The injected UI will appear after this header. To avoid duplicate name we hide the initial header when injecting. -->
     <label style="font-weight:800;color:#444">Selecciona acción / pilar</label>
     <div id="ficha-icon-grid" class="icon-grid"></div>
 
@@ -368,9 +379,15 @@ main{max-width:1200px;margin:18px auto;padding:18px}
     <button class="close-btn" onclick="hideModal('manage-groups-modal')">✕</button>
     <h3>Gestión de Cursos y Grupos</h3>
 
-    <div id="groups-manager-body" style="margin-top:10px"></div>
+    <!-- Group manager UI will be injected/augmented by consolidated script -->
+    <div id="groups-manager-body" style="margin-top:10px">
+      <!-- Top control area (injected) -->
+    </div>
+
     <div id="groups-list-container" style="margin-top:12px;max-height:240px;overflow:auto"></div>
+
     <hr style="margin:12px 0">
+
     <div id="groups-columns-area" style="margin-top:12px"></div>
   </div>
 </div>
@@ -393,7 +410,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Timer, Roulette, Dice modals (unchanged) -->
+<!-- Timer, Roulette, Dice modals (same as original) -->
 <div id="timer-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('timer-modal')">
   <div class="modal">
     <button class="close-btn" onclick="hideModal('timer-modal')">✕</button>
@@ -460,83 +477,24 @@ main{max-width:1200px;margin:18px auto;padding:18px}
   </div>
 </div>
 
-<!-- Institution settings modal (UPDATED: includes style preferences UI) -->
+<!-- Institution settings modal (kept) -->
 <div id="institution-settings-modal" class="modal-backdrop" style="display:none" onclick="if(event.target===this) hideModal('institution-settings-modal')">
   <div class="modal" style="max-width:640px">
     <button class="close-btn" onclick="hideModal('institution-settings-modal')">✕</button>
     <h3>Ajustes institucionales</h3>
-
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
       <label style="font-weight:700">Nombre de la aplicación</label>
       <input id="inst-app-name" placeholder="Ej. FantasyClass Convivencial" style="width:100%;padding:8px;border-radius:8px">
-
       <label style="font-weight:700">Subtítulo / Nombre de la institución</label>
       <input id="inst-subtitle" placeholder="Ej. Colegio Alfonso López Michelsen" style="width:100%;padding:8px;border-radius:8px">
-
       <label style="font-weight:700">Texto corto / Logo (2-4 caracteres)</label>
       <input id="inst-logo-text" placeholder="Ej. ALM" style="width:160px;padding:8px;border-radius:8px">
     </div>
-
-    <hr style="margin:12px 0">
-
-    <!-- NUEVO: Preferencias de estilo -->
-    <div style="margin-top:8px;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(180deg,rgba(0,0,0,0.04),transparent)">
-      <h4 style="margin:0 0 8px 0">Preferencias de estilo</h4>
-
-      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-        <div style="flex:1;min-width:220px">
-          <label class="small">Color del texto en inputs (modal oscuro)</label>
-          <select id="inst-input-text" style="width:100%;padding:8px;border-radius:6px;margin-top:4px">
-            <option value="light">Claro (texto claro)</option>
-            <option value="dark">Oscuro (texto oscuro)</option>
-          </select>
-        </div>
-
-        <div style="width:220px">
-          <label class="small">Fondo de inputs (modal oscuro)</label>
-          <select id="inst-input-bg" style="width:100%;padding:8px;border-radius:6px;margin-top:4px">
-            <option value="dark">Oscuro</option>
-            <option value="light">Claro</option>
-          </select>
-        </div>
-
-        <div style="width:160px">
-          <label class="small">Color borde</label>
-          <input id="inst-border-color" type="color" value="#0b4db8" style="width:100%;height:42px;border-radius:6px;border:0;margin-top:4px">
-        </div>
-
-        <div style="width:220px">
-          <label class="small">Familia de fuente</label>
-          <select id="inst-font-family" style="width:100%;padding:8px;border-radius:6px;margin-top:4px">
-            <option value="Inter, system-ui, sans-serif">Inter (predeterm.)</option>
-            <option value="system-ui, -apple-system, 'Segoe UI', Roboto">Sistema</option>
-            <option value="Roboto, system-ui, sans-serif">Roboto</option>
-          </select>
-        </div>
-
-        <div style="width:140px">
-          <label class="small">Tamaño (px)</label>
-          <input id="inst-font-size" type="number" value="14" min="12" max="22" style="width:100%;padding:8px;border-radius:6px;margin-top:4px">
-        </div>
-      </div>
-
-      <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
-        <div style="flex:1">
-          <div class="small" style="color:var(--muted)">Vista previa (inputs en modal oscuro)</div>
-          <div id="inst-style-preview" style="margin-top:8px;padding:8px;border-radius:6px;background:linear-gradient(180deg,#07121a,#061019)">
-            <input placeholder="Ej. texto de ejemplo" style="width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.06)">
-          </div>
-        </div>
-
-        <div style="width:220px;display:flex;flex-direction:column;gap:8px">
-          <div class="btn" onclick="loadInstitutionDefaults()">Restaurar por defecto</div>
-          <div class="btn" onclick="saveInstitutionSettings(); saveStyleSettings();">Guardar</div>
-          <div class="btn" onclick="hideModal('institution-settings-modal')">Cancelar</div>
-        </div>
-      </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <div class="btn" onclick="loadInstitutionDefaults()">Restaurar por defecto</div>
+      <div class="btn" onclick="saveInstitutionSettings()">Guardar</div>
+      <div class="btn" onclick="hideModal('institution-settings-modal')">Cancelar</div>
     </div>
-    <!-- FIN NUEVO -->
-
   </div>
 </div>
 
@@ -608,9 +566,6 @@ function toggleMenu(id){
 }
 document.addEventListener('click', (e) => { if(!e.target.closest('.menu')) document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')); });
 
-/* Close menus with Escape */
-document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')); });
-
 /* ========== UTILS ========== */
 function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
 function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
@@ -637,7 +592,14 @@ function populateClassSelect(){
 }
 function switchClass(v){ if(!db.classes[v]) return showToast('Grado no encontrado','warn'); currentClass = v; populateClassSelect(); renderStudentGrid(); renderGroupsColumns(); }
 
-/* ========== STUDENTS RENDER ========== */
+/* ========== STUDENTS RENDER (NEW style) ========== */
+function calcStudentSums(s){
+  const hist = s.history || [];
+  let pos = 0, neg = 0;
+  hist.forEach(h => { if(h.type==='positive') pos += (h.magnitude||0); else neg += (h.magnitude||0); });
+  return { pos, neg };
+}
+
 function renderStudentGrid(){
   const grid = document.getElementById('students-grid'); if(!grid) return;
   grid.innerHTML = '';
@@ -645,24 +607,28 @@ function renderStudentGrid(){
   const q = (document.getElementById('student-search').value||'').toLowerCase();
   const list = db.classes[currentClass] || [];
   list.filter(s => s.name.toLowerCase().includes(q)).forEach(s => {
-    const el = document.createElement('div'); el.className = 'card';
+    const sums = calcStudentSums(s);
+    const el = document.createElement('div'); el.className = 'student-card';
     el.innerHTML = `
-      <div class="level">NIV ${s.level}</div>
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="avatar" style="background:${avatarGradient(s.name)}">${s.name.charAt(0)}</div>
+      <div class="level-badge">NIV ${s.level}</div>
+      <div class="top-row">
+        <div class="avatar-circle" style="background:${avatarGradient(s.name)}">${s.name.charAt(0)}</div>
         <div style="flex:1">
-          <div style="font-weight:800">${s.name}</div>
-          <div style="color:var(--muted)">Grado ${currentClass}</div>
-          <div class="hp-wrap">
-            <div class="hp-bar"><div class="hp-fill" style="width:${(s.hp/HP_MAX)*100}%"></div></div>
-            <div style="color:var(--muted);margin-top:6px">HP: ${s.hp}/${HP_MAX} • XP: ${s.xp}</div>
-          </div>
+          <div class="name">${s.name}</div>
+          <div class="sub">Grado ${currentClass} • ${document.getElementById('period-select')?.value || ''}</div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div class="btn blue" onclick="openFicha('${s.id}')">Ficha</div>
-          <div class="btn light" onclick="assignQuick('${s.id}')">Asignar</div>
-          <div class="btn red" onclick="promptDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></div>
+        <div style="text-align:right">
+          <div style="font-size:13px;color:#06d6a0;font-weight:800">+ ${sums.pos} pts</div>
+          <div style="font-size:13px;color:#ff7b7b;font-weight:800">- ${sums.neg}</div>
         </div>
+      </div>
+
+      <div class="card-actions">
+        <button class="btn green" onclick="applyMeritToStudent('${s.id}',1)"><i class="fa-solid fa-plus"></i> Mérito</button>
+        <button class="btn red" onclick="applyFaultToStudent('${s.id}',1)"><i class="fa-solid fa-minus"></i> Falta</button>
+        <button class="btn ficha" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+        <div style="flex:1"></div>
+        <button class="btn ghost" onclick="promptDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></button>
       </div>
     `;
     grid.appendChild(el);
@@ -694,10 +660,25 @@ function promptDeleteStudent(id){
   });
 }
 
-/* assign quick helper */
-function assignQuick(id){
-  openGroupsModal();
-  setTimeout(()=> showToast('Arrastra al estudiante desde "Sin asignar" al grupo', 'info', 3000), 400);
+/* ========== Shared apply functions (central logic) ========== */
+function applyMeritToStudent(studentId, points=1){
+  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
+  if(!s) return showToast('Estudiante no encontrado','err');
+  s.history = s.history || [];
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'positive', pilar:'Mérito Rápido', magnitude: points, note: 'Aplicado desde tarjeta' });
+  s.xp = (s.xp||0) + points;
+  if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1);
+  s.level = Math.floor((s.xp||0)/20) + 1;
+  saveDB(); renderStudentGrid(); showToast(`+${points} XP a ${s.name}`,'success');
+}
+
+function applyFaultToStudent(studentId, points=1){
+  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
+  if(!s) return showToast('Estudiante no encontrado','err');
+  s.history = s.history || [];
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'negative', pilar:'Falta Rápida', magnitude: points, note: 'Aplicado desde tarjeta' });
+  s.hp = Math.max(0, s.hp - points);
+  saveDB(); renderStudentGrid(); showToast(`-${points} HP a ${s.name}`,'info');
 }
 
 /* ========== FICHA / HISTORY (kept for compatibility) ========== */
@@ -707,7 +688,7 @@ function openFicha(id){
   activeStudentId = id;
   const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
   if(!s) return showToast('Estudiante no encontrado','err');
-  // update preserved minimal header (kept for backward compat) but we'll hide it when injecting EF2
+  // update preserved minimal header (kept)
   document.getElementById('history-student-name').innerText = s.name;
   document.getElementById('history-student-avatar').innerText = s.name.charAt(0);
   document.getElementById('history-period-label').innerText = document.getElementById('period-select').value;
@@ -722,7 +703,7 @@ function openFicha(id){
   showModal('ficha-modal');
 }
 
-/* Original simple ficha history render (keeps bottom fallback) */
+/* render old ficha history for bottom area */
 function renderFichaHistory(s){
   const c = document.getElementById('ficha-history'); if(!c) return;
   c.innerHTML = '';
@@ -734,22 +715,22 @@ function renderFichaHistory(s){
     c.appendChild(d);
   });
 }
+
+/* fichaApply now delegates to shared applyMerit/applyFault when appropriate */
 function fichaApply(isPositive){
   if(!activeStudentId) return showToast('Abre la ficha primero','warn');
-  const s = (db.classes[currentClass]||[]).find(x=>x.id===activeStudentId);
-  if(!s) return showToast('Estudiante no encontrado','err');
   const points = parseInt(document.getElementById('ficha-points').value) || 1;
+  if(isPositive) applyMeritToStudent(activeStudentId, points);
+  else applyFaultToStudent(activeStudentId, points);
+  // also push history note for pilar and note text
+  const s = (db.classes[currentClass]||[]).find(x=>x.id===activeStudentId);
+  if(!s) return;
   const pilar = selectedPilar || 'General';
-  const type = isPositive ? 'positive' : 'negative';
-  const note = document.getElementById('ficha-note').value || '';
-  s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type, pilar, magnitude: points, note });
-  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); try{ confetti({ particleCount: 20 }); }catch(e){} }
-  else { s.hp = Math.max(0, s.hp - points); }
-  s.level = Math.floor((s.xp||0)/20) + 1;
+  const note = document.getElementById('ficha-note')?.value || '';
+  s.history = s.history || [];
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPositive?'positive':'negative', pilar, magnitude: points, note });
   saveDB();
-  renderStudentGrid();
   renderFichaHistory(s);
-  showToast('Registro guardado','success');
 }
 
 /* ========== ICON GRID (DEFAULT + CHARACTERS) ========== */
@@ -795,16 +776,8 @@ function openQuick(kind){
 function applyQuick(isPositive){
   const sid = document.getElementById('quick-student-select').value;
   const pts = parseInt(document.getElementById('quick-points').value) || 1;
-  const s = (db.classes[currentClass]||[]).find(x=>x.id===sid);
-  if(!s) return showToast('Selecciona estudiante','warn');
-  s.history = s.history || [];
-  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPositive?'positive':'negative', pilar:'Rápido', magnitude: pts, note:'Acción rápida' });
-  if(isPositive){ s.xp = (s.xp||0) + pts; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); } else { s.hp = Math.max(0, s.hp - pts); }
-  s.level = Math.floor((s.xp||0)/20) + 1;
-  saveDB();
+  if(isPositive) applyMeritToStudent(sid, pts); else applyFaultToStudent(sid, pts);
   hideModal('quick-modal');
-  renderStudentGrid();
-  showToast('Acción aplicada','success');
 }
 
 /* ========== GROUPS / SUBGROUPS (consolidated manager) ========== */
@@ -859,32 +832,6 @@ function moveToGroup(studentId, groupKey){
   renderGroupsColumns();
   renderStudentGrid();
   showToast('Asignación actualizada','success');
-}
-
-/* Distribution helpers used by injected UI (see later) */
-function distributeGroupsByNumber(){
-  const n = parseInt(prompt('Número de grupos:'));
-  if(!n || n<1) return showToast('Número inválido','warn');
-  const grade = currentClass;
-  const ids = (db.classes[grade]||[]).map(s=>s.id);
-  if(!ids.length) return showToast('No hay estudiantes','warn');
-  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-  db.groups[grade] = db.groups[grade] || {};
-  for(let i=1;i<=n;i++) db.groups[grade][`Grupo ${i}`] = [];
-  for(let i=0;i<ids.length;i++){ const g=`Grupo ${ (i % n)+1}`; db.groups[grade][g].push(ids[i]); }
-  saveDB(); renderGroupsColumns(); showToast('Distribuido por número','success');
-}
-function distributeGroupsBySize(){
-  const size = parseInt(prompt('Tamaño por grupo:'));
-  if(!size || size<1) return showToast('Tamaño inválido','warn');
-  const grade = currentClass;
-  const ids=(db.classes[grade]||[]).map(s=>s.id);
-  if(!ids.length) return showToast('No hay estudiantes','warn');
-  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
-  db.groups[grade] = db.groups[grade] || {};
-  Object.keys(db.groups[grade]||{}).forEach(k => { if(k.startsWith('Grupo ')) delete db.groups[grade][k]; });
-  let idx=0,g=1; while(idx<ids.length){ db.groups[grade][`Grupo ${g}`] = ids.slice(idx,idx+size); idx+=size; g++; }
-  saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño','success');
 }
 
 /* ========== EXPORTS (XLSX) ========== */
@@ -1088,128 +1035,152 @@ function wireToolsPanelButtons(){
   }
 }
 
-/* ================= STYLE PRESETS: guardado y aplicación dinámica ================= */
+/* ========== CLASS PANEL implementation ========== */
+function openClassPanel(){
+  buildClassPanel(); showModal('class-panel-modal');
+}
 
-function getDefaultStylePrefs(){
-  return {
-    inputText: 'light',   // 'light' => texto claro, 'dark' => texto oscuro
-    inputBg: 'dark',      // 'dark' => fondo oscuro, 'light' => fondo claro
-    borderColor: '#0b4db8',
-    fontFamily: "Inter, system-ui, sans-serif",
-    fontSize: '14px'
+function buildClassPanel(){
+  const container = document.getElementById('class-panel-students');
+  if(!container) return;
+  container.innerHTML = '';
+  if(!currentClass) return;
+  const students = db.classes[currentClass] || [];
+  students.forEach(s => {
+    const wrapper = document.createElement('div');
+    wrapper.style.display = 'flex';
+    wrapper.style.alignItems = 'center';
+    wrapper.style.justifyContent = 'space-between';
+    wrapper.style.padding = '8px';
+    wrapper.style.borderBottom = '1px solid rgba(0,0,0,0.06)';
+
+    const left = document.createElement('div');
+    left.style.display = 'flex'; left.style.alignItems='center'; left.style.gap='12px';
+    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid = s.id;
+    chk.style.width='18px'; chk.style.height='18px';
+    const avatar = document.createElement('div'); avatar.style.width='40px'; avatar.style.height='40px'; avatar.style.borderRadius='8px'; avatar.style.display='flex'; avatar.style.alignItems='center'; avatar.style.justifyContent='center';
+    avatar.style.background = avatarGradient(s.name); avatar.style.color='#ffd88a'; avatar.style.fontWeight='800';
+    avatar.innerText = s.name.charAt(0);
+    const info = document.createElement('div');
+    info.innerHTML = `<div style="font-weight:800">${s.name}</div><div style="color:var(--muted);font-size:13px">Grado ${currentClass}</div>`;
+
+    left.appendChild(chk); left.appendChild(avatar); left.appendChild(info);
+
+    const right = document.createElement('div');
+    right.style.display='flex'; right.style.gap='8px'; right.style.alignItems='center';
+    const btnProfile = document.createElement('button'); btnProfile.className='btn ficha'; btnProfile.innerHTML = '<i class="fa-solid fa-folder-open"></i>'; btnProfile.onclick = ()=> openFicha(s.id);
+    right.appendChild(btnProfile);
+
+    wrapper.appendChild(left); wrapper.appendChild(right);
+    container.appendChild(wrapper);
+  });
+
+  // populate pilar select
+  const pilarSel = document.getElementById('class-panel-pilar-select');
+  if(pilarSel){
+    pilarSel.innerHTML = '';
+    const all = [...DEFAULT_ICONS, ...(db.characters||[]) ].map(x => ({ key: x.key||x.name, icon: x.icon||x.emoji, type: x.type || x.type }));
+    all.forEach(b => {
+      const opt = document.createElement('option'); opt.value = b.key; opt.textContent = `${b.icon} ${b.key}`; pilarSel.appendChild(opt);
+    });
+  }
+
+  // show/hide pilar row depending on action selection
+  document.getElementById('class-panel-action-type').onchange = function(){
+    const val = this.value;
+    document.getElementById('class-panel-pilar-row').style.display = (val === 'pilar') ? 'block' : 'none';
   };
 }
 
-function applyStyleSettings(styles){
-  if(!styles) styles = (db.institution && db.institution.styles) ? db.institution.styles : getDefaultStylePrefs();
+/* helper: select all / clear in class panel */
+function classPanelSelectAll(val){
+  const container = document.getElementById('class-panel-students');
+  if(!container) return;
+  container.querySelectorAll('input[type=checkbox]').forEach(cb => cb.checked = !!val);
+}
 
-  const inputText = styles.inputText === 'dark' ? '#222222' : '#e6eef6';
-  const inputBg = styles.inputBg === 'light' ? '#ffffff' : 'rgba(255,255,255,0.03)';
-  const border = styles.borderColor || '#0b4db8';
-  const fontFamily = styles.fontFamily || getDefaultStylePrefs().fontFamily;
-  const fontSize = styles.fontSize || getDefaultStylePrefs().fontSize;
-  const placeholderColor = (styles.inputText === 'dark') ? 'rgba(34,34,34,0.45)' : 'rgba(230,238,246,0.6)';
-
-  const css = `
-  /* user overrides injected by settings */
-  .modal:not(.white) input,
-  .modal:not(.white) textarea,
-  .modal:not(.white) select,
-  .modal:not(.white) .ef2-input {
-    background: ${inputBg} !important;
-    color: ${inputText} !important;
-    border: 1px solid ${border} !important;
-    padding: 8px !important;
-    border-radius: 8px !important;
-    box-sizing: border-box !important;
-    font-family: ${fontFamily} !important;
-    font-size: ${fontSize} !important;
+/* preview action */
+function previewClassPanelAction(){
+  const type = document.getElementById('class-panel-action-type').value;
+  const points = parseInt(document.getElementById('class-panel-points').value) || 1;
+  const op = document.getElementById('class-panel-op').value;
+  const scope = document.getElementById('class-panel-scope').value;
+  const pilar = document.getElementById('class-panel-pilar-select')?.value || '';
+  let targets = [];
+  const container = document.getElementById('class-panel-students');
+  container && container.querySelectorAll('input[type=checkbox]').forEach(cb => { if(cb.checked) targets.push(cb.dataset.sid); });
+  if(scope === 'all') targets = (db.classes[currentClass]||[]).map(s=>s.id);
+  if(scope === 'ungrouped'){
+    const assigned = new Set(); const groups = db.groups[currentClass] || {};
+    Object.keys(groups).forEach(g => (groups[g]||[]).forEach(id => assigned.add(id)));
+    targets = (db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id);
   }
-  .modal input.dark-text,
-  .modal textarea.dark-text,
-  .modal select.dark-text {
-    background: #ffffff !important;
-    color: #222222 !important;
-    border: 3px solid ${border} !important;
-    font-family: ${fontFamily} !important;
-    font-size: ${fontSize} !important;
-  }
-  .modal:not(.white) input::placeholder,
-  .modal:not(.white) textarea::placeholder,
-  .modal:not(.white) select::placeholder {
-    color: ${placeholderColor} !important;
-  }
-  `;
-
-  let styleTag = document.getElementById('user-style-overrides');
-  if(!styleTag){
-    styleTag = document.createElement('style');
-    styleTag.id = 'user-style-overrides';
-    document.head.appendChild(styleTag);
-  }
-  styleTag.textContent = css;
-
-  // actualizar preview si existe
-  const previewInput = document.querySelector('#inst-style-preview input');
-  if(previewInput){
-    previewInput.style.background = inputBg;
-    previewInput.style.color = inputText;
-    previewInput.style.borderColor = border;
-    previewInput.style.fontFamily = fontFamily;
-    previewInput.style.fontSize = fontSize;
+  const preview = document.getElementById('class-panel-preview');
+  if(!targets.length) preview.innerText = 'No hay estudiantes seleccionados.';
+  else {
+    preview.innerText = `${op === 'add' ? 'Agregar' : 'Restar'} ${points} ${type.toUpperCase()} a ${targets.length} estudiante(s).` + (type==='pilar' ? ` Pilar: ${pilar}` : '');
   }
 }
 
-function saveStyleSettings(){
-  const inputText = document.getElementById('inst-input-text')?.value || 'light';
-  const inputBg = document.getElementById('inst-input-bg')?.value || 'dark';
-  const borderColor = document.getElementById('inst-border-color')?.value || '#0b4db8';
-  const fontFamily = document.getElementById('inst-font-family')?.value || getDefaultStylePrefs().fontFamily;
-  const fontSize = (document.getElementById('inst-font-size')?.value || '14') + 'px';
+/* apply action */
+function applyClassPanelAction(){
+  const type = document.getElementById('class-panel-action-type').value;
+  const points = parseInt(document.getElementById('class-panel-points').value) || 1;
+  const op = document.getElementById('class-panel-op').value;
+  const scope = document.getElementById('class-panel-scope').value;
+  const pilar = document.getElementById('class-panel-pilar-select')?.value || '';
 
-  db.institution = db.institution || {};
-  db.institution.styles = { inputText, inputBg, borderColor, fontFamily, fontSize };
-  saveDB();
-  applyStyleSettings(db.institution.styles);
-  showToast('Preferencias de estilo guardadas', 'success', 2200);
-}
+  let targets = [];
+  const container = document.getElementById('class-panel-students');
+  container && container.querySelectorAll('input[type=checkbox]').forEach(cb => { if(cb.checked) targets.push(cb.dataset.sid); });
 
-function loadStyleControls(){
-  const styles = (db.institution && db.institution.styles) ? db.institution.styles : getDefaultStylePrefs();
-  document.getElementById('inst-input-text') && (document.getElementById('inst-input-text').value = styles.inputText || 'light');
-  document.getElementById('inst-input-bg') && (document.getElementById('inst-input-bg').value = styles.inputBg || 'dark');
-  document.getElementById('inst-border-color') && (document.getElementById('inst-border-color').value = styles.borderColor || '#0b4db8');
-  document.getElementById('inst-font-family') && (document.getElementById('inst-font-family').value = styles.fontFamily || getDefaultStylePrefs().fontFamily);
-  document.getElementById('inst-font-size') && (document.getElementById('inst-font-size').value = parseInt(styles.fontSize) || 14);
+  if(scope === 'all') targets = (db.classes[currentClass]||[]).map(s=>s.id);
+  if(scope === 'ungrouped'){
+    const assigned = new Set(); const groups = db.groups[currentClass] || {};
+    Object.keys(groups).forEach(g => (groups[g]||[]).forEach(id => assigned.add(id)));
+    targets = (db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id);
+  }
+  if(!targets.length) return showToast('No hay estudiantes objetivo','warn');
 
-  applyStyleSettings(styles);
-
-  // actualiza preview en tiempo real al cambiar controles
-  ['inst-input-text','inst-input-bg','inst-border-color','inst-font-family','inst-font-size'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.oninput = () => {
-      // leer valores temporales y aplicar sin guardar
-      const tmp = {
-        inputText: document.getElementById('inst-input-text').value,
-        inputBg: document.getElementById('inst-input-bg').value,
-        borderColor: document.getElementById('inst-border-color').value,
-        fontFamily: document.getElementById('inst-font-family').value,
-        fontSize: (document.getElementById('inst-font-size').value || 14) + 'px'
-      };
-      applyStyleSettings(tmp);
-    };
+  // for each target, apply
+  targets.forEach(id => {
+    const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
+    if(!s) return;
+    if(type === 'xp'){
+      const delta = (op === 'add') ? points : -points;
+      s.xp = (s.xp||0) + delta;
+      if(s.xp < 0) s.xp = 0;
+      s.level = Math.floor((s.xp||0)/20) + 1;
+      s.history = s.history || [];
+      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0 ? 'positive' : 'negative', pilar: 'XP Clase', magnitude: Math.abs(delta), note: `Aplicado desde Panel de Clase` });
+    } else if(type === 'gold'){
+      const delta = (op === 'add') ? points : -points;
+      s.gold = (s.gold||0) + delta;
+      if(s.gold < 0) s.gold = 0;
+      s.history = s.history || [];
+      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0 ? 'positive' : 'negative', pilar: 'ORO Clase', magnitude: Math.abs(delta), note: `Aplicado desde Panel de Clase` });
+    } else if(type === 'hp'){
+      const delta = (op === 'add') ? points : -points;
+      s.hp = (s.hp||HP_MAX) + delta;
+      s.hp = Math.max(0, Math.min(HP_MAX, s.hp));
+      s.history = s.history || [];
+      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0 ? 'positive' : 'negative', pilar: 'HP Clase', magnitude: Math.abs(delta), note: `Aplicado desde Panel de Clase` });
+    } else if(type === 'pilar'){
+      const isPositive = (op === 'add');
+      s.history = s.history || [];
+      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: pilar || 'Pilar', magnitude: points, note: `Aplicado desde Panel de Clase` });
+      if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); s.level = Math.floor((s.xp||0)/20) + 1; }
+      else { s.hp = Math.max(0, s.hp - points); }
+    }
   });
+
+  saveDB();
+  renderStudentGrid();
+  showToast('Acción aplicada a ' + targets.length + ' estudiante(s)','success');
+  hideModal('class-panel-modal');
 }
 
-/* hook: cuando se abre el modal de institución, cargamos controles */
-const originalOpenInstitutionModal = openInstitutionModal;
-window.openInstitutionModal = function(){
-  try{ originalOpenInstitutionModal(); }catch(e){}
-  setTimeout(()=> { loadStyleControls(); }, 40);
-};
-
-/* ========== CONSOLIDATED: Enhanced Ficha UI injection (updated with Gamificación tab + Class Actions) ========== */
+/* ========== CHARACTERS & Ficha injection (kept earlier) ========== */
 (function enhancedFichaInjection(){
   const HP_DEFAULT = 5;
 
@@ -1227,9 +1198,9 @@ window.openInstitutionModal = function(){
   function buildEnhancedFichaUI(){
     const content = findModalContent();
     if(!content) return;
-    if(content.querySelector('#ef2-ficha')) return; // already injected
+    if(content.querySelector('#ef2-ficha')) return;
 
-    // hide the original minimal header to avoid duplicate name
+    // hide initial header to avoid duplication
     const initialHeader = content.querySelector('#ficha-initial-header');
     if(initialHeader) initialHeader.style.display = 'none';
 
@@ -1378,20 +1349,8 @@ window.openInstitutionModal = function(){
               <div class="ef2-small">Acciones rápidas</div>
             </div>
 
-            <!-- Class actions: apply XP / Gold to class or groups -->
-            <div style="margin-top:10px">
-              <div style="font-weight:700;margin-bottom:6px">Acciones de clase</div>
-              <div style="display:flex;gap:8px;margin-bottom:8px">
-                <input id="class-action-points" type="number" value="1" class="ef2-input" style="width:84px">
-                <select id="class-action-target" class="ef2-input" style="flex:1">
-                  <option value="all">Todo el curso</option>
-                  <option value="ungrouped">Sin asignar</option>
-                </select>
-              </div>
-              <div style="display:flex;gap:8px;justify-content:space-between">
-                <button class="ef2-btn primary" onclick="applyClassAction('xp')">+ XP Clase</button>
-                <button class="ef2-btn" onclick="applyClassAction('gold')">+ Oro Clase</button>
-              </div>
+            <div style="margin-top:10px;color:#475569">
+              El panel de clase ahora es independiente. Puedes abrirlo desde Herramientas → Panel de Clase para aplicar acciones masivas y gestionar la clase rápidamente.
             </div>
 
             <hr style="margin:12px 0">
@@ -1412,7 +1371,7 @@ window.openInstitutionModal = function(){
       </div>
     `;
 
-    // insert after initial header (which we hid)
+    // insert into modal content
     content.appendChild(container);
 
     // fill behavior select with DEFAULT_ICONS + custom characters
@@ -1493,27 +1452,7 @@ window.openInstitutionModal = function(){
       applyBehaviorToScope(behavior, type, points, scope);
     });
 
-    // class action handlers
-    window.applyClassAction = function(kind){
-      const pts = parseInt(document.getElementById('class-action-points').value) || 1;
-      const target = document.getElementById('class-action-target').value;
-      if(!currentClass) return showToast('Selecciona un grado','warn');
-      let ids = [];
-      if(target === 'all'){ ids = (db.classes[currentClass]||[]).map(s=>s.id); }
-      else if(target === 'ungrouped'){ const groups = db.groups[currentClass] || {}; const assigned = new Set(); Object.keys(groups).forEach(g => (groups[g]||[]).forEach(id => assigned.add(id))); ids = (db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); }
-      if(!ids.length) return showToast('No hay estudiantes objetivos','warn');
-      ids.forEach(id=>{
-        const s = (db.classes[currentClass]||[]).find(x=>x.id===id);
-        if(!s) return;
-        if(kind === 'xp'){ s.xp = (s.xp||0) + pts; s.level = Math.floor((s.xp||0)/20) + 1; }
-        else if(kind === 'gold'){ s.gold = (s.gold||0) + pts; }
-        // add history note for traceability
-        s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'positive', pilar: kind === 'xp' ? 'XP Clase' : 'Oro Clase', magnitude: pts, note: `Aplicado a ${target}` });
-      });
-      saveDB(); renderStudentGrid(); showToast('Acción de clase aplicada','success');
-    };
-
-    // rebuild character/behavior select when characters change (expose function)
+    // update behavior select exposed
     window.refreshBehaviorSelect = rebuildBehaviorSelect;
   } // end buildEnhancedFichaUI
 
