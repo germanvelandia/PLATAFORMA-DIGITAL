@@ -28,6 +28,18 @@ header{background:linear-gradient(180deg,#07121a,#061019);padding:12px;border-bo
 .menu-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid var(--glass-border);padding:8px;border-radius:10px;box-shadow:0 12px 30px rgba(0,0,0,0.6);display:none;min-width:220px;z-index:140}
 .menu-panel button{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:transparent;border:0;color:inherit;width:100%;text-align:left;cursor:pointer}
 
+/* Mostrar panel cuando el contenedor .menu tiene la clase "open" */
+.menu.open .menu-panel {
+  display: block;
+  animation: ef-menu-fade .14s ease;
+}
+
+/* pequeña animación */
+@keyframes ef-menu-fade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 /* Layout */
 main{max-width:1200px;margin:18px auto;padding:18px}
 .metrics{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:12px}
@@ -73,7 +85,7 @@ main{max-width:1200px;margin:18px auto;padding:18px}
 .member{padding:8px;border-radius:8px;background:rgba(0,0,0,0.45);margin-bottom:8px;cursor:grab}
 
 /* Toasts */
-#toast-container{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:400}
+#toast-container{position:fixed;right:18px;bottom:18px;Display:flex;flex-direction:column;gap:8px;z-index:400}
 .toast{background:rgba(0,0,0,0.8);color:#fff;padding:10px 14px;border-radius:8px;min-width:200px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;align-items:center;gap:10px}
 .toast.success{background:linear-gradient(90deg,var(--accent-green),#059669)}
 .toast.info{background:linear-gradient(90deg,#0ea5e9,#0284c7)}
@@ -102,35 +114,35 @@ main{max-width:1200px;margin:18px auto;padding:18px}
       <div id="menu-tools" class="menu">
         <div class="menu-button" onclick="toggleMenu('menu-tools')">Herramientas ▾</div>
         <div class="menu-panel">
-          <button onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i> Cronómetro</button>
-          <button onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i> Ruleta</button>
-          <button onclick="openDiceModal()"><i class="fa-solid fa-dice"></i> Dado</button>
-          <button id="tools-settings-btn"><i class="fa-solid fa-cog"></i> Ajustes</button>
-          <button id="tools-groups-btn"><i class="fa-solid fa-users"></i> Grupos</button>
+          <button type="button" onclick="openTimerModal()"><i class="fa-solid fa-stopwatch"></i> Cronómetro</button>
+          <button type="button" onclick="openRouletteModal()"><i class="fa-solid fa-spinner"></i> Ruleta</button>
+          <button type="button" onclick="openDiceModal()"><i class="fa-solid fa-dice"></i> Dado</button>
+          <button type="button" id="tools-settings-btn"><i class="fa-solid fa-cog"></i> Ajustes</button>
+          <button type="button" id="tools-groups-btn"><i class="fa-solid fa-users"></i> Grupos</button>
         </div>
       </div>
 
       <div id="menu-classes" class="menu">
         <div class="menu-button" onclick="toggleMenu('menu-classes')">Clases ▾</div>
         <div class="menu-panel">
-          <button id="classes-grades-btn"><i class="fa-solid fa-layer-group"></i> Grados</button>
-          <button onclick="openDeleteGradePrompt()"><i class="fa-solid fa-trash-can"></i> Borrar grado</button>
+          <button type="button" id="classes-grades-btn"><i class="fa-solid fa-layer-group"></i> Grados</button>
+          <button type="button" onclick="openDeleteGradePrompt && openDeleteGradePrompt()"><i class="fa-solid fa-trash-can"></i> Borrar grado</button>
         </div>
       </div>
 
       <div id="menu-chars" class="menu">
         <div class="menu-button" onclick="toggleMenu('menu-chars')">Caracteres ▾</div>
         <div class="menu-panel">
-          <button onclick="openCharactersModal()"><i class="fa-solid fa-user-gear"></i> Administrar caracteres</button>
-          <button onclick="openQuick('positive')"><i class="fa-solid fa-thumbs-up"></i> Puntos positivos</button>
-          <button onclick="openQuick('negative')"><i class="fa-solid fa-thumbs-down"></i> Puntos negativos</button>
+          <button type="button" onclick="openCharactersModal()"><i class="fa-solid fa-user-gear"></i> Administrar caracteres</button>
+          <button type="button" onclick="openQuick('positive')"><i class="fa-solid fa-thumbs-up"></i> Puntos positivos</button>
+          <button type="button" onclick="openQuick('negative')"><i class="fa-solid fa-thumbs-down"></i> Puntos negativos</button>
         </div>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center;margin-left:8px">
         <div class="menu-button">
           <i class="fa-solid fa-calendar-days"></i>
-          <select id="period-select" class="muted-select" onchange="switchPeriod(this.value)">
+          <select id="period-select" class="muted-select" onchange="switchPeriod && switchPeriod(this.value)">
             <option value="ALL">Todo el Año</option>
             <option value="P1" selected>Periodo 1</option>
             <option value="P2">Periodo 2</option>
@@ -447,6 +459,9 @@ function toggleMenu(id){
   el.classList.toggle('open');
 }
 document.addEventListener('click', (e) => { if(!e.target.closest('.menu')) document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')); });
+
+/* Close menus with Escape */
+document.addEventListener('keydown', (e) => { if(e.key === 'Escape') document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')); });
 
 /* ========== UTILS ========== */
 function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
@@ -973,8 +988,7 @@ function wireToolsPanelButtons(){
             <input id="ef2_course" class="ef2-input" placeholder="Curso" readonly style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6">
             <input id="ef2_group" class="ef2-input" placeholder="Grupo" readonly style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6e6e6">
           </div>
-          <input id="ef2_birth" type="date" class="ef2-input" style="width:100%;padding:8px;border-radius:8px;border:1px
-                      :1px solid #e6e6e6">
+          <input id="ef2_birth" type="date" class="ef2-input" style="width:100%;padding:8px;border-radius:8px;border:1px solid #e6e6e6">
             <div style="height:6px"></div>
             <div style="font-weight:800;margin-bottom:8px">Contacto acudientes</div>
             <input id="ef2_parent" class="ef2-input" placeholder="Nombres acudientes" style="margin-bottom:8px">
