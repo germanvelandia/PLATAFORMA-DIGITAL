@@ -1310,5 +1310,10 @@ function wireToolsPanelButtons(){
   border: none;
   text-align: left;
 }
+  /* Inicio: mejora contraste de inputs en modales / .modal:not(.white) input, .modal:not(.white) textarea, .modal:not(.white) select { background: rgba(255,255,255,0.03) !important; / fondo tenue por defecto / color: #e6eef6 !important; / texto claro por defecto */ border: 1px solid rgba(255,255,255,0.06) !important; padding: 8px !important; border-radius: 8px !important; width: 100% !important; box-sizing: border-box !important; }
+
+/* Si quieres forzar texto oscuro (para inputs con fondo blanco) añade la clase .dark-text / .modal input.dark-text, .modal textarea.dark-text, .modal select.dark-text { background: #ffffff !important; color: #222222 !important; / tono más oscuro para la letra / border: 3px solid #0b4db8 !important; / borde azul similar al que muestras (ajústalo si quieres) */ padding: 10px !important; border-radius: 10px !important; }
+
+/* Placeholder legible / .modal:not(.white) input::placeholder, .modal:not(.white) textarea::placeholder { color: rgba(230,238,246,0.6) !important; } / Fin: mejora contraste de inputs en modales */
 </body>
 </html>
