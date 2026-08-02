@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- html2pdf for direct PDF generation -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 :root{
@@ -127,7 +129,9 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
         <button onclick="openDiceModal()">Dado</button><br>
         <button onclick="openClassPanel()">Panel de Clase</button><br>
         <button onclick="openGroupsModal()">Gestión de Grupos</button><br>
-        <button onclick="openGradesModal()">Administrar Grados</button>
+        <button onclick="openGradesModal()">Administrar Grados</button><br>
+        <button onclick="openLeaderboard()">Tabla de Clasificación</button><br>
+        <button onclick="openInstitutionSettings()">Ajustes</button>
       </div>
     </div>
 
@@ -174,7 +178,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 <!-- Toasts -->
 <div id="toast-container"></div>
 
-<!-- Modals -->
+<!-- Modals (kept & extended) -->
 <div id="class-panel-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('class-panel-modal')">
   <div class="modal" style="max-width:1000px">
     <button class="close-btn" onclick="hideModal('class-panel-modal')">✕</button>
@@ -520,6 +524,45 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   </div>
 </div>
 
+<!-- Leaderboard modal -->
+<div id="leaderboard-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('leaderboard-modal')">
+  <div class="modal white" style="max-width:820px">
+    <button class="close-btn" onclick="hideModal('leaderboard-modal')">✕</button>
+    <h3>Tabla de Clasificación</h3>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+      <label style="color:#666">Top</label>
+      <input id="leaderboard-top-n" type="number" value="10" style="width:70px;padding:6px;border-radius:6px;border:1px solid #eee">
+      <select id="leaderboard-mode" class="ef2-input" style="width:160px">
+        <option value="full">Completo</option>
+        <option value="anonym">Anónimo</option>
+        <option value="teams">Por equipos</option>
+      </select>
+      <button class="action-btn" onclick="renderLeaderboard()">Actualizar</button>
+    </div>
+    <div id="leaderboard-area" style="margin-top:12px"></div>
+  </div>
+</div>
+
+<!-- Institution settings modal -->
+<div id="institution-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('institution-modal')">
+  <div class="modal white" style="max-width:720px">
+    <button class="close-btn" onclick="hideModal('institution-modal')">✕</button>
+    <h3>Ajustes institucionales</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <label>Nombre de la aplicación</label><input id="inst-app-name" class="ef2-input">
+      <label>Subtítulo</label><input id="inst-subtitle" class="ef2-input">
+      <label>Logo (2-4 caracteres)</label><input id="inst-logo-text" class="ef2-input" style="width:160px">
+      <label>Color primario (hex)</label><input id="inst-color-primary" class="ef2-input" placeholder="#0ea5e9">
+      <label>Fuente (familia CSS)</label><input id="inst-font" class="ef2-input" placeholder="Inter, system-ui">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button class="action-btn" onclick="loadInstitutionDefaults()">Restaurar</button>
+      <button class="action-btn merit" onclick="saveInstitutionSettings()">Guardar</button>
+      <button class="action-btn" onclick="hideModal('institution-modal')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm modal -->
 <div id="confirm-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('confirm-modal')">
   <div class="modal" style="max-width:420px">
@@ -535,7 +578,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 
 <script>
 /* =========================
-   STATE & DEFAULTS
+   STATE & DEFAULTS (keeps your STORAGE_KEY & structure)
    ========================= */
 const STORAGE_KEY = 'fantasyclass_alm_db';
 const HP_MAX = 5;
@@ -594,6 +637,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderStudentGrid();
   wireMenus();
   refreshBehaviorSelects();
+  renderCharactersList(); // initial render
+  renderGradesList();
+  renderHeaderFromInstitution(); // apply institution settings if any
 });
 
 /* ========== MENU UTILS ========== */
@@ -658,6 +704,7 @@ function renderStudentGrid(){
             <button class="action-btn merit" onclick="applyMeritToStudent('${s.id}',1)"><i class="fa-solid fa-plus"></i> Mérito</button>
             <button class="action-btn fault" onclick="applyFaultToStudent('${s.id}',1)"><i class="fa-solid fa-minus"></i> Falta</button>
             <button class="action-btn ficha" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+            <button class="action-btn" title="Editar nombre" onclick="editStudentNamePrompt('${s.id}')"><i class="fa-solid fa-pen"></i></button>
           </div>
         </div>
       </div>
@@ -672,9 +719,10 @@ function renderStudentGrid(){
   updateMetrics();
 }
 
-/* ========== Add/Delete Student ========== */
-function openAddStudentModal(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[] }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
+/* ========== Add/Delete/Edit Student ========== */
+function openAddStudentModal(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], badges:[] }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
 function promptDeleteStudent(id){ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado','err'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado','success'); }); }
+function editStudentNamePrompt(id){ const found = findStudentById(id); if(!found) return showToast('No encontrado','err'); const s = found.student; const newName = prompt('Editar nombre', s.name); if(!newName) return; s.name = newName; saveDB(); renderStudentGrid(); if(activeStudentId===id) fillFicha(id); showToast('Nombre actualizado','success'); }
 
 /* ========== APPLY MERIT / FAULT ========== */
 function applyMeritToStudent(studentId, points=1){
@@ -714,11 +762,12 @@ function buildEF2(){
             <div style="display:flex;gap:8px;margin-top:8px"><input id="ef2_doc" class="ef2-input" placeholder="Documento"> <input id="ef2_birth" type="date" class="ef2-input"></div>
             <div style="margin-top:8px"><input id="ef2_parent" class="ef2-input" placeholder="Acudiente / padre"></div>
             <div style="display:flex;gap:8px;margin-top:8px"><input id="ef2_phone" class="ef2-input" placeholder="Teléfono"><input id="ef2_email" class="ef2-input" placeholder="Email"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><button class="action-btn ficha" onclick="saveFichaPersonal()">Guardar datos</button></div>
           </div></div>
 
         <div class="details-accord"><summary>2 • Actas</summary>
           <div class="body">
-            <div style="margin-bottom:8px"><button class="action-btn fiche" onclick="openActaModal()">Crear / Rellenar Acta</button></div>
+            <div style="margin-bottom:8px"><button class="action-btn ficha" onclick="openActaModal()">Crear / Rellenar Acta</button></div>
             <div id="ef2-actas-list" style="max-height:220px;overflow:auto"></div>
           </div></div>
 
@@ -778,7 +827,7 @@ function fillFicha(studentId){
   // actas
   const actasList = document.getElementById('ef2-actas-list'); actasList.innerHTML = '';
   (s.actas||[]).slice().reverse().forEach(a=>{
-    const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML = `<div style="font-weight:800">${a.numero||''} • ${a.fecha} ${a.hora||''}</div><div style="color:#475569">${a.descripcion?.slice(0,180) || ''}</div><div style="margin-top:6px"><button class="action-btn ficha" onclick='previewActa("${a.id}")'>Ver / Imprimir</button></div>`;
+    const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML = `<div style="font-weight:800">${a.numero||''} • ${a.fecha} ${a.hora||''}</div><div style="color:#475569">${(a.descripcion||'').slice(0,180) || ''}</div><div style="margin-top:6px"><button class="action-btn ficha" onclick='previewActa("${a.id}")'>Ver / Imprimir</button> <button class="action-btn" onclick='downloadActaPDF("${a.id}")'>Descargar PDF</button></div>`;
     actasList.appendChild(el);
   });
 
@@ -798,7 +847,22 @@ function fillFicha(studentId){
   refreshBehaviorSelects();
 }
 
-/* ========== ACTA (save/print) ========== */
+/* Save personal info inside ficha */
+function saveFichaPersonal(){
+  if(!activeStudentId) return showToast('Abre ficha primero','warn');
+  const found = findStudentById(activeStudentId);
+  if(!found) return showToast('No encontrado','err');
+  const s = found.student;
+  s.name = document.getElementById('ef2_name').value || s.name;
+  s.document = document.getElementById('ef2_doc').value || s.document;
+  s.birthdate = document.getElementById('ef2_birth').value || s.birthdate;
+  s.acudiente = s.acudiente || {};
+  s.acudiente.name = document.getElementById('ef2_parent').value || s.acudiente.name;
+  s.acudiente.phone = document.getElementById('ef2_phone').value || s.acudiente.phone;
+  saveDB(); renderStudentGrid(); fillFicha(activeStudentId); showToast('Datos guardados','success');
+}
+
+/* ========== ACTA (save/print/pdf) ========== */
 function openActaModal(){
   if(!activeStudentId) return showToast('Abre la ficha del estudiante primero','warn');
   const found = findStudentById(activeStudentId);
@@ -865,6 +929,7 @@ function saveActaDraft(){
   found.student.actas.push(acta);
   saveDB();
   hideModal('acta-modal');
+  fillFicha(activeStudentId);
   showToast('Acta guardada','success');
 }
 function saveActaAndPrint(){
@@ -874,7 +939,7 @@ function saveActaAndPrint(){
   previewActa(acta.id);
 }
 
-/* build printable acta HTML and print */
+/* build printable acta HTML and print or export PDF */
 function buildPrintableActa(acta, inst){
   const logoText = inst && inst.logoText ? inst.logoText : 'ALM';
   const appName = inst && inst.appName ? inst.appName : 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED';
@@ -885,13 +950,13 @@ function buildPrintableActa(acta, inst){
   html += `<div><strong>Acta No.:</strong> ${acta.numero || '---'} &nbsp;&nbsp; <strong>Fecha:</strong> ${acta.fecha || ''} <strong>Hora:</strong> ${acta.hora || ''}</div>`;
   html += `<div class="section"><h2>1. Información General</h2><div><strong>Lugar:</strong> ${acta.lugar || ''}</div></div>`;
   html += `<div class="section"><h2>2. Datos del estudiante</h2><div><strong>Nombre:</strong> ${acta.estudiante.nombre || ''}</div><div><strong>Documento:</strong> ${acta.estudiante.documento || ''}</div><div><strong>Curso:</strong> ${acta.estudiante.curso || ''}</div></div>`;
-  html += `<div class="section"><h2>3. Descripción de la situación</h2><div>${acta.descripcion.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>3. Descripción de la situación</h2><div>${(acta.descripcion||'').replace(/\n/g,'<br>')}</div></div>`;
   html += `<div class="section"><h2>4. Personas involucradas</h2><div>${Object.entries(acta.involucrados).map(([k,v])=> v ? k : null).filter(Boolean).join(', ')}</div></div>`;
   html += `<div class="section"><h2>5. Clasificación</h2><div>${acta.clasificacion.t1? 'Situación Tipo I':''} ${acta.clasificacion.t2? 'Situación Tipo II':''} ${acta.clasificacion.t3? 'Situación Tipo III':''} <div>Manual numeral: ${acta.clasificacion.numeral || ''}</div></div></div>`;
-  html += `<div class="section"><h2>6. Descargos del estudiante</h2><div>${acta.descargos.replace(/\n/g,'<br>')}</div></div>`;
-  html += `<div class="section"><h2>7. Intervención del acudiente</h2><div>${acta.intervencion_acudiente.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>6. Descargos del estudiante</h2><div>${(acta.descargos||'').replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>7. Intervención del acudiente</h2><div>${(acta.intervencion_acudiente||'').replace(/\n/g,'<br>')}</div></div>`;
   html += `<div class="section"><h2>8. Acciones pedagógicas</h2><ul>`;
-  const acc = acta.acciones;
+  const acc = acta.acciones || {};
   if(acc.reflexion) html += '<li>Reflexión escrita</li>';
   if(acc.disculpas) html += '<li>Presentación de disculpas</li>';
   if(acc.restaurativa) html += '<li>Actividad restaurativa</li>';
@@ -901,9 +966,9 @@ function buildPrintableActa(acta, inst){
   if(acc.comite) html += '<li>Remisión al Comité Escolar</li>';
   if(acc.otra) html += `<li>Otra: ${acc.otra}</li>`;
   html += `</ul></div>`;
-  html += `<div class="section"><h2>9. Compromisos</h2><div><strong>Del estudiante:</strong><div>${acta.compromisos.estudiante.replace(/\n/g,'<br>')}</div></div><div><strong>Del padre/acudiente:</strong><div>${acta.compromisos.padre.replace(/\n/g,'<br>')}</div></div></div>`;
+  html += `<div class="section"><h2>9. Compromisos</h2><div><strong>Del estudiante:</strong><div>${(acta.compromisos.estudiante||'').replace(/\n/g,'<br>')}</div></div><div><strong>Del padre/acudiente:</strong><div>${(acta.compromisos.padre||'').replace(/\n/g,'<br>')}</div></div></div>`;
   html += `<div class="section"><h2>10. Fecha de seguimiento</h2><div>${acta.seguimiento.fecha || ''} — Responsable: ${acta.seguimiento.responsable || ''}</div></div>`;
-  html += `<div class="section"><h2>11. Observaciones</h2><div>${acta.observaciones.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>11. Observaciones</h2><div>${(acta.observaciones||'').replace(/\n/g,'<br>')}</div></div>`;
   html += `<div style="margin-top:24px">Firma Estudiante: _________________________ &nbsp;&nbsp; Firma Acudiente: _________________________</div>`;
   html += `</body></html>`;
   return html;
@@ -915,6 +980,16 @@ function previewActa(actaId){
   if(!acta) return showToast('Acta no encontrada','err');
   const html = buildPrintableActa(acta, db.institution || { appName: 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED', logoText: 'ALM' });
   const w = window.open('','_blank','width=900,height=900'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(), 400);
+}
+function downloadActaPDF(actaId){
+  const found = findStudentById(activeStudentId);
+  if(!found) return showToast('Estudiante no encontrado','err');
+  const acta = (found.student.actas||[]).find(a=>a.id===actaId);
+  if(!acta) return showToast('Acta no encontrada','err');
+  const html = buildPrintableActa(acta, db.institution || { appName: 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED', logoText: 'ALM' });
+  const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container);
+  const opt = { margin:0.4, filename: `Acta_${acta.numero||acta.id}.pdf`, image:{ type:'jpeg', quality:0.98 }, html2canvas:{ scale:2 }, jsPDF:{ unit:'in', format:'a4', orientation:'portrait' } };
+  html2pdf().set(opt).from(container).save().then(()=> container.remove());
 }
 
 /* ========== BEHAVIOR / CHARACTERS handling ========= */
@@ -962,7 +1037,6 @@ function applyBehaviorToScope(behaviorKey, type, points, scope){
     applyToStudentInternal(s, behaviorKey, type, points);
     showToast('Aplicado a estudiante','success');
   } else if(scope === 'group'){
-    // find group for active student
     const groups = db.groups[grade] || {};
     let groupName = '';
     Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName = g; });
@@ -983,7 +1057,6 @@ function applyToStudentInternal(s, behaviorKey, type, points){
   s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
   s.level = Math.floor((s.xp||0)/20) + 1;
 }
-
 /* wrapper from EF2 button */
 function applyBehaviorFromEF2(){
   const sel = document.getElementById('ef2_behavior_select'); if(!sel) return;
@@ -1065,33 +1138,23 @@ function exportSubgroup(grade, subgroup){
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado','success');
 }
 
-/* ========== CHARACTERS COUNTS helper (for badge display) ========== */
-function characterCounts(){
-  const counts = {};
-  Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar){ counts[h.pilar]= (counts[h.pilar]||0)+1; } } )));
-  return counts;
-}
-
 /* ========== DICE with animation ========== */
 function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
 function rollDice(){
   const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1);
   const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6);
   const dieEl = document.getElementById('die');
-  // animate
-  dieEl.classList.remove('spin'); void dieEl.offsetWidth; // restart animation
-  dieEl.classList.add('spin');
+  dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
   const interim = setInterval(()=>{ dieEl.innerText = Math.floor(Math.random()*sides)+1; }, 80);
   setTimeout(()=>{ clearInterval(interim); dieEl.classList.remove('spin'); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900);
 }
 
-/* ========== ROULETTE / TIMER kept (unchanged behavior w/ previous code) ========== */
+/* ========== ROULETTE / TIMER ========= */
 let rouletteInterval=null, rouletteRunning=false, rouletteNames=[];
 function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
 function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) openFicha(s.id); else showToast('Seleccionado: '+rouletteNames[idx]); }, 200); } }, 80); }
-function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
+function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); roulette_running=false; rouletteRunning=false; }
 
-/* ========== Timer ========= */
 let timerSeconds=300, timerInterval=null;
 function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
 function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
@@ -1099,40 +1162,8 @@ function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).pad
 function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado','info'); } }, 1000); } }
 function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText=formatTime(timerSeconds); }
 
-/* ========== Class Panel functions (preview/apply) already implemented earlier - keep */ 
+/* ========== Class Panel (already implemented above) ========== */
 function openClassPanel(){ buildClassPanel(); showModal('class-panel-modal'); }
-function buildClassPanel(){
-  const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
-  const students = db.classes[currentClass] || [];
-  students.forEach(s=>{
-    const w = document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)';
-    const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
-    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id;
-    left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div style="color:var(--muted);font-size:13px">Grado ${currentClass}</div></div>`;
-    const right = document.createElement('div'); right.innerHTML = `<button class="action-btn ficha" onclick="openFicha('${s.id}')">Ficha</button>`;
-    w.appendChild(left); w.appendChild(right); container.appendChild(w);
-  });
-  document.getElementById('class-panel-pilar-select').innerHTML='';
-  const all = [...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji})), ...(db.characters||[])];
-  all.forEach(b=>{ const o=document.createElement('option'); o.value=b.key; o.textContent = (b.emoji||'') + ' ' + b.key; document.getElementById('class-panel-pilar-select').appendChild(o); });
-  document.getElementById('class-panel-action-type').onchange = function(){ document.getElementById('class-panel-pilar-row').style.display = this.value === 'pilar' ? 'block' : 'none'; };
-  document.getElementById('class-preview-empty').style.display = 'block';
-  document.getElementById('class-preview').style.display = 'none';
-}
-function classPanelSelectAll(val){ document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked = !!val); }
-function previewClassPanelAction(){ const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=>groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } document.getElementById('class-panel-preview').innerText = targets.length? `${op==='add'?'Agregar':'Restar'} ${points} ${type} a ${targets.length} estudiantes` : 'No hay estudiantes seleccionados.'; }
-function applyClassPanelAction(){
-  const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value;
-  let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); });
-  if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id);
-  if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=>groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); }
-  if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); }
-  if(!targets.length) return showToast('No hay estudiantes objetivo','warn');
-  // find student by id in all grades
-  function findById(id){ for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return s; } return null; }
-  targets.forEach(id=>{ const s = findById(id); if(!s) return; if(type==='xp'){ const delta = (op==='add')? points : -points; s.xp = (s.xp||0) + delta; if(s.xp<0) s.xp=0; s.level = Math.floor((s.xp||0)/20)+1; s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'XP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='gold'){ const delta=(op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'Oro Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='hp'){ const delta=(op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'HP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:pilar, magnitude:points, note:'Aplicado Panel de Clase' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else { s.hp = Math.max(0, (s.hp||HP_MAX)-points); } } });
-  saveDB(); renderStudentGrid(); showToast('Acción aplicada a ' + targets.length + ' estudiante(s)','success'); hideModal('class-panel-modal');
-}
 
 /* ========== PRINT / EXPORT helpers ========== */
 function printStudent(studentId){
@@ -1146,13 +1177,24 @@ function printStudentsList(ids){
 }
 function printCurrentPreviewStudent(){ const modal=document.getElementById('class-panel-modal'); const id=modal.dataset.previewId; if(!id) return showToast('Selecciona estudiante'); printStudent(id); }
 function printSelectedOrClass(){ const container=document.getElementById('class-panel-students'); let ids=[]; container.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb.checked) ids.push(cb.dataset.sid); }); if(!ids.length) ids=(db.classes[currentClass]||[]).map(s=>s.id); printStudentsList(ids); }
-function printCurrentFicha(kind){ const sid = (document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId; if(!sid) return showToast('Abre ficha'); if(kind==='student') printStudent(sid); else if(kind==='group'){ const grade = currentClass; const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {}; let groupName=''; Object.keys(groupsFor).forEach(g=>{ if(groupsFor[g].includes(sid)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo','warn'); printGroup(groupName); } else if(kind==='course') printStudentsList((db.classes[currentClass]||[]).map(s=>s.id)); }
+function printCurrentFicha(kind){ const sid = (document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId; if(!sid) return showToast('Abre ficha'); if(kind==='student') printStudent(sid); else if(kind==='group'){ const grade = currentClass; const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {}; let groupName=''; Object.keys(groupsFor).forEach(g=>{ if(groupsFor[g].includes(sid)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo','warn'); printStudentsList(groupsFor[groupName]); } else if(kind==='course') printStudentsList((db.classes[currentClass]||[]).map(s=>s.id)); }
 function buildPrintableHTML(students, grade){
   const now = new Date().toLocaleString(); let body=`<!doctype html><html><head><meta charset="utf-8"><title>Reporte</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:20px}</style></head><body>`; body += `<h1>Reporte convivencial — ${grade||''}</h1><div style="color:#666">Generado: ${now}</div>`; students.forEach(s=>{ body += `<hr><h2 style="margin:6px 0">${s.name}</h2><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div>`; if(s.actas&&s.actas.length){ body += `<h3>Actas</h3><ul>`; s.actas.forEach(a=>{ body += `<li><strong>${a.fecha}</strong> ${a.descripcion||''}</li>`; }); body += `</ul>`;} if(s.observador&&s.observador.length){ body += `<h3>Observador</h3><ul>`; s.observador.forEach(o=> body+=`<li>${o.fecha} ${o.tipo}: ${o.desc}</li>`); body += `</ul>`;} body += `<h3>Historial</h3><ul>`; (s.history||[]).slice(0,25).forEach(h=> body += `<li>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</li>`); body += `</ul>`; }); body += `</body></html>`; return body;
 }
 
-/* ========== Acta prints already implemented above: previewActa/buildPrintableActa */
+/* ========== Leaderboard ========== */
+function openLeaderboard(){ document.getElementById('leaderboard-top-n').value = db.leaderOptions ? db.leaderOptions.topN || 10 : 10; document.getElementById('leaderboard-mode').value = db.leaderOptions ? db.leaderOptions.mode || 'full' : 'full'; renderLeaderboard(); showModal('leaderboard-modal'); }
+function renderLeaderboard(){
+  const topN = Math.max(1, parseInt(document.getElementById('leaderboard-top-n').value)||10);
+  const mode = document.getElementById('leaderboard-mode').value;
+  db.leaderOptions = { topN, mode }; saveDB();
+  const arr=[]; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> arr.push({ id:s.id, name:s.name, xp:s.xp||0, grade:g })));
+  arr.sort((a,b)=>b.xp - a.xp);
+  const list = document.getElementById('leaderboard-area'); list.innerHTML=''; const top = arr.slice(0, topN);
+  top.forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; const name = mode==='anonym' ? `Estudiante ${i+1}` : r.name; row.innerHTML = `<div style="font-weight:800">${i+1}. ${name} <small style="color:#666">(${r.grade})</small></div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); });
+}
 
+/* ========== Utility functions ========= */
 function findStudentById(id){
   if(!id) return null;
   for(const g of Object.keys(db.classes||{})){
@@ -1161,22 +1203,19 @@ function findStudentById(id){
   }
   return null;
 }
-
-/* ========== Characters helper deletion toggle ========== */
-function deleteCharacter(id){
-  db.characters = (db.characters||[]).filter(c=>c.id !== id);
-  saveDB(); refreshBehaviorSelects(); showToast('Carácter eliminado','success');
+function characterCounts(){
+  const counts = {};
+  Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar){ counts[h.pilar]= (counts[h.pilar]||0)+1; } } )));
+  return counts;
 }
 
-/* ========== Simple confirm helper ========== */
+/* ========== Confirm helper & modal helpers ========= */
 function showConfirm(title, message, cb){
   document.getElementById('confirm-title').innerText = title;
   document.getElementById('confirm-message').innerText = message;
   document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); };
   showModal('confirm-modal');
 }
-
-/* ========== Modal show/hide ========== */
 function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
 function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
 
@@ -1190,27 +1229,24 @@ function createGrade(){ const key=document.getElementById('new-grade-key').value
 function deleteGradePrompt(k){ showConfirm('Eliminar grado', `Eliminar grado ${k} y todos sus estudiantes?`, ()=>{ delete db.classes[k]; delete db.groups[k]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Grado eliminado','success'); }); }
 function renameGradePrompt(oldKey){ const newKey=prompt('Nuevo código de grado', oldKey); if(!newKey) return; if(db.classes[newKey]) return showToast('Ya existe','warn'); db.classes[newKey]=db.classes[oldKey]; db.groups[newKey]=db.groups[oldKey]||{}; delete db.classes[oldKey]; delete db.groups[oldKey]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Renombrado','success'); }
 
-/* ========== characters list initial render + counts ========= */
-function renderCharactersList(){ renderCharactersList = function(){ // overridden earlier; keep implementation consistent
-  const list = document.getElementById('characters-list'); if(!list) return; list.innerHTML='';
-  const all = [...DEFAULT_CHARACTERS.map(c=>({id:`def_${c.key}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type})), ...(db.characters||[])];
-  const counts = characterCounts();
-  all.forEach(c=>{
-    const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee';
-    row.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="font-size:22px">${c.emoji}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name||''}</div></div></div><div style="display:flex;align-items:center;gap:6px"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${c.id && c.id.startsWith('def_') ? '' : `<button class="action-btn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`;
-    list.appendChild(row);
-  });
-}; renderCharactersList(); }
+/* ========== Institution settings (save/load/render) ========= */
+function openInstitutionSettings(){ const inst = db.institution || {}; document.getElementById('inst-app-name').value = inst.appName || document.title || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || ''; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#0ea5e9'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
+function saveInstitutionSettings(){ db.institution = db.institution || {}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#0ea5e9'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados','success'); }
+function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value = 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = 'ALM'; document.getElementById('inst-color-primary').value = '#0ea5e9'; document.getElementById('inst-font').value = 'Inter, system-ui'; showToast('Valores restaurados','info'); }
+function renderHeaderFromInstitution(){ const inst = db.institution || {}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--blue', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
 
-/* ========== Final helpers ========= */
-function updateMetrics(){
-  const students = db.classes[currentClass] || [];
-  const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && totals[h.pilar] !== undefined) totals[h.pilar] += (h.magnitude||1); }));
-  Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; });
+/* ========== Small init helpers ========= */
+function initUI(){
+  populateClassSelect();
+  renderStudentGrid();
+  refreshBehaviorSelects();
+  renderCharactersList();
+  renderGradesList();
+  updateMetrics();
 }
+initUI();
 
-/* Expose some functions to window for handlers used inline */
+/* Expose small functions used inline */
 window.openClassPanel = openClassPanel;
 window.openGroupsModal = ()=>{ renderGroupsColumns(); showModal('manage-groups-modal'); };
 window.openGradesModal = openGradesModal;
