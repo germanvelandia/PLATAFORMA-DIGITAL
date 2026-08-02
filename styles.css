@@ -296,3 +296,66 @@ body {
 .btn-falta { background-color: #dc2626; }
 .btn-ficha { background-color: #2563eb; }
 .btn-action:hover { opacity: 0.9; }
+/* ====== BUTTON COLORS FOR STUDENT CARD (distinctive, non-invasive) ====== */
+
+/* Mérito (verde más vivo) */
+.student-card .btn.green {
+  background: linear-gradient(180deg,#10b981,#059669);
+  color: #fff;
+  border: 1px solid rgba(6,157,116,0.9);
+  box-shadow: 0 8px 18px rgba(16,185,129,0.12);
+}
+.student-card .btn.green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(16,185,129,0.18);
+}
+
+/* Falta (rojo claro) */
+.student-card .btn.red {
+  background: linear-gradient(180deg,#ef4444,#dc2626);
+  color: #fff;
+  border: 1px solid rgba(220,38,38,0.9);
+  box-shadow: 0 8px 18px rgba(239,68,68,0.12);
+}
+.student-card .btn.red:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(239,68,68,0.18);
+}
+
+/* Ficha (azul / botón de acción primaria pero oscuro) */
+.student-card .btn.ficha {
+  background: linear-gradient(180deg,#0ea5e9,#0284c7);
+  color: #fff;
+  border: 1px solid rgba(2,132,199,0.9);
+  box-shadow: 0 8px 18px rgba(14,165,233,0.12);
+}
+.student-card .btn.ficha:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(14,165,233,0.18);
+}
+
+/* Papelera / eliminar: gris sobrio */
+.student-card .btn.ghost {
+  background: rgba(255,255,255,0.03);
+  color: #e6eef6;
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow: none;
+}
+.student-card .btn.ghost:hover {
+  background: rgba(255,255,255,0.06);
+  transform: translateY(-1px);
+}
+
+/* Alineación y espacio para iconos y texto */
+.student-card .card-actions .btn {
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+/* Opcional: iconos blancos en botones para contraste */
+.student-card .card-actions .btn i {
+  color: rgba(255,255,255,0.95);
+  font-size: 14px;
+}
