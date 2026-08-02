@@ -5,86 +5,85 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>FantasyClass Convivencial — index-3</title>
 
-<!-- Fonts & icons -->
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Libraries: xlsx for Excel, html2pdf for PDF -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 :root{
-  --bg:#071122; --panel:#0f1720; --muted:#9aa7b6;
-  --accent-green:#10b981; --accent-red:#ef4444; --accent-gold:#f59e0b; --accent-blue:#0ea5e9;
-  --card-grad: linear-gradient(180deg,#061423,#0f1b2a);
-  --glass: rgba(255,255,255,0.03);
+  --bg-900:#06121a; --panel:#0f1720; --muted:#9aa7b6;
+  --accent-green:#10b981; --accent-red:#ef4444; --accent-gold:#f59e0b;
+  --card-dark:#0b1722; --glass: rgba(255,255,255,0.03);
+  --blue:#0ea5e9;
+  --student-card-bg: linear-gradient(180deg,#061423,#0f1b2a);
 }
 *{box-sizing:border-box}
 html,body{height:100%}
-body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#061019);color:#e6eef6;-webkit-font-smoothing:antialiased}
-.header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;background:linear-gradient(180deg,#07121a,#061019);z-index:90}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg-900),#071122);color:#e6eef6;-webkit-font-smoothing:antialiased}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;background:linear-gradient(180deg,#07121a,#061019);z-index:40}
 .brand{display:flex;align-items:center;gap:12px}
-.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#122033,#0f172a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a}
-.header-title{font-weight:900}
-.header-sub{color:var(--muted);font-size:12px}
+.logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#122033,#0f172a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a}
+.header h1{margin:0;font-size:18px;font-weight:800}
+.header small{color:var(--muted);font-size:12px}
 
-/* menus */
-.controls{display:flex;gap:10px;align-items:center}
+.controls{display:flex;gap:8px;align-items:center}
 .menu{position:relative}
-.menu-btn{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700;color:inherit}
-.menu-panel{position:absolute;top:calc(100% + 8px);right:0;background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;display:none;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,0.6);z-index:120}
-.menu.open .menu-panel{display:block}
+.menu .menu-btn{background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);cursor:pointer;font-weight:700;color:inherit}
+.menu .panel{position:absolute;top:calc(100% + 6px);right:0;background:var(--panel);border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;display:none;min-width:220px;box-shadow:0 12px 30px rgba(0,0,0,0.6);z-index:120}
+.menu.open .panel{display:block}
 
-/* layout */
+/* main layout */
 .container{max-width:1180px;margin:18px auto;padding:0 18px}
 .metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071225,#081329);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-.top-controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.search{display:flex;align-items:center;gap:8px}
-.search input{background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:10px;color:inherit;width:260px}
+.metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071225,#091628);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
+.controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.search-input{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;color:inherit;width:280px}
 
-/* student grid */
-#students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px}
+/* student card style similar to requested image */
+.student-card{
+  background:var(--student-card-bg);
+  border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 20px rgba(0,0,0,0.6);
+  display:flex;gap:12px;align-items:center;position:relative;
+}
+.student-left{display:flex;gap:12px;align-items:center}
+.badge-level{position:absolute;left:14px;top:14px;background:#2b1b11;color:#ffd88a;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
+.avatar{
+  width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#122b45,#3b1b59);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#ffd88a
+}
+.student-name{font-weight:900;text-transform:uppercase}
+.student-sub{color:var(--muted);font-size:13px}
+.stats-right{margin-left:auto;text-align:right;color:var(--muted)}
+.stat-pts{color:var(--accent-green);font-weight:900}
+.stat-neg{color:var(--accent-red);font-weight:900}
 
-/* student card (styled like provided image) */
-.student-card{background:var(--card-grad);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.04);display:flex;gap:12px;align-items:center;position:relative;box-shadow:0 8px 20px rgba(0,0,0,0.5)}
-.level-badge{position:absolute;left:14px;top:14px;background:#2b1b11;color:#ffd88a;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
-.avatar{width:64px;height:64px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a}
-.student-info{flex:1}
-.student-name{font-weight:900;font-size:16px}
-.student-meta{color:var(--muted);font-size:13px}
-.card-actions{display:flex;gap:8px;margin-top:8px}
-.btn{padding:8px 12px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
-.btn.merit{background:linear-gradient(180deg,var(--accent-green),#059669);color:#fff}
-.btn.fault{background:linear-gradient(180deg,var(--accent-red),#c53030);color:#fff}
-.btn.ficha{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--accent-blue)}
+/* actions */
+.card-actions{display:flex;gap:8px;margin-top:10px}
+.action-btn{padding:8px 14px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+.action-btn.merit{background:linear-gradient(180deg,var(--accent-green),#059669);color:#fff}
+.action-btn.fault{background:linear-gradient(180deg,var(--accent-red),#dc2626);color:#fff}
+.action-btn.ficha{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--blue)}
 
-/* modal */
+/* modals */
 .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:200}
-.modal{background:linear-gradient(180deg,#0f1720,#08121a);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);color:#e6eef6;max-height:90vh;overflow:auto;width:100%;max-width:1000px;position:relative}
+.modal{background:linear-gradient(180deg,#0f1720,#08121a);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);color:#e6eef6;max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative}
 .modal.white{background:#fff;color:#111}
 .close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
 
-/* tabs (Ficha) */
-.tabs{display:flex;border-bottom:1px solid rgba(0,0,0,0.06);gap:6px;margin-bottom:12px}
-.tab{padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);background:transparent;border:1px solid rgba(255,255,255,0.02)}
-.tab.active{background:linear-gradient(180deg,#fff,#f3f4f6);color:#111;border:1px solid #e6e6e6}
-.tab-content{padding:8px;background:linear-gradient(180deg,#fff,#fff);border-radius:8px;color:#111}
+/* EF2 accordion */
+.details-accord{background:linear-gradient(180deg,#071324,#071426);border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.03);margin-bottom:10px}
+.details-accord summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px;font-weight:800}
+.details-accord .body{padding:8px;color:var(--muted)}
 
 /* groups UI */
-.groups-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.groups-pool{display:flex;flex-wrap:wrap;gap:8px;padding:10px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid rgba(255,255,255,0.03);max-height:180px;overflow:auto}
-.group-columns{display:flex;gap:12px;align-items:flex-start;margin-top:12px;overflow:auto}
+.groups-container{display:flex;flex-direction:column;gap:12px}
+.groups-top{display:flex;gap:8px;align-items:center}
+.group-columns{display:flex;gap:12px;align-items:flex-start;overflow:auto;padding-top:8px}
 .group-card{min-width:220px;background:linear-gradient(180deg,#0b1722,#0f1b26);border-radius:10px;padding:10px;border:1px solid rgba(255,255,255,0.04)}
 .student-chip{background:linear-gradient(180deg,#071226,#0c1b28);padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);margin-bottom:6px;display:flex;align-items:center;gap:8px}
 
-/* characters */
+/* characters list */
 .chars-grid{display:flex;gap:8px;flex-wrap:wrap}
 .char-card{background:#fff;color:#111;padding:8px;border-radius:10px;border:1px solid #eef2f7;display:flex;align-items:center;gap:8px}
-
-/* leaderboard */
-.leaderboard{background:linear-gradient(180deg,#071225,#081329);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
 
 /* dice animation */
 .dice-box{width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04)}
@@ -105,51 +104,50 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 .toast.warn{background:linear-gradient(90deg,#f59e0b,#d97706)}
 .toast.err{background:linear-gradient(90deg,var(--accent-red),#c0392b)}
 
-@media(max-width:920px){ .group-columns{flex-direction:column} .student-card{flex-direction:column;align-items:flex-start} .avatar{width:48px;height:48px} }
+@media(max-width:900px){ .group-columns{flex-direction:column} .student-card{flex-direction:column} }
 </style>
 </head>
 <body>
 
-<!-- Header -->
 <header class="header">
   <div class="brand">
     <div class="logo" id="header-logo">ALM</div>
     <div>
-      <div class="header-title" id="header-title">FantasyClass Convivencial</div>
-      <div class="header-sub" id="header-subtitle">Aprendiendo Jugando</div>
+      <h1 id="header-title">FantasyClass Convivencial</h1>
+      <small id="header-subtitle">Aprendiendo Jugando</small>
     </div>
   </div>
 
   <div class="controls">
-    <div class="menu" id="menu-tools"><div class="menu-btn" onclick="toggleMenu('menu-tools')">Herramientas ▾</div>
-      <div class="menu-panel">
+    <div class="menu" id="menu-tools">
+      <div class="menu-btn" onclick="toggleMenu('menu-tools')">Herramientas ▾</div>
+      <div class="panel">
         <button onclick="openTimerModal()">Cronómetro</button><br>
         <button onclick="openRouletteModal()">Ruleta</button><br>
         <button onclick="openDiceModal()">Dado</button><br>
         <button onclick="openClassPanel()">Panel de Clase</button><br>
-        <button onclick="openGroupsManager()">Gestión Cursos/Grupos</button><br>
-        <button onclick="openLeaderboard()">Tabla de Clasificación</button>
+        <button onclick="openGroupsModal()">Gestión de Grupos</button><br>
+        <button onclick="openGradesModal()">Administrar Grados</button>
       </div>
     </div>
 
-    <div class="menu" id="menu-chars"><div class="menu-btn" onclick="toggleMenu('menu-chars')">Caracteres ▾</div>
-      <div class="menu-panel">
+    <div class="menu" id="menu-chars">
+      <div class="menu-btn" onclick="toggleMenu('menu-chars')">Caracteres ▾</div>
+      <div class="panel">
         <button onclick="openCharactersModal()">Administrar caracteres</button><br>
-        <button onclick="openBadgesModal()">Administrar badges</button>
+        <button onclick="openQuick('positive')">Puntos positivos</button><br>
+        <button onclick="openQuick('negative')">Puntos negativos</button>
       </div>
     </div>
 
-    <div style="background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
-      <select id="class-select" onchange="switchClass(this.value)"></select>
-    </div>
-
-    <div style="background:rgba(255,255,255,0.02);padding:8px 10px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
-      <button onclick="openInstitutionSettings()">Ajustes</button>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)">
+        <select id="class-select" onchange="switchClass(this.value)"></select>
+      </div>
     </div>
   </div>
 </header>
 
-<!-- Main container -->
 <main class="container">
   <div class="metrics" id="metrics-row">
     <div class="metric"><div style="font-weight:800">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0 pts</div></div>
@@ -160,50 +158,45 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     <div class="metric"><div style="font-weight:800">Ciudadanía</div><div id="badge-Ciudadanía" style="font-weight:900">0 pts</div></div>
   </div>
 
-  <div class="top-controls">
-    <div class="search">
-      <i class="fa-solid fa-magnifying-glass" style="color:var(--muted)"></i>
-      <input id="student-search" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
-    </div>
+  <div class="controls-row">
     <div style="display:flex;gap:8px;align-items:center">
-      <button class="btn ficha" onclick="openAddStudentModal()">Añadir Estudiante</button>
-      <button class="btn ficha" onclick="openGroupsManager()">Gestión Cursos/Grupos</button>
-      <button class="btn" onclick="exportCurrentClassExcel()">Exportar curso XLSX</button>
+      <input id="student-search" class="search-input" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
+      <button class="action-btn ficha" onclick="openAddStudentModal()">Añadir Estudiante</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="action-btn ficha" onclick="openGradesModal()">Administrar Grados</button>
     </div>
   </div>
 
-  <div id="students-grid"></div>
+  <div id="students-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px"></div>
 </main>
 
 <!-- Toasts -->
 <div id="toast-container"></div>
 
-<!-- Modals & UI pieces (many) -->
-
-<!-- CLASS PANEL modal (quick actions) -->
+<!-- Modals -->
 <div id="class-panel-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('class-panel-modal')">
-  <div class="modal">
+  <div class="modal" style="max-width:1000px">
     <button class="close-btn" onclick="hideModal('class-panel-modal')">✕</button>
     <h3>Panel de Clase — Acciones rápidas</h3>
     <div style="display:flex;gap:12px;margin-top:12px">
       <div style="flex:1;max-width:520px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
           <div style="font-weight:800">Selecciona Estudiantes</div>
-          <div>
-            <button class="btn ficha" onclick="classPanelSelectAll(true)">Seleccionar todos</button>
-            <button class="btn" onclick="classPanelSelectAll(false)">Limpiar</button>
+          <div style="display:flex;gap:6px">
+            <button class="action-btn ficha" onclick="classPanelSelectAll(true)">Seleccionar todos</button>
+            <button class="action-btn ficha" onclick="classPanelSelectAll(false)">Limpiar</button>
           </div>
         </div>
-        <div id="class-panel-students" style="max-height:420px;overflow:auto;margin-top:8px"></div>
+        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px"></div>
       </div>
 
       <div style="width:440px">
         <div style="display:flex;justify-content:space-between;align-items:center">
           <div style="font-weight:800">Resumen</div>
           <div>
-            <button class="btn" onclick="printCurrentPreviewStudent()"><i class="fa-solid fa-print"></i> Imprimir estudiante</button>
-            <button class="btn" onclick="printSelectedOrClass()"><i class="fa-solid fa-print"></i> Imprimir seleccionados/curso</button>
-            <button class="btn" onclick="exportSelectedToXlsx()"><i class="fa-solid fa-file-excel"></i> XLSX</button>
+            <button class="action-btn ficha" onclick="printCurrentPreviewStudent()"><i class="fa-solid fa-print"></i> Imprimir estudiante</button>
+            <button class="action-btn ficha" onclick="printSelectedOrClass()"><i class="fa-solid fa-print"></i> Imprimir seleccionados/curso</button>
           </div>
         </div>
 
@@ -213,8 +206,8 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
             <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
               <div id="cp-avatar" style="width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;background:#16243a;color:#ffd88a"></div>
               <div style="flex:1">
-                <div id="cp-name" style="font-weight:800"></div>
-                <div id="cp-grade" class="small"></div>
+                <div id="cp-name" style="font-weight:800;color:#111"></div>
+                <div id="cp-grade" class="small" style="color:#666"></div>
               </div>
             </div>
             <div style="display:flex;gap:8px;margin-bottom:8px">
@@ -252,9 +245,9 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
         </div>
 
         <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="btn merit" onclick="applyClassPanelAction()">Aplicar acción</button>
-          <button class="btn" onclick="previewClassPanelAction()">Vista previa</button>
-          <div class="small" style="flex:1">Se registrará historial para cada estudiante afectado.</div>
+          <button class="action-btn merit" onclick="applyClassPanelAction()">Aplicar acción</button>
+          <button class="action-btn ficha" onclick="previewClassPanelAction()">Vista previa</button>
+          <div class="small" style="flex:1;color:#666">Se registrará historial para cada estudiante afectado.</div>
         </div>
         <div style="margin-top:10px;font-weight:700">Previsualización</div>
         <div id="class-panel-preview" style="min-height:80px;color:var(--muted)"></div>
@@ -264,45 +257,60 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   </div>
 </div>
 
-<!-- Groups / Courses Manager modal -->
-<div id="groups-manager-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('groups-manager-modal')">
+<!-- Grades modal -->
+<div id="grades-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('grades-modal')">
+  <div class="modal" style="max-width:720px">
+    <button class="close-btn" onclick="hideModal('grades-modal')">✕</button>
+    <h3>Administrar Grados</h3>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input id="new-grade-key" class="ef2-input" placeholder="Código grado (ej. 801)">
+      <input id="new-grade-n" class="ef2-input" placeholder="Nombre/Descripción (opcional)">
+      <button class="action-btn ficha" onclick="createGrade()">Crear grado</button>
+    </div>
+    <div id="grades-list" style="margin-top:12px;max-height:320px;overflow:auto"></div>
+  </div>
+</div>
+
+<!-- Groups modal (enhanced UI) -->
+<div id="manage-groups-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('manage-groups-modal')">
   <div class="modal" style="max-width:1100px">
-    <button class="close-btn" onclick="hideModal('groups-manager-modal')">✕</button>
+    <button class="close-btn" onclick="hideModal('manage-groups-modal')">✕</button>
     <h3>Crea y configura los grupos para la clase</h3>
 
-    <div class="groups-top" style="margin-top:8px">
+    <div class="groups-top" style="margin-top:8px;display:flex;justify-content:space-between;align-items:center">
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn merit" onclick="createGroupPrompt()">+ Crear grupo</button>
-        <button class="btn ficha" onclick="editGroupsMode()">✎ Editar grupos</button>
-        <button class="btn" onclick="distributeGroupsByNumberPrompt()">🔀 Asignación aleatoria</button>
-        <button class="btn" onclick="distributeGroupsBySizePrompt()">🔀 Distribuir por tamaño</button>
+        <button class="action-btn merit" onclick="createGroupPrompt()">+ Crear grupo</button>
+        <button class="action-btn ficha" onclick="editGroups()">✎ Editar los grupos</button>
+        <button class="action-btn ficha" onclick="distributeGroupsByNumber()">🔀 Asignación aleatoria</button>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center">
         <div style="color:var(--muted);font-weight:700;margin-right:8px">N. de grupos</div>
         <div style="display:flex;align-items:center;border-radius:999px;background:linear-gradient(180deg,#081822,#0b2734);padding:6px 10px;border:1px solid rgba(255,255,255,0.04)">
-          <button class="btn" style="padding:6px 10px" onclick="changeGroupCount(-1)">−</button>
+          <button class="action-btn ficha" style="padding:6px 10px" onclick="changeGroupCount(-1)">−</button>
           <div id="group-count" style="min-width:36px;text-align:center">3</div>
-          <button class="btn" style="padding:6px 10px" onclick="changeGroupCount(1)">+</button>
+          <button class="action-btn ficha" style="padding:6px 10px" onclick="changeGroupCount(1)">+</button>
         </div>
       </div>
     </div>
 
-    <div style="margin-top:12px">
-      <div style="font-weight:800;margin-bottom:6px">Estudiantes</div>
-      <div id="groups-students-pool" class="groups-pool"></div>
+    <hr style="margin:12px 0;border-color:rgba(255,255,255,0.04)">
+
+    <div style="margin-bottom:12px">
+      <div style="font-weight:800;margin-bottom:6px">Estudiantes (arrastra al grupo)</div>
+      <div id="groups-students-pool" style="display:flex;flex-wrap:wrap;gap:8px;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid rgba(255,255,255,0.03);max-height:180px;overflow:auto"></div>
     </div>
 
-    <div id="groups-columns-area" class="group-columns"></div>
+    <div class="group-columns" id="groups-columns-area"></div>
 
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button class="btn ficha" onclick="saveGroupsChanges()">Guardar</button>
-      <button class="btn" onclick="hideModal('groups-manager-modal')">Cancelar</button>
+      <button class="action-btn ficha" onclick="saveGroups()">Guardar</button>
+      <button class="action-btn" onclick="hideModal('manage-groups-modal')">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- Ficha modal (TABS: Datos / Seguimiento / Actas) -->
+<!-- Ficha modal (EF2 accordion + Acta button) -->
 <div id="ficha-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('ficha-modal')">
   <div class="modal white" style="max-width:980px;color:#111">
     <button class="close-btn" onclick="hideModal('ficha-modal')">✕</button>
@@ -312,109 +320,164 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
         <div id="history-student-avatar" style="width:64px;height:64px;border-radius:12px;background:#eee;display:flex;align-items:center;justify-content:center;color:#333;font-weight:900">A</div>
         <div>
           <div id="history-student-name" style="font-weight:900;color:#111"></div>
-          <div style="color:#666">Ficha • <span id="history-period-label">P1</span></div>
+          <div style="color:#666">Ficha • <span id="history-period-label"></span></div>
         </div>
       </div>
 
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn" onclick="exportSingleStudentExcel()">Exportar XLSX</button>
-        <button class="btn" onclick="printCurrentFicha('student')">Imprimir (navegador)</button>
-        <button class="btn" onclick="downloadCurrentFichaPDF()">Descargar PDF</button>
+        <button class="action-btn ficha" onclick="exportSingleStudentExcel()">Exportar</button>
+        <button class="action-btn ficha" onclick="printCurrentFicha('student')">Imprimir</button>
+        <button class="action-btn merit" onclick="openActaModal()">Crear / Rellenar Acta</button>
       </div>
     </div>
 
-    <div style="margin-top:12px">
-      <div class="tabs">
-        <div class="tab active" id="tab-datos" onclick="switchTab('datos')">Datos del estudiante</div>
-        <div class="tab" id="tab-seguimiento" onclick="switchTab('seguimiento')">Seguimiento convivencial</div>
-        <div class="tab" id="tab-actas" onclick="switchTab('actas')">Elaboración de actas</div>
-      </div>
-
-      <div id="tab-content" class="tab-content">
-        <!-- content injected by JS (switchTab) -->
-      </div>
-    </div>
+    <div id="ef2-root" style="margin-top:12px"></div>
 
   </div>
 </div>
 
-<!-- Acta modal (form & print) -->
+<!-- Acta modal (form) -->
 <div id="acta-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('acta-modal')">
   <div class="modal white" style="max-width:900px;color:#111">
     <button class="close-btn" onclick="hideModal('acta-modal')">✕</button>
     <h3>Acta de Registro y Compromiso de Convivencia Escolar</h3>
 
-    <div id="acta-form" style="margin-top:8px">
-      <!-- form fields injected by JS when opening, using same structure provided -->
-      <!-- For brevity the fields will be generated by openActaModal() which pre-fills -->
+    <div style="margin-top:8px">
+      <label><strong>Acta No.</strong></label>
+      <input id="acta-number" class="ef2-input" placeholder="Número del acta">
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="flex:1"><label>Fecha</label><input id="acta-fecha" type="date" class="ef2-input"></div>
+      <div style="flex:1"><label>Hora</label><input id="acta-hora" type="time" class="ef2-input"></div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Lugar</label>
+      <input id="acta-lugar" class="ef2-input" placeholder="Lugar">
+    </div>
+
+    <hr style="margin:10px 0">
+
+    <h4>Datos del estudiante</h4>
+    <div style="display:flex;gap:8px">
+      <input id="acta-estudiante-nombre" class="ef2-input" placeholder="Nombre completo" style="flex:2">
+      <input id="acta-estudiante-doc" class="ef2-input" placeholder="Documento" style="flex:1">
+      <input id="acta-estudiante-curso" class="ef2-input" placeholder="Curso" style="flex:1">
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Descripción de la situación</label>
+      <textarea id="acta-descripcion" class="ef2-input" rows="4" placeholder="Describa de manera objetiva, cronológica y verificable..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="flex:1">
+        <div><strong>Personas involucradas</strong></div>
+        <label><input type="checkbox" id="acta_invol_est"> Estudiante</label><br>
+        <label><input type="checkbox" id="acta_invol_doc"> Docente</label><br>
+        <label><input type="checkbox" id="acta_invol_dir"> Directivo</label><br>
+        <label><input type="checkbox" id="acta_invol_pad"> Padre de familia</label><br>
+        <label><input type="checkbox" id="acta_invol_otro"> Otro</label>
+      </div>
+
+      <div style="flex:1">
+        <div><strong>Clasificación</strong></div>
+        <label><input type="checkbox" id="acta_tipo_1"> Situación Tipo I</label><br>
+        <label><input type="checkbox" id="acta_tipo_2"> Situación Tipo II</label><br>
+        <label><input type="checkbox" id="acta_tipo_3"> Situación Tipo III</label>
+        <div style="margin-top:8px"><label>Artículo / numeral</label><input id="acta_manual_numeral" class="ef2-input" placeholder=""></div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Descargos del estudiante</label>
+      <textarea id="acta-descargos" class="ef2-input" rows="3"></textarea>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Intervención del padre, madre o acudiente</label>
+      <textarea id="acta-intervencion" class="ef2-input" rows="2"></textarea>
+    </div>
+
+    <div style="margin-top:8px">
+      <label><strong>Acciones pedagógicas y formativas acordadas</strong></label>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+        <label><input type="checkbox" id="acta_acc_refl"> Reflexión escrita</label>
+        <label><input type="checkbox" id="acta_acc_dis"> Presentación de disculpas</label>
+        <label><input type="checkbox" id="acta_acc_rest"> Actividad restaurativa</label>
+        <label><input type="checkbox" id="acta_acc_comp"> Compromiso de cambio</label>
+        <label><input type="checkbox" id="acta_acc_sig"> Seguimiento por Dirección</label>
+        <label><input type="checkbox" id="acta_acc_orient"> Remisión a Orientación</label>
+        <label><input type="checkbox" id="acta_acc_com"> Remisión al Comité Escolar</label>
+      </div>
+      <textarea id="acta_acc_otro" class="ef2-input" rows="2" placeholder="Otra (especifique)"></textarea>
+    </div>
+
+    <div style="margin-top:8px">
+      <label><strong>Compromisos</strong></label>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1">
+          <div style="font-weight:700">Del estudiante</div>
+          <textarea id="acta_comp_est" class="ef2-input" rows="3"></textarea>
+        </div>
+        <div style="flex:1">
+          <div style="font-weight:700">Del padre / acudiente</div>
+          <textarea id="acta_comp_padre" class="ef2-input" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Fecha de seguimiento</label>
+      <div style="display:flex;gap:8px">
+        <input id="acta_fecha_segu" type="date" class="ef2-input">
+        <input id="acta_responsable" class="ef2-input" placeholder="Responsable">
+      </div>
+    </div>
+
+    <div style="margin-top:8px">
+      <label>Observaciones</label>
+      <textarea id="acta_observaciones" class="ef2-input" rows="2"></textarea>
     </div>
 
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button class="btn merit" onclick="saveActaAndDownload()">Guardar y Descargar PDF</button>
-      <button class="btn" onclick="saveActaDraft()">Guardar acta</button>
-      <button class="btn" onclick="hideModal('acta-modal')">Cancelar</button>
+      <button class="action-btn merit" onclick="saveActaAndPrint()">Guardar e Imprimir</button>
+      <button class="action-btn ficha" onclick="saveActaDraft()">Guardar acta</button>
+      <button class="action-btn" onclick="hideModal('acta-modal')">Cancelar</button>
     </div>
   </div>
 </div>
 
 <!-- Characters modal -->
 <div id="characters-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('characters-modal')">
-  <div class="modal white" style="max-width:760px">
+  <div class="modal white" style="max-width:720px">
     <button class="close-btn" onclick="hideModal('characters-modal')">✕</button>
     <h3>Administrar Caracteres</h3>
     <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="char-name-input" placeholder="Nombre del carácter (pilar)" class="ef2-input" style="flex:1">
+      <input id="char-name-input" placeholder="Nombre del carácter" class="ef2-input" style="flex:1">
       <input id="char-emoji-input" placeholder="Emoji (ej. 🐯)" class="ef2-input" style="width:120px">
-      <button class="btn merit" onclick="createCharacter()">Crear</button>
+      <div style="display:flex;gap:6px">
+        <select id="char-type-input" class="ef2-input" style="width:160px"><option value="positive">Positive</option><option value="negative">Negative</option></select>
+        <button class="action-btn merit" onclick="createCharacter()">Crear</button>
+      </div>
     </div>
+
     <div id="characters-list" style="margin-top:12px;max-height:360px;overflow:auto"></div>
   </div>
 </div>
 
-<!-- Badges modal (simple) -->
-<div id="badges-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('badges-modal')">
-  <div class="modal white" style="max-width:720px">
-    <button class="close-btn" onclick="hideModal('badges-modal')">✕</button>
-    <h3>Insignias (Badges)</h3>
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <input id="badge-name-input" placeholder="Nombre insignia" class="ef2-input" style="flex:1">
-      <input id="badge-emoji-input" placeholder="Emoji" class="ef2-input" style="width:120px">
-      <button class="btn merit" onclick="createBadge()">Crear</button>
-    </div>
-    <div id="badges-list" style="margin-top:12px;max-height:360px;overflow:auto"></div>
-  </div>
-</div>
-
-<!-- Leaderboard modal -->
-<div id="leaderboard-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('leaderboard-modal')">
-  <div class="modal white" style="max-width:820px">
-    <button class="close-btn" onclick="hideModal('leaderboard-modal')">✕</button>
-    <h3>Tabla de Clasificación</h3>
-    <div style="display:flex;gap:8px;align-items:center;margin-top:8px">
-      <label style="color:#666">Top</label>
-      <input id="leaderboard-top-n" type="number" value="10" style="width:70px;padding:6px;border-radius:6px;border:1px solid #eee">
-      <select id="leaderboard-mode" class="ef2-input" style="width:160px">
-        <option value="full">Completo</option>
-        <option value="anonym">Anónimo</option>
-        <option value="teams">Por equipos</option>
-      </select>
-      <button class="btn" onclick="renderLeaderboard()">Actualizar</button>
-    </div>
-    <div id="leaderboard-area" style="margin-top:12px"></div>
-  </div>
-</div>
-
-<!-- Timer, roulette, dice modals -->
+<!-- Timer / Roulette / Dice modal -->
 <div id="timer-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('timer-modal')">
   <div class="modal">
     <button class="close-btn" onclick="hideModal('timer-modal')">✕</button>
     <h3>Cronómetro</h3>
     <div id="timer-display" style="font-weight:900;font-size:36px;color:var(--accent-gold);margin-top:12px">05:00</div>
     <div style="display:flex;gap:8px;margin-top:12px">
-      <button class="btn merit" onclick="toggleTimer()">Iniciar/Pausar</button>
-      <button class="btn" onclick="resetTimer()">Reset</button>
-      <button class="btn" onclick="setTimerMinutes(1)">1m</button>
-      <button class="btn" onclick="setTimerMinutes(5)">5m</button>
+      <button class="action-btn merit" onclick="toggleTimer()">Iniciar/Pausar</button>
+      <button class="action-btn" onclick="resetTimer()">Reset</button>
+      <button class="action-btn" onclick="setTimerMinutes(1)">1m</button>
+      <button class="action-btn" onclick="setTimerMinutes(5)">5m</button>
     </div>
   </div>
 </div>
@@ -425,8 +488,8 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     <h3>Ruleta</h3>
     <div id="roulette-display" style="font-weight:900;font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);margin-top:12px">¡Presiona Girar!</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn merit" onclick="startRoulette()">Girar</button>
-      <button class="btn" onclick="stopRoulette()">Detener</button>
+      <button class="action-btn merit" onclick="startRoulette()">Girar</button>
+      <button class="action-btn" onclick="stopRoulette()">Detener</button>
     </div>
   </div>
 </div>
@@ -436,34 +499,24 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     <button class="close-btn" onclick="hideModal('dice-modal')">✕</button>
     <h3>Dado</h3>
     <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-      <div class="dice-box"><div id="die" class="die">🎲</div></div>
+      <div class="dice-box">
+        <div id="die" class="die">🎲</div>
+      </div>
       <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Cantidad</label><input id="dice-count" type="number" min="1" max="10" value="1" style="width:60px" /></div>
-        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Caras</label><input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px" /></div>
-        <div><button class="btn merit" onclick="rollDice()">Lanzar Dado</button></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="color:var(--muted)">Cantidad</label>
+          <input id="dice-count" type="number" min="1" max="10" value="1" style="width:60px" />
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="color:var(--muted)">Caras</label>
+          <input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px" />
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="action-btn merit" onclick="rollDice()">Lanzar Dado</button>
+        </div>
       </div>
     </div>
     <div id="dice-detail" style="color:var(--muted);margin-top:8px"></div>
-  </div>
-</div>
-
-<!-- Institution settings modal (personalization) -->
-<div id="institution-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('institution-modal')">
-  <div class="modal white" style="max-width:720px">
-    <button class="close-btn" onclick="hideModal('institution-modal')">✕</button>
-    <h3>Ajustes institucionales</h3>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-      <label>Nombre de la aplicación</label><input id="inst-app-name" class="ef2-input">
-      <label>Subtítulo</label><input id="inst-subtitle" class="ef2-input">
-      <label>Logo (2-4 caracteres)</label><input id="inst-logo-text" class="ef2-input" style="width:160px">
-      <label>Color primario (hex)</label><input id="inst-color-primary" class="ef2-input" placeholder="#0ea5e9">
-      <label>Fuente (familia CSS)</label><input id="inst-font" class="ef2-input" placeholder="Inter, system-ui">
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button class="btn" onclick="loadInstitutionDefaults()">Restaurar</button>
-      <button class="btn merit" onclick="saveInstitutionSettings()">Guardar</button>
-      <button class="btn" onclick="hideModal('institution-modal')">Cancelar</button>
-    </div>
   </div>
 </div>
 
@@ -474,139 +527,144 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     <h3 id="confirm-title">¿Estás seguro?</h3>
     <p id="confirm-message" style="color:var(--muted)"></p>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn red" id="confirm-yes">Eliminar</button>
-      <button class="btn" onclick="hideModal('confirm-modal')">Cancelar</button>
+      <button class="action-btn red" id="confirm-yes">Eliminar</button>
+      <button class="action-btn" onclick="hideModal('confirm-modal')">Cancelar</button>
     </div>
   </div>
 </div>
 
 <script>
-/* =====================================================
-   Application state and defaults
-   ===================================================== */
-const STORAGE_KEY = 'fantasyclass_alm_db_v3';
+/* =========================
+   STATE & DEFAULTS
+   ========================= */
+const STORAGE_KEY = 'fantasyclass_alm_db';
 const HP_MAX = 5;
-
-/* Default rosters */
 const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
 
-/* Default characters/emojis provided */
+/* Characters mapping requested */
 const DEFAULT_CHARACTERS = [
-  { id:'def_Confiabilidad', key:'Confiabilidad', emoji:'🐪', name:'Camello — Charlotte', type:'positive' },
-  { id:'def_Respeto', key:'Respeto', emoji:'🦁', name:'León — Logan', type:'positive' },
-  { id:'def_Responsabilidad', key:'Responsabilidad', emoji:'🐘', name:'Elefante — Eddy', type:'positive' },
-  { id:'def_Justicia', key:'Justicia', emoji:'🦒', name:'Jirafa — Gus', type:'positive' },
-  { id:'def_Solidaridad', key:'Solidaridad', emoji:'🦘', name:'Canguro — Karina', type:'positive' },
-  { id:'def_Ciudadania', key:'Ciudadanía', emoji:'🐻', name:'Oso — Brooke', type:'positive' }
+  { key: 'Confiabilidad', emoji: '🐪', name: 'Camello — Charlotte', type: 'positive' },
+  { key: 'Respeto', emoji: '🦁', name: 'León — Logan', type: 'positive' },
+  { key: 'Responsabilidad', emoji: '🐘', name: 'Elefante — Eddy', type: 'positive' },
+  { key: 'Justicia', emoji: '🦒', name: 'Jirafa — Gus', type: 'positive' },
+  { key: 'Solidaridad', emoji: '🦘', name: 'Canguro — Karina', type: 'positive' },
+  { key: 'Ciudadanía', emoji: '🐻', name: 'Oso — Brooke', type: 'positive' }
 ];
 
-/* default badges (empty) */
-const DEFAULT_BADGES = [];
-
-/* DB structure */
-let db = { classes: {}, groups: {}, characters: [], badges: [], institution: {}, leaderOptions: {} };
-
-/* runtime */
+let db = { classes: {}, groups: {}, characters: [], institution: {}, googleScriptUrl: '' };
 let currentClass = null;
 let activeStudentId = null;
 
-/* toasts */
+/* ---------- TOAST ---------- */
 const toastContainer = document.getElementById('toast-container');
-function showToast(message, type='info', t=3000){
+function showToast(msg, type='info', t=3000){
   if(!toastContainer) return;
-  const el=document.createElement('div'); el.className='toast '+(type==='success'?'success':type==='warn'?'warn':type==='err'?'err':'info');
-  el.innerHTML=`<div style="flex:1">${message}</div><div style="margin-left:8px;cursor:pointer" onclick="this.parentElement.remove()">✕</div>`;
+  const el = document.createElement('div'); el.className = 'toast ' + (type==='success'?'success':type==='warn'?'warn':type==='err'?'err':'info');
+  el.innerHTML = `<div style="flex:1">${msg}</div><div style="margin-left:8px;cursor:pointer" onclick="this.parentElement.remove()">✕</div>`;
   toastContainer.appendChild(el);
-  setTimeout(()=>{ el.style.opacity=0; setTimeout(()=>el.remove(),300); }, t);
+  setTimeout(()=> el.style.opacity='0' && setTimeout(()=>el.remove(),400), t);
 }
 
-/* persistence */
+/* ---------- Persistence ---------- */
 function loadDB(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw) db = JSON.parse(raw);
-  }catch(e){ db = { classes:{}, groups:{}, characters:[], badges:[], institution:{}, leaderOptions:{} }; }
+  }catch(e){ db = { classes: {}, groups: {}, characters: [], institution: {}, googleScriptUrl: '' }; }
   if(!db.classes) db.classes = {};
   if(!db.groups) db.groups = {};
-  if(!Array.isArray(db.characters) || !db.characters.length) db.characters = DEFAULT_CHARACTERS.slice();
-  if(!Array.isArray(db.badges)) db.badges = DEFAULT_BADGES.slice();
-  // ensure classes exist (do not overwrite existing)
+  if(!Array.isArray(db.characters)) db.characters = [];
+  // Ensure default rosters exist (do not override existing content)
   Object.keys(DEFAULT_ROSTERS).forEach(k=>{
-    if(!db.classes[k]) db.classes[k] = [];
-    if(!db.groups[k]) db.groups[k] = db.groups[k] || {};
+    if(!db.classes[k]) db.classes[k] = (DEFAULT_ROSTERS[k] || []).map((name,i)=> ({ id: `${k}_${i+1}`, name, xp:0, level:1, hp:HP_MAX, history: [], actas: [] }));
+    if(!db.groups[k]) db.groups[k] = {};
   });
+  // ensure default characters present if none
+  if(!db.characters || !db.characters.length) {
+    db.characters = DEFAULT_CHARACTERS.map((c,i)=>({ id:`char_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type }));
+  }
   currentClass = currentClass || Object.keys(db.classes)[0] || null;
 }
 function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('saveDB', e); } }
 
-/* init */
+/* ---------- INIT ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   loadDB();
-  renderHeaderFromInstitution();
   populateClassSelect();
   renderStudentGrid();
   wireMenus();
   refreshBehaviorSelects();
 });
 
-/* menu toggle */
+/* ========== MENU UTILS ========== */
 function toggleMenu(id){
   document.querySelectorAll('.menu').forEach(m=>{ if(m.id!==id) m.classList.remove('open'); });
-  const el=document.getElementById(id);
+  const el = document.getElementById(id);
   if(!el) return;
   el.classList.toggle('open');
 }
-function wireMenus(){ document.querySelectorAll('.menu .menu-btn').forEach(b=>b.addEventListener('click', e=>{ e.stopPropagation(); const p=b.parentElement; p.classList.toggle('open'); })); document.addEventListener('click', ()=> document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open'))); }
+function wireMenus(){
+  document.querySelectorAll('.menu .menu-btn').forEach(btn=>btn.addEventListener('click', (e)=>{ e.stopPropagation(); const p = btn.parentElement; p.classList.toggle('open'); }));
+  document.addEventListener('click', ()=> document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')));
+}
 
-/* helpers */
-function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
-function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
-let confirmCb=null;
-function showConfirm(title, message, cb){ document.getElementById('confirm-title').innerText=title; document.getElementById('confirm-message').innerText=message; confirmCb=cb; document.getElementById('confirm-yes').onclick=()=>{ if(confirmCb) confirmCb(); hideModal('confirm-modal'); }; showModal('confirm-modal'); }
-
-/* =========================
-   CLASS / STUDENTS UI
-   ========================= */
+/* ========== CLASS SELECT ========== */
 function populateClassSelect(){
-  const sel=document.getElementById('class-select'); if(!sel) return;
-  sel.innerHTML='';
-  Object.keys(db.classes).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt); });
-  if(currentClass && db.classes[currentClass]) sel.value=currentClass; else currentClass = sel.value || Object.keys(db.classes)[0] || null;
+  const sel = document.getElementById('class-select'); if(!sel) return;
+  sel.innerHTML = '';
+  Object.keys(db.classes).forEach(k=>{
+    const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt);
+  });
+  if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+  else currentClass = sel.value || Object.keys(db.classes)[0] || null;
 }
-function switchClass(val){ if(!db.classes[val]) return showToast('Grado no encontrado','warn'); currentClass=val; populateClassSelect(); renderStudentGrid(); }
+function switchClass(val){
+  if(!db.classes[val]) return showToast('Grado no encontrado','err');
+  currentClass = val;
+  populateClassSelect();
+  renderStudentGrid();
+  renderGroupsColumns();
+}
 
-/* avatar gradient */
+/* ========== STUDENT GRID RENDER ========== */
 function avatarGradient(name){
-  const idx = name && name.charCodeAt(0) ? name.charCodeAt(0)%10 : 0;
+  const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
   const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-  const p=palettes[idx]; return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+  const p = palettes[idx];
+  return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
 }
-
-/* render students grid */
+function calcStudentSums(s){
+  let pos=0, neg=0;
+  (s.history||[]).forEach(h=>{ if(h.type==='positive') pos += (h.magnitude||0); else neg += (h.magnitude||0); });
+  return { pos, neg };
+}
 function renderStudentGrid(){
-  const grid=document.getElementById('students-grid'); if(!grid) return;
-  grid.innerHTML='';
+  const grid = document.getElementById('students-grid'); if(!grid) return;
+  grid.innerHTML = '';
   if(!currentClass) return;
-  const q=(document.getElementById('student-search').value||'').toLowerCase();
+  const q = (document.getElementById('student-search').value||'').toLowerCase();
   const list = db.classes[currentClass] || [];
-  list.filter(s=>s.name.toLowerCase().includes(q)).forEach(s=>{
-    const card=document.createElement('div'); card.className='student-card';
+  list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
+    const sums = calcStudentSums(s);
+    const card = document.createElement('div'); card.className='student-card';
     card.innerHTML = `
-      <div class="level-badge">NIV ${s.level||1}</div>
-      <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
-      <div class="student-info">
-        <div class="student-name" id="name_${s.id}">${s.name}</div>
-        <div class="student-meta">Grado ${currentClass} • ${document.getElementById('history-period-label')?.innerText || 'P1'}</div>
-        <div class="card-actions">
-          <button class="btn merit" onclick="applyMeritToStudent('${s.id}',1)"><i class="fa-solid fa-plus"></i> Mérito</button>
-          <button class="btn fault" onclick="applyFaultToStudent('${s.id}',1)"><i class="fa-solid fa-minus"></i> Falta</button>
-          <button class="btn ficha" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
-          <button class="btn" onclick="editStudentNamePrompt('${s.id}')"><i class="fa-solid fa-pen"></i></button>
+      <div class="badge-level">NIV ${s.level||1}</div>
+      <div class="student-left">
+        <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
+        <div>
+          <div class="student-name">${s.name} <span style="color:var(--muted);font-weight:600">(${currentClass})</span></div>
+          <div class="student-sub">Grado ${currentClass} • ${document.getElementById('period-select')?.value || 'P1'}</div>
+          <div style="margin-top:8px" class="card-actions">
+            <button class="action-btn merit" onclick="applyMeritToStudent('${s.id}',1)"><i class="fa-solid fa-plus"></i> Mérito</button>
+            <button class="action-btn fault" onclick="applyFaultToStudent('${s.id}',1)"><i class="fa-solid fa-minus"></i> Falta</button>
+            <button class="action-btn ficha" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+          </div>
         </div>
       </div>
-      <div style="margin-left:auto;text-align:right">
-        <div style="color:var(--accent-green);font-weight:800">+ ${(s.history||[]).filter(h=>h.type==='positive').reduce((a,b)=>a+(b.magnitude||0),0)}</div>
-        <div style="color:var(--accent-red);font-weight:800">- ${(s.history||[]).filter(h=>h.type==='negative').reduce((a,b)=>a+(b.magnitude||0),0)}</div>
+      <div class="stats-right">
+        <div class="stat-pts">+ ${sums.pos} pts</div>
+        <div class="stat-neg">⚠ ${sums.neg}</div>
+        <div style="margin-top:8px"><button class="action-btn" onclick="promptDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></button></div>
       </div>
     `;
     grid.appendChild(card);
@@ -614,433 +672,426 @@ function renderStudentGrid(){
   updateMetrics();
 }
 
-/* add/delete/edit student */
-function openAddStudentModal(){ const name=prompt('Nombre del nuevo estudiante:'); if(!name) return; const id=`${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass]||[]; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], badges:[] }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
-function promptDeleteStudent(id){ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado','err'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g=>db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); showToast('Eliminado','success'); }); }
-function editStudentNamePrompt(id){ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const newName = prompt('Nuevo nombre', s.name); if(!newName) return; s.name = newName; saveDB(); renderStudentGrid(); showToast('Nombre actualizado','success'); }
+/* ========== Add/Delete Student ========== */
+function openAddStudentModal(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[] }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
+function promptDeleteStudent(id){ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado','err'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado','success'); }); }
 
-/* apply merit / fault */
-function applyMeritToStudent(id, points=1){
-  const s=(db.classes[currentClass]||[]).find(x=>x.id===id);
-  if(!s) return showToast('No encontrado','err');
-  s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'positive', pilar:'Mérito Rápido', magnitude:points, note:'Desde tarjeta' });
-  s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); s.level = Math.floor((s.xp||0)/20)+1; saveDB(); renderStudentGrid(); showToast(`+${points} XP a ${s.name}`,'success');
+/* ========== APPLY MERIT / FAULT ========== */
+function applyMeritToStudent(studentId, points=1){
+  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
+  if(!s) return showToast('Estudiante no encontrado','err');
+  s.history = s.history || [];
+  s.history.unshift({ id: Date.now(), ts: new Date().toLocaleString(), type:'positive', pilar:'Mérito Rápido', magnitude: points, note:'Aplicado desde tarjeta' });
+  s.xp = (s.xp||0) + points;
+  if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1);
+  s.level = Math.floor((s.xp||0)/20) + 1;
+  saveDB(); renderStudentGrid(); showToast(`+${points} XP a ${s.name}`,'success');
 }
-function applyFaultToStudent(id, points=1){
-  const s=(db.classes[currentClass]||[]).find(x=>x.id===id);
-  if(!s) return showToast('No encontrado','err');
-  s.history = s.history || []; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:'negative', pilar:'Falta Rápida', magnitude:points, note:'Desde tarjeta' });
-  s.hp = Math.max(0, (s.hp||HP_MAX) - points); saveDB(); renderStudentGrid(); showToast(`-${points} HP a ${s.name}`,'info');
+function applyFaultToStudent(studentId, points=1){
+  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
+  if(!s) return showToast('Estudiante no encontrado','err');
+  s.history = s.history || [];
+  s.history.unshift({ id: Date.now(), ts: new Date().toLocaleString(), type:'negative', pilar:'Falta Rápida', magnitude: points, note:'Aplicado desde tarjeta' });
+  s.hp = Math.max(0, s.hp - points);
+  saveDB(); renderStudentGrid(); showToast(`-${points} HP a ${s.name}`,'info');
 }
 
-/* ================================
-   FICHA (TABS) implementation
-   ================================ */
-function switchTab(tab){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+tab).classList.add('active');
-  renderTabContent(tab);
+/* ========== FICHA (EF2) with accordion injection & Acta hook ========== */
+function openFicha(id){
+  activeStudentId = id;
+  showModal('ficha-modal');
+  setTimeout(()=> fillFicha(id), 120);
 }
-function renderTabContent(tab){
-  const area = document.getElementById('tab-content'); if(!area) return;
-  const found = findStudentById(activeStudentId);
-  if(!found) { area.innerHTML = '<div style="color:#666">Abre la ficha de un estudiante.</div>'; return; }
-  const s = found.student;
-  if(tab === 'datos'){
-    area.innerHTML = `
-      <div style="display:flex;gap:12px">
-        <div style="flex:1">
-          <label>Nombre</label>
-          <input id="f_name" class="ef2-input" value="${escapeHtml(s.name||'')}">
-          <label style="margin-top:8px">Documento</label>
-          <input id="f_doc" class="ef2-input" value="${escapeHtml(s.document||'')}">
-          <label style="margin-top:8px">Fecha de nacimiento</label>
-          <input id="f_birth" type="date" class="ef2-input" value="${s.birthdate||''}">
-          <label style="margin-top:8px">Acudiente</label>
-          <input id="f_parent" class="ef2-input" value="${escapeHtml((s.acudiente&&s.acudiente.name)||'')}">
+function buildEF2(){
+  const root = document.getElementById('ef2-root');
+  if(root.innerHTML.trim()) return;
+  root.innerHTML = `
+    <div style="display:flex;gap:12px">
+      <div style="flex:1">
+        <div class="details-accord"><summary>1 • Personal <small style="color:var(--muted)"></small></summary>
+          <div class="body">
+            <input id="ef2_name" class="ef2-input" placeholder="Nombre completo">
+            <div style="display:flex;gap:8px;margin-top:8px"><input id="ef2_doc" class="ef2-input" placeholder="Documento"> <input id="ef2_birth" type="date" class="ef2-input"></div>
+            <div style="margin-top:8px"><input id="ef2_parent" class="ef2-input" placeholder="Acudiente / padre"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><input id="ef2_phone" class="ef2-input" placeholder="Teléfono"><input id="ef2_email" class="ef2-input" placeholder="Email"></div>
+          </div></div>
+
+        <div class="details-accord"><summary>2 • Actas</summary>
+          <div class="body">
+            <div style="margin-bottom:8px"><button class="action-btn fiche" onclick="openActaModal()">Crear / Rellenar Acta</button></div>
+            <div id="ef2-actas-list" style="max-height:220px;overflow:auto"></div>
+          </div></div>
+
+        <div class="details-accord"><summary>3 • Observador</summary>
+          <div class="body">
+            <div id="ef2-obs-list" style="max-height:220px;overflow:auto"></div>
+          </div></div>
+
+        <div class="details-accord"><summary>4 • Gamificación / Pilar</summary>
+          <div class="body">
+            <div style="display:flex;gap:8px"><input id="ef2_level" class="ef2-input" placeholder="Nivel" style="width:80px"><input id="ef2_xp" class="ef2-input" placeholder="XP" type="number" style="width:120px"><input id="ef2_hp" class="ef2-input" placeholder="HP" type="number" style="width:80px"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><select id="ef2_behavior_select" class="ef2-input" style="flex:1"></select><input id="ef2_behavior_points" class="ef2-input" type="number" value="1" style="width:90px"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><select id="ef2_behavior_scope" class="ef2-input" style="width:180px"><option value="student">Estudiante</option><option value="group">Grupo</option><option value="class">Curso</option></select><button class="action-btn merit" onclick="applyBehaviorFromEF2()">Aplicar</button></div>
+          </div></div>
+      </div>
+
+      <div style="width:360px">
+        <div style="background:#fff;padding:12px;border-radius:10px;color:#111">
+          <div style="display:flex;justify-content:space-between;align-items:center"><strong>Resumen</strong><small style="color:#666">Últimos</small></div>
           <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="btn merit" onclick="saveFichaPersonal('${s.id}')">Guardar</button>
-            <button class="btn" onclick="openActaModal()">Crear Acta</button>
+            <div style="flex:1;text-align:center"><div style="color:#64748b">XP</div><div id="ef2-xp-display" style="font-weight:800">0</div></div>
+            <div style="flex:1;text-align:center"><div style="color:#64748b">HP</div><div id="ef2-hp-display" style="font-weight:800">5</div></div>
+            <div style="flex:1;text-align:center"><div style="color:#64748b">ORO</div><div id="ef2-gold-display" style="font-weight:800">0</div></div>
           </div>
+          <div style="margin-top:10px;font-weight:700">Historial reciente</div>
+          <div id="ef2-history" style="max-height:220px;overflow:auto;color:#333"></div>
         </div>
-        <div style="width:320px">
-          <div style="background:#f8fafc;padding:12px;border-radius:8px;color:#111">
-            <div style="font-weight:800">Resumen</div>
-            <div style="margin-top:8px">XP: <strong id="f_xp">${s.xp||0}</strong></div>
-            <div>HP: <strong id="f_hp">${s.hp||HP_MAX}</strong></div>
-            <div>ORO: <strong id="f_gold">${s.gold||0}</strong></div>
-            <div style="margin-top:8px"><strong>Badges:</strong> ${(s.badges||[]).map(b=>b.emoji||'').join(' ')}</div>
-            <div style="margin-top:8px"><button class="btn" onclick="exportSingleStudentExcel()">Exportar XLSX</button> <button class="btn" onclick="printCurrentFicha('student')">Imprimir</button></div>
-          </div>
-        </div>
-      </div>
-    `;
-  } else if(tab === 'seguimiento'){
-    area.innerHTML = `
-      <div>
-        <h4>Observador / Incidentes</h4>
-        <div style="display:flex;gap:8px">
-          <input id="obs_fecha" type="date" class="ef2-input" style="width:160px">
-          <select id="obs_tipo" class="ef2-input" style="width:160px"><option>Incidente</option><option>Observación</option></select>
-          <button class="btn" onclick="addObsToStudent('${s.id}')">Agregar</button>
-        </div>
-        <textarea id="obs_desc" class="ef2-input" rows="3" placeholder="Descripción..."></textarea>
-        <div id="f_obs_list" style="margin-top:8px;max-height:240px;overflow:auto"></div>
-        <hr>
-        <h4>Historial</h4>
-        <div id="f_history" style="max-height:220px;overflow:auto"></div>
-      </div>
-    `;
-    renderFichaHistory(s.id);
-  } else if(tab === 'actas'){
-    area.innerHTML = `
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">Actas</div>
-          <div><button class="btn" onclick="openActaModal()">Crear nueva Acta</button></div>
-        </div>
-        <div id="f_actas_list" style="margin-top:8px;max-height:360px;overflow:auto"></div>
-      </div>
-    `;
-    renderFichaActas(s.id);
-  }
-}
-
-/* escape helper for inputs */
-function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-/* save personal info in ficha */
-function saveFichaPersonal(id){
-  const res = findStudentById(id); if(!res) return showToast('Estudiante no encontrado','err');
-  const s=res.student;
-  s.name = document.getElementById('f_name').value || s.name;
-  s.document = document.getElementById('f_doc').value || s.document;
-  s.birthdate = document.getElementById('f_birth').value || s.birthdate;
-  s.acudiente = s.acudiente || {};
-  s.acudiente.name = document.getElementById('f_parent').value || s.acudiente.name;
-  saveDB(); renderStudentGrid(); showToast('Datos guardados','success');
-}
-
-/* Observador: add and render */
-function addObsToStudent(id){
-  const res=findStudentById(id); if(!res) return showToast('No encontrado','err');
-  const s=res.student;
-  const fecha=document.getElementById('obs_fecha').value || new Date().toLocaleDateString();
-  const tipo=document.getElementById('obs_tipo').value || 'Incidente';
-  const desc=document.getElementById('obs_desc').value || '';
-  if(!desc) return showToast('Escribe descripción','warn');
-  s.observador = s.observador || []; s.observador.unshift({ id:Date.now(), fecha, tipo, desc, estado:'En proceso' }); saveDB(); renderFichaHistory(id); renderFichaActas(id); showToast('Observación guardada','success');
-}
-function renderFichaHistory(id){
-  const res=findStudentById(id); if(!res) return;
-  const s=res.student;
-  const el=document.getElementById('f_history'); if(!el) return; el.innerHTML=''; (s.history||[]).slice(0,50).forEach(h=>{ const row=document.createElement('div'); row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML=`<div style="font-weight:800">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="color:#666">${h.ts}</div><div>${h.note||''}</div>`; el.appendChild(row); });
-  const obsEl=document.getElementById('f_obs_list'); if(obsEl){ obsEl.innerHTML=''; (s.observador||[]).forEach(o=>{ const node=document.createElement('div'); node.style.padding='8px'; node.style.borderBottom='1px solid #eee'; node.innerHTML=`<div style="font-weight:800">${o.tipo} • ${o.fecha}</div><div style="color:#666">${o.desc}</div>`; obsEl.appendChild(node); }); }
-}
-
-/* Actas: render list */
-function renderFichaActas(id){
-  const res=findStudentById(id); if(!res) return;
-  const s=res.student;
-  const list=document.getElementById('f_actas_list'); if(!list) return; list.innerHTML='';
-  (s.actas||[]).slice().reverse().forEach(a=>{ const el=document.createElement('div'); el.style.padding='10px'; el.style.borderBottom='1px solid #eee'; el.innerHTML=`<div style="font-weight:800">${a.numero||''} • ${a.fecha} ${a.hora||''}</div><div style="color:#666">${(a.descripcion||'').slice(0,200)}</div><div style="margin-top:6px"><button class="btn" onclick='previewActa("${a.id}")'>Ver / Imprimir</button><button class="btn" onclick='downloadActaPDF("${a.id}")'>PDF</button></div>`; list.appendChild(el); });
-}
-
-/* open ficha main */
-function openFicha(id){ activeStudentId=id; showModal('ficha-modal'); document.getElementById('ficha-modal').dataset.currentStudent = id; document.getElementById('history-period-label').innerText = document.getElementById('period-select')?.value || 'P1'; setTimeout(()=>{ switchTab('datos'); renderTabContent('datos'); }, 80); }
-
-/* Acta modal builder and saving */
-function openActaModal(){
-  if(!activeStudentId) return showToast('Abre ficha primero','warn');
-  const sRes=findStudentById(activeStudentId); if(!sRes) return;
-  const actaForm = document.getElementById('acta-form'); actaForm.innerHTML = '';
-  // build form fields (mirando template given by user)
-  actaForm.innerHTML = `
-    <div style="display:flex;gap:8px">
-      <input id="acta-num" class="ef2-input" placeholder="Acta No.">
-      <input id="acta-fecha" type="date" class="ef2-input" value="${new Date().toISOString().slice(0,10)}">
-      <input id="acta-hora" type="time" class="ef2-input">
-    </div>
-    <div style="margin-top:8px"><input id="acta-lugar" class="ef2-input" placeholder="Lugar"></div>
-    <h4 style="margin-top:10px">Datos del estudiante</h4>
-    <div style="display:flex;gap:8px"><input id="acta-est-name" class="ef2-input" style="flex:2" value="${escapeHtml(sRes.student.name)}"><input id="acta-est-doc" class="ef2-input" style="flex:1" value="${escapeHtml(sRes.student.document||'')}"></div>
-    <div style="margin-top:8px"><textarea id="acta-descripcion" class="ef2-input" rows="4" placeholder="Describe los hechos..."></textarea></div>
-    <div style="display:flex;gap:12px;margin-top:8px">
-      <div style="flex:1">
-        <div><strong>Personas involucradas</strong></div>
-        <label><input type="checkbox" id="inv_est"> Estudiante</label><br>
-        <label><input type="checkbox" id="inv_doc"> Docente</label><br>
-        <label><input type="checkbox" id="inv_dir"> Directivo</label><br>
-        <label><input type="checkbox" id="inv_pad"> Padre/Acudiente</label><br>
-        <label><input type="checkbox" id="inv_otro"> Otro</label>
-      </div>
-      <div style="flex:1">
-        <div><strong>Clasificación</strong></div>
-        <label><input type="checkbox" id="c_t1"> Tipo I</label><br>
-        <label><input type="checkbox" id="c_t2"> Tipo II</label><br>
-        <label><input type="checkbox" id="c_t3"> Tipo III</label><br>
-        <input id="c_numeral" class="ef2-input" placeholder="Artículo / numeral">
       </div>
     </div>
-    <div style="margin-top:8px"><label>Descargos estudiante</label><textarea id="acta-desc" class="ef2-input" rows="3"></textarea></div>
-    <div style="margin-top:8px"><label>Intervención acudiente</label><textarea id="acta-acud" class="ef2-input" rows="2"></textarea></div>
-    <div style="margin-top:8px"><strong>Acciones pedagógicas</strong><div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
-      <label><input type="checkbox" id="acc_ref"> Reflexión escrita</label>
-      <label><input type="checkbox" id="acc_dis"> Presentación disculpas</label>
-      <label><input type="checkbox" id="acc_res"> Actividad restaurativa</label>
-      <label><input type="checkbox" id="acc_comp"> Compromiso de cambio</label>
-      <label><input type="checkbox" id="acc_sig"> Seguimiento Dirección</label>
-      <label><input type="checkbox" id="acc_ori"> Remisión a Orientación</label>
-      <label><input type="checkbox" id="acc_com"> Remisión Comité</label>
-    </div></div>
-    <div style="margin-top:8px"><label>Compromisos - Estudiante</label><textarea id="comp_est" class="ef2-input" rows="2"></textarea></div>
-    <div style="margin-top:8px"><label>Compromisos - Padre</label><textarea id="comp_pad" class="ef2-input" rows="2"></textarea></div>
-    <div style="display:flex;gap:8px;margin-top:8px"><input id="acta_fecha_segu" type="date" class="ef2-input"><input id="acta_resp" class="ef2-input" placeholder="Responsable"></div>
-    <div style="margin-top:8px"><label>Observaciones</label><textarea id="acta_obs" class="ef2-input" rows="2"></textarea></div>
   `;
+}
+/* Fill ficha fields for student */
+function fillFicha(studentId){
+  buildEF2();
+  const found = findStudentById(studentId);
+  if(!found) return showToast('Estudiante no encontrado','err');
+  const s = found.student;
+  activeStudentId = s.id;
+  document.getElementById('history-student-name').innerText = s.name;
+  document.getElementById('history-student-avatar').innerText = (s.name||' ')[0];
+
+  // personal fields
+  document.getElementById('ef2_name').value = s.name || '';
+  document.getElementById('ef2_doc').value = s.document || '';
+  document.getElementById('ef2_birth').value = s.birthdate || '';
+  document.getElementById('ef2_parent').value = (s.acudiente && (s.acudiente.name||s.acudiente)) || '';
+  document.getElementById('ef2_phone').value = (s.acudiente && s.acudiente.phone) || '';
+
+  // gamification
+  document.getElementById('ef2_level').value = s.level || 1;
+  document.getElementById('ef2_xp').value = s.xp || 0;
+  document.getElementById('ef2_hp').value = s.hp || HP_MAX;
+  document.getElementById('ef2-xp-display').innerText = s.xp||0;
+  document.getElementById('ef2-hp-display').innerText = s.hp||HP_MAX;
+  document.getElementById('ef2-gold-display').innerText = s.gold||0;
+
+  // actas
+  const actasList = document.getElementById('ef2-actas-list'); actasList.innerHTML = '';
+  (s.actas||[]).slice().reverse().forEach(a=>{
+    const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML = `<div style="font-weight:800">${a.numero||''} • ${a.fecha} ${a.hora||''}</div><div style="color:#475569">${a.descripcion?.slice(0,180) || ''}</div><div style="margin-top:6px"><button class="action-btn ficha" onclick='previewActa("${a.id}")'>Ver / Imprimir</button></div>`;
+    actasList.appendChild(el);
+  });
+
+  // observador
+  const obsList = document.getElementById('ef2-obs-list'); obsList.innerHTML='';
+  (s.observador||[]).slice().reverse().forEach(o=>{
+    const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML=`<div style="font-weight:700">${o.tipo} • ${o.fecha}</div><div style="color:#475569">${o.desc}</div>`; obsList.appendChild(el);
+  });
+
+  // history
+  const hist = document.getElementById('ef2-history'); hist.innerHTML='';
+  (s.history||[]).slice(0,15).forEach(h=>{
+    const n=document.createElement('div'); n.style.padding='6px'; n.style.borderBottom='1px solid #f1f5f9'; n.innerHTML=`<div style="font-weight:700">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="font-size:12px;color:#666">${h.ts}</div>`; hist.appendChild(n);
+  });
+
+  // refresh select options
+  refreshBehaviorSelects();
+}
+
+/* ========== ACTA (save/print) ========== */
+function openActaModal(){
+  if(!activeStudentId) return showToast('Abre la ficha del estudiante primero','warn');
+  const found = findStudentById(activeStudentId);
+  if(!found) return showToast('No encontrado','err');
+  // prefill some fields
+  document.getElementById('acta-estudiante-nombre').value = found.student.name || '';
+  document.getElementById('acta-estudiante-doc').value = found.student.document || '';
+  document.getElementById('acta-estudiante-curso').value = currentClass || '';
+  document.getElementById('acta-fecha').valueAsDate = new Date();
   showModal('acta-modal');
 }
-
-function gatherActaData(){
+function gatherActaForm(){
   return {
     id: `acta_${Date.now()}`,
-    numero: document.getElementById('acta-num')?.value||'',
-    fecha: document.getElementById('acta-fecha')?.value||new Date().toLocaleDateString(),
-    hora: document.getElementById('acta-hora')?.value||'',
-    lugar: document.getElementById('acta-lugar')?.value||'',
-    estudiante: { nombre: document.getElementById('acta-est-name')?.value||'', documento: document.getElementById('acta-est-doc')?.value||'' },
-    descripcion: document.getElementById('acta-descripcion')?.value||'',
+    numero: document.getElementById('acta-number').value || '',
+    fecha: document.getElementById('acta-fecha').value || new Date().toLocaleDateString(),
+    hora: document.getElementById('acta-hora').value || '',
+    lugar: document.getElementById('acta-lugar').value || '',
+    estudiante: { nombre: document.getElementById('acta-estudiante-nombre').value || '', documento: document.getElementById('acta-estudiante-doc').value || '', curso: document.getElementById('acta-estudiante-curso').value || '' },
+    descripcion: document.getElementById('acta-descripcion').value || '',
     involucrados: {
-      estudiante: !!document.getElementById('inv_est')?.checked,
-      docente: !!document.getElementById('inv_doc')?.checked,
-      directivo: !!document.getElementById('inv_dir')?.checked,
-      padre: !!document.getElementById('inv_pad')?.checked,
-      otro: !!document.getElementById('inv_otro')?.checked
+      estudiante: !!document.getElementById('acta_invol_est').checked,
+      docente: !!document.getElementById('acta_invol_doc').checked,
+      directivo: !!document.getElementById('acta_invol_dir').checked,
+      padre: !!document.getElementById('acta_invol_pad').checked,
+      otro: !!document.getElementById('acta_invol_otro').checked
     },
     clasificacion: {
-      t1: !!document.getElementById('c_t1')?.checked,
-      t2: !!document.getElementById('c_t2')?.checked,
-      t3: !!document.getElementById('c_t3')?.checked,
-      numeral: document.getElementById('c_numeral')?.value||''
+      t1: !!document.getElementById('acta_tipo_1').checked,
+      t2: !!document.getElementById('acta_tipo_2').checked,
+      t3: !!document.getElementById('acta_tipo_3').checked,
+      numeral: document.getElementById('acta_manual_numeral').value || ''
     },
-    descargos: document.getElementById('acta-desc')?.value||'',
-    intervencion_acudiente: document.getElementById('acta-acud')?.value||'',
+    descargos: document.getElementById('acta-descargos').value || '',
+    intervencion_acudiente: document.getElementById('acta-intervencion').value || '',
     acciones: {
-      reflexion: !!document.getElementById('acc_ref')?.checked,
-      disculpas: !!document.getElementById('acc_dis')?.checked,
-      restaurativa: !!document.getElementById('acc_res')?.checked,
-      compromiso: !!document.getElementById('acc_comp')?.checked,
-      seguimiento: !!document.getElementById('acc_sig')?.checked,
-      orientacion: !!document.getElementById('acc_ori')?.checked,
-      comite: !!document.getElementById('acc_com')?.checked
+      reflexion: !!document.getElementById('acta_acc_refl').checked,
+      disculpas: !!document.getElementById('acta_acc_dis').checked,
+      restaurativa: !!document.getElementById('acta_acc_rest').checked,
+      compromiso: !!document.getElementById('acta_acc_comp').checked,
+      seguimiento: !!document.getElementById('acta_acc_sig').checked,
+      orientacion: !!document.getElementById('acta_acc_orient').checked,
+      comite: !!document.getElementById('acta_acc_com').checked,
+      otra: document.getElementById('acta_acc_otro').value || ''
     },
     compromisos: {
-      estudiante: document.getElementById('comp_est')?.value||'',
-      padre: document.getElementById('comp_pad')?.value||''
+      estudiante: document.getElementById('acta_comp_est').value || '',
+      padre: document.getElementById('acta_comp_padre').value || ''
     },
-    seguimiento: { fecha: document.getElementById('acta_fecha_segu')?.value||'', responsable: document.getElementById('acta_resp')?.value||'' },
-    observaciones: document.getElementById('acta_obs')?.value||'',
+    seguimiento: {
+      fecha: document.getElementById('acta_fecha_segu').value || '',
+      responsable: document.getElementById('acta_responsable').value || ''
+    },
+    observaciones: document.getElementById('acta_observaciones').value || '',
     createdAt: new Date().toLocaleString()
   };
 }
-
 function saveActaDraft(){
-  if(!activeStudentId) return showToast('Abre ficha primero','warn');
-  const a = gatherActaData();
-  const sRes = findStudentById(activeStudentId);
-  if(!sRes) return showToast('Estudiante no encontrado','err');
-  sRes.student.actas = sRes.student.actas || []; sRes.student.actas.push(a);
-  saveDB(); hideModal('acta-modal'); renderFichaActas(activeStudentId); showToast('Acta guardada','success');
+  if(!activeStudentId) return showToast('Abre la ficha primero','warn');
+  const acta = gatherActaForm();
+  const found = findStudentById(activeStudentId);
+  if(!found) return showToast('Estudiante no encontrado','err');
+  found.student.actas = found.student.actas || [];
+  found.student.actas.push(acta);
+  saveDB();
+  hideModal('acta-modal');
+  showToast('Acta guardada','success');
+}
+function saveActaAndPrint(){
+  saveActaDraft();
+  const found = findStudentById(activeStudentId);
+  const acta = found.student.actas[found.student.actas.length - 1];
+  previewActa(acta.id);
 }
 
-function buildPrintableActa(acta){
-  const inst = db.institution || {};
-  const headerName = inst.appName || 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED';
-  const logoText = inst.logoText || 'ALM';
-  let html = `<!doctype html><html><head><meta charset="utf-8"><title>Acta ${acta.numero||''}</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:18px} .section{margin-top:12px;border-top:1px solid #ddd;padding-top:8px}</style></head><body>`;
-  html += `<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>${headerName}</h1><div style="color:#666">Acta de Registro y Compromiso</div></div><div style="font-weight:700;background:#f3f4f6;padding:10px;border-radius:8px">${logoText}</div></header>`;
-  html += `<div class="section"><strong>Acta No.:</strong> ${acta.numero||'---'} &nbsp;&nbsp; <strong>Fecha:</strong> ${acta.fecha||''} <strong>Hora:</strong> ${acta.hora||''}</div>`;
-  html += `<div class="section"><h3>Datos del estudiante</h3><div><strong>Nombre:</strong> ${escapeHtml(acta.estudiante.nombre)}</div><div><strong>Documento:</strong> ${escapeHtml(acta.estudiante.documento)}</div></div>`;
-  html += `<div class="section"><h3>Descripción</h3><div>${escapeHtml(acta.descripcion).replace(/\n/g,'<br>')}</div></div>`;
-  html += `<div class="section"><h3>Acciones y Compromisos</h3><div>${Object.keys(acta.acciones||{}).filter(k=>acta.acciones[k]).map(k=>`• ${k}`).join('<br>')}</div><div style="margin-top:8px"><strong>Compromisos:</strong><div>Estudiante: ${escapeHtml(acta.compromisos.estudiante)}</div><div>Padre: ${escapeHtml(acta.compromisos.padre)}</div></div></div>`;
+/* build printable acta HTML and print */
+function buildPrintableActa(acta, inst){
+  const logoText = inst && inst.logoText ? inst.logoText : 'ALM';
+  const appName = inst && inst.appName ? inst.appName : 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED';
+  // Minimal A4-like printable layout
+  let html = `<!doctype html><html><head><meta charset="utf-8"><title>Acta</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:18px}h2{font-size:16px}small{color:#666} .section{margin-top:12px;padding-top:8px;border-top:1px solid #ddd}</style></head><body>`;
+  html += `<header style="display:flex;align-items:center;justify-content:space-between"><div><h1>${appName}</h1><div style="color:#666">Acta de registro y compromiso</div></div><div style="font-weight:900;background:#f5f3ea;padding:10px;border-radius:8px">${logoText}</div></header>`;
+  html += `<hr>`;
+  html += `<div><strong>Acta No.:</strong> ${acta.numero || '---'} &nbsp;&nbsp; <strong>Fecha:</strong> ${acta.fecha || ''} <strong>Hora:</strong> ${acta.hora || ''}</div>`;
+  html += `<div class="section"><h2>1. Información General</h2><div><strong>Lugar:</strong> ${acta.lugar || ''}</div></div>`;
+  html += `<div class="section"><h2>2. Datos del estudiante</h2><div><strong>Nombre:</strong> ${acta.estudiante.nombre || ''}</div><div><strong>Documento:</strong> ${acta.estudiante.documento || ''}</div><div><strong>Curso:</strong> ${acta.estudiante.curso || ''}</div></div>`;
+  html += `<div class="section"><h2>3. Descripción de la situación</h2><div>${acta.descripcion.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>4. Personas involucradas</h2><div>${Object.entries(acta.involucrados).map(([k,v])=> v ? k : null).filter(Boolean).join(', ')}</div></div>`;
+  html += `<div class="section"><h2>5. Clasificación</h2><div>${acta.clasificacion.t1? 'Situación Tipo I':''} ${acta.clasificacion.t2? 'Situación Tipo II':''} ${acta.clasificacion.t3? 'Situación Tipo III':''} <div>Manual numeral: ${acta.clasificacion.numeral || ''}</div></div></div>`;
+  html += `<div class="section"><h2>6. Descargos del estudiante</h2><div>${acta.descargos.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>7. Intervención del acudiente</h2><div>${acta.intervencion_acudiente.replace(/\n/g,'<br>')}</div></div>`;
+  html += `<div class="section"><h2>8. Acciones pedagógicas</h2><ul>`;
+  const acc = acta.acciones;
+  if(acc.reflexion) html += '<li>Reflexión escrita</li>';
+  if(acc.disculpas) html += '<li>Presentación de disculpas</li>';
+  if(acc.restaurativa) html += '<li>Actividad restaurativa</li>';
+  if(acc.compromiso) html += '<li>Compromiso de cambio</li>';
+  if(acc.seguimiento) html += '<li>Seguimiento por Dirección de Curso</li>';
+  if(acc.orientacion) html += '<li>Remisión a Orientación Escolar</li>';
+  if(acc.comite) html += '<li>Remisión al Comité Escolar</li>';
+  if(acc.otra) html += `<li>Otra: ${acc.otra}</li>`;
+  html += `</ul></div>`;
+  html += `<div class="section"><h2>9. Compromisos</h2><div><strong>Del estudiante:</strong><div>${acta.compromisos.estudiante.replace(/\n/g,'<br>')}</div></div><div><strong>Del padre/acudiente:</strong><div>${acta.compromisos.padre.replace(/\n/g,'<br>')}</div></div></div>`;
+  html += `<div class="section"><h2>10. Fecha de seguimiento</h2><div>${acta.seguimiento.fecha || ''} — Responsable: ${acta.seguimiento.responsable || ''}</div></div>`;
+  html += `<div class="section"><h2>11. Observaciones</h2><div>${acta.observaciones.replace(/\n/g,'<br>')}</div></div>`;
   html += `<div style="margin-top:24px">Firma Estudiante: _________________________ &nbsp;&nbsp; Firma Acudiente: _________________________</div>`;
   html += `</body></html>`;
   return html;
 }
-
-function saveActaAndDownload(){
-  saveActaDraft();
-  const sRes=findStudentById(activeStudentId);
-  if(!sRes) return;
-  const acta = sRes.student.actas[sRes.student.actas.length-1];
-  downloadActaPDF(acta.id);
-}
-function downloadActaPDF(actaId){
-  const sRes = findStudentById(activeStudentId);
-  if(!sRes) return showToast('Estudiante no encontrado','err');
-  const acta = (sRes.student.actas||[]).find(a=>a.id===actaId);
-  if(!acta) return showToast('Acta no encontrada','err');
-  const html = buildPrintableActa(acta);
-  const opt = { margin:0.4, filename: `Acta_${acta.numero||acta.id}.pdf`, image:{ type:'jpeg', quality:0.98 }, html2canvas:{ scale:2 }, jsPDF:{ unit:'in', format:'a4', orientation:'portrait' } };
-  const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container);
-  html2pdf().set(opt).from(container).save().then(()=>{ container.remove(); });
-}
-
-/* preview acta in new tab and print */
 function previewActa(actaId){
-  const sRes = findStudentById(activeStudentId); if(!sRes) return;
-  const acta = (sRes.student.actas||[]).find(a=>a.id===actaId); if(!acta) return showToast('Acta no encontrada','err');
-  const html = buildPrintableActa(acta);
-  const w = window.open('','_blank','width=900,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),350);
+  const found = findStudentById(activeStudentId);
+  if(!found) return showToast('Estudiante no encontrado','err');
+  const acta = (found.student.actas||[]).find(a=>a.id===actaId);
+  if(!acta) return showToast('Acta no encontrada','err');
+  const html = buildPrintableActa(acta, db.institution || { appName: 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED', logoText: 'ALM' });
+  const w = window.open('','_blank','width=900,height=900'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(), 400);
 }
 
-/* ======================
-   Characters handling
-   ====================== */
+/* ========== BEHAVIOR / CHARACTERS handling ========= */
 function refreshBehaviorSelects(){
-  const sel = document.getElementById('class-panel-pilar-select'); if(sel){ sel.innerHTML=''; const all = db.characters.concat(DEFAULT_CHARACTERS); all.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent=(c.emoji||'')+' '+c.key; sel.appendChild(opt); }); }
-  renderCharactersListUI();
+  const cfg = [...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji,name:c.name,type:c.type})), ...(db.characters||[])];
+  const ef2 = document.getElementById('ef2_behavior_select'); if(ef2){ ef2.innerHTML=''; cfg.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent = `${c.emoji} ${c.key}`; opt.dataset.type=c.type; ef2.appendChild(opt); }); }
+  const pilar = document.getElementById('class-panel-pilar-select'); if(pilar){ pilar.innerHTML=''; cfg.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent=`${c.emoji} ${c.key}`; pilar.appendChild(opt); }); }
+  renderCharactersList();
 }
-function renderCharactersListUI(){
-  const list = document.getElementById('characters-list'); if(!list) return;
-  list.innerHTML = '';
-  const counts = characterCounts();
-  const all = db.characters.concat(DEFAULT_CHARACTERS);
+function createCharacter(){
+  const name = (document.getElementById('char-name-input').value||'').trim();
+  const emoji = (document.getElementById('char-emoji-input').value||'').trim();
+  const type = (document.getElementById('char-type-input').value||'positive');
+  if(!name || !emoji) return showToast('Nombre y emoji son obligatorios','warn');
+  db.characters = db.characters || [];
+  db.characters.push({ id:`char_${Date.now()}`, key:name, emoji, name: name, type });
+  saveDB(); document.getElementById('char-name-input').value=''; document.getElementById('char-emoji-input').value=''; refreshBehaviorSelects(); showToast('Carácter creado','success');
+}
+function renderCharactersList(){
+  const list = document.getElementById('characters-list'); if(!list) return; list.innerHTML='';
+  const all = [...DEFAULT_CHARACTERS.map(c=>({id:`def_${c.key}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type})), ...(db.characters||[])];
+  // compute counts from history across all students
+  const counts = {};
+  Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar){ counts[h.pilar] = (counts[h.pilar]||0)+1; } } )));
   all.forEach(c=>{
-    const div = document.createElement('div'); div.className='char-card'; div.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="font-size:20px">${c.emoji}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name||''}</div></div></div><div style="display:flex;align-items:center;gap:8px"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${c.id && c.id.startsWith('def_') ? '' : `<button class="btn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`; list.appendChild(div);
+    const card = document.createElement('div'); card.className='char-card'; card.style.display='flex'; card.style.justifyContent='space-between'; card.style.alignItems='center'; card.style.width='100%';
+    card.innerHTML=`<div style="display:flex;gap:10px;align-items:center"><div style="font-size:22px">${c.emoji}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name || ''}</div></div></div><div style="display:flex;gap:8px;align-items:center"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${c.id && c.id.startsWith('def_')? '': `<button class="action-btn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`;
+    list.appendChild(card);
   });
 }
-function createCharacter(){ const name=document.getElementById('char-name-input').value.trim(); const emoji=document.getElementById('char-emoji-input').value.trim(); if(!name||!emoji) return showToast('Nombre y emoji obligatorios','warn'); db.characters = db.characters || []; db.characters.push({ id:`char_${Date.now()}`, key:name, emoji, name }); saveDB(); document.getElementById('char-name-input').value=''; document.getElementById('char-emoji-input').value=''; refreshBehaviorSelects(); showToast('Carácter creado','success'); }
-function deleteCharacter(id){ showConfirm('Eliminar carácter','Eliminar carácter?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); refreshBehaviorSelects(); showToast('Eliminado','success'); }); }
-
-/* compute character counts across histories */
-function characterCounts(){
-  const counts={}; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=>{ if(h.pilar){ counts[h.pilar] = (counts[h.pilar]||0)+1; } } ))); return counts;
+function deleteCharacter(id){
+  if(!id) return;
+  showConfirm('Eliminar carácter', '¿Eliminar este carácter?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id !== id); saveDB(); refreshBehaviorSelects(); showToast('Carácter eliminado','success'); });
 }
 
-/* ======================
-   Groups manager
-   ====================== */
-function openGroupsManager(){ renderGroupsManager(); showModal('groups-manager-modal'); }
-function renderGroupsManager(){
-  populateClassSelect();
-  renderGroupsPool();
-  renderGroupsColumns();
-  document.getElementById('group-count').innerText = Object.keys(db.groups[currentClass]||{}).length || 3;
+/* ========== Apply behavior (from EF2 / Panel) ========= */
+const PILLAR_EFFECTS = { 'Responsabilidad':{xp:1}, 'Respeto':{xp:1}, 'Confiabilidad':{xp:1}, 'Confianza':{xp:1}, 'Empatía':{xp:1}, 'Justicia':{xp:1}, 'Solidaridad':{xp:1}, 'Ciudadanía':{xp:1} };
+function applyBehaviorToScope(behaviorKey, type, points, scope){
+  if(!behaviorKey) return showToast('Selecciona pilar','warn');
+  const grade = currentClass;
+  if(scope === 'student'){
+    const sid = activeStudentId;
+    const s = (db.classes[grade]||[]).find(x=>x.id===sid);
+    if(!s) return showToast('Estudiante no encontrado','err');
+    applyToStudentInternal(s, behaviorKey, type, points);
+    showToast('Aplicado a estudiante','success');
+  } else if(scope === 'group'){
+    // find group for active student
+    const groups = db.groups[grade] || {};
+    let groupName = '';
+    Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName = g; });
+    if(!groupName) return showToast('Estudiante no pertenece a grupo','warn');
+    groups[groupName].forEach(id=>{ const s = (db.classes[grade]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); });
+    showToast(`Aplicado a grupo ${groupName}`,'success');
+  } else if(scope === 'class'){
+    (db.classes[grade]||[]).forEach(s=> applyToStudentInternal(s,behaviorKey,type,points));
+    showToast('Aplicado a todo el curso','success');
+  }
+  saveDB(); renderStudentGrid(); fillFicha(activeStudentId);
 }
-function renderGroupsPool(){
-  const pool = document.getElementById('groups-students-pool'); if(!pool) return; pool.innerHTML='';
-  const assigned = new Set(); const groups = db.groups[currentClass]||{};
-  Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
-  (db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).forEach(s=>{
-    const chip = document.createElement('div'); chip.className='student-chip'; chip.draggable=true; chip.ondragstart = e => e.dataTransfer.setData('text/plain', s.id);
-    chip.innerHTML = `<div style="width:32px;height:32px;border-radius:6px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div>`;
-    pool.appendChild(chip);
-  });
+function applyToStudentInternal(s, behaviorKey, type, points){
+  s.history = s.history || [];
+  const isPositive = (type !== 'negative');
+  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
+  else s.hp = Math.max(0, (s.hp||HP_MAX) - points);
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
+  s.level = Math.floor((s.xp||0)/20) + 1;
 }
+
+/* wrapper from EF2 button */
+function applyBehaviorFromEF2(){
+  const sel = document.getElementById('ef2_behavior_select'); if(!sel) return;
+  const behavior = sel.value; const type = sel.selectedOptions[0]?.dataset?.type || 'positive'; const points = parseInt(document.getElementById('ef2_behavior_points').value)||1; const scope = document.getElementById('ef2_behavior_scope').value;
+  applyBehaviorToScope(behavior, type, points, scope);
+}
+
+/* ========== Groups UI implementation ========== */
+let groupCount = 3;
+function createGroupPrompt(){
+  const name = prompt('Nombre del grupo:'); if(!name) return;
+  if(!db.groups[currentClass]) db.groups[currentClass] = {};
+  db.groups[currentClass][name] = [];
+  saveDB(); renderGroupsColumns(); showToast('Grupo creado','success');
+}
+function editGroups(){ showToast('Modo edición de grupos (arrastrar/soltar disponible)', 'info'); }
+function changeGroupCount(delta){
+  groupCount = Math.max(1, (groupCount||3) + delta);
+  document.getElementById('group-count').innerText = groupCount;
+  showToast('N. de grupos: ' + groupCount,'info');
+}
+
 function renderGroupsColumns(){
-  const area=document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
+  const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
+  if(!currentClass) return;
+  const all = db.classes[currentClass] || [];
   const groups = db.groups[currentClass] || {};
+  const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
+  const unassigned = all.filter(s=>!assigned.has(s.id));
+  // pool
+  const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip = document.createElement('div'); chip.className='student-chip'; chip.draggable=true; chip.ondragstart = e => e.dataTransfer.setData('text/plain', s.id); chip.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div>`; pool.appendChild(chip); }); }
+  // groups
   Object.keys(groups).forEach(g=>{
-    const card=document.createElement('div'); card.className='group-card';
-    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div><button class="btn" onclick="exportSubgroup('${currentClass}','${g}')">Export</button> <button class="btn" onclick="promptDeleteGroup('${currentClass}','${g}')">Eliminar</button></div></div>`;
-    const list=document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px'; list.ondragover = e => e.preventDefault(); list.ondrop = e => { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
-    (groups[g]||[]).forEach(id=>{ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const chip = document.createElement('div'); chip.className='student-chip'; chip.innerHTML = `<div style="width:28px;height:28px;border-radius:6px;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div><div style="margin-left:auto"><button class="btn" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div>`; list.appendChild(chip); });
+    const card = document.createElement('div'); card.className='group-card';
+    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong>${g}</strong><div><button class="action-btn" onclick="exportSubgroup('${currentClass}','${g}')">Export</button> <button class="action-btn" onclick="promptDeleteGroup('${currentClass}','${g}')">Eliminar</button></div></div>`;
+    const list = document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
+    list.ondragover = e => e.preventDefault();
+    list.ondrop = e => { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
+    (groups[g]||[]).forEach(id=>{
+      const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return;
+      const chip = document.createElement('div'); chip.className='student-chip'; chip.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div><div style="margin-left:auto"><button class="action-btn" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div>`; list.appendChild(chip);
+    });
     card.appendChild(list); area.appendChild(card);
   });
 }
-function createGroupPrompt(){ const name=prompt('Nombre del grupo'); if(!name) return; db.groups[currentClass]=db.groups[currentClass]||{}; db.groups[currentClass][name]=[]; saveDB(); renderGroupsManager(); showToast('Grupo creado','success'); }
-function renameGroupPrompt(oldName, newName){ newName = newName.trim(); if(!newName || newName===oldName) return; db.groups[currentClass]=db.groups[currentClass]||{}; db.groups[currentClass][newName] = db.groups[currentClass][oldName] || []; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsManager(); showToast('Renombrado','success'); }
-function promptDeleteGroup(course, group){ showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsManager(); showToast('Grupo eliminado','success'); }); }
-function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey]||[]; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsManager(); renderStudentGrid(); }
-function saveGroupsChanges(){ saveDB(); hideModal('groups-manager-modal'); showToast('Cambios guardados','success'); }
-function changeGroupCount(delta){ const current = Object.keys(db.groups[currentClass]||{}).length || 0; let n = Math.max(1, current + delta); document.getElementById('group-count').innerText = n; showToast('N. de grupos: '+n,'info'); }
+function createGroup(){ const name = prompt('Nombre del grupo'); if(!name) return; db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][name]=[]; saveDB(); renderGroupsColumns(); }
+function promptDeleteGroup(course, group){ if(!db.groups[course]||!db.groups[course][group]) return; if(confirm(`Eliminar grupo ${group}?`)){ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado','success'); } }
+function moveToGroup(studentId, groupKey){
+  // remove from any group
+  Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId));
+  if(groupKey !== '__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); }
+  saveDB(); renderGroupsColumns(); renderStudentGrid();
+}
+function saveGroups(){ saveDB(); hideModal('manage-groups-modal'); showToast('Grupos guardados','success'); }
 
-/* distribution prompts */
-function distributeGroupsByNumberPrompt(){ const n=parseInt(prompt('Número de grupos:')); if(!n||n<1) return showToast('Número inválido','warn'); distributeGroupsByNumber(n); }
-function distributeGroupsBySizePrompt(){ const size=parseInt(prompt('Tamaño por grupo:')); if(!size||size<1) return showToast('Tamaño inválido','warn'); distributeGroupsBySize(size); }
-function distributeGroupsByNumber(n){ const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${ (i % n)+1 }`].push(id)); saveDB(); renderGroupsManager(); showToast('Distribuido','success'); }
-function distributeGroupsBySize(size){ const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass] = {}; let idx=0, g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsManager(); showToast('Distribuido por tamaño','success'); }
-
-/* export subgroup */
-function exportSubgroup(grade, subgroup){ const members = (db.groups[grade] && db.groups[grade][subgroup])||[]; if(!members.length) return showToast('Grupo vacío','warn'); const rows = members.map((id,i)=>{ const s = (db.classes[grade]||[]).find(x=>x.id===id); return { 'N°': i+1, 'Nombre': s? s.name:id, 'Grado': grade, 'Grupo': subgroup }; }); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado','success'); }
-
-/* =========================
-   CLASS PANEL (apply actions)
-   ========================= */
-function openClassPanel(){ buildClassPanel(); showModal('class-panel-modal'); }
-function buildClassPanel(){ const container=document.getElementById('class-panel-students'); if(!container) return; container.innerHTML=''; (db.classes[currentClass]||[]).forEach(s=>{ const w=document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)'; const left=document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px'; const chk=document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id; left.appendChild(chk); left.innerHTML += `<div style="width:40px;height:40px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700;cursor:pointer" onclick="classPanelPreview('${s.id}')">${s.name}</div><div style="color:#666;font-size:13px">Grado ${currentClass}</div></div>`; const right=document.createElement('div'); right.innerHTML=`<button class="btn ficha" onclick="openFicha('${s.id}')">Ficha</button>`; w.appendChild(left); w.appendChild(right); container.appendChild(w); }); const pilarSel=document.getElementById('class-panel-pilar-select'); pilarSel.innerHTML=''; const all=db.characters.concat(DEFAULT_CHARACTERS); all.forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent=(c.emoji||'')+' '+c.key; pilarSel.appendChild(o); }); document.getElementById('class-panel-action-type').onchange=function(){ document.getElementById('class-panel-pilar-row').style.display = this.value === 'pilar' ? 'block' : 'none'; }; document.getElementById('class-preview-empty').style.display='block'; document.getElementById('class-preview').style.display='none'; }
-function classPanelSelectAll(val){ document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked = !!val); }
-function classPanelPreview(id){ const found=findStudentById(id); if(!found) return; document.getElementById('class-preview-empty').style.display='none'; document.getElementById('class-preview').style.display='block'; document.getElementById('cp-avatar').innerText = (found.student.name||' ')[0]; document.getElementById('cp-name').innerText = found.student.name; document.getElementById('cp-grade').innerText = `Grado ${found.grade}`; document.getElementById('cp-xp').innerText = found.student.xp||0; document.getElementById('cp-hp').innerText = found.student.hp||HP_MAX; document.getElementById('cp-gold').innerText = found.student.gold||0; const hist=document.getElementById('cp-history'); hist.innerHTML=''; (found.student.history||[]).slice(0,8).forEach(h=>{ const n=document.createElement('div'); n.style.padding='6px 0'; n.style.borderBottom='1px solid #f1f5f9'; n.innerHTML=`<div style="font-weight:800">${h.type==='positive'?'+':'-'} ${h.magnitude} • ${h.pilar}</div><div style="color:#94a3b8">${h.ts}</div>`; hist.appendChild(n); }); document.getElementById('class-panel-modal').dataset.previewId = id; }
-function previewClassPanelAction(){ const type=document.getElementById('class-panel-action-type').value; const pts=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); Object.keys(db.groups[currentClass]||{}).forEach(g=>db.groups[currentClass][g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } document.getElementById('class-panel-preview').innerText = targets.length? `${op==='add'?'Agregar':'Restar'} ${pts} ${type} a ${targets.length} estudiante(s) ${type==='pilar'?('• Pilar: '+pilar):''}` : 'No hay estudiantes seleccionados.'; }
-function applyClassPanelAction(){
-  const type=document.getElementById('class-panel-action-type').value; const pts=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); Object.keys(db.groups[currentClass]||{}).forEach(g=>db.groups[currentClass][g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } if(!targets.length) return showToast('No hay estudiantes objetivo','warn');
-  function findById(id){ for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return s; } return null; }
-  targets.forEach(id=>{ const s=findById(id); if(!s) return; if(type==='xp'){ const delta = op==='add'? pts : -pts; s.xp=(s.xp||0)+delta; if(s.xp<0) s.xp=0; s.level=Math.floor((s.xp||0)/20)+1; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:delta>0?'positive':'negative', pilar:'XP Panel', magnitude:Math.abs(delta), note:'Panel de Clase' }); } else if(type==='gold'){ const delta= op==='add'? pts : -pts; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:delta>0?'positive':'negative', pilar:'ORO Panel', magnitude:Math.abs(delta), note:'Panel de Clase' }); } else if(type==='hp'){ const delta= op==='add'? pts : -pts; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:delta>0?'positive':'negative', pilar:'HP Panel', magnitude:Math.abs(delta), note:'Panel de Clase' }); } else if(type==='pilar'){ const isPos = op==='add'; s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:pilar, magnitude:pts, note:'Panel de Clase' }); if(isPos){ s.xp=(s.xp||0)+pts; s.level=Math.floor((s.xp||0)/20)+1; if(s.hp<HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); } else { s.hp = Math.max(0, (s.hp||HP_MAX)-pts); } } });
-  saveDB(); renderStudentGrid(); hideModal('class-panel-modal'); showToast('Acción aplicada','success');
+/* Distribution helpers */
+function distributeGroupsByNumber(){
+  const n = parseInt(prompt('Número de grupos:')) || 0;
+  if(n<1) return showToast('Número inválido','warn');
+  const ids = (db.classes[currentClass]||[]).map(s=>s.id);
+  if(!ids.length) return showToast('No hay estudiantes','warn');
+  for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; }
+  db.groups[currentClass] = {}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[];
+  ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${ (i % n)+1 }`].push(id));
+  saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente','success');
 }
 
-/* export selected or class to xlsx */
-function exportSelectedToXlsx(){ const container=document.getElementById('class-panel-students'); let ids=[]; container.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb.checked) ids.push(cb.dataset.sid); }); if(!ids.length) ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); const rows = ids.map((id,i)=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); return { 'N°': i+1, 'Nombre': s? s.name:'', 'Grado': currentClass, 'XP': s? s.xp:0, 'HP': s? s.hp:HP_MAX }; }); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Export_${currentClass}`); XLSX.writeFile(wb, `Export_${currentClass}.xlsx`); showToast('Exportado XLSX','success'); }
-
-/* print students helpers (in ficha and class panel) */
-function printStudentsList(ids){ const grade=currentClass; const students=ids.map(id=> (db.classes[grade]||[]).find(s=>s.id===id)).filter(Boolean); if(!students.length) return showToast('No hay estudiantes','warn'); const html = buildPrintableHTML(students, grade); const w = window.open('','_blank','width=1000,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),350); }
-function buildPrintableHTML(students, grade){ const now=new Date().toLocaleString(); let body=`<!doctype html><html><head><meta charset="utf-8"><title>Reporte ${grade}</title><style>body{font-family:Inter,Arial;color:#111;padding:18px}h1{font-size:18px}</style></head><body>`; body+=`<h1>Reporte convivencial — ${grade}</h1><div style="color:#666">Generado: ${now}</div>`; students.forEach(s=>{ body+=`<hr><h2>${s.name}</h2><div>XP: ${s.xp||0} — HP: ${s.hp||HP_MAX} — ORO: ${s.gold||0}</div>`; if(s.actas && s.actas.length){ body+=`<h3>Actas</h3><ul>`; s.actas.forEach(a=> body+=`<li>${a.fecha} • ${a.descripcion?.slice(0,200)||''}</li>`); body+=`</ul>`;} if(s.history && s.history.length){ body+=`<h3>Historial</h3><ul>`; s.history.slice(0,20).forEach(h=> body+=`<li>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</li>`); body+=`</ul>`;} }); body+=`</body></html>`; return body; }
-function exportCurrentClassExcel(){ const grade=currentClass; if(!grade) return showToast('Selecciona grado','warn'); const students=db.classes[grade]||[]; const rows=students.map((s,i)=>({ 'N°':i+1,'ID':s.id,'Nombre':s.name,'Grado':grade,'Nivel':s.level||1,'XP':s.xp||0,'HP':s.hp||HP_MAX })); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${grade}`); XLSX.writeFile(wb, `Curso_${grade}.xlsx`); showToast('Exportado XLSX','success'); }
-
-/* helper: export single student */
-function exportSingleStudentExcel(){ if(!activeStudentId) return showToast('Abre ficha'); const res=findStudentById(activeStudentId); if(!res) return showToast('No encontrado'); const s=res.student; const rows=(s.history||[]).map(h=>({ Fecha:h.ts, Tipo:h.type, Pilar:h.pilar, Puntos:h.magnitude, Nota:h.note })); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Nombre:s.name, Grado:currentClass, XP:s.xp||0, HP:s.hp||HP_MAX }]), 'Resumen'); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]), 'Historial'); XLSX.writeFile(wb, `Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada','success'); }
-
-/* print / pdf current ficha */
-function printCurrentFicha(kind){
-  const sid = (document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId;
-  if(!sid) return showToast('Abre ficha','warn');
-  if(kind==='student') printStudentsList([sid]);
-  else if(kind==='group'){ const grade=currentClass; const groups=db.groups[grade]||{}; let gName = ''; Object.keys(groups).forEach(g=>{ if(groups[g].includes(sid)) gName=g; }); if(!gName) return showToast('Estudiante no en grupo','warn'); printStudentsList(groups[gName]); }
-  else if(kind==='course') printStudentsList((db.classes[currentClass]||[]).map(s=>s.id));
+/* ========== Export functions (XLSX) ========== */
+function exportCurrentClassExcel(gradeKey){
+  const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado','warn');
+  const students = db.classes[key] || [];
+  const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX }));
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado','success');
 }
-function downloadCurrentFichaPDF(){
-  const sid = (document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId;
-  if(!sid) return showToast('Abre ficha','warn');
-  const res=findStudentById(sid); if(!res) return showToast('No encontrado'); const html = buildPrintableHTML([res.student], res.grade); const opt = { margin:0.4, filename:`Ficha_${res.student.name.replace(/[^a-z0-9]/gi,'_')}.pdf`, html2canvas:{scale:2}, jsPDF:{ unit:'in', format:'a4', orientation:'portrait' } }; const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container); html2pdf().set(opt).from(container).save().then(()=>container.remove()); }
-
-/* =========================
-   Leaderboard (top N)
-   ========================= */
-function openLeaderboard(){ document.getElementById('leaderboard-top-n').value = db.leaderOptions.topN || 10; document.getElementById('leaderboard-mode').value = db.leaderOptions.mode || 'full'; renderLeaderboard(); showModal('leaderboard-modal'); }
-function renderLeaderboard(){
-  const topN = Math.max(1, parseInt(document.getElementById('leaderboard-top-n').value)||10);
-  const mode = document.getElementById('leaderboard-mode').value;
-  db.leaderOptions = { topN, mode }; saveDB();
-  const arr=[]; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> arr.push({ id:s.id, name:s.name, xp:s.xp||0, grade:g })));
-  arr.sort((a,b)=>b.xp - a.xp);
-  const list = document.getElementById('leaderboard-area'); list.innerHTML=''; const top = arr.slice(0, topN);
-  top.forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; const name = mode==='anonym' ? `Estudiante ${i+1}` : r.name; row.innerHTML = `<div style="font-weight:800">${i+1}. ${name} <small style="color:#666">(${r.grade})</small></div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); });
+function exportSubgroup(grade, subgroup){
+  const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {};
+  const members = groupsFor[subgroup] || [];
+  const rows = members.length ? members.map((id,i)=>{ const s = (db.classes[grade]||[]).find(x=>x.id===id); return { 'N°': i+1, 'Nombre': s? s.name:id, 'Grado': grade, 'Grupo': subgroup }; }) : [{ Mensaje: 'Sin miembros' }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado','success');
 }
 
-/* ======================
-   DICE with animation
-   ====================== */
+/* ========== CHARACTERS COUNTS helper (for badge display) ========== */
+function characterCounts(){
+  const counts = {};
+  Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar){ counts[h.pilar]= (counts[h.pilar]||0)+1; } } )));
+  return counts;
+}
+
+/* ========== DICE with animation ========== */
 function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
 function rollDice(){
-  const count=Math.max(1, parseInt(document.getElementById('dice-count').value)||1);
-  const sides=Math.max(2, parseInt(document.getElementById('dice-sides').value)||6);
-  const dieEl=document.getElementById('die'); dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin');
-  let interim = setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80);
-  setTimeout(()=>{ clearInterval(interim); dieEl.classList.remove('spin'); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')}  —  Suma: ${sum}`; }, 900);
+  const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1);
+  const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6);
+  const dieEl = document.getElementById('die');
+  // animate
+  dieEl.classList.remove('spin'); void dieEl.offsetWidth; // restart animation
+  dieEl.classList.add('spin');
+  const interim = setInterval(()=>{ dieEl.innerText = Math.floor(Math.random()*sides)+1; }, 80);
+  setTimeout(()=>{ clearInterval(interim); dieEl.classList.remove('spin'); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900);
 }
 
-/* ======================
-   Roulette
-   ====================== */
+/* ========== ROULETTE / TIMER kept (unchanged behavior w/ previous code) ========== */
 let rouletteInterval=null, rouletteRunning=false, rouletteNames=[];
 function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
-function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes','warn'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) openFicha(s.id); else showToast('Seleccionado: '+rouletteNames[idx]); } }, 80); }
+function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) openFicha(s.id); else showToast('Seleccionado: '+rouletteNames[idx]); }, 200); } }, 80); }
 function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
 
-/* ======================
-   Timer
-   ====================== */
+/* ========== Timer ========= */
 let timerSeconds=300, timerInterval=null;
 function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
 function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
@@ -1048,72 +1099,125 @@ function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).pad
 function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado','info'); } }, 1000); } }
 function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText=formatTime(timerSeconds); }
 
-/* ======================
-   Leader badges & progression helpers
-   ====================== */
-function createBadge(){ const name=document.getElementById('badge-name-input').value.trim(); const emoji=document.getElementById('badge-emoji-input').value.trim(); if(!name||!emoji) return showToast('Nombre y emoji obligatorios','warn'); db.badges = db.badges||[]; db.badges.push({ id:`badge_${Date.now()}`, name, emoji }); saveDB(); document.getElementById('badge-name-input').value=''; document.getElementById('badge-emoji-input').value=''; renderBadgesList(); showToast('Insignia creada','success'); }
-function renderBadgesList(){ const list=document.getElementById('badges-list'); if(!list) return; list.innerHTML=''; (db.badges||[]).forEach(b=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML=`<div><span style="font-size:20px">${b.emoji}</span> <strong>${b.name}</strong></div><div><button class="btn" onclick="deleteBadge('${b.id}')">Eliminar</button></div>`; list.appendChild(row); }); }
-function deleteBadge(id){ showConfirm('Eliminar insignia','Eliminar ?', ()=>{ db.badges = (db.badges||[]).filter(x=>x.id!==id); saveDB(); renderBadgesList(); showToast('Insignia eliminada','success'); }); }
+/* ========== Class Panel functions (preview/apply) already implemented earlier - keep */ 
+function openClassPanel(){ buildClassPanel(); showModal('class-panel-modal'); }
+function buildClassPanel(){
+  const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
+  const students = db.classes[currentClass] || [];
+  students.forEach(s=>{
+    const w = document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)';
+    const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
+    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id;
+    left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div style="color:var(--muted);font-size:13px">Grado ${currentClass}</div></div>`;
+    const right = document.createElement('div'); right.innerHTML = `<button class="action-btn ficha" onclick="openFicha('${s.id}')">Ficha</button>`;
+    w.appendChild(left); w.appendChild(right); container.appendChild(w);
+  });
+  document.getElementById('class-panel-pilar-select').innerHTML='';
+  const all = [...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji})), ...(db.characters||[])];
+  all.forEach(b=>{ const o=document.createElement('option'); o.value=b.key; o.textContent = (b.emoji||'') + ' ' + b.key; document.getElementById('class-panel-pilar-select').appendChild(o); });
+  document.getElementById('class-panel-action-type').onchange = function(){ document.getElementById('class-panel-pilar-row').style.display = this.value === 'pilar' ? 'block' : 'none'; };
+  document.getElementById('class-preview-empty').style.display = 'block';
+  document.getElementById('class-preview').style.display = 'none';
+}
+function classPanelSelectAll(val){ document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked = !!val); }
+function previewClassPanelAction(){ const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=>groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } document.getElementById('class-panel-preview').innerText = targets.length? `${op==='add'?'Agregar':'Restar'} ${points} ${type} a ${targets.length} estudiantes` : 'No hay estudiantes seleccionados.'; }
+function applyClassPanelAction(){
+  const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value;
+  let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); });
+  if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id);
+  if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=>groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); }
+  if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); }
+  if(!targets.length) return showToast('No hay estudiantes objetivo','warn');
+  // find student by id in all grades
+  function findById(id){ for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return s; } return null; }
+  targets.forEach(id=>{ const s = findById(id); if(!s) return; if(type==='xp'){ const delta = (op==='add')? points : -points; s.xp = (s.xp||0) + delta; if(s.xp<0) s.xp=0; s.level = Math.floor((s.xp||0)/20)+1; s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'XP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='gold'){ const delta=(op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'Oro Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='hp'){ const delta=(op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'HP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:pilar, magnitude:points, note:'Aplicado Panel de Clase' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else { s.hp = Math.max(0, (s.hp||HP_MAX)-points); } } });
+  saveDB(); renderStudentGrid(); showToast('Acción aplicada a ' + targets.length + ' estudiante(s)','success'); hideModal('class-panel-modal');
+}
 
-/* ======================
-   Utility: find student by id
-   ====================== */
+/* ========== PRINT / EXPORT helpers ========== */
+function printStudent(studentId){
+  const found = findStudentById(studentId); if(!found) return showToast('No encontrado','err');
+  const html = buildPrintableHTML([found.student], found.grade);
+  const w = window.open('','_blank','width=900,height=800'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),300);
+}
+function printStudentsList(ids){
+  const grade = currentClass; const students = ids.map(id=> (db.classes[grade]||[]).find(s=>s.id===id)).filter(Boolean); if(!students.length) return showToast('No hay estudiantes','warn');
+  const html = buildPrintableHTML(students, grade); const w = window.open('','_blank','width=1000,height=800'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),300);
+}
+function printCurrentPreviewStudent(){ const modal=document.getElementById('class-panel-modal'); const id=modal.dataset.previewId; if(!id) return showToast('Selecciona estudiante'); printStudent(id); }
+function printSelectedOrClass(){ const container=document.getElementById('class-panel-students'); let ids=[]; container.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb.checked) ids.push(cb.dataset.sid); }); if(!ids.length) ids=(db.classes[currentClass]||[]).map(s=>s.id); printStudentsList(ids); }
+function printCurrentFicha(kind){ const sid = (document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId; if(!sid) return showToast('Abre ficha'); if(kind==='student') printStudent(sid); else if(kind==='group'){ const grade = currentClass; const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {}; let groupName=''; Object.keys(groupsFor).forEach(g=>{ if(groupsFor[g].includes(sid)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo','warn'); printGroup(groupName); } else if(kind==='course') printStudentsList((db.classes[currentClass]||[]).map(s=>s.id)); }
+function buildPrintableHTML(students, grade){
+  const now = new Date().toLocaleString(); let body=`<!doctype html><html><head><meta charset="utf-8"><title>Reporte</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:20px}</style></head><body>`; body += `<h1>Reporte convivencial — ${grade||''}</h1><div style="color:#666">Generado: ${now}</div>`; students.forEach(s=>{ body += `<hr><h2 style="margin:6px 0">${s.name}</h2><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div>`; if(s.actas&&s.actas.length){ body += `<h3>Actas</h3><ul>`; s.actas.forEach(a=>{ body += `<li><strong>${a.fecha}</strong> ${a.descripcion||''}</li>`; }); body += `</ul>`;} if(s.observador&&s.observador.length){ body += `<h3>Observador</h3><ul>`; s.observador.forEach(o=> body+=`<li>${o.fecha} ${o.tipo}: ${o.desc}</li>`); body += `</ul>`;} body += `<h3>Historial</h3><ul>`; (s.history||[]).slice(0,25).forEach(h=> body += `<li>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</li>`); body += `</ul>`; }); body += `</body></html>`; return body;
+}
+
+/* ========== Acta prints already implemented above: previewActa/buildPrintableActa */
+
 function findStudentById(id){
   if(!id) return null;
-  for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return { student:s, grade:g }; }
+  for(const g of Object.keys(db.classes||{})){
+    const s = (db.classes[g]||[]).find(x=>x.id===id);
+    if(s) return { student: s, grade: g };
+  }
   return null;
 }
 
-/* ======================
-   Metrics / badges refresh
-   ====================== */
+/* ========== Characters helper deletion toggle ========== */
+function deleteCharacter(id){
+  db.characters = (db.characters||[]).filter(c=>c.id !== id);
+  saveDB(); refreshBehaviorSelects(); showToast('Carácter eliminado','success');
+}
+
+/* ========== Simple confirm helper ========== */
+function showConfirm(title, message, cb){
+  document.getElementById('confirm-title').innerText = title;
+  document.getElementById('confirm-message').innerText = message;
+  document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); };
+  showModal('confirm-modal');
+}
+
+/* ========== Modal show/hide ========== */
+function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+/* ========== Grades management (create/rename/delete) ========== */
+function renderGradesList(){
+  const el=document.getElementById('grades-list'); if(!el) return; el.innerHTML='';
+  Object.keys(db.classes||{}).forEach(k=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eef2f7'; row.innerHTML = `<div><strong>${k}</strong> <span style="color:#666">(${(db.classes[k]||[]).length} estudiantes)</span></div><div style="display:flex;gap:6px"><button class="action-btn ficha" onclick="renameGradePrompt('${k}')">Renombrar</button><button class="action-btn red" onclick="deleteGradePrompt('${k}')">Eliminar</button></div>`; el.appendChild(row); });
+}
+function openGradesModal(){ renderGradesList(); showModal('grades-modal'); }
+function createGrade(){ const key=document.getElementById('new-grade-key').value.trim(); if(!key) return showToast('Ingresa código de grado','warn'); if(db.classes[key]) return showToast('Ya existe grado','warn'); db.classes[key]=[]; db.groups[key]={}; saveDB(); populateClassSelect(); renderGradesList(); showToast('Grado creado','success'); }
+function deleteGradePrompt(k){ showConfirm('Eliminar grado', `Eliminar grado ${k} y todos sus estudiantes?`, ()=>{ delete db.classes[k]; delete db.groups[k]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Grado eliminado','success'); }); }
+function renameGradePrompt(oldKey){ const newKey=prompt('Nuevo código de grado', oldKey); if(!newKey) return; if(db.classes[newKey]) return showToast('Ya existe','warn'); db.classes[newKey]=db.classes[oldKey]; db.groups[newKey]=db.groups[oldKey]||{}; delete db.classes[oldKey]; delete db.groups[oldKey]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Renombrado','success'); }
+
+/* ========== characters list initial render + counts ========= */
+function renderCharactersList(){ renderCharactersList = function(){ // overridden earlier; keep implementation consistent
+  const list = document.getElementById('characters-list'); if(!list) return; list.innerHTML='';
+  const all = [...DEFAULT_CHARACTERS.map(c=>({id:`def_${c.key}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type})), ...(db.characters||[])];
+  const counts = characterCounts();
+  all.forEach(c=>{
+    const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee';
+    row.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="font-size:22px">${c.emoji}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name||''}</div></div></div><div style="display:flex;align-items:center;gap:6px"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${c.id && c.id.startsWith('def_') ? '' : `<button class="action-btn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`;
+    list.appendChild(row);
+  });
+}; renderCharactersList(); }
+
+/* ========== Final helpers ========= */
 function updateMetrics(){
-  const tot={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  const students=db.classes[currentClass]||[];
-  students.forEach(s=> (s.history||[]).forEach(h=>{ if(h.type==='positive' && typeof tot[h.pilar] !== 'undefined') tot[h.pilar]+= (h.magnitude||1); }));
-  Object.keys(tot).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${tot[k]} pts`; });
+  const students = db.classes[currentClass] || [];
+  const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+  students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && totals[h.pilar] !== undefined) totals[h.pilar] += (h.magnitude||1); }));
+  Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; });
 }
 
-/* ======================
-   Institution settings
-   ====================== */
-function openInstitutionSettings(){ const inst=db.institution||{}; document.getElementById('inst-app-name').value = inst.appName || document.title || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || ''; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#0ea5e9'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
-function saveInstitutionSettings(){ db.institution = db.institution || {}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#0ea5e9'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados','success'); }
-function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value = 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = 'ALM'; document.getElementById('inst-color-primary').value = '#0ea5e9'; document.getElementById('inst-font').value = 'Inter, system-ui'; showToast('Valores restaurados','info'); }
-function renderHeaderFromInstitution(){ const inst=db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--accent-blue', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
-
-/* ======================
-   Small helpers to export / pdf of actas etc are implemented (html2pdf/xlsx)
-   ====================== */
-
-/* ======================
-   Initialize UI state functions (characters/badges etc)
-   ====================== */
-function initUIAfterLoad(){
-  populateClassSelect();
-  renderStudentGrid();
-  renderCharactersListUI();
-  renderBadgesList();
-  updateMetrics();
-}
-initUIAfterLoad();
-
-/* Expose important functions for inline handlers */
+/* Expose some functions to window for handlers used inline */
 window.openClassPanel = openClassPanel;
-window.openGroupsManager = openGroupsManager;
-window.openCharactersModal = ()=>{ renderCharactersListUI(); showModal('characters-modal'); };
-window.openBadgesModal = ()=>{ renderBadgesList(); showModal('badges-modal'); };
-window.openLeaderboard = openLeaderboard;
-window.openTimerModal = openTimerModal;
-window.openRouletteModal = openRouletteModal;
-window.openDiceModal = openDiceModal;
-window.openActaModal = openActaModal;
-window.printCurrentFicha = printCurrentFicha;
-window.downloadCurrentFichaPDF = downloadCurrentFichaPDF;
-window.exportSingleStudentExcel = exportSingleStudentExcel;
-
-/* small convenience: when panels close, refresh some lists */
-document.addEventListener('click', ()=>{ /* close menus already handled */ });
+window.openGroupsModal = ()=>{ renderGroupsColumns(); showModal('manage-groups-modal'); };
+window.openGradesModal = openGradesModal;
+window.openCharactersModal = ()=>{ renderCharactersList(); showModal('characters-modal'); };
+window.openQuick = (k)=> openQuick(k);
+window.applyBehaviorToScope = applyBehaviorToScope;
+window.exportSingleStudentExcel = function(){ if(!activeStudentId) return showToast('Abre ficha'); const found = findStudentById(activeStudentId); if(!found) return showToast('No encontrado'); const s = found.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:currentClass,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada','success'); };
 
 </script>
 </body>
