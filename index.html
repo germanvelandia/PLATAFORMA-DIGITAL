@@ -1,837 +1,1026 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FantasyClass Convivencial — index-4</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FantasyClass Convivencial — index-4</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <!-- Fonts & icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<style>
-:root{
-  --bg:#071324; --panel:#0c2a37; --card:#0f2f3d; --muted:#9fb3c4; --text:#e6eef6;
-  --accent:#3b82f6; --accent-2:#60a5fa; --success:#10b981; --danger:#ef4444;
-  --border: rgba(255,255,255,0.04); --glass: rgba(255,255,255,0.03); --hpmax:5;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#041421);color:var(--text);-webkit-font-smoothing:antialiased}
-a{color:inherit;text-decoration:none}
+  <!-- Utilities for export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-/* Topbar (menu like image 2) */
-.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#061426,#081d28)}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#0e2b3a,#1b3f50);display:flex;align-items:center;justify-content:center;font-weight:900;color:#eaf6ff}
-.title{font-weight:800}
-.subtitle{color:var(--muted);font-size:12px}
+  <style>
+    :root{
+      /* Cold videogame palette */
+      --bg: #051521;
+      --panel: #07202a;
+      --card: #08323b;
+      --muted: #9bb8c6;
+      --text: #e6f4fb;
+      --accent: #2ea0ff;
+      --accent-2: #66c6ff;
+      --accent-3: #a7e6ff;
+      --danger: #ff6b6b;
+      --success: #66ffb3;
+      --border: rgba(255,255,255,0.04);
+      --glass: rgba(255,255,255,0.03);
+      --hpmax: 100; /* student life maximum */
+      --radius: 12px;
+      --font: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:var(--font);background:linear-gradient(180deg,var(--bg),#041421);color:var(--text);-webkit-font-smoothing:antialiased}
+    a{color:inherit;text-decoration:none}
 
-/* nav */
-.nav{display:flex;gap:8px;align-items:center;margin-left:16px}
-.nav-item{position:relative;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:700;background:transparent}
-.nav-item.open{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
-.dropdown{position:absolute;left:0;top:calc(100% + 8px);background:var(--panel);border:1px solid var(--border);padding:8px;border-radius:8px;min-width:220px;display:none;box-shadow:0 12px 30px rgba(0,0,0,0.6);z-index:200}
-.nav-item.open .dropdown{display:block}
-.dropdown .item{padding:8px;border-radius:6px;color:var(--muted);display:flex;align-items:center;gap:10px}
-.dropdown .item:hover{background:rgba(255,255,255,0.02);color:var(--text)}
+    /* Top bar (clean, minimal per request) */
+    .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;background:linear-gradient(180deg,#061426,#071e2b);z-index:100}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,#0b3344,#114255);display:flex;align-items:center;justify-content:center;font-weight:900;color:#e6fbff}
+    .title{font-weight:900}
+    .subtitle{color:var(--muted);font-size:12px}
+    /* simplified nav (removed elements per your request) */
+    .nav{display:flex;gap:8px;margin-left:18px;align-items:center}
+    .nav .item{padding:8px 12px;border-radius:999px;background:transparent;color:var(--muted);font-weight:800;cursor:default}
+    .logo-badge{background:linear-gradient(180deg,var(--accent),var(--accent-2));padding:6px 10px;border-radius:999px;color:#012233;font-weight:900}
 
-/* layout */
-.container{max-width:1180px;margin:18px auto;padding:0 18px}
-.metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-.metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071f2b,#0b2a36);padding:12px;border-radius:12px;border:1px solid var(--border)}
-.controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
-.search-input{background:transparent;border:1px solid var(--border);padding:8px;border-radius:10px;color:var(--text);width:320px}
+    /* layout */
+    .container{max-width:1180px;margin:18px auto;padding:0 18px}
+    .metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+    .metric{flex:1;min-width:150px;padding:12px;border-radius:12px;background:linear-gradient(180deg,#061822,#072b36);border:1px solid var(--border)}
+    .controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+    .search{background:transparent;border:1px solid var(--border);padding:8px;border-radius:10px;color:var(--text);width:320px}
 
-/* students */
-.students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
-.student-card{background:linear-gradient(180deg,#071a22,#0d2a34);border-radius:12px;padding:14px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(2,6,23,0.6);display:flex;gap:12px;align-items:center;position:relative}
-.avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#12313f,#1a3b4f);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#eaf6ff;border:2px solid rgba(255,255,255,0.03)}
-.student-info{display:flex;flex-direction:column}
-.student-name{font-weight:800;font-size:15px}
-.student-sub{color:var(--muted);font-size:13px}
-.card-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-.btn{padding:8px 12px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
-.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
-.btn.warn{background:linear-gradient(180deg,var(--danger),#c0392b);color:#fff}
-.stat{font-weight:800;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);font-size:13px}
+    /* students grid */
+    .students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+    .student-card{background:linear-gradient(180deg,#061721,#0b2b36);border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,0.6);display:flex;gap:12px;align-items:center;transition:transform .12s}
+    .student-card:hover{transform:translateY(-6px)}
+    .avatar{width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#0f3746,#153f56);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:22px;color:#e8fbff;border:2px solid rgba(255,255,255,0.03)}
+    .student-info{display:flex;flex-direction:column}
+    .student-name{font-weight:900;font-size:16px}
+    .student-sub{color:var(--muted);font-size:13px}
+    .card-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
 
-/* modals */
-.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:400}
-.modal{background:linear-gradient(180deg,#0f2a36,#081f26);border-radius:12px;padding:16px;border:1px solid var(--border);color:var(--text);max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative}
-.modal.white{background:#fff;color:#111}
-.close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
+    /* RPG stat panel */
+    .stat-panel{margin-left:auto;text-align:right;min-width:180px}
+    .stat-row{display:flex;align-items:center;gap:8px;justify-content:flex-end}
+    .hp-bar{background:rgba(255,255,255,0.02);height:14px;border-radius:999px;width:160px;overflow:hidden;border:1px solid rgba(0,0,0,0.2)}
+    .hp-fill{height:100%;background:linear-gradient(90deg,#00e6ff,var(--accent));width:50%}
+    .stat-small{color:var(--muted);font-weight:800;font-size:13px}
 
-/* table */
-.table{width:100%;border-collapse:collapse}
-.table th{background:#102c38;color:#dbeeff;padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
-.table td{padding:10px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.02)}
+    /* buttons */
+    .btn{padding:8px 12px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+    .btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#012233}
+    .btn.warn{background:linear-gradient(180deg,var(--danger),#ff5a5a);color:#fff}
+    .btn.small{padding:6px 8px;font-size:13px}
 
-.small{font-size:12px;color:var(--muted)}
-@media(max-width:900px){ .nav{display:none} .students-grid{grid-template-columns:1fr} .search-input{width:140px} .controls-row{flex-direction:column;align-items:flex-start} }
-</style>
+    /* modals */
+    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:500}
+    .modal{background:linear-gradient(180deg,#0f2a36,#071b25);border-radius:12px;padding:16px;border:1px solid var(--border);color:var(--text);max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative}
+    .modal.white{background:#fff;color:#111}
+    .close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
+
+    /* tabs */
+    .tabs{display:flex;gap:8px;border-bottom:1px solid var(--border);padding-bottom:8px;margin-bottom:12px}
+    .tab{padding:8px 12px;border-radius:10px;cursor:pointer;color:var(--muted);font-weight:800}
+    .tab.active{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#012233}
+
+    /* forms and print area */
+    .ef2-input{padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%}
+    .print-area{background:#fff;padding:18px;border-radius:8px;color:#111}
+
+    /* table */
+    .table{width:100%;border-collapse:collapse;margin-top:8px}
+    .table th{background:#0f3b47;color:#dff6ff;padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+    .table td{padding:8px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.02)}
+
+    .small{font-size:12px;color:var(--muted)}
+
+    @media(max-width:900px){ .students-grid{grid-template-columns:1fr} .search{width:140px} .controls-row{flex-direction:column;align-items:flex-start} }
+  </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div style="display:flex;align-items:center">
-    <div class="brand">
-      <div class="logo" id="header-logo">ALM</div>
-      <div>
-        <div class="title" id="header-title">FantasyClass Convivencial</div>
-        <div class="subtitle" id="header-subtitle">Aprendiendo Jugando</div>
-      </div>
-    </div>
-
-    <nav class="nav" id="topnav">
-      <div class="nav-item" data-nav="clase">Clase</div>
-
-      <div class="nav-item" data-nav="recompensas" id="nav-recompensas">Recompensas ▾
-        <div class="dropdown">
-          <div class="item" data-action="openLevels"><i class="fa-solid fa-trophy" style="width:18px"></i> Niveles</div>
-          <div class="item" data-action="openCards"><i class="fa-solid fa-book" style="width:18px"></i> Cartas</div>
-          <div class="item" data-action="openRoles"><i class="fa-solid fa-mask" style="width:18px"></i> Roles</div>
-          <div class="item" data-action="openBadges"><i class="fa-solid fa-award" style="width:18px"></i> Insignias</div>
-          <div class="item" data-action="openBehaviors"><i class="fa-regular fa-heart" style="width:18px"></i> Comportamientos</div>
-          <div class="item" data-action="openShop"><i class="fa-solid fa-store" style="width:18px"></i> Tienda</div>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div style="display:flex;align-items:center">
+      <div class="brand">
+        <div class="logo" id="header-logo">ALM</div>
+        <div>
+          <div class="title" id="header-title">FantasyClass Convivencial</div>
+          <div class="subtitle" id="header-subtitle">Modo docente — Gamifica tu clase</div>
         </div>
       </div>
 
-      <div class="nav-item" data-nav="aventura">Aventura ▾</div>
-      <div class="nav-item" data-nav="evaluacion">Evaluación ▾</div>
-    </nav>
-  </div>
-
-  <div style="display:flex;align-items:center;gap:10px">
-    <div style="background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid var(--border)">
-      <select id="class-select" onchange="switchClass(this.value)"></select>
-    </div>
-
-    <div class="nav-item" id="tools-menu">Herramientas ▾
-      <div class="dropdown" id="tools-dropdown">
-        <div class="item" data-action="openTimer">Cronómetro</div>
-        <div class="item" data-action="openRoulette">Ruleta</div>
-        <div class="item" data-action="openDice">Dado</div>
-        <div style="height:1px;background:var(--border);margin:6px 0"></div>
-        <div class="item" data-action="openClassPanel">Panel de Clase</div>
-        <div class="item" data-action="openGroups">Gestión de Grupos</div>
-        <div class="item" data-action="openGrades">Administrar Grados</div>
+      <!-- Simplified nav (removed extraneous elements as requested) -->
+      <div class="nav" style="margin-left:18px">
+        <div class="item logo-badge">Clase</div>
+        <div class="item">Recompensas</div>
       </div>
     </div>
 
-    <div class="nav-item" id="chars-menu">Comportamientos ▾
-      <div class="dropdown" id="chars-dropdown">
-        <div class="item" data-action="openBehaviors">Administrar Comportamientos</div>
-        <div class="item" data-action="openQuickPositive">Puntos positivos</div>
-        <div class="item" data-action="openQuickNegative">Puntos negativos</div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="background:transparent;padding:6px;border-radius:10px;border:1px solid var(--border)">
+        <select id="class-select" onchange="switchClass(this.value)"></select>
       </div>
-    </div>
 
-    <div class="nav-item" id="settings-menu">Ajustes ▾
-      <div class="dropdown" id="settings-dropdown">
-        <div class="item" data-action="openInstitution">Ajustes institucionales</div>
-        <div class="item" data-action="downloadBackup">Descargar backup</div>
-        <div class="item" data-action="openRestore">Restaurar</div>
-      </div>
-    </div>
-  </div>
-</header>
-
-<main class="container">
-  <div class="metrics" id="metrics-row">
-    <div class="metric"><div style="font-weight:800">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0 pts</div></div>
-    <div class="metric"><div style="font-weight:800">Respeto</div><div id="badge-Respeto" style="font-weight:900">0 pts</div></div>
-    <div class="metric"><div style="font-weight:800">Confianza</div><div id="badge-Confianza" style="font-weight:900">0 pts</div></div>
-    <div class="metric"><div style="font-weight:800">Empatía</div><div id="badge-Empatía" style="font-weight:900">0 pts</div></div>
-  </div>
-
-  <div class="controls-row">
-    <div style="display:flex;gap:8px;align-items:center">
-      <input id="student-search" class="search-input" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
-      <button id="add-student" class="btn ghost">+ Estudiante</button>
-      <button id="open-class-panel" class="btn ghost">Panel de Clase</button>
-    </div>
-    <div style="display:flex;gap:8px">
-      <button id="open-grades" class="btn ghost">Administrar Grados</button>
-      <button id="open-groups" class="btn ghost">Gestión de Grupos</button>
-    </div>
-  </div>
-
-  <div id="students-container" class="students-grid"></div>
-</main>
-
-<div id="toast-container" style="position:fixed;right:18px;bottom:18px;z-index:9000"></div>
-
-<!-- ---------- MODALS (full) ---------- -->
-
-<!-- Behaviors modal -->
-<div id="behaviors-modal" class="modal-backdrop" style="display:none">
-  <div class="modal white" role="dialog" aria-modal="true">
-    <button class="close-btn" data-close="behaviors-modal">✕</button>
-    <h3>Comportamientos</h3>
-
-    <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
-      <div style="flex:1;display:flex;gap:8px;align-items:center">
-        <button id="new-behavior" class="btn primary">+ Nuevo comportamiento</button>
-        <div class="small">Ver</div>
-        <select id="behavior-filter" class="ef2-input" style="width:150px">
-          <option value="all">Todos</option><option value="positive">Positivos</option><option value="negative">Negativos</option>
-        </select>
-      </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <input id="behavior-search" class="ef2-input" placeholder="Buscar comportamiento..." style="width:260px" />
+        <button id="open-tools" class="btn ghost">Herramientas</button>
+        <button id="open-behaviors" class="btn ghost">Comportamientos</button>
+        <button id="open-groups" class="btn ghost">Grupos</button>
       </div>
     </div>
+  </header>
 
-    <table class="table" style="margin-top:12px">
-      <thead><tr><th>Icono</th><th>Nombre</th><th>Texto</th><th>HP</th><th>XP</th><th>Oro</th><th>Tipo</th><th style="text-align:right">Acciones</th></tr></thead>
-      <tbody id="behaviors-body"></tbody>
-    </table>
-  </div>
-</div>
+  <!-- MAIN -->
+  <main class="container">
+    <div class="metrics" id="metrics-row">
+      <div class="metric"><div style="font-weight:800">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0 pts</div></div>
+      <div class="metric"><div style="font-weight:800">Respeto</div><div id="badge-Respeto" style="font-weight:900">0 pts</div></div>
+      <div class="metric"><div style="font-weight:800">Confianza</div><div id="badge-Confianza" style="font-weight:900">0 pts</div></div>
+      <div class="metric"><div style="font-weight:800">Empatía</div><div id="badge-Empatía" style="font-weight:900">0 pts</div></div>
+    </div>
 
-<!-- Behavior edit -->
-<div id="behavior-edit-modal" class="modal-backdrop" style="display:none">
-  <div class="modal white" style="max-width:520px">
-    <button class="close-btn" data-close="behavior-edit-modal">✕</button>
-    <h3 id="behavior-edit-title">Nuevo comportamiento</h3>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-      <input id="b-key" class="ef2-input" placeholder="Nombre (ej. Participación)">
-      <input id="b-emoji" class="ef2-input" placeholder="Emoji (ej. 👍)">
-      <input id="b-text" class="ef2-input" placeholder="Texto visible">
+    <div class="controls-row">
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="student-search" class="search" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
+        <button id="btn-add-student" class="btn ghost">+ Estudiante</button>
+        <button id="btn-panel-class" class="btn ghost">Panel de Clase</button>
+      </div>
+
       <div style="display:flex;gap:8px">
-        <input id="b-hp" class="ef2-input" type="number" placeholder="HP" style="width:120px">
-        <input id="b-xp" class="ef2-input" type="number" placeholder="XP" style="width:120px">
-        <input id="b-gold" class="ef2-input" type="number" placeholder="Oro" style="width:120px">
-      </div>
-      <select id="b-type" class="ef2-input"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" data-close="behavior-edit-modal">Cancelar</button>
-        <button id="save-behavior-btn" class="btn primary">Guardar</button>
+        <button id="btn-grades" class="btn ghost">Administrar Grados</button>
+        <button id="btn-export-class" class="btn ghost">Exportar curso</button>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Behavior apply modal -->
-<div id="behavior-apply-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:520px">
-    <button class="close-btn" data-close="behavior-apply-modal">✕</button>
-    <h3>Aplicar comportamiento</h3>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-      <select id="apply-behavior-select" class="ef2-input"></select>
-      <div style="display:flex;gap:8px">
-        <select id="apply-type" class="ef2-input" style="width:160px"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
-        <input id="apply-points" class="ef2-input" type="number" value="1" style="width:120px">
-        <select id="apply-scope" class="ef2-input" style="width:160px"><option value="student">Estudiante</option><option value="group">Grupo</option><option value="class">Curso</option></select>
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="btn ghost" data-close="behavior-apply-modal">Cancelar</button>
-        <button id="apply-behavior-btn" class="btn primary">Aplicar</button>
-      </div>
-    </div>
-  </div>
-</div>
+    <section id="students-container" class="students-grid"></section>
+  </main>
 
-<!-- Class Panel modal -->
-<div id="class-panel-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:1000px">
-    <button class="close-btn" data-close="class-panel-modal">✕</button>
-    <h3>Panel de Clase — Acciones rápidas</h3>
-    <div style="display:flex;gap:12px;margin-top:12px">
-      <div style="flex:1;max-width:520px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">Selecciona Estudiantes</div>
-          <div style="display:flex;gap:6px">
-            <button id="panel-select-all" class="btn ghost">Seleccionar todos</button>
-            <button id="panel-clear" class="btn ghost">Limpiar</button>
-          </div>
-        </div>
-        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px;margin-top:8px"></div>
-      </div>
+  <!-- Toasts -->
+  <div id="toast-container" style="position:fixed;right:18px;bottom:18px;z-index:1200"></div>
 
-      <div style="width:440px">
-        <div style="font-weight:800">Acción</div>
-        <div style="margin-top:8px">
-          <select id="class-panel-action-type" class="ef2-input" style="width:100%">
-            <option value="pilar">Comportamiento (pilar)</option>
-            <option value="xp">XP</option>
-            <option value="hp">HP</option>
-            <option value="gold">Oro</option>
+  <!-- -----------------------------
+       MODALS: BEHAVIORS, GROUPS, TOOLS, FICHA
+       ----------------------------- -->
+
+  <!-- Behaviors modal (CRUD) -->
+  <div id="behaviors-modal" class="modal-backdrop" style="display:none">
+    <div class="modal white" style="max-width:880px">
+      <button class="close-btn" data-close="behaviors-modal">✕</button>
+      <h3>Comportamientos</h3>
+
+      <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+        <div style="flex:1;display:flex;gap:8px;align-items:center">
+          <button id="new-behavior" class="btn primary">+ Nuevo comportamiento</button>
+          <div class="small">Ver</div>
+          <select id="behavior-filter" class="ef2-input" style="width:140px">
+            <option value="all">Todos</option><option value="positive">Positivos</option><option value="negative">Negativos</option>
           </select>
-          <div id="class-panel-pilar-row" style="margin-top:8px"><select id="class-panel-pilar-select" class="ef2-input" style="width:100%"></select></div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:120px">
-            <select id="class-panel-op" class="ef2-input" style="width:120px"><option value="add">Agregar</option><option value="sub">Restar</option></select>
-            <button id="class-panel-apply" class="btn primary">Aplicar</button>
-          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="behavior-search" class="ef2-input" placeholder="Buscar..." style="width:240px">
         </div>
       </div>
+
+      <table class="table" style="margin-top:12px">
+        <thead><tr><th>Icono</th><th>Nombre</th><th>Descripción</th><th>HP</th><th>XP</th><th>Oro</th><th>Tipo</th><th style="text-align:right">Acciones</th></tr></thead>
+        <tbody id="behaviors-body"></tbody>
+      </table>
     </div>
   </div>
-</div>
 
-<!-- Groups modal -->
-<div id="manage-groups-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:1100px">
-    <button class="close-btn" data-close="manage-groups-modal">✕</button>
-    <h3>Crear y configurar grupos</h3>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <div style="display:flex;gap:8px;align-items:center">
-        <button id="create-group" class="btn primary">+ Crear grupo</button>
-        <button id="distrib-rand-btn" class="btn ghost">Distrib. aleatoria</button>
-        <button id="distrib-size-btn" class="btn ghost">Por tamaño</button>
-      </div>
-
-      <div style="display:flex;gap:8px;align-items:center">
-        <div style="color:var(--muted);font-weight:700;margin-right:8px">N. de grupos</div>
-        <div style="display:flex;align-items:center;border-radius:999px;background:linear-gradient(180deg,#081822,#0b2734);padding:6px 10px;border:1px solid var(--border)">
-          <button class="btn ghost" id="group-count-minus">−</button>
-          <div id="group-count" style="min-width:36px;text-align:center">3</div>
-          <button class="btn ghost" id="group-count-plus">+</button>
+  <!-- Behavior edit -->
+  <div id="behavior-edit-modal" class="modal-backdrop" style="display:none">
+    <div class="modal white" style="max-width:520px">
+      <button class="close-btn" data-close="behavior-edit-modal">✕</button>
+      <h3 id="behavior-edit-title">Nuevo comportamiento</h3>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+        <input id="b-key" class="ef2-input" placeholder="Nombre (ej. Participación)">
+        <input id="b-emoji" class="ef2-input" placeholder="Emoji (ej. 👍)">
+        <input id="b-desc" class="ef2-input" placeholder="Texto visible / descripción">
+        <div style="display:flex;gap:8px">
+          <input id="b-hp" class="ef2-input" type="number" placeholder="HP (ej. -10 or 10)" style="width:120px">
+          <input id="b-xp" class="ef2-input" type="number" placeholder="XP" style="width:120px">
+          <input id="b-gold" class="ef2-input" type="number" placeholder="Oro" style="width:120px">
         </div>
-      </div>
-    </div>
-
-    <div style="margin-top:12px;display:flex;gap:12px">
-      <div style="width:320px">
-        <div style="font-weight:800">Pool de estudiantes</div>
-        <div id="groups-students-pool" style="max-height:420px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid var(--border);margin-top:8px"></div>
-      </div>
-      <div style="flex:1">
-        <div id="groups-columns-area" class="group-columns" style="display:flex;gap:12px;align-items:flex-start;overflow:auto;padding-top:8px"></div>
-      </div>
-    </div>
-
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button id="save-groups" class="btn primary">Guardar</button>
-      <button class="btn ghost" data-close="manage-groups-modal">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Institution modal -->
-<div id="institution-modal" class="modal-backdrop" style="display:none">
-  <div class="modal white" style="max-width:720px">
-    <button class="close-btn" data-close="institution-modal">✕</button>
-    <h3>Ajustes institucionales</h3>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-      <label>Nombre de la aplicación</label><input id="inst-app-name" class="ef2-input">
-      <label>Subtítulo</label><input id="inst-subtitle" class="ef2-input">
-      <label>Logo (2-4 caracteres)</label><input id="inst-logo-text" class="ef2-input" style="width:160px">
-      <label>Color primario (hex)</label><input id="inst-color-primary" class="ef2-input" placeholder="#3b82f6">
-      <label>Fuente (familia CSS)</label><input id="inst-font" class="ef2-input" placeholder="Inter, system-ui">
-    </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button id="inst-defaults" class="btn ghost">Restaurar</button>
-      <button id="inst-save" class="btn primary">Guardar</button>
-      <button class="btn ghost" data-close="institution-modal">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Timer / Roulette / Dice modals -->
-<div id="timer-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:520px">
-    <button class="close-btn" data-close="timer-modal">✕</button>
-    <h3>Cronómetro</h3>
-    <div id="timer-display" style="font-weight:900;font-size:48px;color:var(--accent);margin:18px 0;text-align:center">05:00</div>
-    <div style="display:flex;gap:8px;justify-content:center">
-      <button id="timer-toggle" class="btn primary">Iniciar/Pausar</button>
-      <button id="timer-reset" class="btn ghost">Reset</button>
-      <button class="btn ghost" onclick="setTimerMinutes(1)">1m</button>
-      <button class="btn ghost" onclick="setTimerMinutes(5)">5m</button>
-    </div>
-  </div>
-</div>
-
-<div id="roulette-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:640px">
-    <button class="close-btn" data-close="roulette-modal">✕</button>
-    <h3>Ruleta</h3>
-    <div id="roulette-display" style="font-weight:900;font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#07121a,#041018);margin-top:12px">¡Presiona Girar!</div>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button id="roulette-start" class="btn primary">Girar</button>
-      <button id="roulette-stop" class="btn ghost">Detener</button>
-    </div>
-  </div>
-</div>
-
-<div id="dice-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:640px">
-    <button class="close-btn" data-close="dice-modal">✕</button>
-    <h3>Dado</h3>
-    <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-      <div style="width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)">
-        <div id="die" style="font-size:36px">🎲</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Cantidad</label><input id="dice-count" type="number" min="1" max="10" value="1" class="ef2-input" style="width:60px" /></div>
-        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Caras</label><input id="dice-sides" type="number" min="2" max="100" value="6" class="ef2-input" style="width:80px" /></div>
-        <div style="display:flex;gap:8px"><button id="dice-roll" class="btn primary">Lanzar Dado</button></div>
-      </div>
-    </div>
-    <div id="dice-detail" style="color:var(--muted);margin-top:8px"></div>
-  </div>
-</div>
-
-<!-- Confirm modal -->
-<div id="confirm-modal" class="modal-backdrop" style="display:none">
-  <div class="modal" style="max-width:420px">
-    <button class="close-btn" data-close="confirm-modal">✕</button>
-    <h3 id="confirm-title">¿Estás seguro?</h3>
-    <p id="confirm-message" style="color:var(--muted)"></p>
-    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="btn warn" id="confirm-yes">Eliminar</button>
-      <button class="btn ghost" data-close="confirm-modal">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Restore modal -->
-<div id="restore-modal" class="modal-backdrop" style="display:none">
-  <div class="modal white" style="max-width:760px">
-    <button class="close-btn" data-close="restore-modal">✕</button>
-    <h3>Restaurar backup (pegar JSON)</h3>
-    <div>
-      <label>Clave localStorage</label>
-      <input id="restore-key" class="ef2-input" value="fantasyclass_alm_db">
-      <label>JSON</label>
-      <textarea id="restore-json" style="width:100%;height:220px"></textarea>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-        <button class="btn ghost" data-close="restore-modal">Cancelar</button>
-        <button class="btn primary" id="apply-restore">Restaurar</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- =========================
-     SCRIPT
-     ========================= -->
-<script>
-/* ==========
-   State & Defaults
-   ========== */
-const STORAGE_KEY = 'fantasyclass_alm_db';
-const HP_MAX = 5;
-const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
-const DEFAULT_CHARACTERS = [
-  { key: 'Participación', emoji:'👍', name:'Participación', type:'positive', hp:0, xp:5, gold:0 },
-  { key: 'Tareas', emoji:'📘', name:'Hace los deberes', type:'positive', hp:0, xp:5, gold:0 },
-  { key: 'Puntualidad', emoji:'⏰', name:'Puntualidad y asistencia', type:'positive', hp:0, xp:5, gold:0 },
-  { key: 'Falta', emoji:'⚠️', name:'Falta', type:'negative', hp:-1, xp:0, gold:0 }
-];
-
-let db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} };
-let currentClass = null;
-let activeStudentId = null;
-
-/* ----- Toast ----- */
-const toastContainer = document.getElementById('toast-container');
-function showToast(msg, t=2800){
-  const el = document.createElement('div'); el.style.marginTop='8px'; el.innerHTML = `<div style="background:rgba(0,0,0,0.75);color:#fff;padding:10px 14px;border-radius:8px">${msg}</div>`;
-  toastContainer.appendChild(el); setTimeout(()=> el.remove(), t);
-}
-
-/* ----- Persistence ----- */
-function loadDB(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(raw) db = JSON.parse(raw);
-  }catch(e){ db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} }; }
-  if(!db.classes) db.classes = {};
-  if(!db.groups) db.groups = {};
-  if(!Array.isArray(db.characters)) db.characters = [];
-  Object.keys(DEFAULT_ROSTERS).forEach(k=>{ if(!db.classes[k]) db.classes[k] = []; if(!db.groups[k]) db.groups[k] = {}; });
-  if(!db.characters.length) db.characters = DEFAULT_CHARACTERS.map((c,i)=> ({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type, hp:c.hp, xp:c.xp, gold:c.gold }));
-  currentClass = currentClass || Object.keys(db.classes)[0] || null;
-}
-function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('save error', e); } }
-
-/* ----- Init ----- */
-document.addEventListener('DOMContentLoaded', ()=>{
-  loadDB();
-  wireTopNav();
-  populateClassSelect();
-  wireHeaderButtons();
-  renderStudentGrid();
-  renderBehaviorsTable();
-  refreshBehaviorSelects();
-  renderGroupsColumns();
-  renderHeaderFromInstitution();
-  wireModalCloseButtons();
-});
-
-/* ===== Top nav dropdowns ===== */
-function wireTopNav(){
-  document.querySelectorAll('.nav-item').forEach(item=>{
-    item.addEventListener('click', e=>{
-      e.stopPropagation();
-      const open = item.classList.contains('open');
-      document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open'));
-      if(!open) item.classList.add('open');
-    });
-  });
-  document.addEventListener('click', e=>{ if(!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); });
-  document.querySelectorAll('.dropdown .item').forEach(it=> it.addEventListener('click', ()=> { if(it.dataset.action) handleAction(it.dataset.action); document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); }));
-}
-
-/* map actions */
-function handleAction(action){
-  const actions = {
-    openTimer: ()=> openTimerModal(),
-    openRoulette: ()=> openRouletteModal(),
-    openDice: ()=> openDiceModal(),
-    openClassPanel: ()=> { buildClassPanel(); showModal('class-panel-modal'); },
-    openGroups: ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); },
-    openGrades: ()=> openGradesModal(),
-    openBehaviors: ()=> { renderBehaviorsTable(); showModal('behaviors-modal'); },
-    openQuickPositive: ()=> openQuick('positive'),
-    openQuickNegative: ()=> openQuick('negative'),
-    downloadBackup: ()=> downloadBackup(),
-    openRestore: ()=> openRestore(),
-    openInstitution: ()=> openInstitutionSettings()
-  };
-  if(actions[action]) actions[action](); else console.warn('Unmapped action', action);
-}
-
-/* ===== Class select ===== */
-function populateClassSelect(){
-  const sel = document.getElementById('class-select'); if(!sel) return; sel.innerHTML='';
-  Object.keys(db.classes).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt); });
-  if(currentClass && db.classes[currentClass]) sel.value = currentClass;
-  else currentClass = sel.value || Object.keys(db.classes)[0] || null;
-  sel.onchange = ()=> { switchClass(sel.value); };
-}
-function switchClass(val){
-  if(!db.classes[val]) return showToast('Grado no encontrado');
-  currentClass = val;
-  populateClassSelect();
-  renderStudentGrid();
-  renderGroupsColumns();
-}
-
-/* ===== Students grid ===== */
-function avatarGradient(name){
-  const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
-  const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-  const p = palettes[idx];
-  return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
-}
-function calcStudentSums(s){
-  let pos=0, neg=0; (s.history||[]).forEach(h=>{ if(h.type==='positive') pos += (h.magnitude||0); else neg += (h.magnitude||0); }); return { pos, neg };
-}
-function renderStudentGrid(){
-  const grid = document.getElementById('students-container'); if(!grid) return; grid.innerHTML='';
-  if(!currentClass) return;
-  const q = (document.getElementById('student-search').value||'').toLowerCase();
-  const list = db.classes[currentClass] || [];
-  list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
-    const sums = calcStudentSums(s);
-    const card = document.createElement('div'); card.className='student-card';
-    card.innerHTML = `
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
-        <div class="student-info">
-          <div class="student-name">${s.name}</div>
-          <div class="student-sub">Grado ${currentClass} • ${s.document||''}</div>
-          <div class="card-actions">
-            <button class="btn ghost" data-action="openFicha" data-sid="${s.id}">Ficha</button>
-            <button class="btn ghost" data-action="export" data-sid="${s.id}"><i class="fa-solid fa-file-excel"></i></button>
-            <button class="btn primary" data-action="applyBehavior" data-sid="${s.id}"><i class="fa-regular fa-heart"></i> Comportamiento</button>
-          </div>
-        </div>
-      </div>
-      <div style="margin-left:auto;text-align:right">
+        <select id="b-type" class="ef2-input"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
         <div style="display:flex;gap:8px;justify-content:flex-end">
-          <div class="stat">XP ${s.xp||0}</div>
-          <div class="stat">HP ${s.hp||HP_MAX}</div>
-          <div class="stat">ORO ${s.gold||0}</div>
+          <button class="btn ghost" data-close="behavior-edit-modal">Cancelar</button>
+          <button id="save-behavior" class="btn primary">Guardar</button>
         </div>
-        <div style="margin-top:8px"><button class="btn warn" data-action="delete" data-sid="${s.id}"><i class="fa-solid fa-trash"></i></button></div>
       </div>
-    `;
-    grid.appendChild(card);
-  });
-  grid.querySelectorAll('button[data-action]').forEach(btn=>{
-    btn.onclick = (e)=>{ e.stopPropagation(); const act=btn.dataset.action; const sid=btn.dataset.sid; if(act==='openFicha') openFicha(sid); else if(act==='export') exportSingleStudentExcel(sid); else if(act==='applyBehavior'){ activeStudentId=sid; refreshBehaviorSelects(); showModal('behavior-apply-modal'); } else if(act==='delete') promptDeleteStudent(sid); };
-  });
-  updateMetrics();
-}
+    </div>
+  </div>
 
-/* ===== Add/Delete student ===== */
-function openAddStudentPrompt(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], gold:0 }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado'); }
-function promptDeleteStudent(id){ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado'); }); }
+  <!-- Groups modal -->
+  <div id="groups-modal" class="modal-backdrop" style="display:none">
+    <div class="modal" style="max-width:1100px">
+      <button class="close-btn" data-close="groups-modal">✕</button>
+      <h3>Gestión de grupos</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="groups-create" class="btn primary">+ Crear grupo</button>
+          <button id="groups-random" class="btn ghost">Asignación aleatoria</button>
+          <button id="groups-by-size" class="btn ghost">Por tamaño</button>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="color:var(--muted);font-weight:700">N. de grupos</div>
+          <div style="display:flex;align-items:center;border-radius:999px;background:linear-gradient(180deg,#071a25,#092733);padding:6px 10px;border:1px solid var(--border)">
+            <button id="group-minus" class="btn ghost">−</button>
+            <div id="group-count" style="min-width:36px;text-align:center">3</div>
+            <button id="group-plus" class="btn ghost">+</button>
+          </div>
+        </div>
+      </div>
 
-/* ===== Ficha (basic modal summary) ===== */
-function openFicha(id){
-  const f = findStudentById(id); if(!f) return showToast('No encontrado'); activeStudentId = id;
-  // We provide a quick modal with options to open full ficha (more complex). For now show summary with options.
-  const s = f.student;
-  const info = `Nombre: ${s.name}\nGrado: ${f.grade}\nXP:${s.xp||0} HP:${s.hp||HP_MAX} ORO:${s.gold||0}\nActas: ${(s.actas||[]).length}\nHistorial: ${(s.history||[]).slice(0,5).map(h=>`${h.ts} ${h.pilar} ${h.magnitude}`).join('\\n')}`;
-  alert(info);
-}
+      <div style="display:flex;gap:12px;margin-top:12px">
+        <div style="width:320px">
+          <div style="font-weight:800">Pool de estudiantes</div>
+          <div id="groups-pool" style="margin-top:8px;max-height:420px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid var(--border)"></div>
+        </div>
 
-/* ===== Behaviors CRUD & apply ===== */
-function renderBehaviorsTable(){
-  const tbody = document.getElementById('behaviors-body'); if(!tbody) return; tbody.innerHTML='';
-  const q = (document.getElementById('behavior-search')?.value||'').toLowerCase();
-  const filter = document.getElementById('behavior-filter')?.value || 'all';
-  (db.characters||[]).filter(b=>{ if(filter!=='all' && b.type !== filter) return false; if(q && !(b.key.toLowerCase().includes(q) || (b.name||'').toLowerCase().includes(q))) return false; return true; }).forEach(b=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="width:80px">${b.emoji||''}</td><td>${escapeHtml(b.key)}</td><td>${escapeHtml(b.name||'')}</td><td>${b.hp||0}</td><td>${b.xp||0}</td><td>${b.gold||0}</td><td>${b.type}</td><td style="text-align:right"><button class="btn ghost" data-edit="${b.id}"><i class="fa-solid fa-pen"></i></button> <button class="btn warn" data-del="${b.id}"><i class="fa-solid fa-trash"></i></button></td>`;
-    tbody.appendChild(tr);
-  });
-  tbody.querySelectorAll('button[data-edit]').forEach(b=> b.addEventListener('click', ()=> openBehaviorEdit(b.dataset.edit)));
-  tbody.querySelectorAll('button[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteBehavior(b.dataset.del)));
-}
-function openBehaviorEdit(id){
-  document.getElementById('behavior-edit-title').innerText = id ? 'Editar comportamiento' : 'Nuevo comportamiento';
-  document.getElementById('b-key').value = '';
-  document.getElementById('b-emoji').value = '';
-  document.getElementById('b-text').value = '';
-  document.getElementById('b-hp').value = 0;
-  document.getElementById('b-xp').value = 0;
-  document.getElementById('b-gold').value = 0;
-  document.getElementById('b-type').value = 'positive';
-  document.getElementById('save-behavior-btn').dataset.edit = id || '';
-  if(id){
-    const b = db.characters.find(x=>x.id===id); if(b){ document.getElementById('b-key').value=b.key; document.getElementById('b-emoji').value=b.emoji; document.getElementById('b-text').value=b.name; document.getElementById('b-hp').value=b.hp||0; document.getElementById('b-xp').value=b.xp||0; document.getElementById('b-gold').value=b.gold||0; document.getElementById('b-type').value=b.type; }
+        <div style="flex:1">
+          <div id="groups-columns" style="display:flex;gap:12px;align-items:flex-start;overflow:auto"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+        <button id="groups-save" class="btn primary">Guardar</button>
+        <button class="btn ghost" data-close="groups-modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tools modal: Timer / Roulette / Dice -->
+  <div id="tools-modal" class="modal-backdrop" style="display:none">
+    <div class="modal" style="max-width:860px">
+      <button class="close-btn" data-close="tools-modal">✕</button>
+      <h3>Herramientas</h3>
+
+      <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap">
+        <!-- Timer -->
+        <div style="flex:1;min-width:280px">
+          <h4>Cronómetro</h4>
+          <div id="timer-display" style="font-weight:900;font-size:40px;color:var(--accent);margin:12px 0">05:00</div>
+
+          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+            <button id="timer-toggle" class="btn primary">Iniciar/Pausar</button>
+            <button id="timer-reset" class="btn ghost">Reset</button>
+            <select id="timer-presets" class="ef2-input" style="width:140px">
+              <option value="60">1 min</option>
+              <option value="300">5 min</option>
+              <option value="1200">20 min</option>
+              <option value="1800">30 min</option>
+              <option value="manual">Manual...</option>
+            </select>
+            <input id="timer-manual" class="ef2-input" type="number" placeholder="Tiempo (segundos)" style="width:140px;display:none">
+            <label style="display:flex;align-items:center;gap:8px;color:var(--muted)"><input type="checkbox" id="timer-sound" checked> Sonido</label>
+          </div>
+        </div>
+
+        <!-- Roulette -->
+        <div style="flex:1;min-width:280px">
+          <h4>Ruleta</h4>
+          <div id="roulette-display" style="height:120px;border-radius:12px;background:linear-gradient(180deg,#061421,#071b27);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;margin:12px 0">¡Presiona Girar!</div>
+          <div style="display:flex;gap:8px">
+            <button id="roulette-start" class="btn primary">Girar</button>
+            <button id="roulette-stop" class="btn ghost">Detener</button>
+            <label style="display:flex;align-items:center;gap:8px;color:var(--muted)"><input type="checkbox" id="roulette-sound" checked> Sonido</label>
+          </div>
+        </div>
+
+        <!-- Dice -->
+        <div style="flex:1;min-width:200px">
+          <h4>Dado</h4>
+          <div style="display:flex;gap:12px;align-items:center">
+            <div style="width:92px;height:92px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)">
+              <div id="die" style="font-size:36px">🎲</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Cantidad</label><input id="dice-count" type="number" min="1" max="10" value="1" class="ef2-input" style="width:60px"/></div>
+              <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Caras</label><input id="dice-sides" type="number" min="2" max="100" value="6" class="ef2-input" style="width:80px"/></div>
+              <div><button id="dice-roll" class="btn primary">Lanzar Dado</button></div>
+            </div>
+          </div>
+          <div id="dice-detail" style="color:var(--muted);margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Student ficha modal (full features) -->
+  <div id="ficha-modal" class="modal-backdrop" style="display:none">
+    <div class="modal white" style="max-width:980px;color:#111">
+      <button class="close-btn" data-close="ficha-modal">✕</button>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="display:flex;gap:12px;align-items:center">
+          <div id="f-avatar" style="width:72px;height:72px;border-radius:12px;background:#f1f7fb;display:flex;align-items:center;justify-content:center;font-weight:900;color:#012233;font-size:22px">A</div>
+          <div>
+            <div id="f-name" style="font-weight:900;font-size:18px"></div>
+            <div id="f-grade" style="color:#666"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <button id="f-export-excel" class="btn ghost">Exportar Excel</button>
+          <button id="f-export-pdf" class="btn ghost">Exportar PDF</button>
+          <button id="f-print" class="btn primary">Imprimir</button>
+        </div>
+      </div>
+
+      <div class="tabs" style="margin-top:12px">
+        <div class="tab active" data-tab="datos">A. Datos del estudiante</div>
+        <div class="tab" data-tab="gamificacion">B. Gamificación</div>
+        <div class="tab" data-tab="observador">C. Observador</div>
+        <div class="tab" data-tab="export">D. Export / Imprimir</div>
+        <div class="tab" data-tab="acta">E. Acta convivencial</div>
+      </div>
+
+      <div id="tab-datos" class="tab-content">
+        <div style="display:flex;gap:12px">
+          <div style="flex:1">
+            <label>Nombre</label><input id="f-name-input" class="ef2-input">
+            <label>Documento</label><input id="f-doc-input" class="ef2-input">
+            <label>Fecha de nacimiento</label><input id="f-birth-input" type="date" class="ef2-input">
+            <label>Acudiente</label><input id="f-guardian-input" class="ef2-input">
+          </div>
+          <div style="width:320px">
+            <label>Nivel</label><input id="f-level-input" class="ef2-input">
+            <label>XP</label><input id="f-xp-input" type="number" class="ef2-input">
+            <label>HP</label><input id="f-hp-input" type="number" class="ef2-input">
+            <label>ORO</label><input id="f-gold-input" type="number" class="ef2-input">
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="f-save-data" class="btn primary">Guardar</button>
+              <button id="f-close" class="btn ghost" data-close="ficha-modal">Cerrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-gamificacion" class="tab-content" style="display:none">
+        <h4>Aplicar comportamiento (rápido)</h4>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="f-behavior-select" class="ef2-input" style="width:260px"></select>
+          <select id="f-behavior-type" class="ef2-input" style="width:140px"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
+          <input id="f-behavior-points" class="ef2-input" type="number" value="1" style="width:100px">
+          <button id="f-apply-behavior" class="btn primary">Aplicar</button>
+        </div>
+
+        <h4 style="margin-top:12px">Historial reciente</h4>
+        <div id="f-history" style="max-height:220px;overflow:auto;border-radius:8px;border:1px solid var(--border);padding:8px;background:linear-gradient(180deg,#f8fafc,#ffffff)"></div>
+      </div>
+
+      <div id="tab-observador" class="tab-content" style="display:none">
+        <h4>Observador</h4>
+        <div>
+          <textarea id="obs-text" class="ef2-input" rows="4" placeholder="Anotar observación..."></textarea>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button id="obs-save" class="btn primary">Guardar observación</button>
+            <button id="obs-print" class="btn ghost">Imprimir observaciones</button>
+          </div>
+        </div>
+        <div id="obs-list" style="margin-top:12px;max-height:220px;overflow:auto"></div>
+      </div>
+
+      <div id="tab-export" class="tab-content" style="display:none">
+        <h4>Exportar / Imprimir</h4>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+          <button id="export-excel" class="btn primary">Exportar Excel (Ficha)</button>
+          <button id="export-pdf" class="btn ghost">Exportar PDF (Ficha)</button>
+          <button id="print-ficha" class="btn primary">Imprimir ficha</button>
+        </div>
+      </div>
+
+      <div id="tab-acta" class="tab-content" style="display:none">
+        <h4>Elaboración de Acta Convivencial</h4>
+        <div class="print-area" id="acta-area">
+          <label>Número de acta</label><input id="acta-no" class="ef2-input">
+          <label>Fecha</label><input id="acta-fecha" type="date" class="ef2-input">
+          <label>Hora</label><input id="acta-hora" type="time" class="ef2-input">
+          <label>Lugar</label><input id="acta-lugar" class="ef2-input">
+          <hr>
+          <h5>Datos del estudiante</h5>
+          <input id="acta-est-name" class="ef2-input" placeholder="Nombre completo">
+          <input id="acta-est-doc" class="ef2-input" placeholder="Documento">
+          <input id="acta-est-grade" class="ef2-input" placeholder="Curso">
+          <label>Descripción de la situación</label>
+          <textarea id="acta-desc" class="ef2-input" rows="4" placeholder="Describa objetivamente..."></textarea>
+          <label>Acciones pedagógicas acordadas</label>
+          <textarea id="acta-actions" class="ef2-input" rows="3"></textarea>
+          <label>Compromisos (estudiante / acudiente)</label>
+          <textarea id="acta-compromises" class="ef2-input" rows="3"></textarea>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+            <button id="save-acta" class="btn primary">Guardar acta</button>
+            <button id="print-acta" class="btn ghost">Imprimir acta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirm modal -->
+  <div id="confirm-modal" class="modal-backdrop" style="display:none">
+    <div class="modal" style="max-width:420px">
+      <button class="close-btn" data-close="confirm-modal">✕</button>
+      <h3 id="confirm-title">¿Estás seguro?</h3>
+      <p id="confirm-message" style="color:var(--muted)"></p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button id="confirm-yes" class="btn warn">Confirmar</button>
+        <button class="btn ghost" data-close="confirm-modal">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Restore modal -->
+  <div id="restore-modal" class="modal-backdrop" style="display:none">
+    <div class="modal white" style="max-width:760px">
+      <button class="close-btn" data-close="restore-modal">✕</button>
+      <h3>Restaurar backup (pegar JSON)</h3>
+      <div>
+        <label>Clave localStorage</label>
+        <input id="restore-key" class="ef2-input" value="fantasyclass_alm_db">
+        <label>JSON</label>
+        <textarea id="restore-json" style="width:100%;height:220px"></textarea>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+          <button class="btn ghost" data-close="restore-modal">Cancelar</button>
+          <button id="apply-restore" class="btn primary">Restaurar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS: organized and fully functional -->
+  <script>
+  /* ==========
+     State & Defaults
+     ========== */
+  const STORAGE_KEY = 'fantasyclass_alm_db';
+  const HP_MAX = 100;
+  const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
+  const DEFAULT_CHARACTERS = [
+    { key: 'Participación', emoji:'👍', name:'Participación', type:'positive', hp:0, xp:10, gold:0 },
+    { key: 'Tareas', emoji:'📘', name:'Hace los deberes', type:'positive', hp:0, xp:5, gold:0 },
+    { key: 'Puntualidad', emoji:'⏰', name:'Puntualidad y asistencia', type:'positive', hp:0, xp:5, gold:0 },
+    { key: 'Falta', emoji:'⚠️', name:'Falta', type:'negative', hp:-10, xp:0, gold:0 }
+  ];
+
+  let db = { classes: {}, groups: {}, characters: [], institution: {}, sessions: {} };
+  let currentClass = null;
+  let activeStudentId = null;
+
+  /* ===== Utilities: toast ===== */
+  const toastContainer = document.getElementById('toast-container');
+  function showToast(msg, t=3000){
+    const n = document.createElement('div'); n.style.marginTop='8px'; n.innerHTML = `<div style="background:rgba(0,0,0,0.75);color:#fff;padding:10px 14px;border-radius:8px">${msg}</div>`;
+    toastContainer.appendChild(n); setTimeout(()=> n.remove(), t);
   }
-  showModal('behavior-edit-modal');
-}
-function saveBehaviorFromForm(){
-  const id = document.getElementById('save-behavior-btn').dataset.edit;
-  const key = (document.getElementById('b-key').value||'').trim();
-  const emoji = (document.getElementById('b-emoji').value||'').trim();
-  const text = (document.getElementById('b-text').value||'').trim();
-  const hp = parseInt(document.getElementById('b-hp').value)||0;
-  const xp = parseInt(document.getElementById('b-xp').value)||0;
-  const gold = parseInt(document.getElementById('b-gold').value)||0;
-  const type = document.getElementById('b-type').value;
-  if(!key || !emoji) return showToast('Nombre y emoji obligatorios');
-  if(id){
-    const b = db.characters.find(x=>x.id===id); if(!b) return;
-    b.key=key; b.emoji=emoji; b.name=text; b.hp=hp; b.xp=xp; b.gold=gold; b.type=type;
-    saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento actualizado');
-  } else {
-    if((db.characters||[]).some(c=>c.key===key)) return showToast('Ya existe un comportamiento con ese nombre');
-    db.characters.push({ id:`char_${Date.now()}`, key, emoji, name:text, hp, xp, gold, type });
-    saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento creado');
+
+  /* ===== Persistence ===== */
+  function loadDB(){
+    try{
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if(raw) db = JSON.parse(raw);
+    }catch(e){ db = { classes: {}, groups: {}, characters: [], institution: {}, sessions: {} }; }
+    if(!db.classes) db.classes = {};
+    if(!db.groups) db.groups = {};
+    if(!Array.isArray(db.characters)) db.characters = [];
+    Object.keys(DEFAULT_ROSTERS).forEach(k=>{ if(!db.classes[k]) db.classes[k] = []; if(!db.groups[k]) db.groups[k] = {}; });
+    if(!db.characters.length) db.characters = DEFAULT_CHARACTERS.map((c,i)=>({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type, hp:c.hp, xp:c.xp, gold:c.gold }));
+    currentClass = currentClass || Object.keys(db.classes)[0] || null;
   }
-}
-function deleteBehavior(id){ showConfirm('Eliminar comportamiento','¿Eliminar este comportamiento?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); showToast('Eliminado'); }); }
-function refreshBehaviorSelects(){
-  const sel = document.getElementById('apply-behavior-select'); if(sel){ sel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; sel.appendChild(o); }); }
-  const cp = document.getElementById('class-panel-pilar-select'); if(cp){ cp.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; cp.appendChild(o); }); }
-}
+  function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('save error', e); } }
 
-/* apply behavior wrapper */
-document.getElementById('apply-behavior-btn').addEventListener('click', ()=> {
-  const key = document.getElementById('apply-behavior-select').value;
-  const type = document.getElementById('apply-type').value;
-  const pts = parseInt(document.getElementById('apply-points').value)||1;
-  const scope = document.getElementById('apply-scope').value;
-  if(!key) return showToast('Selecciona comportamiento');
-  if(scope==='student' && !activeStudentId) return showToast('Abre ficha del estudiante');
-  if(scope==='student') applyBehaviorToStudentById(activeStudentId, key, type==='negative'?'negative':'positive', pts);
-  else applyBehaviorToScope(key, type==='negative'?'negative':'positive', pts, scope);
-  hideModal('behavior-apply-modal'); showToast('Comportamiento aplicado');
-});
-
-/* implement apply */
-function applyBehaviorToStudentById(studentId, behaviorKey, type, points){
-  const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado');
-  const s = f.student; s.history = s.history || [];
-  const isPos = (type!=='negative');
-  if(isPos) { s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
-  else s.hp = Math.max(0, (s.hp||HP_MAX) - points);
-  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
-  s.level = Math.floor((s.xp||0)/20) + 1;
-  saveDB(); renderStudentGrid();
-}
-
-/* apply to group/class */
-function applyBehaviorToScope(behaviorKey, type, points, scope){
-  if(scope==='class'){ (db.classes[currentClass]||[]).forEach(s=> applyToStudentInternal(s, behaviorKey, type, points)); saveDB(); renderStudentGrid(); showToast('Aplicado a todo el curso'); }
-  else if(scope==='group'){ const groups = db.groups[currentClass] || {}; let groupName=''; Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo'); groups[groupName].forEach(id=>{ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); }); saveDB(); renderStudentGrid(); showToast('Aplicado a grupo'); }
-}
-function applyToStudentInternal(s, behaviorKey, type, points){ s.history = s.history || []; const isPos = (type!=='negative'); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp < HP_MAX) s.hp=Math.min(HP_MAX, s.hp+1); } else s.hp = Math.max(0, (s.hp||HP_MAX)-points); s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos?'positive':'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' }); s.level = Math.floor((s.xp||0)/20) + 1; }
-
-/* ===== Class Panel bulk actions ===== */
-function buildClassPanel(){
-  const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
-  const students = db.classes[currentClass] || [];
-  students.forEach(s=>{
-    const w = document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)';
-    const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
-    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id;
-    left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div class="small" style="color:var(--muted)">Grado ${currentClass}</div></div>`;
-    const right = document.createElement('div'); right.innerHTML = `<button class="btn ghost" onclick="openFicha('${s.id}')">Ficha</button>`;
-    w.appendChild(left); w.appendChild(right); container.appendChild(w);
+  /* ===== Init wiring ===== */
+  document.addEventListener('DOMContentLoaded', ()=>{
+    loadDB();
+    populateClassSelect();
+    wireHeaderButtons();
+    wireTopInteractions();
+    renderStudentGrid();
+    renderBehaviorsTable();
+    refreshBehaviorSelects();
+    renderGroupsColumns();
+    renderHeaderInstitution();
+    wireModalCloseHandlers();
+    initAudio();
   });
-  refreshBehaviorSelects();
-}
-document.getElementById('class-panel-apply')?.addEventListener('click', ()=> {
-  const type = document.getElementById('class-panel-action-type').value;
-  const points = parseInt(document.getElementById('class-panel-points').value)||1;
-  const op = document.getElementById('class-panel-op').value;
-  const pilar = document.getElementById('class-panel-pilar-select').value;
-  let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); });
-  if(!targets.length) return showToast('No hay estudiantes seleccionados');
-  targets.forEach(id=>{ const f=findStudentById(id); if(!f) return; const s=f.student;
-    if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar, magnitude:points, note:'Panel' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp=Math.min(HP_MAX,s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else s.hp=Math.max(0,(s.hp||HP_MAX)-points); }
-    else if(type==='xp'){ const delta = (op==='add')? points:-points; s.xp=(s.xp||0)+delta; if(s.xp<0) s.xp=0; s.level=Math.floor((s.xp||0)/20)+1; s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'XP Panel',magnitude:Math.abs(delta),note:'Panel'}); }
-    else if(type==='hp'){ const delta = (op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0,Math.min(HP_MAX,s.hp)); s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'HP Panel',magnitude:Math.abs(delta),note:'Panel'}); }
-    else if(type==='gold'){ const delta = (op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'Gold Panel',magnitude:Math.abs(delta),note:'Panel'}); }
-  });
-  saveDB(); renderStudentGrid(); hideModal('class-panel-modal'); showToast('Acción aplicada');
-});
 
-/* ===== Groups management ===== */
-function renderGroupsColumns(){
-  const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
-  if(!currentClass) return;
-  const all = db.classes[currentClass] || [];
-  const groups = db.groups[currentClass] || {};
-  const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
-  const unassigned = all.filter(s=>!assigned.has(s.id));
-  const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip = document.createElement('div'); chip.style.padding='8px'; chip.style.border='1px solid var(--border)'; chip.style.borderRadius='8px'; chip.style.marginBottom='8px'; chip.draggable=true; chip.ondragstart = e=> e.dataTransfer.setData('text/plain', s.id); chip.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div></div>`; pool.appendChild(chip); }); }
-  Object.keys(groups).forEach(g=>{
-    const card = document.createElement('div'); card.style.minWidth='220px'; card.style.background='linear-gradient(180deg,#0b2730,#0c2f3b)'; card.style.padding='10px'; card.style.borderRadius='8px'; card.style.border='1px solid var(--border)'; card.style.marginRight='8px';
-    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div style="display:flex;gap:8px"><span style="color:var(--muted)">${(groups[g]||[]).length} miembros</span></div></div>`;
-    const list = document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
-    list.ondragover = e=> e.preventDefault();
-    list.ondrop = e=> { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
-    (groups[g]||[]).forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const chip=document.createElement('div'); chip.style.padding='8px'; chip.style.border='1px solid var(--border)'; chip.style.borderRadius='8px'; chip.style.marginBottom='8px'; chip.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div><div style="margin-left:auto"><button class="btn ghost" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div></div>`; list.appendChild(chip); });
-    card.appendChild(list); area.appendChild(card);
-  });
-}
-function createGroupPrompt(){ const name = prompt('Nombre del grupo:'); if(!name) return; db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][name] = []; saveDB(); renderGroupsColumns(); showToast('Grupo creado'); }
-function renameGroupPrompt(oldName, newName){ newName=newName.trim(); if(!newName||newName===oldName) return; if(db.groups[currentClass][newName]) return showToast('Nombre existe'); db.groups[currentClass][newName]=db.groups[currentClass][oldName]||[]; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado'); }
-function promptDeleteGroup(course, group){ showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado'); }); }
-function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsColumns(); renderStudentGrid(); }
-function saveGroups(){ saveDB(); hideModal('manage-groups-modal'); showToast('Grupos guardados'); }
-function distributeGroupsByNumber(){ const n = parseInt(prompt('Número de grupos:')) || 0; if(n<1) return showToast('Número inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${(i % n)+1}`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente'); }
-function distributeGroupsBySizePrompt(){ const size = parseInt(prompt('Tamaño por grupo:'))||0; if(size<1) return showToast('Tamaño inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0, g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]=ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño'); }
+  /* ===== Header buttons ===== */
+  function populateClassSelect(){
+    const sel = document.getElementById('class-select'); if(!sel) return; sel.innerHTML='';
+    Object.keys(db.classes).forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(o); });
+    if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+    else currentClass = sel.value || Object.keys(db.classes)[0] || null;
+    sel.onchange = ()=> { switchClass(sel.value); };
+  }
+  function switchClass(val){
+    if(!db.classes[val]) return showToast('Grado no encontrado');
+    currentClass = val;
+    populateClassSelect();
+    renderStudentGrid();
+    renderGroupsColumns();
+  }
 
-/* group count minor control */
-let groupCount = 3;
-document.getElementById('group-count-minus')?.addEventListener('click', ()=> changeGroupCount(-1));
-document.getElementById('group-count-plus')?.addEventListener('click', ()=> changeGroupCount(1));
-function changeGroupCount(delta){ groupCount = Math.max(1, (groupCount||3) + delta); document.getElementById('group-count').innerText = groupCount; showToast('N. de grupos: ' + groupCount); }
+  function wireHeaderButtons(){
+    document.getElementById('btn-add-student')?.addEventListener('click', ()=> {
+      const name = prompt('Nombre del nuevo estudiante:'); if(!name) return;
+      const id = `${currentClass}_${Date.now()}`;
+      db.classes[currentClass] = db.classes[currentClass] || [];
+      db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], gold:0 });
+      saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado');
+    });
+    document.getElementById('btn-panel-class')?.addEventListener('click', ()=> { buildClassPanel(); showModal('class-panel-modal'); });
+    document.getElementById('open-behaviors')?.addEventListener('click', ()=> { renderBehaviorsTable(); showModal('behaviors-modal'); });
+    document.getElementById('open-groups')?.addEventListener('click', ()=> { renderGroupsColumns(); showModal('groups-modal'); });
+    document.getElementById('btn-export-class')?.addEventListener('click', ()=> exportCurrentClassExcel());
+    document.getElementById('open-tools')?.addEventListener('click', ()=> showModal('tools-modal'));
+  }
 
-/* wire group buttons */
-document.getElementById('create-group')?.addEventListener('click', ()=> createGroupPrompt());
-document.getElementById('distrib-rand-btn')?.addEventListener('click', ()=> distributeGroupsByNumber());
-document.getElementById('distrib-size-btn')?.addEventListener('click', ()=> distributeGroupsBySizePrompt());
-document.getElementById('save-groups')?.addEventListener('click', ()=> saveGroups());
+  /* ===== Top interactions for simple actions ===== */
+  function wireTopInteractions(){
+    // Behaviors modal controls
+    document.getElementById('new-behavior')?.addEventListener('click', ()=> openBehaviorEdit());
+    document.getElementById('behavior-search')?.addEventListener('input', ()=> renderBehaviorsTable());
+    document.getElementById('behavior-filter')?.addEventListener('change', ()=> renderBehaviorsTable());
+    document.getElementById('save-behavior')?.addEventListener('click', ()=> saveBehaviorFromForm());
 
-/* ===== Export helpers ===== */
-function exportCurrentClassExcel(gradeKey){ const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado'); const students = db.classes[key] || []; const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado'); }
-function exportSubgroup(grade, subgroup){ const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {}; const members = groupsFor[subgroup] || []; const rows = members.length ? members.map((id,i)=>{ const s=(db.classes[grade]||[]).find(x=>x.id===id); return {'N°':i+1,'Nombre': s? s.name:id,'Grado':grade,'Grupo':subgroup}; }) : [{ Mensaje: 'Sin miembros' }]; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado'); }
-function exportSingleStudentExcel(id){ const sid = id || activeStudentId; if(!sid) return showToast('Selecciona estudiante'); const f = findStudentById(sid); if(!f) return showToast('No encontrado'); const s=f.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:f.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada'); }
+    // Groups controls
+    document.getElementById('groups-create')?.addEventListener('click', ()=> {
+      const name = prompt('Nombre del grupo:'); if(!name) return;
+      db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][name] = []; saveDB();
+      renderGroupsColumns(); showToast('Grupo creado');
+    });
+    document.getElementById('groups-random')?.addEventListener('click', ()=> distributeGroupsByNumber());
+    document.getElementById('groups-by-size')?.addEventListener('click', ()=> distributeGroupsBySize());
+    document.getElementById('group-minus')?.addEventListener('click', ()=> changeGroupCount(-1));
+    document.getElementById('group-plus')?.addEventListener('click', ()=> changeGroupCount(1));
+    document.getElementById('groups-save')?.addEventListener('click', ()=> saveGroups());
 
-/* ===== Timer / Roulette / Dice ===== */
-let timerSeconds = 300, timerInterval = null;
-function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
-function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
-function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado'); } },1000); } }
-function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText=formatTime(timerSeconds); }
+    // Tools: timer presets, toggles
+    document.getElementById('timer-presets')?.addEventListener('change', (e)=> {
+      const v = e.target.value;
+      if(v==='manual'){ document.getElementById('timer-manual').style.display='inline-block'; }
+      else { document.getElementById('timer-manual').style.display='none'; setTimerSeconds(parseInt(v)); }
+    });
+    document.getElementById('timer-manual')?.addEventListener('change', (e)=> setTimerSeconds(parseInt(e.target.value)||0));
+    document.getElementById('timer-toggle')?.addEventListener('click', ()=> toggleTimer());
+    document.getElementById('timer-reset')?.addEventListener('click', ()=> resetTimer());
 
-let rouletteInterval=null, rouletteRunning=false, rouletteNames=[];
-function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
-function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) { activeStudentId = s.id; openFicha(s.id); } else showToast('Seleccionado: '+rouletteNames[idx]); },200); } },80); }
-function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
+    // Roulette
+    document.getElementById('roulette-start')?.addEventListener('click', ()=> startRoulette());
+    document.getElementById('roulette-stop')?.addEventListener('click', ()=> stopRoulette());
 
-function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
-function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6); const dieEl = document.getElementById('die'); let interim = setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900); }
+    // Dice
+    document.getElementById('dice-roll')?.addEventListener('click', ()=> rollDice());
 
-/* ===== Institution settings & backup ===== */
-function openInstitutionSettings(){ const inst=db.institution||{}; document.getElementById('inst-app-name').value = inst.appName || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#3b82f6'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
-function saveInstitutionSettings(){ db.institution = db.institution || {}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#3b82f6'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados'); }
-function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value='FantasyClass Convivencial'; document.getElementById('inst-subtitle').value='Aprendiendo Jugando'; document.getElementById('inst-logo-text').value='ALM'; document.getElementById('inst-color-primary').value='#3b82f6'; document.getElementById('inst-font').value='Inter, system-ui'; showToast('Valores restaurados'); }
-function renderHeaderFromInstitution(){ const inst=db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--accent', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
+    // Ficha modal: tabs
+    document.querySelectorAll('#ficha-modal .tab').forEach(tab=> tab.addEventListener('click', (e)=> switchFichaTab(tab.dataset.tab)));
+    document.getElementById('f-save-data')?.addEventListener('click', ()=> saveFichaData());
+    document.getElementById('f-apply-behavior')?.addEventListener('click', ()=> {
+      const key = document.getElementById('f-behavior-select').value;
+      const type = document.getElementById('f-behavior-type').value;
+      const pts = parseInt(document.getElementById('f-behavior-points').value)||1;
+      if(!activeStudentId) return showToast('Abre ficha de estudiante');
+      applyBehaviorToStudentById(activeStudentId, key, type, pts);
+      refreshFicha(activeStudentId);
+    });
+    document.getElementById('obs-save')?.addEventListener('click', ()=> saveObservation());
+    document.getElementById('obs-print')?.addEventListener('click', ()=> printObservations());
+    document.getElementById('f-export-excel')?.addEventListener('click', ()=> exportFichaExcel(activeStudentId));
+    document.getElementById('f-export-pdf')?.addEventListener('click', ()=> exportFichaPDF(activeStudentId));
+    document.getElementById('f-print')?.addEventListener('click', ()=> printFicha(activeStudentId));
+    document.getElementById('export-excel')?.addEventListener('click', ()=> exportFichaExcel(activeStudentId));
+    document.getElementById('export-pdf')?.addEventListener('click', ()=> exportFichaPDF(activeStudentId));
+    document.getElementById('print-ficha')?.addEventListener('click', ()=> printFicha(activeStudentId));
+    document.getElementById('save-acta')?.addEventListener('click', ()=> saveActa());
+    document.getElementById('print-acta')?.addEventListener('click', ()=> printActa());
+    document.getElementById('apply-restore')?.addEventListener('click', ()=> applyRestore());
+  }
 
-/* ===== Backup/restore ===== */
-function downloadBackup(){ const data = Object.fromEntries(Object.entries(localStorage)); const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2)); a.download=`localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Backup descargado'); }
-function openRestore(){ showModal('restore-modal'); }
-function applyRestore(){ const key = document.getElementById('restore-key').value.trim()||STORAGE_KEY; const json = document.getElementById('restore-json').value; if(!json) return showToast('Pega el JSON'); try{ JSON.parse(json); localStorage.setItem(key,json); showToast('Restaurado. Recargando...'); setTimeout(()=> location.reload(),700); }catch(e){ showToast('JSON inválido'); } }
+  /* ===== Modal close handler utility ===== */
+  function wireModalCloseHandlers(){
+    document.querySelectorAll('[data-close]').forEach(btn=> btn.addEventListener('click', ()=> hideModal(btn.dataset.close)));
+    document.addEventListener('keydown', (e)=> { if(e.key==='Escape') document.querySelectorAll('.modal-backdrop').forEach(m=> m.style.display='none'); });
+    document.querySelectorAll('.modal-backdrop').forEach(mb=> mb.addEventListener('click', (e)=> { if(e.target === mb) mb.style.display='none'; }));
+  }
 
-/* ===== Utilities ===== */
-function findStudentById(id){ if(!id) return null; for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return { student:s, grade:g }; } return null; }
-function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function updateMetrics(){ const students = db.classes[currentClass] || []; const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0}; students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); })); Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; }); }
+  /* ===== Students rendering ===== */
+  function avatarGradient(name){
+    const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
+    const palettes=[['#083447','#0d4758'],['#0a3140','#133a4a'],['#0b3b2e','#0c503e'],['#14283a','#0b2a46'],['#08364a','#0f4a5e'],['#0b3526','#114033'],['#082b3f','#0a3b53'],['#153340','#0b2a3f'],['#0d3442','#0b2f3c'],['#0b3b47','#0a4a58']];
+    const p = palettes[idx];
+    return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+  }
 
-/* ===== Confirm & modal helpers ===== */
-function showConfirm(title, message, cb){ document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-message').innerText = message; document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); }; showModal('confirm-modal'); }
-function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
-function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+  function renderStudentGrid(){
+    const container = document.getElementById('students-container'); if(!container) return; container.innerHTML='';
+    if(!currentClass) return;
+    const q = (document.getElementById('student-search').value||'').toLowerCase();
+    const list = db.classes[currentClass] || [];
+    list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
+      const card = document.createElement('div'); card.className='student-card';
+      const hpPct = Math.max(0, Math.min(100, Math.round((s.hp||HP_MAX)/HP_MAX*100)));
+      card.innerHTML = `
+        <div style="display:flex;gap:12px;align-items:center">
+          <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
+          <div class="student-info">
+            <div class="student-name">${s.name}</div>
+            <div class="student-sub">Grado ${currentClass} • ${s.document||''}</div>
+            <div class="card-actions">
+              <button class="btn ghost" data-action="openFicha" data-sid="${s.id}">Ficha</button>
+              <button class="btn ghost" data-action="export" data-sid="${s.id}"><i class="fa-solid fa-file-excel"></i></button>
+              <button class="btn primary" data-action="applyBehavior" data-sid="${s.id}"><i class="fa-regular fa-heart"></i> Comportamiento</button>
+            </div>
+          </div>
+        </div>
+        <div class="stat-panel">
+          <div class="stat-row"><div class="stat-small">HP</div><div style="width:10px"></div><div class="hp-bar"><div class="hp-fill" style="width:${hpPct}%"></div></div></div>
+          <div class="stat-row" style="margin-top:6px"><div class="stat-small">XP ${s.xp||0}</div></div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
 
-/* ===== Wire UI actions (header buttons, modal closes, etc.) ===== */
-function wireHeaderButtons(){
-  document.getElementById('add-student')?.addEventListener('click', ()=> openAddStudentPrompt());
-  document.getElementById('open-class-panel')?.addEventListener('click', ()=> { buildClassPanel(); showModal('class-panel-modal'); });
-  document.getElementById('open-grades')?.addEventListener('click', ()=> openGradesModal());
-  document.getElementById('open-groups')?.addEventListener('click', ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); });
+    // wire inline actions
+    container.querySelectorAll('button[data-action]').forEach(btn=>{
+      btn.onclick = (e)=> {
+        e.stopPropagation();
+        const act = btn.dataset.action;
+        const sid = btn.dataset.sid;
+        if(act==='openFicha') { openFichaModal(sid); }
+        else if(act==='applyBehavior') { activeStudentId=sid; refreshBehaviorSelects(); showModal('ficha-modal'); switchFichaTab('gamificacion'); }
+        else if(act==='export') exportSingleStudentExcel(sid);
+      };
+    });
+    updateMetrics();
+  }
 
-  document.getElementById('new-behavior')?.addEventListener('click', ()=> openBehaviorEdit());
-  document.getElementById('behavior-search')?.addEventListener('input', ()=> renderBehaviorsTable());
-  document.getElementById('behavior-filter')?.addEventListener('change', ()=> renderBehaviorsTable());
-  document.getElementById('save-behavior-btn')?.addEventListener('click', ()=> saveBehaviorFromForm());
+  /* ===== Behaviors (CRUD) ===== */
+  function renderBehaviorsTable(){
+    const tbody = document.getElementById('behaviors-body'); if(!tbody) return; tbody.innerHTML='';
+    const q = (document.getElementById('behavior-search')?.value||'').toLowerCase();
+    const filter = document.getElementById('behavior-filter')?.value || 'all';
+    (db.characters||[]).filter(b=>{
+      if(filter!=='all' && b.type !== filter) return false;
+      if(q && !(b.key.toLowerCase().includes(q) || (b.name||'').toLowerCase().includes(q))) return false;
+      return true;
+    }).forEach(b=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="width:72px">${b.emoji||''}</td><td>${escapeHtml(b.key)}</td><td>${escapeHtml(b.name||'')}</td><td>${b.hp||0}</td><td>${b.xp||0}</td><td>${b.gold||0}</td><td>${b.type}</td><td style="text-align:right"><button class="btn ghost" data-edit="${b.id}"><i class="fa-solid fa-pen"></i></button> <button class="btn warn" data-del="${b.id}"><i class="fa-solid fa-trash"></i></button></td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button[data-edit]').forEach(b=> b.addEventListener('click', ()=> openBehaviorEdit(b.dataset.edit)));
+    tbody.querySelectorAll('button[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteBehavior(b.dataset.del)));
+  }
 
-  document.getElementById('panel-select-all')?.addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=true));
-  document.getElementById('panel-clear')?.addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=false));
-  document.getElementById('class-panel-apply')?.addEventListener('click', ()=> applyClassPanelAction());
+  function openBehaviorEdit(id){
+    document.getElementById('behavior-edit-title').innerText = id ? 'Editar comportamiento' : 'Nuevo comportamiento';
+    document.getElementById('b-key').value=''; document.getElementById('b-emoji').value=''; document.getElementById('b-desc').value=''; document.getElementById('b-hp').value=0; document.getElementById('b-xp').value=0; document.getElementById('b-gold').value=0; document.getElementById('b-type').value='positive';
+    document.getElementById('save-behavior').dataset.edit = id||'';
+    if(id){ const b = db.characters.find(x=>x.id===id); if(b){ document.getElementById('b-key').value=b.key; document.getElementById('b-emoji').value=b.emoji; document.getElementById('b-desc').value=b.name; document.getElementById('b-hp').value=b.hp||0; document.getElementById('b-xp').value=b.xp||0; document.getElementById('b-gold').value=b.gold||0; document.getElementById('b-type').value=b.type; } }
+    showModal('behavior-edit-modal');
+  }
 
-  // groups wired above
-  document.getElementById('create-group')?.addEventListener('click', ()=> createGroupPrompt());
-  document.getElementById('distrib-rand-btn')?.addEventListener('click', ()=> distributeGroupsByNumber());
-  document.getElementById('distrib-size-btn')?.addEventListener('click', ()=> distributeGroupsBySizePrompt());
-  document.getElementById('save-groups')?.addEventListener('click', ()=> saveGroups());
+  function saveBehaviorFromForm(){
+    const id = document.getElementById('save-behavior').dataset.edit;
+    const key = (document.getElementById('b-key').value||'').trim();
+    const emoji = (document.getElementById('b-emoji').value||'').trim();
+    const text = (document.getElementById('b-desc').value||'').trim();
+    const hp = parseInt(document.getElementById('b-hp').value)||0;
+    const xp = parseInt(document.getElementById('b-xp').value)||0;
+    const gold = parseInt(document.getElementById('b-gold').value)||0;
+    const type = document.getElementById('b-type').value;
+    if(!key || !emoji) return showToast('Nombre y emoji son obligatorios');
+    if(id){
+      const b = db.characters.find(x=>x.id===id); if(!b) return;
+      b.key=key; b.emoji=emoji; b.name=text; b.hp=hp; b.xp=xp; b.gold=gold; b.type=type; saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento actualizado');
+    } else {
+      if((db.characters||[]).some(c=>c.key===key)) return showToast('Ya existe un comportamiento con ese nombre');
+      db.characters.push({ id:`char_${Date.now()}`, key, emoji, name:text, hp, xp, gold, type }); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento creado');
+    }
+  }
 
-  // institution
-  document.getElementById('inst-save')?.addEventListener('click', ()=> saveInstitutionSettings());
-  document.getElementById('inst-defaults')?.addEventListener('click', ()=> loadInstitutionDefaults());
+  function deleteBehavior(id){ showConfirm('Eliminar comportamiento','¿Eliminar este comportamiento?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); showToast('Eliminado'); }); }
 
-  // timer/roulette/dice
-  document.getElementById('timer-toggle')?.addEventListener('click', ()=> toggleTimer());
-  document.getElementById('timer-reset')?.addEventListener('click', ()=> resetTimer());
-  document.getElementById('roulette-start')?.addEventListener('click', ()=> startRoulette());
-  document.getElementById('roulette-stop')?.addEventListener('click', ()=> stopRoulette());
-  document.getElementById('dice-roll')?.addEventListener('click', ()=> rollDice());
+  function refreshBehaviorSelects(){
+    const sel = document.getElementById('f-behavior-select'); if(sel){ sel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; sel.appendChild(o); }); }
+    const psel = document.getElementById('class-panel-pilar-select'); if(psel){ psel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; psel.appendChild(o); }); }
+  }
 
-  // restore
-  document.getElementById('apply-restore')?.addEventListener('click', ()=> applyRestore());
-}
-function wireModalCloseButtons(){
-  document.querySelectorAll('[data-close]').forEach(btn=> btn.addEventListener('click', ()=> hideModal(btn.dataset.close)));
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') document.querySelectorAll('.modal-backdrop').forEach(m=>m.style.display='none'); });
-  document.querySelectorAll('.modal-backdrop').forEach(mb=> mb.addEventListener('click', (e)=>{ if(e.target===mb) mb.style.display='none'; }));
-}
+  /* ===== Apply behavior functions ===== */
+  function applyBehaviorToStudentById(studentId, behaviorKey, type, points){
+    const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado');
+    const s = f.student; s.history = s.history || [];
+    const isPos = (type!=='negative');
+    if(isPos){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + Math.abs(points)); }
+    else s.hp = Math.max(0, (s.hp||HP_MAX) - Math.abs(points));
+    s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
+    s.level = Math.floor((s.xp||0)/100) + 1;
+    saveDB(); renderStudentGrid(); if(activeStudentId===studentId) refreshFicha(studentId);
+  }
 
-/* ===== Misc helpers called earlier ===== */
-function openQuick(x){ showModal('behavior-apply-modal'); document.getElementById('apply-type').value = x; }
-function openGradesModal(){ renderBehaviorsTable(); showModal('behaviors-modal'); } // reuse behaviors modal as simple placeholder
+  function applyBehaviorToScope(behaviorKey, type, points, scope){
+    if(scope==='class'){ (db.classes[currentClass]||[]).forEach(s=> applyToStudentInternal(s,behaviorKey,type,points)); saveDB(); renderStudentGrid(); showToast('Aplicado a todo el curso'); }
+    else if(scope==='group'){ const groups = db.groups[currentClass]||{}; let groupName=''; Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo'); groups[groupName].forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); }); saveDB(); renderStudentGrid(); showToast('Aplicado a grupo'); }
+  }
+  function applyToStudentInternal(s, behaviorKey, type, points){ s.history = s.history || []; const isPos = (type!=='negative'); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp+Math.abs(points)); } else s.hp = Math.max(0, (s.hp||HP_MAX)-Math.abs(points)); s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:behaviorKey, magnitude:points, note:'Aplicado (pilar)'}); s.level = Math.floor((s.xp||0)/100) + 1; }
 
-/* ---- initial wiring call to set header listeners ----- */
-wireHeaderButtons();
-wireModalCloseButtons();
+  /* ===== Groups functions ===== */
+  function renderGroupsColumns(){
+    const area = document.getElementById('groups-columns'); if(!area) return; area.innerHTML='';
+    if(!currentClass) return;
+    const all = db.classes[currentClass] || [];
+    const groups = db.groups[currentClass] || {};
+    const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
+    const pool = document.getElementById('groups-pool'); if(pool){ pool.innerHTML=''; all.filter(s=>!assigned.has(s.id)).forEach(s=>{ const d=document.createElement('div'); d.style.padding='8px'; d.style.border='1px solid var(--border)'; d.style.borderRadius='8px'; d.style.marginBottom='8px'; d.draggable=true; d.ondragstart = e => e.dataTransfer.setData('text/plain', s.id); d.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><div style="width:30px;height:30px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div></div>`; pool.appendChild(d); }); }
+    Object.keys(groups).forEach(g=>{
+      const col = document.createElement('div'); col.style.minWidth='220px'; col.style.background='linear-gradient(180deg,#07242f,#0b3a44)'; col.style.padding='10px'; col.style.borderRadius='8px'; col.style.border='1px solid var(--border)';
+      col.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroup('${g}', this.innerText)">${g}</strong><div style="display:flex;gap:6px"><button class="btn ghost" onclick="exportSubgroup('${currentClass}','${g}')">Export</button><button class="btn warn" onclick="promptDeleteGroup('${g}')">Eliminar</button></div></div>`;
+      const list=document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
+      list.ondragover = e => e.preventDefault();
+      list.ondrop = e => { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid,g); };
+      (groups[g]||[]).forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const d=document.createElement('div'); d.style.padding='8px'; d.style.border='1px solid var(--border)'; d.style.borderRadius='8px'; d.style.marginBottom='8px'; d.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div><div style="margin-left:auto"><button class="btn ghost" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div></div>`; list.appendChild(d); });
+      col.appendChild(list); area.appendChild(col);
+    });
+  }
 
-/* ===== Final small init: refresh UI elements used by modals ===== */
-(function finalInit(){
-  populateClassSelect();
-  renderStudentGrid();
-  renderBehaviorsTable();
-  refreshBehaviorSelects();
-  renderGroupsColumns();
-  renderHeaderFromInstitution();
-})();
+  function renameGroup(oldName,newName){ newName=newName.trim(); if(!newName||newName===oldName) return; if(db.groups[currentClass][newName]) return showToast('Nombre existe'); db.groups[currentClass][newName] = db.groups[currentClass][oldName]||[]; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado'); }
+  function promptDeleteGroup(g){ showConfirm('Eliminar grupo', `Eliminar grupo ${g}?`, ()=>{ delete db.groups[currentClass][g]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado'); }); }
+  function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsColumns(); renderStudentGrid(); }
 
-</script>
+  function saveGroups(){ saveDB(); hideModal('groups-modal'); showToast('Grupos guardados'); }
+  function distributeGroupsByNumber(){ const n = parseInt(prompt('Número de grupos:')) || 0; if(n<1) return showToast('Número inválido'); const ids = (db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${(i % n)+1}`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente'); }
+  function distributeGroupsBySize(){ const size = parseInt(prompt('Tamaño por grupo:'))||0; if(size<1) return showToast('Tamaño inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0,g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]=ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño'); }
+
+  let groupCount = 3;
+  function changeGroupCount(delta){ groupCount = Math.max(1, groupCount + delta); document.getElementById('group-count').innerText = groupCount; showToast('N. de grupos: ' + groupCount); }
+
+  /* ===== Export helpers ===== */
+  function exportCurrentClassExcel(gradeKey){ const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado'); const students = db.classes[key] || []; const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado'); }
+  function exportSubgroup(grade, subgroup){ const groupsFor=db.groups[grade]||{}; const members=groupsFor[subgroup]||[]; const rows = members.length ? members.map((id,i)=>{ const s=(db.classes[grade]||[]).find(x=>x.id===id); return {'N°':i+1,'Nombre':s? s.name:id,'Grado':grade,'Grupo':subgroup}; }) : [{ Mensaje:'Sin miembros' }]; const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado'); }
+  function exportSingleStudentExcel(id){ const sid = id || activeStudentId; if(!sid) return showToast('Selecciona estudiante'); const found = findStudentById(sid); if(!found) return showToast('No encontrado'); const s=found.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:found.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada'); }
+
+  /* ===== Timer / Roulette / Dice (with sounds) ===== */
+  let timerSeconds = 300, timerInterval = null, timerAlertPlayed=false;
+  function setTimerSeconds(s){ timerSeconds = Math.max(0, parseInt(s)||0); document.getElementById('timer-display').innerText = formatTime(timerSeconds); timerAlertPlayed=false; }
+  function formatTime(s){ const m=Math.floor(s/60), sec = s%60; return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
+  function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('tools-modal'); }
+  function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval = setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); if(timerSeconds===300 && !timerAlertPlayed && document.getElementById('timer-sound').checked){ playExplosionSound(); timerAlertPlayed=true; } } else { clearInterval(timerInterval); timerInterval=null; if(document.getElementById('timer-sound').checked) playTadaSound(); showToast('Tiempo terminado'); } },1000); } }
+  function resetTimer(){ timerSeconds = 300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText = formatTime(timerSeconds); timerAlertPlayed=false; }
+
+  let rouletteInterval=null, rouletteRunning=false;
+  function openRouletteModal(){ document.getElementById('roulette-display').innerText = (db.classes[currentClass]||[]).length? '¡Presiona Girar!':'No hay estudiantes'; showModal('tools-modal'); }
+  function startRoulette(){ if(rouletteRunning) return; const names=(db.classes[currentClass]||[]).map(s=>s.name); if(!names.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*names.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%names.length; document.getElementById('roulette-display').innerText = names[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); rouletteRunning=false; const found=(db.classes[currentClass]||[]).find(x=>x.name===names[idx]); if(found){ activeStudentId = found.id; openFichaModal(found.id); } if(document.getElementById('roulette-sound').checked) playTadaSound(); } },80); }
+  function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
+
+  function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6); const dieEl = document.getElementById('die'); dieEl.innerText=''; const interim = setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum = res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900); }
+
+  /* ===== Simple audio functions (WebAudio) ===== */
+  let audioCtx = null;
+  function initAudio(){ try{ audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ audioCtx=null; } }
+  function playTadaSound(){ if(!audioCtx) return; const o = audioCtx.createOscillator(); const g = audioCtx.createGain(); o.type='sine'; o.frequency.setValueAtTime(880, audioCtx.currentTime); o.connect(g); g.connect(audioCtx.destination); g.gain.setValueAtTime(0.001, audioCtx.currentTime); g.gain.exponentialRampToValueAtTime(0.5, audioCtx.currentTime+0.02); o.start(); o.frequency.exponentialRampToValueAtTime(660, audioCtx.currentTime+0.2); g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.6); setTimeout(()=>{ o.stop(); },700); }
+  function playExplosionSound(){ if(!audioCtx) return; // noise burst
+    const bufferSize = audioCtx.sampleRate * 0.5;
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for(let i=0;i<bufferSize;i++){ data[i] = (Math.random()*2-1) * (1 - i/bufferSize); }
+    const source = audioCtx.createBufferSource(); source.buffer = buffer;
+    const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.8, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime+0.6);
+    source.connect(gain); gain.connect(audioCtx.destination); source.start();
+  }
+
+  /* ===== Ficha modal: tabs, print, export, acta ===== */
+  function openFichaModal(studentId){
+    activeStudentId = studentId;
+    refreshFicha(studentId);
+    showModal('ficha-modal');
+    switchFichaTab('datos');
+  }
+
+  function refreshFicha(studentId){
+    const f = findStudentById(studentId); if(!f) return;
+    const s = f.student;
+    document.getElementById('f-avatar').innerText = (s.name||' ')[0];
+    document.getElementById('f-name').innerText = s.name;
+    document.getElementById('f-grade').innerText = `Grado ${f.grade}`;
+    // populate fields
+    document.getElementById('f-name-input').value = s.name||'';
+    document.getElementById('f-doc-input').value = s.document||'';
+    document.getElementById('f-birth-input').value = s.birthdate||'';
+    document.getElementById('f-guardian-input').value = s.guardian||'';
+    document.getElementById('f-level-input').value = s.level||1;
+    document.getElementById('f-xp-input').value = s.xp||0;
+    document.getElementById('f-hp-input').value = s.hp||HP_MAX;
+    document.getElementById('f-gold-input').value = s.gold||0;
+
+    // history
+    const hist = document.getElementById('f-history'); hist.innerHTML=''; (s.history||[]).slice(0,50).forEach(h=>{ const d=document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #eee'; d.innerHTML = `<div style="font-weight:700">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="font-size:12px;color:#666">${h.ts} — ${h.note||''}</div>`; hist.appendChild(d); });
+
+    // observador
+    const obsList = document.getElementById('obs-list'); obsList.innerHTML=''; (s.observador||[]).slice().reverse().forEach(o=>{ const d=document.createElement('div'); d.style.padding='8px'; d.style.borderBottom='1px solid #eee'; d.innerHTML = `<div style="font-weight:700">${o.date}</div><div style="color:#666">${o.text}</div>`; obsList.appendChild(d); });
+
+    // populate behavior select
+    refreshBehaviorSelects();
+  }
+
+  function switchFichaTab(tab){
+    document.querySelectorAll('#ficha-modal .tab').forEach(t=> t.classList.remove('active'));
+    document.querySelectorAll('#ficha-modal .tab-content').forEach(c=> c.style.display='none');
+    document.querySelector(`#ficha-modal .tab[data-tab="${tab}"]`)?.classList.add('active');
+    document.getElementById(`tab-${tab}`)?.style.display = 'block';
+  }
+
+  function saveFichaData(){
+    if(!activeStudentId) return showToast('No hay ficha abierta');
+    const f = findStudentById(activeStudentId); if(!f) return;
+    const s = f.student;
+    s.name = document.getElementById('f-name-input').value||s.name;
+    s.document = document.getElementById('f-doc-input').value||'';
+    s.birthdate = document.getElementById('f-birth-input').value||'';
+    s.guardian = document.getElementById('f-guardian-input').value||'';
+    s.level = document.getElementById('f-level-input').value||s.level;
+    s.xp = parseInt(document.getElementById('f-xp-input').value)||s.xp;
+    s.hp = parseInt(document.getElementById('f-hp-input').value)||s.hp;
+    s.gold = parseInt(document.getElementById('f-gold-input').value)||s.gold;
+    saveDB(); renderStudentGrid(); refreshFicha(activeStudentId);
+    showToast('Datos guardados');
+  }
+
+  function saveObservation(){
+    if(!activeStudentId) return showToast('Abre ficha');
+    const f = findStudentById(activeStudentId); if(!f) return;
+    const txt = document.getElementById('obs-text').value.trim(); if(!txt) return showToast('Escribe una observación');
+    f.student.observador = f.student.observador || []; f.student.observador.push({ date: new Date().toLocaleString(), text: txt });
+    document.getElementById('obs-text').value=''; saveDB(); refreshFicha(activeStudentId); showToast('Observación guardada');
+  }
+
+  function printObservations(){
+    if(!activeStudentId) return showToast('Abre ficha');
+    const f = findStudentById(activeStudentId); if(!f) return;
+    const s = f.student; let html = `<h1>Observaciones — ${s.name}</h1>`; (s.observador||[]).forEach(o=> html += `<div style="margin-bottom:12px"><strong>${o.date}</strong><div>${o.text}</div></div>`);
+    const w = window.open('','_blank'); w.document.write('<html><head><meta charset="utf-8"><title>Observaciones</title></head><body>'+html+'</body></html>'); w.document.close(); setTimeout(()=> w.print(),300);
+  }
+
+  function exportFichaExcel(id){
+    const sid = id || activeStudentId; if(!sid) return showToast('Abre ficha');
+    const f = findStudentById(sid); if(!f) return showToast('No encontrado');
+    const s = f.student; const rows = (s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note}));
+    const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:f.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Export generado');
+  }
+
+  function exportFichaPDF(id){
+    const sid = id || activeStudentId; if(!sid) return showToast('Abre ficha');
+    const f = findStudentById(sid); if(!f) return showToast('No encontrado');
+    const s = f.student;
+    const el = document.createElement('div'); el.style.padding='18px'; el.style.fontFamily='Inter,Arial'; el.innerHTML = `<h1>Ficha — ${s.name}</h1><div><strong>Grado:</strong> ${f.grade}</div><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div><h3>Historial</h3>` + (s.history||[]).slice(0,50).map(h=>`<div>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</div>`).join('');
+    document.body.appendChild(el);
+    html2pdf().from(el).save(`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.pdf`).then(()=> el.remove());
+  }
+
+  function printFicha(id){
+    const sid = id || activeStudentId; if(!sid) return showToast('Abre ficha');
+    const f = findStudentById(sid); if(!f) return showToast('No encontrado');
+    const s = f.student;
+    const html = `<h1>Ficha — ${s.name}</h1><div><strong>Grado:</strong> ${f.grade}</div><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div><h3>Historial</h3>` + (s.history||[]).slice(0,50).map(h=>`<div>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</div>`).join('');
+    const w = window.open('','_blank'); w.document.write('<html><head><meta charset="utf-8"><title>Ficha</title></head><body>'+html+'</body></html>'); w.document.close(); setTimeout(()=> w.print(),300);
+  }
+
+  /* ===== Acta functions ===== */
+  function saveActa(){
+    if(!activeStudentId) return showToast('Abre ficha');
+    const f = findStudentById(activeStudentId); if(!f) return showToast('No encontrado');
+    const acta = {
+      id: `acta_${Date.now()}`,
+      numero: document.getElementById('acta-no').value || '',
+      fecha: document.getElementById('acta-fecha').value || new Date().toLocaleDateString(),
+      hora: document.getElementById('acta-hora').value || '',
+      lugar: document.getElementById('acta-lugar').value || '',
+      estudiante: { nombre: document.getElementById('acta-est-name').value || f.student.name || '', documento: document.getElementById('acta-est-doc').value || '', curso: document.getElementById('acta-est-grade').value || currentClass || '' },
+      descripcion: document.getElementById('acta-desc').value || '',
+      acciones: document.getElementById('acta-actions').value || '',
+      compromisos: document.getElementById('acta-compromises').value || '',
+      createdAt: new Date().toLocaleString()
+    };
+    f.student.actas = f.student.actas || []; f.student.actas.push(acta);
+    saveDB(); showToast('Acta guardada'); // keep acta in student record
+  }
+
+  function buildPrintableActa(acta){
+    let html = `<!doctype html><html><head><meta charset="utf-8"><title>Acta</title><style>body{font-family:Inter,Arial;color:#111;padding:18px}h1{font-size:18px}small{color:#666}.section{margin-top:12px;padding-top:8px;border-top:1px solid #ddd}</style></head><body>`;
+    html += `<h1>Acta No. ${acta.numero || '---'}</h1><div><strong>Fecha:</strong> ${acta.fecha} ${acta.hora || ''}</div>`;
+    html += `<div class="section"><h2>Datos del estudiante</h2><div><strong>Nombre:</strong> ${acta.estudiante.nombre}</div><div><strong>Documento:</strong> ${acta.estudiante.documento}</div><div><strong>Curso:</strong> ${acta.estudiante.curso}</div></div>`;
+    html += `<div class="section"><h2>Descripción</h2><div>${(acta.descripcion||'').replace(/\n/g,'<br>')}</div></div>`;
+    html += `<div class="section"><h2>Acciones pedagógicas</h2><div>${(acta.acciones||'')}</div></div>`;
+    html += `<div class="section"><h2>Compromisos</h2><div>${(acta.compromises||'') || acta.compromisos}</div></div>`;
+    html += `<div style="margin-top:24px">Firma Estudiante: _________________________ &nbsp;&nbsp; Firma Acudiente: _________________________</div>`;
+    html += `</body></html>`;
+    return html;
+  }
+
+  function printActa(){
+    if(!activeStudentId) return showToast('Abre ficha');
+    const f = findStudentById(activeStudentId); if(!f) return;
+    const acta = (f.student.actas||[]).slice(-1)[0];
+    if(!acta) return showToast('No hay acta guardada');
+    const html = buildPrintableActa(acta);
+    const w = window.open('','_blank','width=900,height=900'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),400);
+  }
+
+  /* ===== Confirm helper & modal utils ===== */
+  function showConfirm(title, message, cb){
+    document.getElementById('confirm-title').innerText = title;
+    document.getElementById('confirm-message').innerText = message;
+    document.getElementById('confirm-yes').onclick = ()=> { cb && cb(); hideModal('confirm-modal'); };
+    showModal('confirm-modal');
+  }
+  function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+  function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+
+  /* ===== Utility find student ===== */
+  function findStudentById(id){
+    if(!id) return null;
+    for(const g of Object.keys(db.classes||{})){
+      const s = (db.classes[g]||[]).find(x=>x.id===id);
+      if(s) return { student: s, grade: g };
+    }
+    return null;
+  }
+
+  /* ===== Simple confirm & render metrics ===== */
+  function updateMetrics(){
+    const students = db.classes[currentClass] || [];
+    const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
+    students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); }));
+    Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; });
+  }
+
+  /* ===== Render behaviors initial & refresh selects ===== */
+  function renderBehaviorsTable(){
+    const tbody = document.getElementById('behaviors-body'); if(!tbody) return; tbody.innerHTML='';
+    const q = (document.getElementById('behavior-search')?.value||'').toLowerCase();
+    const filter = document.getElementById('behavior-filter')?.value || 'all';
+    (db.characters||[]).filter(b=>{
+      if(filter!=='all' && b.type !== filter) return false;
+      if(q && !(b.key.toLowerCase().includes(q) || (b.name||'').toLowerCase().includes(q))) return false;
+      return true;
+    }).forEach(b=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td style="width:72px">${b.emoji||''}</td><td>${escapeHtml(b.key)}</td><td>${escapeHtml(b.name||'')}</td><td>${b.hp||0}</td><td>${b.xp||0}</td><td>${b.gold||0}</td><td>${b.type}</td><td style="text-align:right"><button class="btn ghost" data-edit="${b.id}"><i class="fa-solid fa-pen"></i></button> <button class="btn warn" data-del="${b.id}"><i class="fa-solid fa-trash"></i></button></td>`;
+      tbody.appendChild(tr);
+    });
+    tbody.querySelectorAll('button[data-edit]').forEach(b=> b.addEventListener('click', ()=> openBehaviorEdit(b.dataset.edit)));
+    tbody.querySelectorAll('button[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteBehavior(b.dataset.del)));
+  }
+
+  function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  /* ===== Small helpers for delete/restore ===== */
+  function downloadBackup(){ const data = Object.fromEntries(Object.entries(localStorage)); const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2)); a.download=`localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Backup descargado'); }
+  function openRestore(){ showModal('restore-modal'); }
+  function applyRestore(){ const key = document.getElementById('restore-key').value.trim()||STORAGE_KEY; const json = document.getElementById('restore-json').value; if(!json) return showToast('Pega el JSON'); try{ JSON.parse(json); localStorage.setItem(key,json); showToast('Restaurado. Recargando...'); setTimeout(()=> location.reload(),700); }catch(e){ showToast('JSON inválido'); } }
+
+  /* ===== Render groups initial ===== */
+  function renderGroupsColumns(){ /* implemented above; ensure called after modifications */ try{ document.getElementById('groups-columns').innerHTML=''; }catch(e){} }
+
+  /* ===== Render header institution settings ===== */
+  function renderHeaderInstitution(){ const inst = db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--accent', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
+
+  /* ===== Misc: apply behavior modal save wiring ===== */
+  document.getElementById('save-behavior')?.addEventListener('click', saveBehaviorFromForm);
+
+  /* ===== Utility to open various modals from code further ===== */
+  function openBehaviorEdit(id){ /* wrapper to show modal and fill if id */ document.getElementById('behavior-edit-title').innerText = id ? 'Editar comportamiento' : 'Nuevo comportamiento'; document.getElementById('b-key').value=''; document.getElementById('b-emoji').value=''; document.getElementById('b-desc').value=''; document.getElementById('b-hp').value=0; document.getElementById('b-xp').value=0; document.getElementById('b-gold').value=0; document.getElementById('b-type').value='positive'; document.getElementById('save-behavior').dataset.edit = id||''; if(id){ const b = db.characters.find(x=>x.id===id); if(b){ document.getElementById('b-key').value=b.key; document.getElementById('b-emoji').value=b.emoji; document.getElementById('b-desc').value=b.name; document.getElementById('b-hp').value=b.hp||0; document.getElementById('b-xp').value=b.xp||0; document.getElementById('b-gold').value=b.gold||0; document.getElementById('b-type').value=b.type; } } showModal('behavior-edit-modal'); }
+  function deleteBehavior(id){ showConfirm('Eliminar comportamiento','¿Eliminar este comportamiento?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); showToast('Eliminado'); }); }
+
+  /* ===== Refresh behavior select lists ===== */
+  function refreshBehaviorSelects(){ const sel = document.getElementById('f-behavior-select'); if(sel){ sel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; sel.appendChild(o); }); } const cp = document.getElementById('class-panel-pilar-select'); if(cp){ cp.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; cp.appendChild(o); }); } }
+
+  /* ===== Update metrics periodically or after actions ===== */
+  function updateAllDisplays(){ renderStudentGrid(); renderBehaviorsTable(); refreshBehaviorSelects(); renderGroupsColumns(); updateMetrics(); saveDB(); }
+  function updateMetrics(){ const students = db.classes[currentClass]||[]; const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0}; students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); })); Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; }); }
+
+  /* ===== Small: open modal helper for ficha from other code ===== */
+  function openFichaModalByElementId(sid){ if(!sid) return; activeStudentId=sid; refreshFicha(sid); showModal('ficha-modal'); }
+
+  /* ---- initial rendering after load ---- */
+  (function startup(){
+    // ensure at least one class exists
+    if(!Object.keys(db.classes).length){ db.classes['801'] = []; saveDB(); }
+    populateClassSelect();
+    renderStudentGrid();
+    renderBehaviorsTable();
+    refreshBehaviorSelects();
+    renderGroupsColumns();
+    updateMetrics();
+    renderHeaderInstitution();
+  })();
+
+  </script>
 </body>
 </html>
