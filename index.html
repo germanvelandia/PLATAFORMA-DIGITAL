@@ -1,852 +1,837 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FantasyClass Convivencial — index-4</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>FantasyClass Convivencial — index-4</title>
 
-  <!-- Fonts & icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <!-- XLSX + html2pdf (export features) -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<style>
+:root{
+  --bg:#071324; --panel:#0c2a37; --card:#0f2f3d; --muted:#9fb3c4; --text:#e6eef6;
+  --accent:#3b82f6; --accent-2:#60a5fa; --success:#10b981; --danger:#ef4444;
+  --border: rgba(255,255,255,0.04); --glass: rgba(255,255,255,0.03); --hpmax:5;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#041421);color:var(--text);-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
 
-  <style>
-    /* ===========================
-       Palette: cool, low contrast
-       =========================== */
-    :root{
-      --bg:#071324;
-      --panel:#0c2a37;
-      --card:#0f2f3d;
-      --muted:#9fb3c4;
-      --text:#e6eef6;
-      --accent:#3b82f6;
-      --accent-2:#60a5fa;
-      --success:#10b981;
-      --danger:#ef4444;
-      --border: rgba(255,255,255,0.04);
-      --glass: rgba(255,255,255,0.03);
-      --hpmax: 5;
-    }
+/* Topbar (menu like image 2) */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#061426,#081d28)}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#0e2b3a,#1b3f50);display:flex;align-items:center;justify-content:center;font-weight:900;color:#eaf6ff}
+.title{font-weight:800}
+.subtitle{color:var(--muted);font-size:12px}
 
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg),#041421);color:var(--text);-webkit-font-smoothing:antialiased}
+/* nav */
+.nav{display:flex;gap:8px;align-items:center;margin-left:16px}
+.nav-item{position:relative;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:700;background:transparent}
+.nav-item.open{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
+.dropdown{position:absolute;left:0;top:calc(100% + 8px);background:var(--panel);border:1px solid var(--border);padding:8px;border-radius:8px;min-width:220px;display:none;box-shadow:0 12px 30px rgba(0,0,0,0.6);z-index:200}
+.nav-item.open .dropdown{display:block}
+.dropdown .item{padding:8px;border-radius:6px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.dropdown .item:hover{background:rgba(255,255,255,0.02);color:var(--text)}
 
-    /* Topbar */
-    .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#061426,#081d28)}
-    .brand{display:flex;align-items:center;gap:12px}
-    .logo{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#0e2b3a,#1b3f50);display:flex;align-items:center;justify-content:center;font-weight:900;color:#eaf6ff}
-    .title{font-weight:800}
-    .subtitle{color:var(--muted);font-size:12px}
+/* layout */
+.container{max-width:1180px;margin:18px auto;padding:0 18px}
+.metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071f2b,#0b2a36);padding:12px;border-radius:12px;border:1px solid var(--border)}
+.controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
+.search-input{background:transparent;border:1px solid var(--border);padding:8px;border-radius:10px;color:var(--text);width:320px}
 
-    /* Navigation like image 2 */
-    .nav{display:flex;gap:8px;align-items:center;margin-left:16px}
-    .nav-item{position:relative;padding:8px 12px;border-radius:8px;cursor:pointer;color:var(--muted);font-weight:700;background:transparent;user-select:none}
-    .nav-item.open{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
-    .dropdown{position:absolute;left:0;top:calc(100% + 8px);background:var(--panel);border:1px solid var(--border);padding:8px;border-radius:8px;min-width:220px;display:none;box-shadow:0 12px 30px rgba(0,0,0,0.6);z-index:200}
-    .nav-item.open .dropdown{display:block}
-    .dropdown .item{padding:8px;border-radius:6px;color:var(--muted);display:flex;align-items:center;gap:10px}
-    .dropdown .item:hover{background:rgba(255,255,255,0.02);color:var(--text)}
+/* students */
+.students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.student-card{background:linear-gradient(180deg,#071a22,#0d2a34);border-radius:12px;padding:14px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(2,6,23,0.6);display:flex;gap:12px;align-items:center;position:relative}
+.avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#12313f,#1a3b4f);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#eaf6ff;border:2px solid rgba(255,255,255,0.03)}
+.student-info{display:flex;flex-direction:column}
+.student-name{font-weight:800;font-size:15px}
+.student-sub{color:var(--muted);font-size:13px}
+.card-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.btn{padding:8px 12px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
+.btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
+.btn.warn{background:linear-gradient(180deg,var(--danger),#c0392b);color:#fff}
+.stat{font-weight:800;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,0.02);color:var(--muted);font-size:13px}
 
-    /* Layout */
-    .container{max-width:1180px;margin:18px auto;padding:0 18px}
-    .metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
-    .metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071f2b,#0b2a36);padding:12px;border-radius:12px;border:1px solid var(--border)}
-    .controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px;flex-wrap:wrap}
-    .search-input{background:transparent;border:1px solid var(--border);padding:8px;border-radius:10px;color:var(--text);width:320px}
+/* modals */
+.modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:400}
+.modal{background:linear-gradient(180deg,#0f2a36,#081f26);border-radius:12px;padding:16px;border:1px solid var(--border);color:var(--text);max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative}
+.modal.white{background:#fff;color:#111}
+.close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
 
-    /* Students grid and card */
-    .students-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
-    .student-card{background:linear-gradient(180deg,#071a22,#0d2a34);border-radius:12px;padding:14px;border:1px solid var(--border);box-shadow:0 8px 24px rgba(2,6,23,0.6);display:flex;gap:12px;align-items:center;position:relative}
-    .avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#12313f,#1a3b4f);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#eaf6ff;border:2px solid rgba(255,255,255,0.03)}
-    .student-info{display:flex;flex-direction:column}
-    .student-name{font-weight:800;font-size:15px}
-    .student-sub{color:var(--muted);font-size:13px}
-    .card-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
-    .btn{padding:8px 12px;border-radius:10px;border:0;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid var(--border);color:var(--muted)}
-    .btn.primary{background:linear-gradient(180deg,var(--accent),var(--accent-2));color:#fff}
-    .btn.warn{background:linear-gradient(180deg,var(--danger),#c0392b);color:#fff}
+/* table */
+.table{width:100%;border-collapse:collapse}
+.table th{background:#102c38;color:#dbeeff;padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+.table td{padding:10px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.02)}
 
-    /* Modals */
-    .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:400}
-    .modal{background:linear-gradient(180deg,#0f2a36,#081f26);border-radius:12px;padding:16px;border:1px solid var(--border);color:var(--text);max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative}
-    .modal.white{background:#fff;color:#111}
-    .close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
-
-    /* Table */
-    .table{width:100%;border-collapse:collapse}
-    .table th{background:#102c38;color:#dbeeff;padding:10px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
-    .table td{padding:10px;color:var(--muted);border-bottom:1px solid rgba(255,255,255,0.02)}
-
-    /* responsive */
-    @media(max-width:900px){ .nav{display:none} .students-grid{grid-template-columns:1fr} .search-input{width:140px} }
-  </style>
+.small{font-size:12px;color:var(--muted)}
+@media(max-width:900px){ .nav{display:none} .students-grid{grid-template-columns:1fr} .search-input{width:140px} .controls-row{flex-direction:column;align-items:flex-start} }
+</style>
 </head>
-
 <body>
-  <!-- TOPBAR -->
-  <header class="topbar">
-    <div style="display:flex;align-items:center">
-      <div class="brand">
-        <div class="logo" id="header-logo">ALM</div>
-        <div>
-          <div class="title" id="header-title">FantasyClass Convivencial</div>
-          <div class="subtitle" id="header-subtitle">Aprendiendo Jugando</div>
-        </div>
-      </div>
 
-      <nav class="nav" id="topnav">
-        <div class="nav-item" data-nav="clase">Clase</div>
-
-        <div class="nav-item" data-nav="recompensas" id="nav-recompensas">
-          Recompensas ▾
-          <div class="dropdown">
-            <div class="item" data-action="openLevels"><i class="fa-solid fa-trophy" style="width:18px"></i> Niveles</div>
-            <div class="item" data-action="openCards"><i class="fa-solid fa-book" style="width:18px"></i> Cartas</div>
-            <div class="item" data-action="openRoles"><i class="fa-solid fa-mask" style="width:18px"></i> Roles</div>
-            <div class="item" data-action="openBadges"><i class="fa-solid fa-award" style="width:18px"></i> Insignias</div>
-            <div class="item" data-action="openBehaviors"><i class="fa-regular fa-heart" style="width:18px"></i> Comportamientos</div>
-            <div class="item" data-action="openShop"><i class="fa-solid fa-store" style="width:18px"></i> Tienda</div>
-          </div>
-        </div>
-
-        <div class="nav-item" data-nav="aventura">Aventura ▾</div>
-        <div class="nav-item" data-nav="evaluacion">Evaluación ▾</div>
-      </nav>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid var(--border)">
-        <select id="class-select" onchange="switchClass(this.value)"></select>
-      </div>
-
-      <div class="nav-item" id="tools-menu">Herramientas ▾
-        <div class="dropdown" id="tools-dropdown">
-          <div class="item" data-action="openTimer">Cronómetro</div>
-          <div class="item" data-action="openRoulette">Ruleta</div>
-          <div class="item" data-action="openDice">Dado</div>
-          <div style="height:1px;background:var(--border);margin:6px 0"></div>
-          <div class="item" data-action="openClassPanel">Panel de Clase</div>
-          <div class="item" data-action="openGroups">Gestión de Grupos</div>
-          <div class="item" data-action="openGrades">Administrar Grados</div>
-        </div>
-      </div>
-
-      <div class="nav-item" id="chars-menu">Comportamientos ▾
-        <div class="dropdown" id="chars-dropdown">
-          <div class="item" data-action="openBehaviors">Administrar Comportamientos</div>
-          <div class="item" data-action="openQuickPositive">Puntos positivos</div>
-          <div class="item" data-action="openQuickNegative">Puntos negativos</div>
-        </div>
-      </div>
-
-      <div class="nav-item" id="settings-menu">Ajustes ▾
-        <div class="dropdown" id="settings-dropdown">
-          <div class="item" data-action="openInstitution">Ajustes institucionales</div>
-          <div class="item" data-action="downloadBackup">Descargar backup</div>
-          <div class="item" data-action="openRestore">Restaurar</div>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <!-- MAIN -->
-  <main class="container">
-    <div class="metrics" id="metrics-row">
-      <div class="metric"><div style="font-weight:800">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0 pts</div></div>
-      <div class="metric"><div style="font-weight:800">Respeto</div><div id="badge-Respeto" style="font-weight:900">0 pts</div></div>
-      <div class="metric"><div style="font-weight:800">Confianza</div><div id="badge-Confianza" style="font-weight:900">0 pts</div></div>
-      <div class="metric"><div style="font-weight:800">Empatía</div><div id="badge-Empatía" style="font-weight:900">0 pts</div></div>
-    </div>
-
-    <div class="controls-row">
-      <div style="display:flex;gap:8px;align-items:center">
-        <input id="student-search" class="search-input" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
-        <button id="add-student" class="btn ghost">+ Estudiante</button>
-        <button id="open-class-panel" class="btn ghost">Panel de Clase</button>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button id="open-grades" class="btn ghost">Administrar Grados</button>
-        <button id="open-groups" class="btn ghost">Gestión de Grupos</button>
-      </div>
-    </div>
-
-    <div id="students-container" class="students-grid"></div>
-  </main>
-
-  <!-- Toasts -->
-  <div id="toast-container" style="position:fixed;right:18px;bottom:18px;z-index:9000"></div>
-
-  <!-- MODALS (complete, not cut) -->
-  <!-- Behaviors modal -->
-  <div id="behaviors-modal" class="modal-backdrop" style="display:none">
-    <div class="modal white" role="dialog" aria-modal="true">
-      <button class="close-btn" data-close="behaviors-modal">✕</button>
-      <h3>Comportamientos</h3>
-      <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
-        <div style="flex:1;display:flex;gap:8px;align-items:center">
-          <button id="new-behavior" class="btn primary">+ Nuevo comportamiento</button>
-          <div class="small">Ver</div>
-          <select id="behavior-filter" class="ef2-input" style="width:150px">
-            <option value="all">Todos</option><option value="positive">Positivos</option><option value="negative">Negativos</option>
-          </select>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="behavior-search" class="ef2-input" placeholder="Buscar comportamiento..." style="width:260px" />
-        </div>
-      </div>
-      <table class="table" style="margin-top:12px">
-        <thead><tr><th>Icono</th><th>Nombre</th><th>Texto</th><th>HP</th><th>XP</th><th>Oro</th><th>Tipo</th><th style="text-align:right">Acciones</th></tr></thead>
-        <tbody id="behaviors-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- Behavior edit modal -->
-  <div id="behavior-edit-modal" class="modal-backdrop" style="display:none">
-    <div class="modal white" style="max-width:520px">
-      <button class="close-btn" data-close="behavior-edit-modal">✕</button>
-      <h3 id="behavior-edit-title">Nuevo comportamiento</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-        <input id="b-key" class="ef2-input" placeholder="Nombre (ej. Participación)">
-        <input id="b-emoji" class="ef2-input" placeholder="Emoji (ej. 👍)">
-        <input id="b-text" class="ef2-input" placeholder="Texto visible">
-        <div style="display:flex;gap:8px">
-          <input id="b-hp" class="ef2-input" type="number" placeholder="HP" style="width:120px">
-          <input id="b-xp" class="ef2-input" type="number" placeholder="XP" style="width:120px">
-          <input id="b-gold" class="ef2-input" type="number" placeholder="Oro" style="width:120px">
-        </div>
-        <select id="b-type" class="ef2-input"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn ghost" data-close="behavior-edit-modal">Cancelar</button>
-          <button id="save-behavior-btn" class="btn primary">Guardar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Behavior apply modal -->
-  <div id="behavior-apply-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:520px">
-      <button class="close-btn" data-close="behavior-apply-modal">✕</button>
-      <h3>Aplicar comportamiento</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
-        <select id="apply-behavior-select" class="ef2-input"></select>
-        <div style="display:flex;gap:8px">
-          <select id="apply-type" class="ef2-input" style="width:160px"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
-          <input id="apply-points" class="ef2-input" type="number" value="1" style="width:120px">
-          <select id="apply-scope" class="ef2-input" style="width:160px"><option value="student">Estudiante</option><option value="group">Grupo</option><option value="class">Curso</option></select>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <button class="btn ghost" data-close="behavior-apply-modal">Cancelar</button>
-          <button id="apply-behavior-btn" class="btn primary">Aplicar</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Class Panel modal -->
-  <div id="class-panel-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:1000px">
-      <button class="close-btn" data-close="class-panel-modal">✕</button>
-      <h3>Panel de Clase — Acciones rápidas</h3>
-      <div style="display:flex;gap:12px;margin-top:12px">
-        <div style="flex:1;max-width:520px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div style="font-weight:800">Selecciona Estudiantes</div>
-            <div style="display:flex;gap:6px">
-              <button id="panel-select-all" class="btn ghost">Seleccionar todos</button>
-              <button id="panel-clear" class="btn ghost">Limpiar</button>
-            </div>
-          </div>
-          <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px;margin-top:8px"></div>
-        </div>
-        <div style="width:440px">
-          <div style="font-weight:800">Acción</div>
-          <div style="margin-top:8px">
-            <select id="class-panel-action-type" class="ef2-input" style="width:100%">
-              <option value="pilar">Comportamiento (pilar)</option>
-              <option value="xp">XP</option>
-              <option value="hp">HP</option>
-              <option value="gold">Oro</option>
-            </select>
-            <div id="class-panel-pilar-row" style="margin-top:8px"><select id="class-panel-pilar-select" class="ef2-input" style="width:100%"></select></div>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:120px">
-              <select id="class-panel-op" class="ef2-input" style="width:120px"><option value="add">Agregar</option><option value="sub">Restar</option></select>
-              <button id="class-panel-apply" class="btn primary">Aplicar</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Groups modal -->
-  <div id="manage-groups-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:1100px">
-      <button class="close-btn" data-close="manage-groups-modal">✕</button>
-      <h3>Crear y configurar grupos</h3>
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-        <div style="display:flex;gap:8px;align-items:center">
-          <button id="create-group" class="btn primary">+ Crear grupo</button>
-          <button id="distrib-rand-btn" class="btn ghost">Distrib. aleatoria</button>
-          <button id="distrib-size-btn" class="btn ghost">Por tamaño</button>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="color:var(--muted);font-weight:700;margin-right:8px">N. de grupos</div>
-          <div style="display:flex;align-items:center;border-radius:999px;background:linear-gradient(180deg,#081822,#0b2734);padding:6px 10px;border:1px solid var(--border)">
-            <button class="btn ghost" id="group-count-minus">−</button>
-            <div id="group-count" style="min-width:36px;text-align:center">3</div>
-            <button class="btn ghost" id="group-count-plus">+</button>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:12px;display:flex;gap:12px">
-        <div style="width:320px">
-          <div style="font-weight:800">Pool de estudiantes</div>
-          <div id="groups-students-pool" style="max-height:420px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid var(--border);margin-top:8px"></div>
-        </div>
-        <div style="flex:1">
-          <div id="groups-columns-area" class="group-columns" style="display:flex;gap:12px;align-items:flex-start;overflow:auto;padding-top:8px"></div>
-        </div>
-      </div>
-
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button id="save-groups" class="btn primary">Guardar</button>
-        <button class="btn ghost" data-close="manage-groups-modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Institution modal -->
-  <div id="institution-modal" class="modal-backdrop" style="display:none">
-    <div class="modal white" style="max-width:720px">
-      <button class="close-btn" data-close="institution-modal">✕</button>
-      <h3>Ajustes institucionales</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
-        <label>Nombre de la aplicación</label><input id="inst-app-name" class="ef2-input">
-        <label>Subtítulo</label><input id="inst-subtitle" class="ef2-input">
-        <label>Logo (2-4 caracteres)</label><input id="inst-logo-text" class="ef2-input" style="width:160px">
-        <label>Color primario (hex)</label><input id="inst-color-primary" class="ef2-input" placeholder="#3b82f6">
-        <label>Fuente (familia CSS)</label><input id="inst-font" class="ef2-input" placeholder="Inter, system-ui">
-      </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button id="inst-defaults" class="btn ghost">Restaurar</button>
-        <button id="inst-save" class="btn primary">Guardar</button>
-        <button class="btn ghost" data-close="institution-modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Timer / Roulette / Dice modals -->
-  <div id="timer-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:520px">
-      <button class="close-btn" data-close="timer-modal">✕</button>
-      <h3>Cronómetro</h3>
-      <div id="timer-display" style="font-weight:900;font-size:48px;color:var(--accent);margin:18px 0;text-align:center">05:00</div>
-      <div style="display:flex;gap:8px;justify-content:center">
-        <button id="timer-toggle" class="btn primary">Iniciar/Pausar</button>
-        <button id="timer-reset" class="btn ghost">Reset</button>
-        <button class="btn ghost" onclick="setTimerMinutes(1)">1m</button>
-        <button class="btn ghost" onclick="setTimerMinutes(5)">5m</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="roulette-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:640px">
-      <button class="close-btn" data-close="roulette-modal">✕</button>
-      <h3>Ruleta</h3>
-      <div id="roulette-display" style="font-weight:900;font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#07121a,#041018);margin-top:12px">¡Presiona Girar!</div>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <button id="roulette-start" class="btn primary">Girar</button>
-        <button id="roulette-stop" class="btn ghost">Detener</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="dice-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:640px">
-      <button class="close-btn" data-close="dice-modal">✕</button>
-      <h3>Dado</h3>
-      <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
-        <div style="width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)">
-          <div id="die" style="font-size:36px">🎲</div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-          <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Cantidad</label><input id="dice-count" type="number" min="1" max="10" value="1" class="ef2-input" style="width:60px" /></div>
-          <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Caras</label><input id="dice-sides" type="number" min="2" max="100" value="6" class="ef2-input" style="width:80px" /></div>
-          <div style="display:flex;gap:8px"><button id="dice-roll" class="btn primary">Lanzar Dado</button></div>
-        </div>
-      </div>
-      <div id="dice-detail" style="color:var(--muted);margin-top:8px"></div>
-    </div>
-  </div>
-
-  <!-- Confirm modal -->
-  <div id="confirm-modal" class="modal-backdrop" style="display:none">
-    <div class="modal" style="max-width:420px">
-      <button class="close-btn" data-close="confirm-modal">✕</button>
-      <h3 id="confirm-title">¿Estás seguro?</h3>
-      <p id="confirm-message" style="color:var(--muted)"></p>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-        <button class="btn warn" id="confirm-yes">Eliminar</button>
-        <button class="btn ghost" data-close="confirm-modal">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Restore -->
-  <div id="restore-modal" class="modal-backdrop" style="display:none">
-    <div class="modal white" style="max-width:760px">
-      <button class="close-btn" data-close="restore-modal">✕</button>
-      <h3>Restaurar backup (pegar JSON)</h3>
+<header class="topbar">
+  <div style="display:flex;align-items:center">
+    <div class="brand">
+      <div class="logo" id="header-logo">ALM</div>
       <div>
-        <label>Clave localStorage</label>
-        <input id="restore-key" class="ef2-input" value="fantasyclass_alm_db">
-        <label>JSON</label>
-        <textarea id="restore-json" style="width:100%;height:220px"></textarea>
-        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
-          <button class="btn ghost" data-close="restore-modal">Cancelar</button>
-          <button class="btn primary" id="apply-restore">Restaurar</button>
+        <div class="title" id="header-title">FantasyClass Convivencial</div>
+        <div class="subtitle" id="header-subtitle">Aprendiendo Jugando</div>
+      </div>
+    </div>
+
+    <nav class="nav" id="topnav">
+      <div class="nav-item" data-nav="clase">Clase</div>
+
+      <div class="nav-item" data-nav="recompensas" id="nav-recompensas">Recompensas ▾
+        <div class="dropdown">
+          <div class="item" data-action="openLevels"><i class="fa-solid fa-trophy" style="width:18px"></i> Niveles</div>
+          <div class="item" data-action="openCards"><i class="fa-solid fa-book" style="width:18px"></i> Cartas</div>
+          <div class="item" data-action="openRoles"><i class="fa-solid fa-mask" style="width:18px"></i> Roles</div>
+          <div class="item" data-action="openBadges"><i class="fa-solid fa-award" style="width:18px"></i> Insignias</div>
+          <div class="item" data-action="openBehaviors"><i class="fa-regular fa-heart" style="width:18px"></i> Comportamientos</div>
+          <div class="item" data-action="openShop"><i class="fa-solid fa-store" style="width:18px"></i> Tienda</div>
+        </div>
+      </div>
+
+      <div class="nav-item" data-nav="aventura">Aventura ▾</div>
+      <div class="nav-item" data-nav="evaluacion">Evaluación ▾</div>
+    </nav>
+  </div>
+
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="background:rgba(255,255,255,0.02);padding:8px 12px;border-radius:10px;border:1px solid var(--border)">
+      <select id="class-select" onchange="switchClass(this.value)"></select>
+    </div>
+
+    <div class="nav-item" id="tools-menu">Herramientas ▾
+      <div class="dropdown" id="tools-dropdown">
+        <div class="item" data-action="openTimer">Cronómetro</div>
+        <div class="item" data-action="openRoulette">Ruleta</div>
+        <div class="item" data-action="openDice">Dado</div>
+        <div style="height:1px;background:var(--border);margin:6px 0"></div>
+        <div class="item" data-action="openClassPanel">Panel de Clase</div>
+        <div class="item" data-action="openGroups">Gestión de Grupos</div>
+        <div class="item" data-action="openGrades">Administrar Grados</div>
+      </div>
+    </div>
+
+    <div class="nav-item" id="chars-menu">Comportamientos ▾
+      <div class="dropdown" id="chars-dropdown">
+        <div class="item" data-action="openBehaviors">Administrar Comportamientos</div>
+        <div class="item" data-action="openQuickPositive">Puntos positivos</div>
+        <div class="item" data-action="openQuickNegative">Puntos negativos</div>
+      </div>
+    </div>
+
+    <div class="nav-item" id="settings-menu">Ajustes ▾
+      <div class="dropdown" id="settings-dropdown">
+        <div class="item" data-action="openInstitution">Ajustes institucionales</div>
+        <div class="item" data-action="downloadBackup">Descargar backup</div>
+        <div class="item" data-action="openRestore">Restaurar</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="metrics" id="metrics-row">
+    <div class="metric"><div style="font-weight:800">Responsabilidad</div><div id="badge-Responsabilidad" style="font-weight:900">0 pts</div></div>
+    <div class="metric"><div style="font-weight:800">Respeto</div><div id="badge-Respeto" style="font-weight:900">0 pts</div></div>
+    <div class="metric"><div style="font-weight:800">Confianza</div><div id="badge-Confianza" style="font-weight:900">0 pts</div></div>
+    <div class="metric"><div style="font-weight:800">Empatía</div><div id="badge-Empatía" style="font-weight:900">0 pts</div></div>
+  </div>
+
+  <div class="controls-row">
+    <div style="display:flex;gap:8px;align-items:center">
+      <input id="student-search" class="search-input" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
+      <button id="add-student" class="btn ghost">+ Estudiante</button>
+      <button id="open-class-panel" class="btn ghost">Panel de Clase</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button id="open-grades" class="btn ghost">Administrar Grados</button>
+      <button id="open-groups" class="btn ghost">Gestión de Grupos</button>
+    </div>
+  </div>
+
+  <div id="students-container" class="students-grid"></div>
+</main>
+
+<div id="toast-container" style="position:fixed;right:18px;bottom:18px;z-index:9000"></div>
+
+<!-- ---------- MODALS (full) ---------- -->
+
+<!-- Behaviors modal -->
+<div id="behaviors-modal" class="modal-backdrop" style="display:none">
+  <div class="modal white" role="dialog" aria-modal="true">
+    <button class="close-btn" data-close="behaviors-modal">✕</button>
+    <h3>Comportamientos</h3>
+
+    <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+      <div style="flex:1;display:flex;gap:8px;align-items:center">
+        <button id="new-behavior" class="btn primary">+ Nuevo comportamiento</button>
+        <div class="small">Ver</div>
+        <select id="behavior-filter" class="ef2-input" style="width:150px">
+          <option value="all">Todos</option><option value="positive">Positivos</option><option value="negative">Negativos</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="behavior-search" class="ef2-input" placeholder="Buscar comportamiento..." style="width:260px" />
+      </div>
+    </div>
+
+    <table class="table" style="margin-top:12px">
+      <thead><tr><th>Icono</th><th>Nombre</th><th>Texto</th><th>HP</th><th>XP</th><th>Oro</th><th>Tipo</th><th style="text-align:right">Acciones</th></tr></thead>
+      <tbody id="behaviors-body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Behavior edit -->
+<div id="behavior-edit-modal" class="modal-backdrop" style="display:none">
+  <div class="modal white" style="max-width:520px">
+    <button class="close-btn" data-close="behavior-edit-modal">✕</button>
+    <h3 id="behavior-edit-title">Nuevo comportamiento</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+      <input id="b-key" class="ef2-input" placeholder="Nombre (ej. Participación)">
+      <input id="b-emoji" class="ef2-input" placeholder="Emoji (ej. 👍)">
+      <input id="b-text" class="ef2-input" placeholder="Texto visible">
+      <div style="display:flex;gap:8px">
+        <input id="b-hp" class="ef2-input" type="number" placeholder="HP" style="width:120px">
+        <input id="b-xp" class="ef2-input" type="number" placeholder="XP" style="width:120px">
+        <input id="b-gold" class="ef2-input" type="number" placeholder="Oro" style="width:120px">
+      </div>
+      <select id="b-type" class="ef2-input"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" data-close="behavior-edit-modal">Cancelar</button>
+        <button id="save-behavior-btn" class="btn primary">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Behavior apply modal -->
+<div id="behavior-apply-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <button class="close-btn" data-close="behavior-apply-modal">✕</button>
+    <h3>Aplicar comportamiento</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+      <select id="apply-behavior-select" class="ef2-input"></select>
+      <div style="display:flex;gap:8px">
+        <select id="apply-type" class="ef2-input" style="width:160px"><option value="positive">Positivo</option><option value="negative">Negativo</option></select>
+        <input id="apply-points" class="ef2-input" type="number" value="1" style="width:120px">
+        <select id="apply-scope" class="ef2-input" style="width:160px"><option value="student">Estudiante</option><option value="group">Grupo</option><option value="class">Curso</option></select>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end">
+        <button class="btn ghost" data-close="behavior-apply-modal">Cancelar</button>
+        <button id="apply-behavior-btn" class="btn primary">Aplicar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Class Panel modal -->
+<div id="class-panel-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:1000px">
+    <button class="close-btn" data-close="class-panel-modal">✕</button>
+    <h3>Panel de Clase — Acciones rápidas</h3>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="flex:1;max-width:520px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">Selecciona Estudiantes</div>
+          <div style="display:flex;gap:6px">
+            <button id="panel-select-all" class="btn ghost">Seleccionar todos</button>
+            <button id="panel-clear" class="btn ghost">Limpiar</button>
+          </div>
+        </div>
+        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px;margin-top:8px"></div>
+      </div>
+
+      <div style="width:440px">
+        <div style="font-weight:800">Acción</div>
+        <div style="margin-top:8px">
+          <select id="class-panel-action-type" class="ef2-input" style="width:100%">
+            <option value="pilar">Comportamiento (pilar)</option>
+            <option value="xp">XP</option>
+            <option value="hp">HP</option>
+            <option value="gold">Oro</option>
+          </select>
+          <div id="class-panel-pilar-row" style="margin-top:8px"><select id="class-panel-pilar-select" class="ef2-input" style="width:100%"></select></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:120px">
+            <select id="class-panel-op" class="ef2-input" style="width:120px"><option value="add">Agregar</option><option value="sub">Restar</option></select>
+            <button id="class-panel-apply" class="btn primary">Aplicar</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <!-- JS: behavior implemented in organized sections -->
-  <script>
-    /* ====== STATE & DEFAULTS ====== */
-    const STORAGE_KEY = 'fantasyclass_alm_db';
-    const HP_MAX = 5;
-    const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
-    const DEFAULT_CHARACTERS = [
-      { key: 'Participación', emoji:'👍', name:'Participación', type:'positive', hp:0, xp:5, gold:0 },
-      { key: 'Tareas', emoji:'📘', name:'Hace los deberes', type:'positive', hp:0, xp:5, gold:0 },
-      { key: 'Puntualidad', emoji:'⏰', name:'Puntualidad y asistencia', type:'positive', hp:0, xp:5, gold:0 },
-      { key: 'Falta', emoji:'⚠️', name:'Falta', type:'negative', hp:-1, xp:0, gold:0 }
-    ];
+<!-- Groups modal -->
+<div id="manage-groups-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:1100px">
+    <button class="close-btn" data-close="manage-groups-modal">✕</button>
+    <h3>Crear y configurar grupos</h3>
 
-    let db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} };
-    let currentClass = null;
-    let activeStudentId = null;
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <div style="display:flex;gap:8px;align-items:center">
+        <button id="create-group" class="btn primary">+ Crear grupo</button>
+        <button id="distrib-rand-btn" class="btn ghost">Distrib. aleatoria</button>
+        <button id="distrib-size-btn" class="btn ghost">Por tamaño</button>
+      </div>
 
-    /* ====== UTIL: toasts ====== */
-    const toastContainer = document.getElementById('toast-container');
-    function showToast(msg, t=2600){
-      const el = document.createElement('div'); el.style.marginTop='8px';
-      el.innerHTML = `<div style="background:rgba(0,0,0,0.75);color:#fff;padding:10px 14px;border-radius:8px">${msg}</div>`;
-      toastContainer.appendChild(el);
-      setTimeout(()=> el.remove(), t);
-    }
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="color:var(--muted);font-weight:700;margin-right:8px">N. de grupos</div>
+        <div style="display:flex;align-items:center;border-radius:999px;background:linear-gradient(180deg,#081822,#0b2734);padding:6px 10px;border:1px solid var(--border)">
+          <button class="btn ghost" id="group-count-minus">−</button>
+          <div id="group-count" style="min-width:36px;text-align:center">3</div>
+          <button class="btn ghost" id="group-count-plus">+</button>
+        </div>
+      </div>
+    </div>
 
-    /* ====== Persistence ====== */
-    function loadDB(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(raw) db = JSON.parse(raw);
-      }catch(e){ db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} }; }
-      if(!db.classes) db.classes = {};
-      if(!db.groups) db.groups = {};
-      if(!Array.isArray(db.characters)) db.characters = [];
-      Object.keys(DEFAULT_ROSTERS).forEach(k=>{
-        if(!db.classes[k]) db.classes[k] = [];
-        if(!db.groups[k]) db.groups[k] = {};
-      });
-      if(!db.characters.length) db.characters = DEFAULT_CHARACTERS.map((c,i)=> ({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type, hp:c.hp, xp:c.xp, gold:c.gold }));
-      currentClass = currentClass || Object.keys(db.classes)[0] || null;
-    }
-    function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn(e); } }
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="width:320px">
+        <div style="font-weight:800">Pool de estudiantes</div>
+        <div id="groups-students-pool" style="max-height:420px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid var(--border);margin-top:8px"></div>
+      </div>
+      <div style="flex:1">
+        <div id="groups-columns-area" class="group-columns" style="display:flex;gap:12px;align-items:flex-start;overflow:auto;padding-top:8px"></div>
+      </div>
+    </div>
 
-    /* ====== INIT ====== */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      loadDB();
-      wireTopNav();
-      populateClassSelect();
-      wireHeaderButtons();
-      renderStudentGrid();
-      renderBehaviorsTable();
-      refreshBehaviorSelects();
-      renderGroupsColumns();
-      renderHeaderFromInstitution();
-      wireModalCloseButtons();
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button id="save-groups" class="btn primary">Guardar</button>
+      <button class="btn ghost" data-close="manage-groups-modal">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Institution modal -->
+<div id="institution-modal" class="modal-backdrop" style="display:none">
+  <div class="modal white" style="max-width:720px">
+    <button class="close-btn" data-close="institution-modal">✕</button>
+    <h3>Ajustes institucionales</h3>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+      <label>Nombre de la aplicación</label><input id="inst-app-name" class="ef2-input">
+      <label>Subtítulo</label><input id="inst-subtitle" class="ef2-input">
+      <label>Logo (2-4 caracteres)</label><input id="inst-logo-text" class="ef2-input" style="width:160px">
+      <label>Color primario (hex)</label><input id="inst-color-primary" class="ef2-input" placeholder="#3b82f6">
+      <label>Fuente (familia CSS)</label><input id="inst-font" class="ef2-input" placeholder="Inter, system-ui">
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+      <button id="inst-defaults" class="btn ghost">Restaurar</button>
+      <button id="inst-save" class="btn primary">Guardar</button>
+      <button class="btn ghost" data-close="institution-modal">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Timer / Roulette / Dice modals -->
+<div id="timer-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:520px">
+    <button class="close-btn" data-close="timer-modal">✕</button>
+    <h3>Cronómetro</h3>
+    <div id="timer-display" style="font-weight:900;font-size:48px;color:var(--accent);margin:18px 0;text-align:center">05:00</div>
+    <div style="display:flex;gap:8px;justify-content:center">
+      <button id="timer-toggle" class="btn primary">Iniciar/Pausar</button>
+      <button id="timer-reset" class="btn ghost">Reset</button>
+      <button class="btn ghost" onclick="setTimerMinutes(1)">1m</button>
+      <button class="btn ghost" onclick="setTimerMinutes(5)">5m</button>
+    </div>
+  </div>
+</div>
+
+<div id="roulette-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:640px">
+    <button class="close-btn" data-close="roulette-modal">✕</button>
+    <h3>Ruleta</h3>
+    <div id="roulette-display" style="font-weight:900;font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#07121a,#041018);margin-top:12px">¡Presiona Girar!</div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button id="roulette-start" class="btn primary">Girar</button>
+      <button id="roulette-stop" class="btn ghost">Detener</button>
+    </div>
+  </div>
+</div>
+
+<div id="dice-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:640px">
+    <button class="close-btn" data-close="dice-modal">✕</button>
+    <h3>Dado</h3>
+    <div style="display:flex;gap:12px;align-items:center;margin-top:12px">
+      <div style="width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid var(--border)">
+        <div id="die" style="font-size:36px">🎲</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Cantidad</label><input id="dice-count" type="number" min="1" max="10" value="1" class="ef2-input" style="width:60px" /></div>
+        <div style="display:flex;gap:8px;align-items:center"><label style="color:var(--muted)">Caras</label><input id="dice-sides" type="number" min="2" max="100" value="6" class="ef2-input" style="width:80px" /></div>
+        <div style="display:flex;gap:8px"><button id="dice-roll" class="btn primary">Lanzar Dado</button></div>
+      </div>
+    </div>
+    <div id="dice-detail" style="color:var(--muted);margin-top:8px"></div>
+  </div>
+</div>
+
+<!-- Confirm modal -->
+<div id="confirm-modal" class="modal-backdrop" style="display:none">
+  <div class="modal" style="max-width:420px">
+    <button class="close-btn" data-close="confirm-modal">✕</button>
+    <h3 id="confirm-title">¿Estás seguro?</h3>
+    <p id="confirm-message" style="color:var(--muted)"></p>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+      <button class="btn warn" id="confirm-yes">Eliminar</button>
+      <button class="btn ghost" data-close="confirm-modal">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Restore modal -->
+<div id="restore-modal" class="modal-backdrop" style="display:none">
+  <div class="modal white" style="max-width:760px">
+    <button class="close-btn" data-close="restore-modal">✕</button>
+    <h3>Restaurar backup (pegar JSON)</h3>
+    <div>
+      <label>Clave localStorage</label>
+      <input id="restore-key" class="ef2-input" value="fantasyclass_alm_db">
+      <label>JSON</label>
+      <textarea id="restore-json" style="width:100%;height:220px"></textarea>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
+        <button class="btn ghost" data-close="restore-modal">Cancelar</button>
+        <button class="btn primary" id="apply-restore">Restaurar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     SCRIPT
+     ========================= -->
+<script>
+/* ==========
+   State & Defaults
+   ========== */
+const STORAGE_KEY = 'fantasyclass_alm_db';
+const HP_MAX = 5;
+const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
+const DEFAULT_CHARACTERS = [
+  { key: 'Participación', emoji:'👍', name:'Participación', type:'positive', hp:0, xp:5, gold:0 },
+  { key: 'Tareas', emoji:'📘', name:'Hace los deberes', type:'positive', hp:0, xp:5, gold:0 },
+  { key: 'Puntualidad', emoji:'⏰', name:'Puntualidad y asistencia', type:'positive', hp:0, xp:5, gold:0 },
+  { key: 'Falta', emoji:'⚠️', name:'Falta', type:'negative', hp:-1, xp:0, gold:0 }
+];
+
+let db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} };
+let currentClass = null;
+let activeStudentId = null;
+
+/* ----- Toast ----- */
+const toastContainer = document.getElementById('toast-container');
+function showToast(msg, t=2800){
+  const el = document.createElement('div'); el.style.marginTop='8px'; el.innerHTML = `<div style="background:rgba(0,0,0,0.75);color:#fff;padding:10px 14px;border-radius:8px">${msg}</div>`;
+  toastContainer.appendChild(el); setTimeout(()=> el.remove(), t);
+}
+
+/* ----- Persistence ----- */
+function loadDB(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) db = JSON.parse(raw);
+  }catch(e){ db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} }; }
+  if(!db.classes) db.classes = {};
+  if(!db.groups) db.groups = {};
+  if(!Array.isArray(db.characters)) db.characters = [];
+  Object.keys(DEFAULT_ROSTERS).forEach(k=>{ if(!db.classes[k]) db.classes[k] = []; if(!db.groups[k]) db.groups[k] = {}; });
+  if(!db.characters.length) db.characters = DEFAULT_CHARACTERS.map((c,i)=> ({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type, hp:c.hp, xp:c.xp, gold:c.gold }));
+  currentClass = currentClass || Object.keys(db.classes)[0] || null;
+}
+function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('save error', e); } }
+
+/* ----- Init ----- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  loadDB();
+  wireTopNav();
+  populateClassSelect();
+  wireHeaderButtons();
+  renderStudentGrid();
+  renderBehaviorsTable();
+  refreshBehaviorSelects();
+  renderGroupsColumns();
+  renderHeaderFromInstitution();
+  wireModalCloseButtons();
+});
+
+/* ===== Top nav dropdowns ===== */
+function wireTopNav(){
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.addEventListener('click', e=>{
+      e.stopPropagation();
+      const open = item.classList.contains('open');
+      document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open'));
+      if(!open) item.classList.add('open');
     });
+  });
+  document.addEventListener('click', e=>{ if(!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); });
+  document.querySelectorAll('.dropdown .item').forEach(it=> it.addEventListener('click', ()=> { if(it.dataset.action) handleAction(it.dataset.action); document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); }));
+}
 
-    /* ====== Top nav behavior (dropdowns) ====== */
-    function wireTopNav(){
-      document.querySelectorAll('.nav-item').forEach(item=>{
-        item.addEventListener('click', (e)=>{
-          e.stopPropagation();
-          const open = item.classList.contains('open');
-          document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open'));
-          if(!open) item.classList.add('open');
-        });
-      });
-      document.addEventListener('click', (e)=>{ if(!e.target.closest('.nav-item')) document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); });
-      document.querySelectorAll('.dropdown .item').forEach(it=> it.addEventListener('click', (e)=> { handleAction(it.dataset.action); document.querySelectorAll('.nav-item.open').forEach(n=>n.classList.remove('open')); }));
-      // tools & settings dropdown items
-      document.querySelectorAll('#tools-dropdown .item').forEach(it=>it.addEventListener('click', ()=> handleAction(it.dataset.action)));
-      document.querySelectorAll('#chars-dropdown .item').forEach(it=>it.addEventListener('click', ()=> handleAction(it.dataset.action)));
-      document.querySelectorAll('#settings-dropdown .item').forEach(it=>it.addEventListener('click', ()=> handleAction(it.dataset.action)));
-    }
+/* map actions */
+function handleAction(action){
+  const actions = {
+    openTimer: ()=> openTimerModal(),
+    openRoulette: ()=> openRouletteModal(),
+    openDice: ()=> openDiceModal(),
+    openClassPanel: ()=> { buildClassPanel(); showModal('class-panel-modal'); },
+    openGroups: ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); },
+    openGrades: ()=> openGradesModal(),
+    openBehaviors: ()=> { renderBehaviorsTable(); showModal('behaviors-modal'); },
+    openQuickPositive: ()=> openQuick('positive'),
+    openQuickNegative: ()=> openQuick('negative'),
+    downloadBackup: ()=> downloadBackup(),
+    openRestore: ()=> openRestore(),
+    openInstitution: ()=> openInstitutionSettings()
+  };
+  if(actions[action]) actions[action](); else console.warn('Unmapped action', action);
+}
 
-    function handleAction(action){
-      const map = {
-        openTimer: ()=> openTimerModal(),
-        openRoulette: ()=> openRouletteModal(),
-        openDice: ()=> openDiceModal(),
-        openClassPanel: ()=> { buildClassPanel(); showModal('class-panel-modal'); },
-        openGroups: ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); },
-        openGrades: ()=> openGradesModal(),
-        openBehaviors: ()=> { renderBehaviorsTable(); showModal('behaviors-modal'); },
-        openQuickPositive: ()=> openQuick('positive'),
-        openQuickNegative: ()=> openQuick('negative'),
-        downloadBackup: ()=> downloadBackup(),
-        openRestore: ()=> openRestore(),
-        openInstitution: ()=> openInstitutionSettings()
-      };
-      if(map[action]) map[action]();
-      else console.warn('No action mapped:', action);
-    }
+/* ===== Class select ===== */
+function populateClassSelect(){
+  const sel = document.getElementById('class-select'); if(!sel) return; sel.innerHTML='';
+  Object.keys(db.classes).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt); });
+  if(currentClass && db.classes[currentClass]) sel.value = currentClass;
+  else currentClass = sel.value || Object.keys(db.classes)[0] || null;
+  sel.onchange = ()=> { switchClass(sel.value); };
+}
+function switchClass(val){
+  if(!db.classes[val]) return showToast('Grado no encontrado');
+  currentClass = val;
+  populateClassSelect();
+  renderStudentGrid();
+  renderGroupsColumns();
+}
 
-    /* ====== Class select ====== */
-    function populateClassSelect(){
-      const sel = document.getElementById('class-select'); if(!sel) return; sel.innerHTML='';
-      Object.keys(db.classes).forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(o); });
-      if(currentClass && db.classes[currentClass]) sel.value = currentClass;
-      else currentClass = sel.value || Object.keys(db.classes)[0] || null;
-      sel.onchange = ()=> { switchClass(sel.value); };
-    }
-    function switchClass(val){
-      if(!db.classes[val]) return showToast('Grado no encontrado');
-      currentClass = val;
-      populateClassSelect();
-      renderStudentGrid();
-      renderGroupsColumns();
-    }
-
-    /* ====== Student grid ====== */
-    function avatarGradient(name){
-      const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
-      const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
-      const p = palettes[idx];
-      return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
-    }
-    function calcStudentSums(s){
-      let pos=0, neg=0; (s.history||[]).forEach(h=>{ if(h.type==='positive') pos += (h.magnitude||0); else neg += (h.magnitude||0); }); return { pos, neg };
-    }
-    function renderStudentGrid(){
-      const grid = document.getElementById('students-container'); if(!grid) return; grid.innerHTML='';
-      if(!currentClass) return;
-      const q = (document.getElementById('student-search').value||'').toLowerCase();
-      const list = db.classes[currentClass] || [];
-      list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
-        const sums = calcStudentSums(s);
-        const card = document.createElement('div'); card.className='student-card';
-        card.innerHTML = `
-          <div style="display:flex;gap:12px;align-items:center">
-            <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
-            <div class="student-info">
-              <div class="student-name">${s.name}</div>
-              <div class="student-sub">Grado ${currentClass} • ${s.document||''}</div>
-              <div class="card-actions">
-                <button class="btn ghost" data-action="openFicha" data-sid="${s.id}">Ficha</button>
-                <button class="btn ghost" data-action="export" data-sid="${s.id}"><i class="fa-solid fa-file-excel"></i></button>
-                <button class="btn primary" data-action="applyBehavior" data-sid="${s.id}"><i class="fa-regular fa-heart"></i> Comportamiento</button>
-              </div>
-            </div>
+/* ===== Students grid ===== */
+function avatarGradient(name){
+  const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
+  const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
+  const p = palettes[idx];
+  return `linear-gradient(135deg, ${p[0]}, ${p[1]})`;
+}
+function calcStudentSums(s){
+  let pos=0, neg=0; (s.history||[]).forEach(h=>{ if(h.type==='positive') pos += (h.magnitude||0); else neg += (h.magnitude||0); }); return { pos, neg };
+}
+function renderStudentGrid(){
+  const grid = document.getElementById('students-container'); if(!grid) return; grid.innerHTML='';
+  if(!currentClass) return;
+  const q = (document.getElementById('student-search').value||'').toLowerCase();
+  const list = db.classes[currentClass] || [];
+  list.filter(s => s.name.toLowerCase().includes(q)).forEach(s=>{
+    const sums = calcStudentSums(s);
+    const card = document.createElement('div'); card.className='student-card';
+    card.innerHTML = `
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="avatar" style="background:${avatarGradient(s.name)}">${(s.name||' ')[0]}</div>
+        <div class="student-info">
+          <div class="student-name">${s.name}</div>
+          <div class="student-sub">Grado ${currentClass} • ${s.document||''}</div>
+          <div class="card-actions">
+            <button class="btn ghost" data-action="openFicha" data-sid="${s.id}">Ficha</button>
+            <button class="btn ghost" data-action="export" data-sid="${s.id}"><i class="fa-solid fa-file-excel"></i></button>
+            <button class="btn primary" data-action="applyBehavior" data-sid="${s.id}"><i class="fa-regular fa-heart"></i> Comportamiento</button>
           </div>
-          <div style="margin-left:auto;text-align:right">
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-              <div class="stat">XP ${s.xp||0}</div>
-              <div class="stat">HP ${s.hp||HP_MAX}</div>
-              <div class="stat">ORO ${s.gold||0}</div>
-            </div>
-            <div style="margin-top:8px"><button class="btn warn" data-action="delete" data-sid="${s.id}"><i class="fa-solid fa-trash"></i></button></div>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-      // wire card buttons
-      grid.querySelectorAll('button[data-action]').forEach(btn=>{
-        btn.onclick = (e)=>{ e.stopPropagation(); const act=btn.dataset.action; const sid=btn.dataset.sid; if(act==='openFicha') openFicha(sid); else if(act==='export') exportSingleStudentExcel(sid); else if(act==='applyBehavior'){ activeStudentId=sid; refreshBehaviorSelects(); showModal('behavior-apply-modal'); } else if(act==='delete') promptDeleteStudent(sid); };
-      });
-      updateMetrics();
-    }
+        </div>
+      </div>
+      <div style="margin-left:auto;text-align:right">
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <div class="stat">XP ${s.xp||0}</div>
+          <div class="stat">HP ${s.hp||HP_MAX}</div>
+          <div class="stat">ORO ${s.gold||0}</div>
+        </div>
+        <div style="margin-top:8px"><button class="btn warn" data-action="delete" data-sid="${s.id}"><i class="fa-solid fa-trash"></i></button></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+  grid.querySelectorAll('button[data-action]').forEach(btn=>{
+    btn.onclick = (e)=>{ e.stopPropagation(); const act=btn.dataset.action; const sid=btn.dataset.sid; if(act==='openFicha') openFicha(sid); else if(act==='export') exportSingleStudentExcel(sid); else if(act==='applyBehavior'){ activeStudentId=sid; refreshBehaviorSelects(); showModal('behavior-apply-modal'); } else if(act==='delete') promptDeleteStudent(sid); };
+  });
+  updateMetrics();
+}
 
-    /* ====== Add/Delete student ====== */
-    function openAddStudentPrompt(){ const name=prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], gold:0 }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado'); }
-    function promptDeleteStudent(id){ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado'); }); }
+/* ===== Add/Delete student ===== */
+function openAddStudentPrompt(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], gold:0 }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado'); }
+function promptDeleteStudent(id){ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado'); }); }
 
-    /* ====== FICHA (basic) ====== */
-    function openFicha(id){
-      const f = findStudentById(id); if(!f) return showToast('No encontrado');
-      activeStudentId = id;
-      // Simple modal: show summary (we keep original process lightweight)
-      alert(`${f.student.name}\nGrado: ${f.grade}\nXP: ${f.student.xp||0}\nHP: ${f.student.hp||HP_MAX}\nActas: ${(f.student.actas||[]).length}`);
-    }
+/* ===== Ficha (basic modal summary) ===== */
+function openFicha(id){
+  const f = findStudentById(id); if(!f) return showToast('No encontrado'); activeStudentId = id;
+  // We provide a quick modal with options to open full ficha (more complex). For now show summary with options.
+  const s = f.student;
+  const info = `Nombre: ${s.name}\nGrado: ${f.grade}\nXP:${s.xp||0} HP:${s.hp||HP_MAX} ORO:${s.gold||0}\nActas: ${(s.actas||[]).length}\nHistorial: ${(s.history||[]).slice(0,5).map(h=>`${h.ts} ${h.pilar} ${h.magnitude}`).join('\\n')}`;
+  alert(info);
+}
 
-    /* ====== BEHAVIORS CRUD & apply ====== */
-    function renderBehaviorsTable(){
-      const tbody = document.getElementById('behaviors-body'); if(!tbody) return; tbody.innerHTML='';
-      const q = (document.getElementById('behavior-search')?.value||'').toLowerCase();
-      const filter = document.getElementById('behavior-filter')?.value || 'all';
-      const all = db.characters || [];
-      all.filter(b=>{ if(filter!=='all' && b.type !== filter) return false; if(q && !(b.key.toLowerCase().includes(q) || (b.name||'').toLowerCase().includes(q))) return false; return true; })
-        .forEach(b=>{
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td style="width:80px">${b.emoji||''}</td>
-                          <td>${escapeHtml(b.key)}</td>
-                          <td>${escapeHtml(b.name||'')}</td>
-                          <td>${b.hp||0}</td><td>${b.xp||0}</td><td>${b.gold||0}</td><td>${b.type}</td>
-                          <td style="text-align:right"><button class="btn ghost" data-edit="${b.id}"><i class="fa-solid fa-pen"></i></button> <button class="btn warn" data-del="${b.id}"><i class="fa-solid fa-trash"></i></button></td>`;
-          tbody.appendChild(tr);
-        });
-      tbody.querySelectorAll('button[data-edit]').forEach(b=> b.addEventListener('click', ()=> openBehaviorEdit(b.dataset.edit)));
-      tbody.querySelectorAll('button[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteBehavior(b.dataset.del)));
-    }
-    function openBehaviorEdit(id){
-      document.getElementById('behavior-edit-title').innerText = id ? 'Editar comportamiento' : 'Nuevo comportamiento';
-      document.getElementById('b-key').value = '';
-      document.getElementById('b-emoji').value = '';
-      document.getElementById('b-text').value = '';
-      document.getElementById('b-hp').value = 0;
-      document.getElementById('b-xp').value = 0;
-      document.getElementById('b-gold').value = 0;
-      document.getElementById('b-type').value = 'positive';
-      document.getElementById('save-behavior-btn').dataset.edit = id || '';
-      if(id){
-        const b = db.characters.find(x=>x.id===id);
-        if(b){ document.getElementById('b-key').value=b.key; document.getElementById('b-emoji').value=b.emoji; document.getElementById('b-text').value=b.name; document.getElementById('b-hp').value=b.hp||0; document.getElementById('b-xp').value=b.xp||0; document.getElementById('b-gold').value=b.gold||0; document.getElementById('b-type').value=b.type; }
-      }
-      showModal('behavior-edit-modal');
-    }
-    function saveBehaviorFromForm(){
-      const id = document.getElementById('save-behavior-btn').dataset.edit;
-      const key = (document.getElementById('b-key').value||'').trim();
-      const emoji = (document.getElementById('b-emoji').value||'').trim();
-      const text = (document.getElementById('b-text').value||'').trim();
-      const hp = parseInt(document.getElementById('b-hp').value)||0;
-      const xp = parseInt(document.getElementById('b-xp').value)||0;
-      const gold = parseInt(document.getElementById('b-gold').value)||0;
-      const type = document.getElementById('b-type').value;
-      if(!key || !emoji) return showToast('Nombre y emoji obligatorios');
-      if(id){
-        const b = db.characters.find(x=>x.id===id); if(!b) return;
-        b.key=key; b.emoji=emoji; b.name=text; b.hp=hp; b.xp=xp; b.gold=gold; b.type=type;
-        saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento actualizado');
-      } else {
-        if((db.characters||[]).some(c=>c.key===key)) return showToast('Ya existe un comportamiento con ese nombre');
-        db.characters.push({ id:`char_${Date.now()}`, key, emoji, name:text, hp, xp, gold, type });
-        saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento creado');
-      }
-    }
-    function deleteBehavior(id){ showConfirm('Eliminar carácter','¿Eliminar este comportamiento?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); showToast('Eliminado'); }); }
-    function refreshBehaviorSelects(){
-      const sel = document.getElementById('apply-behavior-select'); if(sel){ sel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; sel.appendChild(o); }); }
-      const cp = document.getElementById('class-panel-pilar-select'); if(cp){ cp.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; cp.appendChild(o); }); }
-    }
-    function applyBehaviorToStudentById(studentId, behaviorKey, type, points){
-      const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado');
-      const s = f.student;
-      s.history = s.history||[];
-      const isPos = type !== 'negative';
-      if(isPos){ s.xp = (s.xp||0)+points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
-      else s.hp = Math.max(0, (s.hp||HP_MAX)-points);
-      s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos ? 'positive':'negative', pilar:behaviorKey, magnitude:points, note:'Aplicado (pilar)' });
-      s.level = Math.floor((s.xp||0)/20)+1;
-      saveDB(); renderStudentGrid(); showToast(`Aplicado ${isPos?'+':'-'}${points} a ${s.name}`);
-    }
+/* ===== Behaviors CRUD & apply ===== */
+function renderBehaviorsTable(){
+  const tbody = document.getElementById('behaviors-body'); if(!tbody) return; tbody.innerHTML='';
+  const q = (document.getElementById('behavior-search')?.value||'').toLowerCase();
+  const filter = document.getElementById('behavior-filter')?.value || 'all';
+  (db.characters||[]).filter(b=>{ if(filter!=='all' && b.type !== filter) return false; if(q && !(b.key.toLowerCase().includes(q) || (b.name||'').toLowerCase().includes(q))) return false; return true; }).forEach(b=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="width:80px">${b.emoji||''}</td><td>${escapeHtml(b.key)}</td><td>${escapeHtml(b.name||'')}</td><td>${b.hp||0}</td><td>${b.xp||0}</td><td>${b.gold||0}</td><td>${b.type}</td><td style="text-align:right"><button class="btn ghost" data-edit="${b.id}"><i class="fa-solid fa-pen"></i></button> <button class="btn warn" data-del="${b.id}"><i class="fa-solid fa-trash"></i></button></td>`;
+    tbody.appendChild(tr);
+  });
+  tbody.querySelectorAll('button[data-edit]').forEach(b=> b.addEventListener('click', ()=> openBehaviorEdit(b.dataset.edit)));
+  tbody.querySelectorAll('button[data-del]').forEach(b=> b.addEventListener('click', ()=> deleteBehavior(b.dataset.del)));
+}
+function openBehaviorEdit(id){
+  document.getElementById('behavior-edit-title').innerText = id ? 'Editar comportamiento' : 'Nuevo comportamiento';
+  document.getElementById('b-key').value = '';
+  document.getElementById('b-emoji').value = '';
+  document.getElementById('b-text').value = '';
+  document.getElementById('b-hp').value = 0;
+  document.getElementById('b-xp').value = 0;
+  document.getElementById('b-gold').value = 0;
+  document.getElementById('b-type').value = 'positive';
+  document.getElementById('save-behavior-btn').dataset.edit = id || '';
+  if(id){
+    const b = db.characters.find(x=>x.id===id); if(b){ document.getElementById('b-key').value=b.key; document.getElementById('b-emoji').value=b.emoji; document.getElementById('b-text').value=b.name; document.getElementById('b-hp').value=b.hp||0; document.getElementById('b-xp').value=b.xp||0; document.getElementById('b-gold').value=b.gold||0; document.getElementById('b-type').value=b.type; }
+  }
+  showModal('behavior-edit-modal');
+}
+function saveBehaviorFromForm(){
+  const id = document.getElementById('save-behavior-btn').dataset.edit;
+  const key = (document.getElementById('b-key').value||'').trim();
+  const emoji = (document.getElementById('b-emoji').value||'').trim();
+  const text = (document.getElementById('b-text').value||'').trim();
+  const hp = parseInt(document.getElementById('b-hp').value)||0;
+  const xp = parseInt(document.getElementById('b-xp').value)||0;
+  const gold = parseInt(document.getElementById('b-gold').value)||0;
+  const type = document.getElementById('b-type').value;
+  if(!key || !emoji) return showToast('Nombre y emoji obligatorios');
+  if(id){
+    const b = db.characters.find(x=>x.id===id); if(!b) return;
+    b.key=key; b.emoji=emoji; b.name=text; b.hp=hp; b.xp=xp; b.gold=gold; b.type=type;
+    saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento actualizado');
+  } else {
+    if((db.characters||[]).some(c=>c.key===key)) return showToast('Ya existe un comportamiento con ese nombre');
+    db.characters.push({ id:`char_${Date.now()}`, key, emoji, name:text, hp, xp, gold, type });
+    saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); hideModal('behavior-edit-modal'); showToast('Comportamiento creado');
+  }
+}
+function deleteBehavior(id){ showConfirm('Eliminar comportamiento','¿Eliminar este comportamiento?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); renderBehaviorsTable(); refreshBehaviorSelects(); showToast('Eliminado'); }); }
+function refreshBehaviorSelects(){
+  const sel = document.getElementById('apply-behavior-select'); if(sel){ sel.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; sel.appendChild(o); }); }
+  const cp = document.getElementById('class-panel-pilar-select'); if(cp){ cp.innerHTML=''; (db.characters||[]).forEach(c=>{ const o=document.createElement('option'); o.value=c.key; o.textContent = `${c.emoji||''} ${c.key}`; cp.appendChild(o); }); }
+}
 
-    /* ====== Class Panel bulk apply ====== */
-    function buildClassPanel(){
-      const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
-      const students = db.classes[currentClass] || [];
-      students.forEach(s=>{
-        const row = document.createElement('div'); row.style.display='flex'; row.style.alignItems='center'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid rgba(255,255,255,0.03)';
-        const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
-        const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid = s.id;
-        left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div class="small" style="color:var(--muted)">Grado ${currentClass}</div></div>`;
-        const right = document.createElement('div'); right.innerHTML = `<button class="btn ghost" onclick="openFicha('${s.id}')">Ficha</button>`;
-        row.appendChild(left); row.appendChild(right); container.appendChild(row);
-      });
-      refreshBehaviorSelects();
-    }
-    function applyClassPanelAction(){
-      const type = document.getElementById('class-panel-action-type').value;
-      const points = parseInt(document.getElementById('class-panel-points').value)||1;
-      const op = document.getElementById('class-panel-op').value;
-      const pilar = document.getElementById('class-panel-pilar-select').value;
-      const targets = Array.from(document.querySelectorAll('#class-panel-students input[type=checkbox]')).filter(cb=>cb.checked).map(cb=>cb.dataset.sid);
-      if(!targets.length) return showToast('No hay estudiantes seleccionados');
-      targets.forEach(id=>{
-        const f = findStudentById(id); if(!f) return;
-        const s = f.student;
-        if(type==='pilar'){ const isPos = op==='add'; s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar, magnitude:points, note:'Panel' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp=Math.min(HP_MAX, s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else s.hp=Math.max(0,(s.hp||HP_MAX)-points); }
-        else if(type==='xp'){ const delta=(op==='add')? points:-points; s.xp=(s.xp||0)+delta; if(s.xp<0) s.xp=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'XP Panel', magnitude:Math.abs(delta), note:'Panel' }); s.level = Math.floor((s.xp||0)/20)+1; }
-        else if(type==='hp'){ const delta=(op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'HP Panel', magnitude:Math.abs(delta), note:'Panel' }); }
-        else if(type==='gold'){ const delta=(op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'Gold Panel', magnitude:Math.abs(delta), note:'Panel' }); }
-      });
-      saveDB(); renderStudentGrid(); hideModal('class-panel-modal'); showToast('Acción aplicada');
-    }
+/* apply behavior wrapper */
+document.getElementById('apply-behavior-btn').addEventListener('click', ()=> {
+  const key = document.getElementById('apply-behavior-select').value;
+  const type = document.getElementById('apply-type').value;
+  const pts = parseInt(document.getElementById('apply-points').value)||1;
+  const scope = document.getElementById('apply-scope').value;
+  if(!key) return showToast('Selecciona comportamiento');
+  if(scope==='student' && !activeStudentId) return showToast('Abre ficha del estudiante');
+  if(scope==='student') applyBehaviorToStudentById(activeStudentId, key, type==='negative'?'negative':'positive', pts);
+  else applyBehaviorToScope(key, type==='negative'?'negative':'positive', pts, scope);
+  hideModal('behavior-apply-modal'); showToast('Comportamiento aplicado');
+});
 
-    /* ====== Groups: drag & drop, random, by size ====== */
-    function renderGroupsColumns(){
-      const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
-      if(!currentClass) return;
-      const all = db.classes[currentClass] || [];
-      const groups = db.groups[currentClass] || {};
-      const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
-      const unassigned = all.filter(s=>!assigned.has(s.id));
-      const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip=document.createElement('div'); chip.className='student-chip'; chip.draggable=true; chip.ondragstart = e=> e.dataTransfer.setData('text/plain', s.id); chip.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div>`; pool.appendChild(chip); }); }
-      Object.keys(groups).forEach(g=>{
-        const card = document.createElement('div'); card.className='group-card'; card.style.minWidth='220px'; card.style.background='linear-gradient(180deg,#0b2730,#0c2f3b)'; card.style.padding='10px'; card.style.borderRadius='8px'; card.style.border='1px solid var(--border)';
-        card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div style="display:flex;gap:6px"><span style="color:var(--muted)">${(groups[g]||[]).length} miembros</span></div></div>`;
-        const list = document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
-        list.ondragover = e=>e.preventDefault();
-        list.ondrop = e=>{ e.preventDefault(); const sid=e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
-        (groups[g]||[]).forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const chip = document.createElement('div'); chip.style.display='flex'; chip.style.alignItems='center'; chip.style.gap='8px'; chip.style.padding='8px'; chip.style.border='1px solid var(--border)'; chip.style.borderRadius='8px'; chip.style.marginBottom='8px'; chip.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div><div style="margin-left:auto"><button class="btn ghost" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div>`; list.appendChild(chip); });
-        card.appendChild(list); area.appendChild(card);
-      });
-    }
-    function createGroupPrompt(){ const name=prompt('Nombre del grupo:'); if(!name) return; db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][name]=[]; saveDB(); renderGroupsColumns(); showToast('Grupo creado'); }
-    function renameGroupPrompt(oldName,newName){ newName=newName.trim(); if(!newName||newName===oldName) return; if(db.groups[currentClass][newName]) return showToast('Nombre existe'); db.groups[currentClass][newName]=db.groups[currentClass][oldName]||[]; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado'); }
-    function promptDeleteGroup(course,group){ showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado'); }); }
-    function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsColumns(); renderStudentGrid(); }
-    function saveGroups(){ saveDB(); hideModal('manage-groups-modal'); showToast('Grupos guardados'); }
-    function distributeGroupsByNumber(){ const n=parseInt(prompt('Número de grupos:'))||0; if(n<1) return showToast('Número inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${(i % n)+1}`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente'); }
-    function distributeGroupsBySizePrompt(){ const size=parseInt(prompt('Tamaño por grupo:'))||0; if(size<1) return showToast('Tamaño inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0,g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]=ids.slice(idx,idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño'); }
+/* implement apply */
+function applyBehaviorToStudentById(studentId, behaviorKey, type, points){
+  const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado');
+  const s = f.student; s.history = s.history || [];
+  const isPos = (type!=='negative');
+  if(isPos) { s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
+  else s.hp = Math.max(0, (s.hp||HP_MAX) - points);
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
+  s.level = Math.floor((s.xp||0)/20) + 1;
+  saveDB(); renderStudentGrid();
+}
 
-    /* ====== Export functions ====== */
-    function exportCurrentClassExcel(gradeKey){ const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado'); const students = db.classes[key] || []; const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado'); }
-    function exportSingleStudentExcel(id){ const sid = id || activeStudentId; if(!sid) return showToast('Selecciona estudiante'); const f = findStudentById(sid); if(!f) return showToast('No encontrado'); const s=f.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:f.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada'); }
+/* apply to group/class */
+function applyBehaviorToScope(behaviorKey, type, points, scope){
+  if(scope==='class'){ (db.classes[currentClass]||[]).forEach(s=> applyToStudentInternal(s, behaviorKey, type, points)); saveDB(); renderStudentGrid(); showToast('Aplicado a todo el curso'); }
+  else if(scope==='group'){ const groups = db.groups[currentClass] || {}; let groupName=''; Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo'); groups[groupName].forEach(id=>{ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); }); saveDB(); renderStudentGrid(); showToast('Aplicado a grupo'); }
+}
+function applyToStudentInternal(s, behaviorKey, type, points){ s.history = s.history || []; const isPos = (type!=='negative'); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp < HP_MAX) s.hp=Math.min(HP_MAX, s.hp+1); } else s.hp = Math.max(0, (s.hp||HP_MAX)-points); s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos?'positive':'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' }); s.level = Math.floor((s.xp||0)/20) + 1; }
 
-    /* ====== Timer / Roulette / Dice logic ====== */
-    let timerSeconds=300, timerInterval=null;
-    function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
-    function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
-    function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
-    function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado'); } },1000); } }
-    function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText=formatTime(timerSeconds); }
+/* ===== Class Panel bulk actions ===== */
+function buildClassPanel(){
+  const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
+  const students = db.classes[currentClass] || [];
+  students.forEach(s=>{
+    const w = document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)';
+    const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
+    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id;
+    left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div class="small" style="color:var(--muted)">Grado ${currentClass}</div></div>`;
+    const right = document.createElement('div'); right.innerHTML = `<button class="btn ghost" onclick="openFicha('${s.id}')">Ficha</button>`;
+    w.appendChild(left); w.appendChild(right); container.appendChild(w);
+  });
+  refreshBehaviorSelects();
+}
+document.getElementById('class-panel-apply')?.addEventListener('click', ()=> {
+  const type = document.getElementById('class-panel-action-type').value;
+  const points = parseInt(document.getElementById('class-panel-points').value)||1;
+  const op = document.getElementById('class-panel-op').value;
+  const pilar = document.getElementById('class-panel-pilar-select').value;
+  let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); });
+  if(!targets.length) return showToast('No hay estudiantes seleccionados');
+  targets.forEach(id=>{ const f=findStudentById(id); if(!f) return; const s=f.student;
+    if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar, magnitude:points, note:'Panel' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp=Math.min(HP_MAX,s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else s.hp=Math.max(0,(s.hp||HP_MAX)-points); }
+    else if(type==='xp'){ const delta = (op==='add')? points:-points; s.xp=(s.xp||0)+delta; if(s.xp<0) s.xp=0; s.level=Math.floor((s.xp||0)/20)+1; s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'XP Panel',magnitude:Math.abs(delta),note:'Panel'}); }
+    else if(type==='hp'){ const delta = (op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0,Math.min(HP_MAX,s.hp)); s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'HP Panel',magnitude:Math.abs(delta),note:'Panel'}); }
+    else if(type==='gold'){ const delta = (op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({id:Date.now(),ts:new Date().toLocaleString(),type:delta>0?'positive':'negative',pilar:'Gold Panel',magnitude:Math.abs(delta),note:'Panel'}); }
+  });
+  saveDB(); renderStudentGrid(); hideModal('class-panel-modal'); showToast('Acción aplicada');
+});
 
-    let rouletteInterval=null, rouletteRunning=false, rouletteNames=[];
-    function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
-    function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) { activeStudentId = s.id; openFicha(s.id); } else showToast('Seleccionado: '+rouletteNames[idx]); },200); } },80); }
-    function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
+/* ===== Groups management ===== */
+function renderGroupsColumns(){
+  const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
+  if(!currentClass) return;
+  const all = db.classes[currentClass] || [];
+  const groups = db.groups[currentClass] || {};
+  const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
+  const unassigned = all.filter(s=>!assigned.has(s.id));
+  const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip = document.createElement('div'); chip.style.padding='8px'; chip.style.border='1px solid var(--border)'; chip.style.borderRadius='8px'; chip.style.marginBottom='8px'; chip.draggable=true; chip.ondragstart = e=> e.dataTransfer.setData('text/plain', s.id); chip.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div></div>`; pool.appendChild(chip); }); }
+  Object.keys(groups).forEach(g=>{
+    const card = document.createElement('div'); card.style.minWidth='220px'; card.style.background='linear-gradient(180deg,#0b2730,#0c2f3b)'; card.style.padding='10px'; card.style.borderRadius='8px'; card.style.border='1px solid var(--border)'; card.style.marginRight='8px';
+    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div style="display:flex;gap:8px"><span style="color:var(--muted)">${(groups[g]||[]).length} miembros</span></div></div>`;
+    const list = document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
+    list.ondragover = e=> e.preventDefault();
+    list.ondrop = e=> { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
+    (groups[g]||[]).forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const chip=document.createElement('div'); chip.style.padding='8px'; chip.style.border='1px solid var(--border)'; chip.style.borderRadius='8px'; chip.style.marginBottom='8px'; chip.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div>${s.name}</div><div style="margin-left:auto"><button class="btn ghost" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div></div>`; list.appendChild(chip); });
+    card.appendChild(list); area.appendChild(card);
+  });
+}
+function createGroupPrompt(){ const name = prompt('Nombre del grupo:'); if(!name) return; db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][name] = []; saveDB(); renderGroupsColumns(); showToast('Grupo creado'); }
+function renameGroupPrompt(oldName, newName){ newName=newName.trim(); if(!newName||newName===oldName) return; if(db.groups[currentClass][newName]) return showToast('Nombre existe'); db.groups[currentClass][newName]=db.groups[currentClass][oldName]||[]; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado'); }
+function promptDeleteGroup(course, group){ showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado'); }); }
+function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsColumns(); renderStudentGrid(); }
+function saveGroups(){ saveDB(); hideModal('manage-groups-modal'); showToast('Grupos guardados'); }
+function distributeGroupsByNumber(){ const n = parseInt(prompt('Número de grupos:')) || 0; if(n<1) return showToast('Número inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${(i % n)+1}`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente'); }
+function distributeGroupsBySizePrompt(){ const size = parseInt(prompt('Tamaño por grupo:'))||0; if(size<1) return showToast('Tamaño inválido'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0, g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]=ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño'); }
 
-    function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
-    function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6); const dieEl = document.getElementById('die'); let interim = setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900); }
+/* group count minor control */
+let groupCount = 3;
+document.getElementById('group-count-minus')?.addEventListener('click', ()=> changeGroupCount(-1));
+document.getElementById('group-count-plus')?.addEventListener('click', ()=> changeGroupCount(1));
+function changeGroupCount(delta){ groupCount = Math.max(1, (groupCount||3) + delta); document.getElementById('group-count').innerText = groupCount; showToast('N. de grupos: ' + groupCount); }
 
-    /* ====== Institution settings ====== */
-    function openInstitutionSettings(){ const inst = db.institution||{}; document.getElementById('inst-app-name').value = inst.appName || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#3b82f6'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
-    function saveInstitutionSettings(){ db.institution = db.institution||{}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#3b82f6'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados'); }
-    function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value='FantasyClass Convivencial'; document.getElementById('inst-subtitle').value='Aprendiendo Jugando'; document.getElementById('inst-logo-text').value='ALM'; document.getElementById('inst-color-primary').value='#3b82f6'; document.getElementById('inst-font').value='Inter, system-ui'; showToast('Valores restaurados'); }
-    function renderHeaderFromInstitution(){ const inst=db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--accent', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
+/* wire group buttons */
+document.getElementById('create-group')?.addEventListener('click', ()=> createGroupPrompt());
+document.getElementById('distrib-rand-btn')?.addEventListener('click', ()=> distributeGroupsByNumber());
+document.getElementById('distrib-size-btn')?.addEventListener('click', ()=> distributeGroupsBySizePrompt());
+document.getElementById('save-groups')?.addEventListener('click', ()=> saveGroups());
 
-    /* ====== Backup & restore ====== */
-    function downloadBackup(){ const data = Object.fromEntries(Object.entries(localStorage)); const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2)); a.download=`localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Backup descargado'); }
-    function openRestore(){ showModal('restore-modal'); }
-    function applyRestore(){ const key = document.getElementById('restore-key').value.trim()||STORAGE_KEY; const json = document.getElementById('restore-json').value; if(!json) return showToast('Pega el JSON'); try{ JSON.parse(json); localStorage.setItem(key,json); showToast('Restaurado. Recargando...'); setTimeout(()=> location.reload(),600); }catch(e){ showToast('JSON inválido'); } }
+/* ===== Export helpers ===== */
+function exportCurrentClassExcel(gradeKey){ const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado'); const students = db.classes[key] || []; const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX })); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado'); }
+function exportSubgroup(grade, subgroup){ const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {}; const members = groupsFor[subgroup] || []; const rows = members.length ? members.map((id,i)=>{ const s=(db.classes[grade]||[]).find(x=>x.id===id); return {'N°':i+1,'Nombre': s? s.name:id,'Grado':grade,'Grupo':subgroup}; }) : [{ Mensaje: 'Sin miembros' }]; const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado'); }
+function exportSingleStudentExcel(id){ const sid = id || activeStudentId; if(!sid) return showToast('Selecciona estudiante'); const f = findStudentById(sid); if(!f) return showToast('No encontrado'); const s=f.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:f.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada'); }
 
-    /* ====== Small helpers ====== */
-    function findStudentById(id){ if(!id) return null; for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return { student:s, grade:g }; } return null; }
-    function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function updateMetrics(){ const students=db.classes[currentClass]||[]; const totals={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0}; students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); })); Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; }); }
+/* ===== Timer / Roulette / Dice ===== */
+let timerSeconds = 300, timerInterval = null;
+function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
+function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
+function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).padStart(2,'0')+':'+String(sec).padStart(2,'0'); }
+function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado'); } },1000); } }
+function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText=formatTime(timerSeconds); }
 
-    /* ====== UI wiring (buttons & modals) ====== */
-    function wireHeaderButtons(){
-      document.getElementById('add-student').addEventListener('click', ()=> openAddStudentPrompt());
-      document.getElementById('open-class-panel').addEventListener('click', ()=> { buildClassPanel(); showModal('class-panel-modal'); });
-      document.getElementById('open-grades').addEventListener('click', ()=> openGradesModal());
-      document.getElementById('open-groups').addEventListener('click', ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); });
+let rouletteInterval=null, rouletteRunning=false, rouletteNames=[];
+function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
+function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) { activeStudentId = s.id; openFicha(s.id); } else showToast('Seleccionado: '+rouletteNames[idx]); },200); } },80); }
+function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
 
-      document.getElementById('new-behavior').addEventListener('click', ()=> openBehaviorEdit());
-      document.getElementById('behavior-search').addEventListener('input', ()=> renderBehaviorsTable());
-      document.getElementById('behavior-filter').addEventListener('change', ()=> renderBehaviorsTable());
-      document.getElementById('save-behavior-btn').addEventListener('click', ()=> saveBehaviorFromForm());
-      document.getElementById('apply-behavior-btn').addEventListener('click', ()=> {
-        const key = document.getElementById('apply-behavior-select').value;
-        const type = document.getElementById('apply-type').value;
-        const pts = parseInt(document.getElementById('apply-points').value)||1;
-        const scope = document.getElementById('apply-scope').value;
-        if(!key) return showToast('Selecciona comportamiento');
-        if(scope==='student' && !activeStudentId) return showToast('Selecciona estudiante');
-        if(scope==='student') applyBehaviorToStudentById(activeStudentId, key, type==='negative'?'negative':'positive', pts);
-        else applyBehaviorToScope(key, type==='negative'?'negative':'positive', pts, scope);
-        hideModal('behavior-apply-modal');
-        showToast('Comportamiento aplicado');
-      });
+function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
+function rollDice(){ const count = Math.max(1, parseInt(document.getElementById('dice-count').value)||1); const sides = Math.max(2, parseInt(document.getElementById('dice-sides').value)||6); const dieEl = document.getElementById('die'); let interim = setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900); }
 
-      document.getElementById('panel-select-all').addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=true));
-      document.getElementById('panel-clear').addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=false));
-      document.getElementById('class-panel-apply').addEventListener('click', ()=> applyClassPanelAction());
+/* ===== Institution settings & backup ===== */
+function openInstitutionSettings(){ const inst=db.institution||{}; document.getElementById('inst-app-name').value = inst.appName || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#3b82f6'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
+function saveInstitutionSettings(){ db.institution = db.institution || {}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#3b82f6'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados'); }
+function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value='FantasyClass Convivencial'; document.getElementById('inst-subtitle').value='Aprendiendo Jugando'; document.getElementById('inst-logo-text').value='ALM'; document.getElementById('inst-color-primary').value='#3b82f6'; document.getElementById('inst-font').value='Inter, system-ui'; showToast('Valores restaurados'); }
+function renderHeaderFromInstitution(){ const inst=db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--accent', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
 
-      document.getElementById('create-group').addEventListener('click', ()=> createGroupPrompt());
-      document.getElementById('distrib-rand-btn').addEventListener('click', ()=> distributeGroupsByNumber());
-      document.getElementById('distrib-size-btn').addEventListener('click', ()=> distributeGroupsBySizePrompt());
-      document.getElementById('group-count-minus').addEventListener('click', ()=> changeGroupCount(-1));
-      document.getElementById('group-count-plus').addEventListener('click', ()=> changeGroupCount(1));
-      document.getElementById('save-groups').addEventListener('click', ()=> saveGroups());
+/* ===== Backup/restore ===== */
+function downloadBackup(){ const data = Object.fromEntries(Object.entries(localStorage)); const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2)); a.download=`localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Backup descargado'); }
+function openRestore(){ showModal('restore-modal'); }
+function applyRestore(){ const key = document.getElementById('restore-key').value.trim()||STORAGE_KEY; const json = document.getElementById('restore-json').value; if(!json) return showToast('Pega el JSON'); try{ JSON.parse(json); localStorage.setItem(key,json); showToast('Restaurado. Recargando...'); setTimeout(()=> location.reload(),700); }catch(e){ showToast('JSON inválido'); } }
 
-      document.getElementById('inst-save').addEventListener('click', ()=> saveInstitutionSettings());
-      document.getElementById('inst-defaults').addEventListener('click', ()=> loadInstitutionDefaults());
+/* ===== Utilities ===== */
+function findStudentById(id){ if(!id) return null; for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return { student:s, grade:g }; } return null; }
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function updateMetrics(){ const students = db.classes[currentClass] || []; const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0}; students.forEach(s=> (s.history||[]).forEach(h=> { if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); })); Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; }); }
 
-      document.getElementById('timer-toggle').addEventListener('click', ()=> toggleTimer());
-      document.getElementById('timer-reset').addEventListener('click', ()=> resetTimer());
-      document.getElementById('roulette-start').addEventListener('click', ()=> startRoulette());
-      document.getElementById('roulette-stop').addEventListener('click', ()=> stopRoulette());
-      document.getElementById('dice-roll').addEventListener('click', ()=> rollDice());
+/* ===== Confirm & modal helpers ===== */
+function showConfirm(title, message, cb){ document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-message').innerText = message; document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); }; showModal('confirm-modal'); }
+function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
+function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
 
-      document.getElementById('apply-restore').addEventListener('click', ()=> applyRestore());
-      document.getElementById('apply-restore')?.addEventListener('click', ()=> applyRestore());
-    }
+/* ===== Wire UI actions (header buttons, modal closes, etc.) ===== */
+function wireHeaderButtons(){
+  document.getElementById('add-student')?.addEventListener('click', ()=> openAddStudentPrompt());
+  document.getElementById('open-class-panel')?.addEventListener('click', ()=> { buildClassPanel(); showModal('class-panel-modal'); });
+  document.getElementById('open-grades')?.addEventListener('click', ()=> openGradesModal());
+  document.getElementById('open-groups')?.addEventListener('click', ()=> { renderGroupsColumns(); showModal('manage-groups-modal'); });
 
-    function wireModalCloseButtons(){
-      document.querySelectorAll('[data-close]').forEach(btn=> btn.addEventListener('click', ()=> hideModal(btn.dataset.close)));
-      document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') document.querySelectorAll('.modal-backdrop').forEach(m=>m.style.display='none'); });
-      document.querySelectorAll('.modal-backdrop').forEach(mb=> mb.addEventListener('click', (e)=>{ if(e.target===mb) mb.style.display='none'; }));
-    }
+  document.getElementById('new-behavior')?.addEventListener('click', ()=> openBehaviorEdit());
+  document.getElementById('behavior-search')?.addEventListener('input', ()=> renderBehaviorsTable());
+  document.getElementById('behavior-filter')?.addEventListener('change', ()=> renderBehaviorsTable());
+  document.getElementById('save-behavior-btn')?.addEventListener('click', ()=> saveBehaviorFromForm());
 
-    /* ====== utility methods used earlier ====== */
-    function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
-    function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
+  document.getElementById('panel-select-all')?.addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=true));
+  document.getElementById('panel-clear')?.addEventListener('click', ()=> document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=false));
+  document.getElementById('class-panel-apply')?.addEventListener('click', ()=> applyClassPanelAction());
 
-    /* ====== Small extra functions ====== */
-    function openQuick(x){ showModal('behavior-apply-modal'); document.getElementById('apply-type').value = x; }
-    function openGradesModal(){ renderBehaviorsTable(); showModal('behaviors-modal'); } // placeholder
+  // groups wired above
+  document.getElementById('create-group')?.addEventListener('click', ()=> createGroupPrompt());
+  document.getElementById('distrib-rand-btn')?.addEventListener('click', ()=> distributeGroupsByNumber());
+  document.getElementById('distrib-size-btn')?.addEventListener('click', ()=> distributeGroupsBySizePrompt());
+  document.getElementById('save-groups')?.addEventListener('click', ()=> saveGroups());
 
-    function findStudentIndexById(id){
-      for(const g of Object.keys(db.classes||{})){ const idx = (db.classes[g]||[]).findIndex(s=>s.id===id); if(idx>-1) return { grade:g, index:idx }; } return null;
-    }
+  // institution
+  document.getElementById('inst-save')?.addEventListener('click', ()=> saveInstitutionSettings());
+  document.getElementById('inst-defaults')?.addEventListener('click', ()=> loadInstitutionDefaults());
 
-    function applyBehaviorToScope(behaviorKey, type, points, scope){
-      if(scope==='class'){ (db.classes[currentClass]||[]).forEach(s=> applyToStudentInternal(s,behaviorKey,type,points)); saveDB(); renderStudentGrid(); showToast('Aplicado a todo el curso'); }
-      else if(scope==='group'){ const groups = db.groups[currentClass]||{}; let groupName=''; Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo'); groups[groupName].forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); }); saveDB(); renderStudentGrid(); showToast('Aplicado a grupo'); }
-    }
-    function applyToStudentInternal(s, behaviorKey, type, points){ s.history=s.history||[]; const isPos=type!=='negative'; if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp=Math.min(HP_MAX, s.hp+1); } else s.hp=Math.max(0,(s.hp||HP_MAX)-points); s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:behaviorKey, magnitude:points, note:'Aplicado (pilar)'}); s.level = Math.floor((s.xp||0)/20)+1; }
+  // timer/roulette/dice
+  document.getElementById('timer-toggle')?.addEventListener('click', ()=> toggleTimer());
+  document.getElementById('timer-reset')?.addEventListener('click', ()=> resetTimer());
+  document.getElementById('roulette-start')?.addEventListener('click', ()=> startRoulette());
+  document.getElementById('roulette-stop')?.addEventListener('click', ()=> stopRoulette());
+  document.getElementById('dice-roll')?.addEventListener('click', ()=> rollDice());
 
-    /* ====== confirm helper ====== */
-    function showConfirm(title, message, cb){ document.getElementById('confirm-title').innerText = title; document.getElementById('confirm-message').innerText = message; document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); }; showModal('confirm-modal'); }
+  // restore
+  document.getElementById('apply-restore')?.addEventListener('click', ()=> applyRestore());
+}
+function wireModalCloseButtons(){
+  document.querySelectorAll('[data-close]').forEach(btn=> btn.addEventListener('click', ()=> hideModal(btn.dataset.close)));
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') document.querySelectorAll('.modal-backdrop').forEach(m=>m.style.display='none'); });
+  document.querySelectorAll('.modal-backdrop').forEach(mb=> mb.addEventListener('click', (e)=>{ if(e.target===mb) mb.style.display='none'; }));
+}
 
-    /* ====== final UI initialization ====== */
-    function finalInit(){
-      wireHeaderButtons();
-      // ensure class select exists
-      populateClassSelect();
-      renderStudentGrid();
-      renderBehaviorsTable();
-      refreshBehaviorSelects();
-      renderGroupsColumns();
-      updateMetrics();
-    }
-    finalInit();
+/* ===== Misc helpers called earlier ===== */
+function openQuick(x){ showModal('behavior-apply-modal'); document.getElementById('apply-type').value = x; }
+function openGradesModal(){ renderBehaviorsTable(); showModal('behaviors-modal'); } // reuse behaviors modal as simple placeholder
 
-  </script>
+/* ---- initial wiring call to set header listeners ----- */
+wireHeaderButtons();
+wireModalCloseButtons();
+
+/* ===== Final small init: refresh UI elements used by modals ===== */
+(function finalInit(){
+  populateClassSelect();
+  renderStudentGrid();
+  renderBehaviorsTable();
+  refreshBehaviorSelects();
+  renderGroupsColumns();
+  renderHeaderFromInstitution();
+})();
+
+</script>
 </body>
 </html>
