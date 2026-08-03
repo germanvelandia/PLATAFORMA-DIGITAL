@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>FantasyClass Convivencial — index-4 (actualizado)</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>FantasyClass Convivencial — index-4</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,13 +15,12 @@
   --bg-900:#06121a; --panel:#0f1720; --muted:#9aa7b6;
   --accent-green:#10b981; --accent-red:#ef4444; --accent-gold:#f59e0b;
   --card-dark:#0b1722; --glass: rgba(255,255,255,0.03);
-  --blue:#0ea5e9;
-  --student-card-bg: linear-gradient(180deg,#061423,#0f1b2a);
+  --blue:#0ea5e9; --surface:#071324; --card:#0b1722;
 }
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;background:linear-gradient(180deg,var(--bg-900),#071122);color:#e6eef6;-webkit-font-smoothing:antialiased}
-.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;background:linear-gradient(180deg,#07121a,#061019);z-index:60}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.03);position:sticky;top:0;background:linear-gradient(180deg,#07121a,#061019);z-index:90}
 .brand{display:flex;align-items:center;gap:12px}
 .logo{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,#122033,#0f172a);display:flex;align-items:center;justify-content:center;font-weight:900;color:#ffd88a}
 .header h1{margin:0;font-size:18px;font-weight:800}
@@ -33,22 +32,22 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 .menu.open .panel{display:block}
 .menu .panel h4{margin:6px 0 8px;color:var(--muted);font-size:13px}
 
-/* main layout */
+/* layout */
 .container{max-width:1180px;margin:18px auto;padding:0 18px}
 .metrics{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
 .metric{flex:1;min-width:150px;background:linear-gradient(180deg,#071225,#091628);padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)}
 .controls-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .search-input{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px;border-radius:10px;color:inherit;width:320px;min-width:160px}
 
-/* student card */
+/* student card improved appearance */
 .student-card{
-  background:var(--student-card-bg);
-  border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 20px rgba(0,0,0,0.6);
+  background:linear-gradient(180deg,#071528,#0f2330);
+  border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(2,6,23,0.6);
   display:flex;gap:12px;align-items:center;position:relative;
 }
 .badge-level{position:absolute;left:14px;top:14px;background:#2b1b11;color:#ffd88a;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px}
-.avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#122b45,#3b1b59);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#ffd88a}
-.student-name{font-weight:900;text-transform:uppercase}
+.avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#122b45,#3b1b59);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;color:#ffd88a;border:2px solid rgba(255,255,255,0.03)}
+.student-name{font-weight:900;text-transform:uppercase;font-size:15px}
 .student-sub{color:var(--muted);font-size:13px}
 .stats-right{margin-left:auto;text-align:right;color:var(--muted)}
 .stat-pts{color:var(--accent-green);font-weight:900}
@@ -56,27 +55,25 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 
 /* actions */
 .card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.action-btn{padding:8px 14px;border-radius:10px;border:0;font-weight:800;cursor:pointer}
-.action-btn.merit{background:linear-gradient(180deg,var(--accent-green),#059669);color:#fff}
-.action-btn.fault{background:linear-gradient(180deg,var(--accent-red),#dc2626);color:#fff}
-.action-btn.ficha{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--blue)}
+.action-btn{padding:8px 14px;border-radius:10px;border:0;font-weight:800;cursor:pointer;background:rgba(255,255,255,0.02);color:inherit}
+.action-btn.primary{background:linear-gradient(180deg,var(--accent-green),#059669);color:#fff}
+.action-btn.warn{background:linear-gradient(180deg,var(--accent-red),#dc2626);color:#fff}
+.action-btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--blue)}
 
 /* modals */
 .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:12px;background:rgba(0,0,0,0.6);z-index:200}
 .modal{background:linear-gradient(180deg,#0f1720,#08121a);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.04);color:#e6eef6;max-height:90vh;overflow:auto;width:100%;max-width:980px;position:relative;display:flex;flex-direction:column}
 .modal.white{background:#fff;color:#111}
-.modal .centered{display:flex;align-items:center;justify-content:center;flex-direction:column}
 .close-btn{position:absolute;right:12px;top:12px;background:transparent;border:0;color:var(--muted);cursor:pointer}
 
-/* Tabs for ficha */
+/* tabs and card UI */
 .tabs{display:flex;gap:6px;border-bottom:1px solid rgba(255,255,255,0.02);margin-bottom:12px}
 .tab{padding:8px 12px;border-radius:8px;cursor:pointer;background:transparent;color:var(--muted)}
 .tab.active{background:linear-gradient(180deg,#fff,#f3f4f6);color:#111;border:1px solid #e6e6e6}
+.info-card{background:#071426;padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
 
-/* EF2 accordion */
-.details-accord{background:linear-gradient(180deg,#071324,#071426);border-radius:10px;padding:8px;border:1px solid rgba(255,255,255,0.03);margin-bottom:10px}
-.details-accord summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;padding:8px;font-weight:800}
-.details-accord .body{padding:8px;color:var(--muted)}
+/* forms */
+.ef2-input{width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,0,0,0.06);background:rgba(255,255,255,0.02);color:inherit}
 
 /* groups */
 .group-columns{display:flex;gap:12px;align-items:flex-start;overflow:auto;padding-top:8px}
@@ -87,12 +84,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 .dice-box{width:120px;height:120px;border-radius:12px;background:linear-gradient(180deg,#071225,#091628);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,0.04)}
 .die{width:70px;height:70px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:28px;color:#111;transform-origin:center;transition:transform .9s cubic-bezier(.2,.9,.3,1)}
 .spin { animation: rollAnim .9s cubic-bezier(.2,.9,.3,1); }
-@keyframes rollAnim{
-  0%{ transform: rotateX(0) rotateY(0) scale(1); }
-  30%{ transform: rotateX(360deg) rotateY(180deg) scale(1.05); }
-  60%{ transform: rotateX(720deg) rotateY(360deg) scale(0.98); }
-  100%{ transform: rotateX(900deg) rotateY(540deg) scale(1); }
-}
+@keyframes rollAnim{0%{transform:rotateX(0) rotateY(0)}30%{transform:rotateX(360deg) rotateY(180deg)}60%{transform:rotateX(720deg) rotateY(360deg)}100%{transform:rotateX(900deg) rotateY(540deg)}}
 
 /* toasts */
 #toast-container{position:fixed;right:18px;bottom:18px;display:flex;flex-direction:column;gap:8px;z-index:400}
@@ -117,45 +109,39 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   </div>
 
   <div class="controls">
-    <!-- Herramientas (submenus agrupados) -->
     <div class="menu" id="menu-tools">
       <div class="menu-btn" onclick="toggleMenu('menu-tools')">Herramientas ▾</div>
-      <div class="panel">
-        <h4>Tiempo y Juegos</h4>
-        <button onclick="openTimerModal()">Cronómetro</button><br>
-        <button onclick="openRouletteModal()">Ruleta</button><br>
-        <button onclick="openDiceModal()">Dado</button><br>
-
-        <h4 style="margin-top:10px">Gestión de clase</h4>
-        <button onclick="openClassPanel()">Panel de Clase</button><br>
-        <button onclick="openGroupsModal()">Gestión de Grupos</button><br>
-        <button onclick="openGradesModal()">Administrar Grados</button><br>
-
+      <div class="panel" onclick="event.stopPropagation()">
+        <h4>Tiempo y juegos</h4>
+        <button type="button" onclick="openTimerModal()">Cronómetro</button><br>
+        <button type="button" onclick="openRouletteModal()">Ruleta</button><br>
+        <button type="button" onclick="openDiceModal()">Dado</button><br>
+        <h4 style="margin-top:10px">Clase</h4>
+        <button type="button" onclick="openClassPanel()">Panel de Clase</button><br>
+        <button type="button" onclick="openGroupsModal()">Gestión de Grupos</button><br>
+        <button type="button" onclick="openGradesModal()">Administrar Grados</button><br>
         <h4 style="margin-top:10px">Informes</h4>
-        <button onclick="openLeaderboard()">Tabla de Clasificación</button><br>
-        <button onclick="exportCurrentClassExcel()">Exportar curso XLSX</button>
+        <button type="button" onclick="openLeaderboard()">Tabla de Clasificación</button><br>
+        <button type="button" onclick="exportCurrentClassExcel()">Exportar curso XLSX</button>
       </div>
     </div>
 
-    <!-- Caracteres -->
     <div class="menu" id="menu-chars">
       <div class="menu-btn" onclick="toggleMenu('menu-chars')">Caracteres ▾</div>
-      <div class="panel">
-        <h4>Caracteres</h4>
-        <button onclick="openCharactersModal()">Administrar caracteres</button><br>
-        <h4 style="margin-top:8px">Accesos rápidos</h4>
-        <button onclick="openQuick('positive')">Puntos positivos</button><br>
-        <button onclick="openQuick('negative')">Puntos negativos</button>
+      <div class="panel" onclick="event.stopPropagation()">
+        <h4>Caracteres / Pilar</h4>
+        <button type="button" onclick="openCharactersModal()">Administrar caracteres</button><br>
+        <button type="button" onclick="openQuick('positive')">Puntos positivos</button><br>
+        <button type="button" onclick="openQuick('negative')">Puntos negativos</button>
       </div>
     </div>
 
-    <!-- Ajustes -->
     <div class="menu" id="menu-settings">
       <div class="menu-btn" onclick="toggleMenu('menu-settings')">Ajustes ▾</div>
-      <div class="panel">
-        <button onclick="openInstitutionSettings()">Ajustes institucionales</button><br>
-        <button onclick="downloadBackup()">Descargar backup</button><br>
-        <button onclick="openRestore()">Restaurar backup</button>
+      <div class="panel" onclick="event.stopPropagation()">
+        <button type="button" onclick="openInstitutionSettings()">Ajustes institucionales</button><br>
+        <button type="button" onclick="downloadBackup()">Descargar backup</button><br>
+        <button type="button" onclick="openRestore()">Restaurar backup</button>
       </div>
     </div>
 
@@ -178,157 +164,98 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   <div class="controls-row">
     <div style="display:flex;gap:8px;align-items:center">
       <input id="student-search" class="search-input" placeholder="Buscar estudiante..." oninput="renderStudentGrid()">
-      <button class="action-btn ficha" onclick="openAddStudentModal()">Añadir Estudiante</button>
+      <button class="action-btn ghost" onclick="openAddStudentModal()">+ Estudiante</button>
     </div>
     <div style="display:flex;gap:8px">
-      <button class="action-btn ficha" onclick="openGradesModal()">Administrar Grados</button>
+      <button class="action-btn ghost" onclick="openGradesModal()">Administrar Grados</button>
     </div>
   </div>
 
   <div id="students-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px"></div>
 </main>
 
-<!-- Toasts -->
 <div id="toast-container"></div>
 
-<!-- CLASS PANEL modal (kept) -->
+<!-- Class panel modal -->
 <div id="class-panel-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('class-panel-modal')">
   <div class="modal" style="max-width:1000px">
     <button class="close-btn" onclick="hideModal('class-panel-modal')">✕</button>
-    <h3>Panel de Clase — Acciones rápidas</h3>
+    <h3>Panel de Clase</h3>
     <div style="display:flex;gap:12px;margin-top:12px">
       <div style="flex:1;max-width:520px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:800">Selecciona Estudiantes</div>
-          <div style="display:flex;gap:6px">
-            <button class="action-btn ficha" onclick="classPanelSelectAll(true)">Seleccionar todos</button>
-            <button class="action-btn ficha" onclick="classPanelSelectAll(false)">Limpiar</button>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">Selecciona estudiantes</div>
+          <div style="display:flex;gap:8px">
+            <button class="action-btn ghost" onclick="classPanelSelectAll(true)">Todos</button>
+            <button class="action-btn ghost" onclick="classPanelSelectAll(false)">Limpiar</button>
           </div>
         </div>
-        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px"></div>
+        <div id="class-panel-students" style="max-height:420px;overflow:auto;padding-right:6px;margin-top:8px"></div>
       </div>
 
       <div style="width:440px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">Resumen</div>
+          <div style="font-weight:800">Acciones</div>
           <div>
-            <button class="action-btn ficha" onclick="printCurrentPreviewStudent()"><i class="fa-solid fa-print"></i> Imprimir estudiante</button>
-            <button class="action-btn ficha" onclick="printSelectedOrClass()"><i class="fa-solid fa-print"></i> Imprimir seleccionados/curso</button>
+            <button class="action-btn ghost" onclick="printSelectedOrClass()">Imprimir seleccionados/curso</button>
           </div>
         </div>
 
-        <div id="class-panel-preview-area" style="background:#fff;padding:12px;border-radius:8px;border:1px solid #eee;margin-top:8px;color:#111">
-          <div id="class-preview-empty" class="small">Haz clic en un estudiante para ver su resumen.</div>
-          <div id="class-preview" style="display:none">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
-              <div id="cp-avatar" style="width:56px;height:56px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:900;background:#16243a;color:#ffd88a"></div>
-              <div style="flex:1">
-                <div id="cp-name" style="font-weight:800;color:#111"></div>
-                <div id="cp-grade" class="small" style="color:#666"></div>
-              </div>
-            </div>
-            <div style="display:flex;gap:8px;margin-bottom:8px">
-              <div style="flex:1;padding:10px;border-radius:8px;border:1px solid #eef2f7;text-align:center"><div class="small">XP</div><div id="cp-xp" style="font-weight:800">0</div></div>
-              <div style="flex:1;padding:10px;border-radius:8px;border:1px solid #eef2f7;text-align:center"><div class="small">HP</div><div id="cp-hp" style="font-weight:800">5</div></div>
-              <div style="flex:1;padding:10px;border-radius:8px;border:1px solid #eef2f7;text-align:center"><div class="small">ORO</div><div id="cp-gold" style="font-weight:800">0</div></div>
-            </div>
-            <div style="font-weight:700">Historial reciente</div>
-            <div id="cp-history" style="max-height:160px;overflow:auto;color:#475569"></div>
-          </div>
-        </div>
-
-        <hr style="margin:12px 0">
-
-        <div style="font-weight:800">Acción</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <select id="class-panel-action-type" class="ef2-input" style="flex:1">
-            <option value="xp">Experiencia (XP)</option>
+        <div style="margin-top:8px">
+          <select id="class-panel-action-type" class="ef2-input">
+            <option value="pilar">Comportamiento (pilar)</option>
+            <option value="xp">XP</option>
+            <option value="hp">HP</option>
             <option value="gold">Oro</option>
-            <option value="hp">Vida (HP)</option>
-            <option value="pilar">Registrar Pilar</option>
           </select>
-          <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:96px">
-        </div>
-        <div id="class-panel-pilar-row" style="display:none;margin-top:8px"><select id="class-panel-pilar-select" class="ef2-input" style="width:100%"></select></div>
-
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <select id="class-panel-scope" class="ef2-input" style="flex:1">
-            <option value="selected">A los seleccionados</option>
-            <option value="all">A todo el curso</option>
-            <option value="ungrouped">A sin asignar</option>
-            <option value="all-courses">A todos los cursos</option>
-          </select>
-          <select id="class-panel-op" class="ef2-input" style="width:120px"><option value="add">Agregar</option><option value="sub">Restar</option></select>
+          <div id="class-panel-pilar-row" style="margin-top:8px;display:block">
+            <select id="class-panel-pilar-select" class="ef2-input"></select>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="class-panel-points" type="number" class="ef2-input" value="1" style="width:120px">
+            <select id="class-panel-op" class="ef2-input" style="width:120px"><option value="add">Agregar</option><option value="sub">Restar</option></select>
+            <button class="action-btn primary" onclick="applyClassPanelAction()">Aplicar</button>
+          </div>
         </div>
 
-        <div style="display:flex;gap:8px;margin-top:10px">
-          <button class="action-btn merit" onclick="applyClassPanelAction()">Aplicar acción</button>
-          <button class="action-btn ficha" onclick="previewClassPanelAction()">Vista previa</button>
-          <div class="small" style="flex:1;color:#666">Se registrará historial para cada estudiante afectado.</div>
-        </div>
-        <div style="margin-top:10px;font-weight:700">Previsualización</div>
-        <div id="class-panel-preview" style="min-height:80px;color:var(--muted)"></div>
+        <div style="margin-top:12px" id="class-panel-preview"></div>
 
       </div>
     </div>
   </div>
 </div>
 
-<!-- Grades modal -->
-<div id="grades-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('grades-modal')">
-  <div class="modal" style="max-width:720px">
-    <button class="close-btn" onclick="hideModal('grades-modal')">✕</button>
-    <h3>Administrar Grados</h3>
-    <div style="display:flex;gap:8px;margin-top:12px">
-      <input id="new-grade-key" class="ef2-input" placeholder="Código grado (ej. 801)">
-      <input id="new-grade-n" class="ef2-input" placeholder="Nombre/Descripción (opcional)">
-      <button class="action-btn ficha" onclick="createGrade()">Crear grado</button>
-    </div>
-    <div id="grades-list" style="margin-top:12px;max-height:320px;overflow:auto"></div>
-  </div>
-</div>
-
-<!-- Groups modal (improved structure) -->
+<!-- Groups modal -->
 <div id="manage-groups-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('manage-groups-modal')">
   <div class="modal" style="max-width:1100px">
     <button class="close-btn" onclick="hideModal('manage-groups-modal')">✕</button>
-    <h3>Gestión de Grupos — Estructura clara</h3>
+    <h3>Gestión de Grupos</h3>
 
     <div style="display:flex;gap:12px;margin-top:12px">
       <div style="width:320px">
-        <div style="font-weight:800">Pool de estudiantes (no asignados)</div>
+        <div style="font-weight:800">Pool de estudiantes</div>
         <div id="groups-students-pool" style="max-height:420px;overflow:auto;padding:8px;border-radius:8px;background:linear-gradient(180deg,#071225,#071426);border:1px solid rgba(255,255,255,0.03);margin-top:8px"></div>
       </div>
 
       <div style="flex:1">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="action-btn merit" onclick="createGroupPrompt()">+ Crear grupo</button>
-            <button class="action-btn ficha" onclick="distributeGroupsByNumber()">Distrib. aleatoria</button>
-            <button class="action-btn ficha" onclick="distributeGroupsBySizePrompt()">Distrib. por tamaño</button>
+          <div style="display:flex;gap:8px;">
+            <button class="action-btn ghost" onclick="createGroupPrompt()">+ Grupo</button>
+            <button class="action-btn ghost" onclick="distributeGroupsByNumber()">Distrib. aleatoria</button>
+            <button class="action-btn ghost" onclick="distributeGroupsBySizePrompt()">Por tamaño</button>
           </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <label style="color:var(--muted)">Filtro:</label>
-            <select id="groups-filter" onchange="renderGroupsColumns()"><option value="">Todos</option></select>
+          <div>
+            <button class="action-btn ghost" onclick="saveGroups()">Guardar</button>
           </div>
         </div>
 
         <div id="groups-columns-area" class="group-columns" style="margin-top:12px"></div>
       </div>
-
-      <div style="width:260px">
-        <div style="font-weight:800">Controles de Grupo</div>
-        <div id="group-controls" style="margin-top:8px;color:var(--muted)">Selecciona un grupo para ver acciones (cuenta, vaciar, exportar, bloqueo)</div>
-        <div style="display:flex;gap:8px;flex-direction:column;margin-top:12px">
-          <button class="action-btn ficha" onclick="saveGroups()">Guardar cambios</button>
-          <button class="action-btn" onclick="hideModal('manage-groups-modal')">Cancelar</button>
-        </div>
-      </div>
     </div>
   </div>
 </div>
 
-<!-- FICHA modal: now tabs (Datos / Actas / Observador / Gamificación) -->
+<!-- Ficha modal (tabs) -->
 <div id="ficha-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('ficha-modal')">
   <div class="modal white" style="max-width:980px;color:#111">
     <button class="close-btn" onclick="hideModal('ficha-modal')">✕</button>
@@ -343,13 +270,12 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
       </div>
 
       <div style="display:flex;gap:8px;align-items:center">
-        <button class="action-btn ficha" onclick="exportSingleStudentExcel()">Exportar</button>
-        <button class="action-btn ficha" onclick="printCurrentFicha('student')">Imprimir</button>
-        <button class="action-btn merit" onclick="openActaModal()">Crear / Rellenar Acta</button>
+        <button class="action-btn ghost" onclick="exportSingleStudentExcel()">Exportar</button>
+        <button class="action-btn ghost" onclick="printCurrentFicha('student')">Imprimir</button>
+        <button class="action-btn primary" onclick="openActaModal()">Crear Acta</button>
       </div>
     </div>
 
-    <!-- tabs -->
     <div style="margin-top:12px">
       <div class="tabs">
         <div class="tab active" id="tab-datos-btn" onclick="switchFichaTab('datos')">Datos</div>
@@ -363,13 +289,13 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   </div>
 </div>
 
-<!-- ACTA modal: extended with signatures and coordination type -->
+<!-- Acta modal -->
 <div id="acta-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('acta-modal')">
   <div class="modal white" style="max-width:980px;color:#111">
     <button class="close-btn" onclick="hideModal('acta-modal')">✕</button>
-    <h3>Acta de Registro y Compromiso de Convivencia Escolar</h3>
+    <h3>Acta</h3>
 
-    <div style="display:flex;gap:8px;margin-top:8px">
+    <div style="display:flex;gap:8px">
       <div style="flex:1"><label>Acta No.</label><input id="acta-number" class="ef2-input"></div>
       <div style="flex:1"><label>Fecha</label><input id="acta-fecha" type="date" class="ef2-input"></div>
       <div style="flex:1"><label>Hora</label><input id="acta-hora" type="time" class="ef2-input"></div>
@@ -377,9 +303,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 
     <div style="margin-top:8px"><label>Lugar</label><input id="acta-lugar" class="ef2-input"></div>
 
-    <hr style="margin:10px 0">
-
-    <h4>Datos del estudiante</h4>
+    <h4 style="margin-top:8px">Datos del estudiante</h4>
     <div style="display:flex;gap:8px">
       <input id="acta-estudiante-nombre" class="ef2-input" placeholder="Nombre completo" style="flex:2">
       <input id="acta-estudiante-doc" class="ef2-input" placeholder="Documento" style="flex:1">
@@ -387,64 +311,34 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     </div>
 
     <div style="margin-top:8px">
-      <label>Descripción de la situación</label>
-      <textarea id="acta-descripcion" class="ef2-input" rows="5" placeholder="Describa de manera objetiva, cronológica y verificable..."></textarea>
+      <label>Descripción</label>
+      <textarea id="acta-descripcion" class="ef2-input" rows="5"></textarea>
     </div>
 
-    <!-- firmas y coordinación -->
     <div style="display:flex;gap:8px;margin-top:8px;align-items:end;">
-      <div style="flex:1">
-        <label>Firma del estudiante (nombre)</label>
-        <input id="acta_firma_est" class="ef2-input" placeholder="Nombre / Firma electrónica">
-      </div>
-      <div style="flex:1">
-        <label>Firma del docente (nombre)</label>
-        <input id="acta_firma_doc" class="ef2-input" placeholder="Nombre / Firma electrónica">
-      </div>
-      <div style="flex:1">
-        <label>Firma tutor / acudiente</label>
-        <input id="acta_firma_tutor" class="ef2-input" placeholder="Nombre / Firma">
-      </div>
-      <div style="flex:1">
-        <label>Firma coordinación</label>
-        <input id="acta_firma_coord" class="ef2-input" placeholder="Nombre / Firma">
-        <select id="acta_coord_tipo" class="ef2-input" style="margin-top:6px"><option value="convivencial">Convivencial</option><option value="academica">Académica</option></select>
-      </div>
+      <div style="flex:1"><label>Firma estudiante</label><input id="acta_firma_est" class="ef2-input"></div>
+      <div style="flex:1"><label>Firma docente</label><input id="acta_firma_doc" class="ef2-input"></div>
+      <div style="flex:1"><label>Firma tutor</label><input id="acta_firma_tutor" class="ef2-input"></div>
+      <div style="flex:1"><label>Firma coordinación</label><input id="acta_firma_coord" class="ef2-input"><select id="acta_coord_tipo" class="ef2-input" style="margin-top:6px"><option value="convivencial">Convivencial</option><option value="academica">Académica</option></select></div>
     </div>
 
     <div style="margin-top:8px">
-      <label><strong>Acciones pedagógicas y formativas acordadas</strong></label>
+      <label>Acciones acordadas</label>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
         <label><input type="checkbox" id="acta_acc_refl"> Reflexión escrita</label>
-        <label><input type="checkbox" id="acta_acc_dis"> Presentación de disculpas</label>
+        <label><input type="checkbox" id="acta_acc_dis"> Disculpas</label>
         <label><input type="checkbox" id="acta_acc_rest"> Actividad restaurativa</label>
-        <label><input type="checkbox" id="acta_acc_comp"> Compromiso de cambio</label>
-        <label><input type="checkbox" id="acta_acc_sig"> Seguimiento por Dirección</label>
-        <label><input type="checkbox" id="acta_acc_orient"> Remisión a Orientación</label>
-        <label><input type="checkbox" id="acta_acc_com"> Remisión al Comité Escolar</label>
+        <label><input type="checkbox" id="acta_acc_comp"> Compromiso</label>
+        <label><input type="checkbox" id="acta_acc_sig"> Seguimiento</label>
+        <label><input type="checkbox" id="acta_acc_orient"> Orientación</label>
+        <label><input type="checkbox" id="acta_acc_com"> Comité</label>
       </div>
-      <textarea id="acta_acc_otro" class="ef2-input" rows="2" placeholder="Otra (especifique)"></textarea>
-    </div>
-
-    <div style="margin-top:8px;display:flex;gap:8px">
-      <div style="flex:1">
-        <label>Compromisos del estudiante</label>
-        <textarea id="acta_comp_est" class="ef2-input" rows="3"></textarea>
-      </div>
-      <div style="flex:1">
-        <label>Compromisos del padre / acudiente</label>
-        <textarea id="acta_comp_padre" class="ef2-input" rows="3"></textarea>
-      </div>
-    </div>
-
-    <div style="margin-top:8px">
-      <label>Observaciones</label>
-      <textarea id="acta_observaciones" class="ef2-input" rows="2"></textarea>
+      <textarea id="acta_acc_otro" class="ef2-input" rows="2" placeholder="Otra..."></textarea>
     </div>
 
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-      <button class="action-btn merit" onclick="saveActaAndPrint()">Guardar e Imprimir</button>
-      <button class="action-btn ficha" onclick="saveActaDraft()">Guardar acta</button>
+      <button class="action-btn primary" onclick="saveActaAndPrint()">Guardar e Imprimir</button>
+      <button class="action-btn ghost" onclick="saveActaDraft()">Guardar acta</button>
       <button class="action-btn" onclick="hideModal('acta-modal')">Cancelar</button>
     </div>
   </div>
@@ -454,14 +348,13 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
 <div id="characters-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('characters-modal')">
   <div class="modal white" style="max-width:720px">
     <button class="close-btn" onclick="hideModal('characters-modal')">✕</button>
-    <h3>Administrar Caracteres</h3>
+    <h3>Caracteres (pilares)</h3>
+
     <div style="display:flex;gap:8px;margin-top:8px">
       <input id="char-name-input" placeholder="Nombre del carácter" class="ef2-input" style="flex:1">
       <input id="char-emoji-input" placeholder="Emoji (ej. 🐯)" class="ef2-input" style="width:120px">
-      <div style="display:flex;gap:6px">
-        <select id="char-type-input" class="ef2-input" style="width:160px"><option value="positive">Positive</option><option value="negative">Negative</option></select>
-        <button class="action-btn merit" onclick="createCharacter()">Crear</button>
-      </div>
+      <select id="char-type-input" class="ef2-input" style="width:140px"><option value="positive">Positive</option><option value="negative">Negative</option></select>
+      <button class="action-btn primary" onclick="createCharacter()">Crear</button>
     </div>
 
     <div id="characters-list" style="margin-top:12px;max-height:360px;overflow:auto"></div>
@@ -476,7 +369,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
       <h3 style="margin:0">Cronómetro</h3>
       <div id="timer-display" style="font-weight:900;font-size:48px;color:var(--accent-gold);margin:18px 0;text-align:center">05:00</div>
       <div style="display:flex;gap:8px;justify-content:center">
-        <button class="action-btn merit" onclick="toggleTimer()">Iniciar/Pausar</button>
+        <button class="action-btn primary" onclick="toggleTimer()">Iniciar/Pausar</button>
         <button class="action-btn" onclick="resetTimer()">Reset</button>
         <button class="action-btn" onclick="setTimerMinutes(1)">1m</button>
         <button class="action-btn" onclick="setTimerMinutes(5)">5m</button>
@@ -491,7 +384,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     <h3>Ruleta</h3>
     <div id="roulette-display" style="font-weight:900;font-size:36px;height:160px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:linear-gradient(180deg,#06121a,#041018);margin-top:12px">¡Presiona Girar!</div>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="action-btn merit" onclick="startRoulette()">Girar</button>
+      <button class="action-btn primary" onclick="startRoulette()">Girar</button>
       <button class="action-btn" onclick="stopRoulette()">Detener</button>
     </div>
   </div>
@@ -515,7 +408,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
           <input id="dice-sides" type="number" min="2" max="100" value="6" style="width:80px" />
         </div>
         <div style="display:flex;gap:8px">
-          <button class="action-btn merit" onclick="rollDice()">Lanzar Dado</button>
+          <button class="action-btn primary" onclick="rollDice()">Lanzar Dado</button>
         </div>
       </div>
     </div>
@@ -523,7 +416,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
   </div>
 </div>
 
-<!-- Leaderboard modal with per-grade / total options -->
+<!-- Leaderboard modal -->
 <div id="leaderboard-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('leaderboard-modal')">
   <div class="modal white" style="max-width:820px">
     <button class="close-btn" onclick="hideModal('leaderboard-modal')">✕</button>
@@ -539,6 +432,7 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
       <label style="color:#666">Top</label>
       <input id="leaderboard-top-n" type="number" value="10" style="width:70px;padding:6px;border-radius:6px;border:1px solid #eee">
       <button class="action-btn" onclick="renderLeaderboard()">Actualizar</button>
+      <button class="action-btn ghost" onclick="printClassReport()">Imprimir curso</button>
     </div>
     <div id="leaderboard-area" style="margin-top:12px"></div>
   </div>
@@ -558,26 +452,25 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
     </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
       <button class="action-btn" onclick="loadInstitutionDefaults()">Restaurar</button>
-      <button class="action-btn merit" onclick="saveInstitutionSettings()">Guardar</button>
+      <button class="action-btn primary" onclick="saveInstitutionSettings()">Guardar</button>
       <button class="action-btn" onclick="hideModal('institution-modal')">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- Confirm modal -->
+<!-- Confirm and restore modals -->
 <div id="confirm-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('confirm-modal')">
   <div class="modal" style="max-width:420px">
     <button class="close-btn" onclick="hideModal('confirm-modal')">✕</button>
     <h3 id="confirm-title">¿Estás seguro?</h3>
     <p id="confirm-message" style="color:var(--muted)"></p>
     <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
-      <button class="action-btn red" id="confirm-yes">Eliminar</button>
+      <button class="action-btn warn" id="confirm-yes">Eliminar</button>
       <button class="action-btn" onclick="hideModal('confirm-modal')">Cancelar</button>
     </div>
   </div>
 </div>
 
-<!-- Restore helper modal (small) -->
 <div id="restore-modal" class="modal-backdrop" onclick="if(event.target===this) hideModal('restore-modal')">
   <div class="modal white" style="max-width:760px">
     <button class="close-btn" onclick="hideModal('restore-modal')">✕</button>
@@ -589,27 +482,30 @@ body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetic
       <textarea id="restore-json" style="width:100%;height:220px"></textarea>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px">
         <button class="action-btn" onclick="hideModal('restore-modal')">Cancelar</button>
-        <button class="action-btn merit" onclick="applyRestore()">Restaurar</button>
+        <button class="action-btn primary" onclick="applyRestore()">Restaurar</button>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-/* ====================================================
-   Actualizado: preserva TODO (misma STORAGE_KEY) y aplica
-   los cambios solicitados (ficha reorganizada, acta firmas,
-   leaderboard por grado/total, grupos estructura, timer centrado,
-   deduplicado de emojis, menú organizado).
-   ==================================================== */
+/* =========================
+   App: preserves same STORAGE_KEY (no destructive changes)
+   Implements:
+     - menus fixed
+     - characters CRUD
+     - behaviors (replace merito/falta)
+     - ficha restructured (tabs)
+     - actas printing per individual and per course
+     - groups improved
+   ========================= */
 
-/* STORAGE KEY (no cambiar) */
+/* STORAGE key (unchanged) */
 const STORAGE_KEY = 'fantasyclass_alm_db';
 const HP_MAX = 5;
 
-/* DEFAULTS */
+/* defaults */
 const DEFAULT_ROSTERS = {"801":[], "802":[], "803":[], "804":[], "901":[], "902":[], "903":[], "904":[], "1001":[], "1002":[], "1003":[]};
-
 const DEFAULT_CHARACTERS = [
   { key: 'Confiabilidad', emoji: '🐪', name: 'Camello — Charlotte', type: 'positive' },
   { key: 'Respeto', emoji: '🦁', name: 'León — Logan', type: 'positive' },
@@ -619,42 +515,41 @@ const DEFAULT_CHARACTERS = [
   { key: 'Ciudadanía', emoji: '🐻', name: 'Oso — Brooke', type: 'positive' }
 ];
 
-/* DB skeleton */
-let db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} };
+let db = { classes: {}, groups: {}, characters: [], institution: {}, leaderOptions: {} };
 let currentClass = null;
 let activeStudentId = null;
 
-/* Toast helper */
+/* simple toast */
 const toastContainer = document.getElementById('toast-container');
-function showToast(msg, type='info', t=3000){
+function showToast(msg, type='info', t=2800){
   if(!toastContainer) return;
-  const el = document.createElement('div'); el.className = 'toast ' + (type==='success'?'success':type==='warn'?'warn':type==='err'?'err':'info');
+  const el = document.createElement('div'); el.className='toast '+(type==='success'?'success':type==='warn'?'warn':type==='err'?'err':'info');
   el.innerHTML = `<div style="flex:1">${msg}</div><div style="margin-left:8px;cursor:pointer" onclick="this.parentElement.remove()">✕</div>`;
   toastContainer.appendChild(el);
   setTimeout(()=> { if(el) el.style.opacity='0'; setTimeout(()=>el.remove(),420); }, t);
 }
 
-/* Load DB: DO NOT overwrite existing data; ensure defaults; dedupe characters by key/emoji */
+/* ---------- Persistence (load/save) ---------- */
 function loadDB(){
   try{
     const raw = localStorage.getItem(STORAGE_KEY);
     if(raw) db = JSON.parse(raw);
-  }catch(e){ db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} }; }
+  }catch(e){
+    db = { classes:{}, groups:{}, characters:[], institution:{}, leaderOptions:{} };
+  }
   if(!db.classes) db.classes = {};
   if(!db.groups) db.groups = {};
   if(!Array.isArray(db.characters)) db.characters = [];
 
-  // ensure rosters exist but preserve existing students
+  // ensure default rosters exist (preserve existing)
   Object.keys(DEFAULT_ROSTERS).forEach(k=>{
     if(!db.classes[k]) db.classes[k] = [];
     if(!db.groups[k]) db.groups[k] = {};
   });
 
-  // Merge default characters and existing, dedup by key or emoji
-  const existing = db.characters || [];
-  const merged = [...DEFAULT_CHARACTERS.map((c,i)=>({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type })), ...existing];
-  const seenKeys = new Set();
-  const seenEmoji = new Set();
+  // merge default characters and existing, dedupe by key/emoji
+  const merged = [...DEFAULT_CHARACTERS.map((c,i)=>({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type })), ...(db.characters||[])];
+  const seenKeys = new Set(), seenEmoji = new Set();
   const dedup = [];
   merged.forEach(c=>{
     if(!c) return;
@@ -667,16 +562,14 @@ function loadDB(){
   db.characters = dedup;
   currentClass = currentClass || Object.keys(db.classes)[0] || null;
 }
+function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('saveDB error', e); } }
 
-/* Save DB */
-function saveDB(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(db)); }catch(e){ console.warn('saveDB', e); } }
-
-/* Init UI */
+/* ---------- INIT UI ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   loadDB();
   populateClassSelect();
-  renderStudentGrid();
   wireMenus();
+  renderStudentGrid();
   refreshBehaviorSelects();
   renderCharactersList();
   renderGradesList();
@@ -684,25 +577,25 @@ document.addEventListener('DOMContentLoaded', ()=>{
   populateLeaderboardGradeSelect();
 });
 
-/* Menu utilities */
+/* ---------- Menu utilities (fixed) ---------- */
 function toggleMenu(id){
   document.querySelectorAll('.menu').forEach(m=>{ if(m.id!==id) m.classList.remove('open'); });
   const el = document.getElementById(id);
   if(!el) return;
   el.classList.toggle('open');
 }
-function wireMenus(){
-  document.querySelectorAll('.menu .menu-btn').forEach(btn=>btn.addEventListener('click', (e)=>{ e.stopPropagation(); const p = btn.parentElement; p.classList.toggle('open'); }));
-  document.addEventListener('click', ()=> document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open')));
-}
+/* Close menus only when clicking outside any .menu */
+document.addEventListener('click', (e)=>{
+  if(!e.target.closest || !document.querySelectorAll) return;
+  if(!e.target.closest('.menu')) document.querySelectorAll('.menu').forEach(m=>m.classList.remove('open'));
+});
+function wireMenus(){ document.querySelectorAll('.menu .menu-btn').forEach(btn=> btn.addEventListener('click', e=> { e.stopPropagation(); const p = btn.parentElement; p.classList.toggle('open'); })); }
 
-/* Class select */
+/* ---------- Class select ---------- */
 function populateClassSelect(){
   const sel = document.getElementById('class-select'); if(!sel) return;
   sel.innerHTML = '';
-  Object.keys(db.classes).forEach(k=>{
-    const opt = document.createElement('option'); opt.value = k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt);
-  });
+  Object.keys(db.classes).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = `Grado ${k} (${db.classes[k].length})`; sel.appendChild(opt); });
   if(currentClass && db.classes[currentClass]) sel.value = currentClass;
   else currentClass = sel.value || Object.keys(db.classes)[0] || null;
 }
@@ -715,7 +608,7 @@ function switchClass(val){
   populateLeaderboardGradeSelect();
 }
 
-/* Student grid */
+/* ---------- Student grid ---------- */
 function avatarGradient(name){
   const idx = (name && name.charCodeAt(0))? name.charCodeAt(0)%10 : 0;
   const palettes=[['#0b2540','#07213a'],['#2b0f3a','#3b1b59'],['#243b2e','#0f2b2a'],['#3b2336','#231026'],['#2c3e50','#0f2540'],['#3b2b0f','#4a350f'],['#2b2540','#1b2b4a'],['#40302b','#2d241f'],['#24304a','#18203a'],['#25322b','#17221a']];
@@ -744,18 +637,17 @@ function renderStudentGrid(){
           <div class="student-name">${s.name} <span style="color:var(--muted);font-weight:600">(${currentClass})</span></div>
           <div class="student-sub">Grado ${currentClass} • ${document.getElementById('history-period-label')?.innerText||'P1'}</div>
           <div style="margin-top:8px" class="card-actions">
-            <button class="action-btn merit" onclick="applyMeritToStudent('${s.id}',1)"><i class="fa-solid fa-plus"></i> Mérito</button>
-            <button class="action-btn fault" onclick="applyFaultToStudent('${s.id}',1)"><i class="fa-solid fa-minus"></i> Falta</button>
-            <button class="action-btn ficha" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
-            <button class="action-btn" title="Editar nombre" onclick="editStudentNamePrompt('${s.id}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="action-btn" title="Exportar ficha" onclick="exportSingleStudentExcel('${s.id}')"><i class="fa-solid fa-file-excel"></i></button>
+            <button class="action-btn ghost" onclick="openFicha('${s.id}')"><i class="fa-solid fa-folder-open"></i> Ficha</button>
+            <button class="action-btn ghost" onclick="editStudentNamePrompt('${s.id}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="action-btn ghost" onclick="exportSingleStudentExcel('${s.id}')"><i class="fa-solid fa-file-excel"></i></button>
+            <button class="action-btn primary" onclick="openBehaviorModalFor('${s.id}')"><i class="fa-solid fa-star"></i> Comportamiento</button>
           </div>
         </div>
       </div>
       <div class="stats-right">
         <div class="stat-pts">+ ${sums.pos} pts</div>
         <div class="stat-neg">⚠ ${sums.neg}</div>
-        <div style="margin-top:8px"><button class="action-btn" onclick="promptDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></button></div>
+        <div style="margin-top:8px"><button class="action-btn warn" onclick="promptDeleteStudent('${s.id}')"><i class="fa-solid fa-trash"></i></button></div>
       </div>
     `;
     grid.appendChild(card);
@@ -763,111 +655,126 @@ function renderStudentGrid(){
   updateMetrics();
 }
 
-/* Add / Edit / Delete student */
-function openAddStudentModal(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], badges:[] }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
-function promptDeleteStudent(id){ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado','err'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g => db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado','success'); }); }
+/* ---------- Add/Edit/Delete student ---------- */
+function openAddStudentModal(){ const name = prompt('Nombre del nuevo estudiante:'); if(!name) return; const id = `${currentClass}_${Date.now()}`; db.classes[currentClass] = db.classes[currentClass] || []; db.classes[currentClass].push({ id, name, xp:0, level:1, hp:HP_MAX, history:[], actas:[], observador:[], badges:[], gold:0 }); saveDB(); populateClassSelect(); renderStudentGrid(); showToast('Estudiante agregado','success'); }
+function promptDeleteStudent(id){ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return showToast('No encontrado','err'); showConfirm('Eliminar estudiante', `Eliminar ${s.name}?`, ()=>{ db.classes[currentClass] = db.classes[currentClass].filter(x=>x.id!==id); Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = db.groups[currentClass][g].filter(x=>x!==id)); saveDB(); renderStudentGrid(); renderGroupsColumns(); showToast('Eliminado','success'); }); }
 function editStudentNamePrompt(id){ const found = findStudentById(id); if(!found) return showToast('No encontrado','err'); const s = found.student; const newName = prompt('Editar nombre', s.name); if(!newName) return; s.name = newName; saveDB(); renderStudentGrid(); if(activeStudentId===id) fillFicha(id); showToast('Nombre actualizado','success'); }
 
-/* Apply merit / fault */
-function applyMeritToStudent(studentId, points=1){
-  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
-  if(!s) return showToast('Estudiante no encontrado','err');
-  s.history = s.history || [];
-  s.history.unshift({ id: Date.now(), ts: new Date().toLocaleString(), type:'positive', pilar:'Mérito Rápido', magnitude: points, note:'Aplicado desde tarjeta' });
-  s.xp = (s.xp||0) + points;
-  if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1);
-  s.level = Math.floor((s.xp||0)/20) + 1;
-  saveDB(); renderStudentGrid(); showToast(`+${points} XP a ${s.name}`,'success');
-}
-function applyFaultToStudent(studentId, points=1){
-  const s = (db.classes[currentClass]||[]).find(x=>x.id===studentId);
-  if(!s) return showToast('Estudiante no encontrado','err');
-  s.history = s.history || [];
-  s.history.unshift({ id: Date.now(), ts: new Date().toLocaleString(), type:'negative', pilar:'Falta Rápida', magnitude: points, note:'Aplicado desde tarjeta' });
-  s.hp = Math.max(0, (s.hp||HP_MAX) - points);
-  saveDB(); renderStudentGrid(); showToast(`-${points} HP a ${s.name}`,'info');
+/* ---------- Behavior modal (applies behavior to one student) ---------- */
+function openBehaviorModalFor(studentId){
+  // Small prompt modal using native prompt for simplicity, safer to keep single file size
+  const behaviorKeys = (db.characters||[]).map(c=>c.key);
+  if(!behaviorKeys.length) return showToast('No hay caracteres definidos. Crea primero en Caracteres.','warn');
+  // build selection via prompt sequence
+  const choose = window.prompt(`Comportamiento (${behaviorKeys.join(', ')}). Escribe el nombre exacto:`);
+  if(!choose) return;
+  const behavior = choose.trim();
+  if(!behaviorKeys.includes(behavior)) return showToast('Comportamiento no encontrado','err');
+  const sign = window.prompt('Tipo: escribe + para positivo o - para negativo', '+');
+  if(!sign) return;
+  const positive = sign.trim().startsWith('+');
+  const ptsRaw = window.prompt('Puntos (número)', '1');
+  const pts = Math.max(1, parseInt(ptsRaw)||1);
+  applyBehaviorToStudentById(studentId, behavior, positive ? 'positive' : 'negative', pts);
+  showToast(`${positive?'+':'-'}${pts} aplicado a ${behavior}`,'success');
 }
 
-/* ========== FICHA (tabs) ========== */
+/* internal apply behavior to student by id */
+function applyBehaviorToStudentById(studentId, behaviorKey, type, points){
+  const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado','err');
+  const s = f.student;
+  s.history = s.history || [];
+  const isPos = type !== 'negative';
+  if(isPos){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
+  else { s.hp = Math.max(0, (s.hp||HP_MAX) - points); }
+  s.history.unshift({ id:Date.now(), ts: new Date().toLocaleString(), type: isPos ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (comportamiento)' });
+  s.level = Math.floor((s.xp||0)/20)+1;
+  saveDB(); fillFicha(studentId); renderStudentGrid();
+}
+
+/* ---------- Ficha (tabs, nicer layout) ---------- */
+function openFicha(id){ activeStudentId = id; showModal('ficha-modal'); setTimeout(()=> { fillFicha(id); switchFichaTab('datos'); }, 120); }
 function switchFichaTab(tab){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('tab-'+tab+'-btn').classList.add('active');
   renderFichaTab(tab);
 }
-function openFicha(id){
-  activeStudentId = id;
-  showModal('ficha-modal');
-  setTimeout(()=> { fillFicha(id); switchFichaTab('datos'); }, 120);
-}
-
-/* build ficha content (tabs) */
 function fillFicha(studentId){
-  const found = findStudentById(studentId);
-  if(!found) return showToast('Estudiante no encontrado','err');
-  activeStudentId = studentId;
-  document.getElementById('history-student-name').innerText = found.student.name;
-  document.getElementById('history-student-avatar').innerText = (found.student.name||' ')[0];
-  renderFichaTab('datos');
+  const f = findStudentById(studentId); if(!f) return showToast('Estudiante no encontrado','err');
+  document.getElementById('history-student-name').innerText = f.student.name;
+  document.getElementById('history-student-avatar').innerText = (f.student.name||' ')[0];
+  renderFichaTab('datos'); // default
 }
 function renderFichaTab(tab){
   const area = document.getElementById('ficha-content'); if(!area) return;
-  const res = findStudentById(activeStudentId); if(!res){ area.innerHTML = '<div style="color:#666">Abre la ficha de un estudiante.</div>'; return; }
-  const s = res.student;
-  if(tab === 'datos'){
+  const r = findStudentById(activeStudentId);
+  if(!r){ area.innerHTML = '<div style="color:#666">Selecciona un estudiante</div>'; return; }
+  const s = r.student;
+  if(tab==='datos'){
     area.innerHTML = `
-      <div style="display:flex;gap:12px">
+      <div style="display:flex;gap:14px">
         <div style="flex:1">
-          <label>Nombre</label><input id="f_name" class="ef2-input" value="${escapeHtml(s.name||'')}">
-          <label style="margin-top:8px">Documento</label><input id="f_doc" class="ef2-input" value="${escapeHtml(s.document||'')}">
-          <label style="margin-top:8px">Fecha de nacimiento</label><input id="f_birth" type="date" class="ef2-input" value="${s.birthdate||''}">
-          <label style="margin-top:8px">Acudiente</label><input id="f_parent" class="ef2-input" value="${escapeHtml((s.acudiente&&s.acudiente.name)||'')}">
-          <div style="display:flex;gap:8px;margin-top:10px">
-            <button class="action-btn merit" onclick="saveFichaPersonal()">Guardar</button>
-            <button class="action-btn ficha" onclick="openActaModal()">Crear Acta</button>
-            <button class="action-btn" onclick="printCurrentFicha('student')">Imprimir</button>
+          <div class="info-card">
+            <div style="font-weight:800;font-size:16px">${escapeHtml(s.name)}</div>
+            <div style="color:var(--muted);margin-top:6px">ID: ${escapeHtml(s.id)} • Curso: ${r.grade}</div>
+          </div>
+
+          <div style="margin-top:12px">
+            <label>Documento</label><input id="f_name_doc" class="ef2-input" value="${escapeHtml(s.document||'')}">
+            <label style="margin-top:8px">Acudiente</label><input id="f_name_parent" class="ef2-input" value="${escapeHtml((s.acudiente&&s.acudiente.name)||'')}">
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <button class="action-btn primary" onclick="saveFichaPersonal()">Guardar</button>
+              <button class="action-btn ghost" onclick="openActaModal()">Crear Acta</button>
+            </div>
           </div>
         </div>
+
         <div style="width:360px">
-          <div style="background:#f8fafc;padding:12px;border-radius:8px;color:#111">
-            <div style="font-weight:800">Resumen</div>
-            <div style="margin-top:8px">XP: <strong id="f_xp">${s.xp||0}</strong></div>
-            <div>HP: <strong id="f_hp">${s.hp||HP_MAX}</strong></div>
-            <div>ORO: <strong id="f_gold">${s.gold||0}</strong></div>
-            <div style="margin-top:8px"><strong>Badges:</strong> ${(s.badges||[]).map(b=>b.emoji||'').join(' ')}</div>
+          <div style="background:#fff;padding:12px;border-radius:10px;color:#111">
+            <div style="display:flex;justify-content:space-between;align-items:center"><strong>Resumen</strong></div>
+            <div style="display:flex;gap:8px;margin-top:10px">
+              <div style="flex:1;text-align:center"><div style="color:#64748b">XP</div><div id="f_xp_display" style="font-weight:800">${s.xp||0}</div></div>
+              <div style="flex:1;text-align:center"><div style="color:#64748b">HP</div><div id="f_hp_display" style="font-weight:800">${s.hp||HP_MAX}</div></div>
+              <div style="flex:1;text-align:center"><div style="color:#64748b">ORO</div><div id="f_gold_display" style="font-weight:800">${s.gold||0}</div></div>
+            </div>
+            <div style="margin-top:10px;font-weight:700">Historial reciente</div>
+            <div id="f_history_list" style="max-height:220px;overflow:auto;color:#333"></div>
           </div>
         </div>
       </div>
     `;
-  } else if(tab === 'actas'){
+    // fill history
+    const hist = document.getElementById('f_history_list'); hist.innerHTML=''; (s.history||[]).slice(0,20).forEach(h=>{ const el=document.createElement('div'); el.style.padding='6px'; el.style.borderBottom='1px solid #f1f5f9'; el.innerHTML=`<div style="font-weight:700">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="font-size:12px;color:#666">${h.ts} — ${h.note||''}</div>`; hist.appendChild(el); });
+  }
+  else if(tab==='actas'){
     area.innerHTML = `
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div style="font-weight:800">Actas</div>
-          <div><button class="action-btn ficha" onclick="openActaModal()">Crear nueva Acta</button></div>
-        </div>
-        <div id="f_actas_list" style="margin-top:8px;max-height:360px;overflow:auto"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div style="font-weight:800">Actas</div>
+        <div><button class="action-btn primary" onclick="openActaModal()">Crear Acta</button></div>
       </div>
+      <div id="f_actas_list" style="margin-top:8px;max-height:420px;overflow:auto"></div>
     `;
-    renderFichaActas(s.id);
-  } else if(tab === 'observador'){
+    renderFichaActas(s);
+  }
+  else if(tab==='observador'){
     area.innerHTML = `
       <div>
-        <h4>Observaciones / Incidentes</h4>
-        <div style="display:flex;gap:8px">
-          <input id="obs_fecha" type="date" class="ef2-input" style="width:160px">
-          <select id="obs_tipo" class="ef2-input" style="width:160px"><option>Incidente</option><option>Observación</option></select>
-          <button class="action-btn ficha" onclick="addObsToStudent('${s.id}')">Agregar</button>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="obs_date" type="date" class="ef2-input" style="width:180px">
+          <select id="obs_type" class="ef2-input" style="width:200px"><option>Incidente</option><option>Observación</option></select>
+          <button class="action-btn primary" onclick="addObsToStudent('${s.id}')">Agregar</button>
         </div>
         <textarea id="obs_desc" class="ef2-input" rows="3" placeholder="Descripción..."></textarea>
-        <div id="f_obs_list" style="margin-top:8px;max-height:300px;overflow:auto"></div>
+        <div id="f_obs_list" style="margin-top:8px;max-height:360px;overflow:auto"></div>
       </div>
     `;
     renderFichaHistory(s.id);
-  } else if(tab === 'gamificacion'){
+  }
+  else if(tab==='gamificacion'){
     area.innerHTML = `
       <div style="display:flex;gap:12px">
         <div style="flex:1">
-          <label>Nivel</label><input id="ef2_level" class="ef2-input" value="${s.level||1}">
+          <label>Nivel</label><input id="ef2_lvl" class="ef2-input" value="${s.level||1}">
           <label style="margin-top:8px">XP</label><input id="ef2_xp" class="ef2-input" type="number" value="${s.xp||0}">
           <label style="margin-top:8px">HP</label><input id="ef2_hp" class="ef2-input" type="number" value="${s.hp||HP_MAX}">
           <div style="display:flex;gap:8px;margin-top:8px">
@@ -876,75 +783,51 @@ function renderFichaTab(tab){
           </div>
           <div style="display:flex;gap:8px;margin-top:8px">
             <select id="ef2_behavior_scope" class="ef2-input" style="width:180px"><option value="student">Estudiante</option><option value="group">Grupo</option><option value="class">Curso</option></select>
-            <button class="action-btn merit" onclick="applyBehaviorFromEF2()">Aplicar</button>
+            <button class="action-btn primary" onclick="applyBehaviorFromFicha()">Aplicar</button>
           </div>
         </div>
         <div style="width:360px">
           <div style="background:#fff;padding:12px;border-radius:10px;color:#111">
-            <div style="display:flex;justify-content:space-between;align-items:center"><strong>Resumen</strong></div>
-            <div style="display:flex;gap:8px;margin-top:10px">
-              <div style="flex:1;text-align:center"><div style="color:#64748b">XP</div><div id="ef2-xp-display" style="font-weight:800">${s.xp||0}</div></div>
-              <div style="flex:1;text-align:center"><div style="color:#64748b">HP</div><div id="ef2-hp-display" style="font-weight:800">${s.hp||HP_MAX}</div></div>
-              <div style="flex:1;text-align:center"><div style="color:#64748b">ORO</div><div id="ef2-gold-display" style="font-weight:800">${s.gold||0}</div></div>
-            </div>
-            <div style="margin-top:10px;font-weight:700">Historial reciente</div>
-            <div id="ef2-history" style="max-height:220px;overflow:auto;color:#333"></div>
+            <div style="font-weight:800">Historial</div>
+            <div id="ef2_history_list" style="max-height:320px;overflow:auto"></div>
           </div>
         </div>
       </div>
     `;
-    refreshBehaviorSelects(); renderFichaHistory(s.id);
+    refreshBehaviorSelects();
+    renderFichaHistory(s.id);
   }
 }
 
-/* Helpers for ficha actas and history */
-function renderFichaActas(id){
-  const found = findStudentById(id); if(!found) return;
-  const s=found.student;
-  const list=document.getElementById('f_actas_list'); if(!list) return; list.innerHTML='';
-  (s.actas||[]).slice().reverse().forEach(a=>{ const el=document.createElement('div'); el.style.padding='10px'; el.style.borderBottom='1px solid #eee'; el.innerHTML = `<div style="font-weight:800">${a.numero||''} • ${a.fecha} ${a.hora||''}</div><div style="color:#666">${(a.descripcion||'').slice(0,200)}</div><div style="margin-top:6px"><button class="action-btn ficha" onclick='previewActa("${a.id}")'>Ver / Imprimir</button> <button class="action-btn" onclick='downloadActaPDF("${a.id}")'>PDF</button></div>`; list.appendChild(el); });
+/* helpers to render actas and history in ficha */
+function renderFichaActas(student){
+  const list = document.getElementById('f_actas_list'); list.innerHTML='';
+  (student.actas||[]).slice().reverse().forEach(a=>{ const el=document.createElement('div'); el.style.padding='10px'; el.style.borderBottom='1px solid #eee'; el.innerHTML = `<div style="font-weight:800">${a.numero||''} • ${a.fecha||''} ${a.hora||''}</div><div style="color:#666">${(a.descripcion||'').slice(0,240)}</div><div style="margin-top:6px"><button class="action-btn ghost" onclick='previewActa("${a.id}")'>Ver / Imprimir</button> <button class="action-btn ghost" onclick='downloadActaPDF("${a.id}")'>PDF</button></div>`; list.appendChild(el); });
 }
 function renderFichaHistory(id){
-  const found = findStudentById(id); if(!found) return;
-  const s=found.student;
-  const hist=document.getElementById('ef2-history'); if(hist){ hist.innerHTML=''; (s.history||[]).slice(0,25).forEach(h=>{ const n=document.createElement('div'); n.style.padding='6px'; n.style.borderBottom='1px solid #f1f5f9'; n.innerHTML=`<div style="font-weight:700">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="font-size:12px;color:#666">${h.ts}</div>`; hist.appendChild(n); }); }
-  const obs=document.getElementById('f_obs_list'); if(obs){ obs.innerHTML=''; (s.observador||[]).slice().reverse().forEach(o=>{ const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML=`<div style="font-weight:700">${o.tipo} • ${o.fecha}</div><div style="color:#475569">${o.desc}</div>`; obs.appendChild(el); }); }
+  const f = findStudentById(id); if(!f) return;
+  const histCon = document.getElementById('ef2_history_list'); if(histCon){ histCon.innerHTML=''; (f.student.history||[]).slice(0,50).forEach(h=>{ const el=document.createElement('div'); el.style.padding='6px'; el.style.borderBottom='1px solid #f1f5f9'; el.innerHTML = `<div style="font-weight:700">${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar}</div><div style="font-size:12px;color:#666">${h.ts} — ${h.note||''}</div>`; histCon.appendChild(el); }); }
+  const obsCon = document.getElementById('f_obs_list'); if(obsCon){ obsCon.innerHTML=''; (f.student.observador||[]).slice().reverse().forEach(o=>{ const el=document.createElement('div'); el.style.padding='8px'; el.style.borderBottom='1px solid #eef2f7'; el.innerHTML=`<div style="font-weight:700">${o.tipo} • ${o.fecha}</div><div style="color:#475569">${o.desc}</div>`; obsCon.appendChild(el); }); }
 }
 
-/* Observador add */
+/* ---------- Observador add ---------- */
 function addObsToStudent(id){
-  const s=findStudentById(id); if(!s) return showToast('No encontrado','err');
-  const fecha=document.getElementById('obs_fecha').value || new Date().toLocaleDateString();
-  const tipo=document.getElementById('obs_tipo').value || 'Observación';
-  const desc=document.getElementById('obs_desc').value || '';
-  if(!desc) return showToast('Escribe descripción','warn');
-  s.student.observador = s.student.observador || [];
-  s.student.observador.unshift({ id: Date.now(), fecha, tipo, desc, estado:'En proceso' });
-  saveDB();
-  renderFichaHistory(id);
-  showToast('Observación guardada','success');
+  const f = findStudentById(id); if(!f) return showToast('No encontrado','err');
+  const fecha = document.getElementById('obs_date').value || new Date().toLocaleDateString();
+  const tipo = document.getElementById('obs_type').value || 'Observación';
+  const desc = document.getElementById('obs_desc').value || '';
+  if(!desc.trim()) return showToast('Escribe una descripción','warn');
+  f.student.observador = f.student.observador || [];
+  f.student.observador.unshift({ id: Date.now(), fecha, tipo, desc });
+  saveDB(); renderFichaHistory(id); showToast('Observación guardada','success');
 }
 
-/* Save ficha personal */
-function saveFichaPersonal(){
-  if(!activeStudentId) return showToast('Abre ficha primero','warn');
-  const found = findStudentById(activeStudentId); if(!found) return showToast('No encontrado','err');
-  const s = found.student;
-  s.name = document.getElementById('f_name').value || s.name;
-  s.document = document.getElementById('f_doc').value || s.document;
-  s.birthdate = document.getElementById('f_birth').value || s.birthdate;
-  s.acudiente = s.acudiente || {};
-  s.acudiente.name = document.getElementById('f_parent').value || s.acudiente.name;
-  saveDB(); renderStudentGrid(); fillFicha(activeStudentId); showToast('Datos guardados','success');
-}
-
-/* ========== ACTA: gather/save/print/pdf (signature fields included) ========== */
+/* ---------- Actas (gather/save/print/pdf) ---------- */
 function openActaModal(){
-  if(!activeStudentId) return showToast('Abre la ficha del estudiante primero','warn');
-  const found = findStudentById(activeStudentId);
-  if(!found) return showToast('No encontrado','err');
-  document.getElementById('acta-estudiante-nombre').value = found.student.name || '';
-  document.getElementById('acta-estudiante-doc').value = found.student.document || '';
+  if(!activeStudentId) return showToast('Abre la ficha primero','warn');
+  const f = findStudentById(activeStudentId); if(!f) return showToast('No encontrado','err');
+  document.getElementById('acta-estudiante-nombre').value = f.student.name || '';
+  document.getElementById('acta-estudiante-doc').value = f.student.document || '';
   document.getElementById('acta-estudiante-curso').value = currentClass || '';
   document.getElementById('acta-fecha').valueAsDate = new Date();
   showModal('acta-modal');
@@ -963,7 +846,7 @@ function gatherActaForm(){
       docente: document.getElementById('acta_firma_doc').value || '',
       tutor: document.getElementById('acta_firma_tutor').value || '',
       coordinacion: document.getElementById('acta_firma_coord').value || '',
-      coord_tipo: document.getElementById('acta_coord_tipo').value || 'convivencial'
+      coord_tipo: document.getElementById('acta_coord_tipo').value || ''
     },
     acciones: {
       reflexion: !!document.getElementById('acta_acc_refl').checked,
@@ -976,163 +859,141 @@ function gatherActaForm(){
       otra: document.getElementById('acta_acc_otro').value || ''
     },
     compromisos: {
-      estudiante: document.getElementById('acta_comp_est').value || '',
-      padre: document.getElementById('acta_comp_padre').value || ''
+      estudiante: document.getElementById('acta_comp_est')?.value || '',
+      padre: document.getElementById('acta_comp_padre')?.value || ''
     },
-    seguimiento: {
-      fecha: document.getElementById('acta_fecha_segu')?.value || '',
-      responsable: document.getElementById('acta_responsable')?.value || ''
-    },
-    observaciones: document.getElementById('acta_observaciones').value || '',
+    observaciones: document.getElementById('acta_observaciones')?.value || '',
     createdAt: new Date().toLocaleString()
   };
 }
 function saveActaDraft(){
   if(!activeStudentId) return showToast('Abre la ficha primero','warn');
   const acta = gatherActaForm();
-  const found = findStudentById(activeStudentId);
-  if(!found) return showToast('Estudiante no encontrado','err');
-  found.student.actas = found.student.actas || [];
-  found.student.actas.push(acta);
-  saveDB();
-  hideModal('acta-modal');
-  fillFicha(activeStudentId);
-  showToast('Acta guardada','success');
+  const f = findStudentById(activeStudentId); if(!f) return showToast('No encontrado','err');
+  f.student.actas = f.student.actas || []; f.student.actas.push(acta);
+  saveDB(); hideModal('acta-modal'); fillFicha(activeStudentId); showToast('Acta guardada','success');
 }
 function saveActaAndPrint(){
   saveActaDraft();
-  const found = findStudentById(activeStudentId);
-  const acta = found.student.actas[found.student.actas.length - 1];
+  const f = findStudentById(activeStudentId);
+  const acta = f.student.actas[f.student.actas.length-1];
   previewActa(acta.id);
 }
 function buildPrintableActa(acta, inst){
-  const logoText = inst && inst.logoText ? inst.logoText : 'ALM';
-  const appName = inst && inst.appName ? inst.appName : 'COLEGIO ALFONSO LÓPEZ MICHELSEN IED';
-  let html = `<!doctype html><html><head><meta charset="utf-8"><title>Acta</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:18px} .section{margin-top:12px;border-top:1px solid #ddd;padding-top:8px}table{width:100%;border-collapse:collapse}td,th{padding:6px;border:1px solid #ddd}</style></head><body>`;
-  html += `<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>${appName}</h1><div style="color:#666">Acta de registro y compromiso</div></div><div style="font-weight:900;background:#f5f3ea;padding:10px;border-radius:8px">${logoText}</div></header>`;
-  html += `<div class="section"><strong>Acta No.:</strong> ${acta.numero||''} &nbsp;&nbsp; <strong>Fecha:</strong> ${acta.fecha||''} &nbsp;&nbsp; <strong>Hora:</strong> ${acta.hora||''}</div>`;
-  html += `<div class="section"><h3>Datos del estudiante</h3><div><strong>Nombre:</strong> ${escapeHtml(acta.estudiante.nombre)}</div><div><strong>Documento:</strong> ${escapeHtml(acta.estudiante.documento)}</div><div><strong>Curso:</strong> ${escapeHtml(acta.estudiante.curso)}</div></div>`;
+  const logo = inst && inst.logoText ? inst.logoText : 'ALM';
+  const appName = inst && inst.appName ? inst.appName : 'COLEGIO';
+  let html = `<!doctype html><html><head><meta charset="utf-8"><title>Acta</title><style>body{font-family:Inter,Arial;color:#111;padding:18px}h1{font-size:18px} .section{margin-top:12px;padding-top:8px;border-top:1px solid #ddd} table{width:100%;border-collapse:collapse} td,th{padding:6px;border:1px solid #ddd}</style></head><body>`;
+  html += `<header style="display:flex;justify-content:space-between;align-items:center"><div><h1>${appName}</h1><div style="color:#666">Acta</div></div><div style="font-weight:900;background:#f5f3ea;padding:10px;border-radius:8px">${logo}</div></header>`;
+  html += `<div class="section"><strong>Acta No.:</strong> ${acta.numero||''} &nbsp; <strong>Fecha:</strong> ${acta.fecha||''} &nbsp; <strong>Hora:</strong> ${acta.hora||''}</div>`;
+  html += `<div class="section"><h3>Datos</h3><div><strong>Nombre:</strong> ${escapeHtml(acta.estudiante.nombre)} — <strong>Doc:</strong> ${escapeHtml(acta.estudiante.documento)} — <strong>Curso:</strong> ${escapeHtml(acta.estudiante.curso)}</div></div>`;
   html += `<div class="section"><h3>Descripción</h3><div>${escapeHtml(acta.descripcion).replace(/\n/g,'<br>')}</div></div>`;
-  html += `<div class="section"><h3>Acciones acordadas</h3><ul>`;
-  const acc = acta.acciones || {};
+  html += `<div class="section"><h3>Acciones</h3><ul>`;
+  const acc = acta.acciones||{};
   if(acc.reflexion) html += '<li>Reflexión escrita</li>';
-  if(acc.disculpas) html += '<li>Presentación de disculpas</li>';
+  if(acc.disculpas) html += '<li>Disculpas</li>';
   if(acc.restaurativa) html += '<li>Actividad restaurativa</li>';
-  if(acc.compromiso) html += '<li>Compromiso de cambio</li>';
-  if(acc.seguimiento) html += '<li>Seguimiento por Dirección</li>';
-  if(acc.orientacion) html += '<li>Remisión a Orientación</li>';
-  if(acc.comite) html += '<li>Remisión al Comité Escolar</li>';
+  if(acc.compromiso) html += '<li>Compromiso</li>';
+  if(acc.seguimiento) html += '<li>Seguimiento</li>';
+  if(acc.orientacion) html += '<li>Orientación</li>';
+  if(acc.comite) html += '<li>Comité</li>';
   if(acc.otra) html += `<li>Otra: ${escapeHtml(acc.otra)}</li>`;
-  html += '</ul></div>';
-  html += `<div class="section"><h3>Compromisos</h3><div><strong>Estudiante:</strong><div>${escapeHtml(acta.compromisos.estudiante).replace(/\n/g,'<br>')}</div></div><div><strong>Padre/Acudiente:</strong><div>${escapeHtml(acta.compromisos.padre).replace(/\n/g,'<br>')}</div></div></div>`;
-  html += `<div class="section"><h3>Firmas</h3><table><tr><th>Estudiante</th><th>Docente</th><th>Tutor/Padre</th><th>Coordinación (${escapeHtml(acta.firmas.coord_tipo||'')})</th></tr>`;
+  html += `</ul></div>`;
+  html += `<div class="section"><h3>Firmas</h3><table><tr><th>Estudiante</th><th>Docente</th><th>Tutor</th><th>Coordinación (${escapeHtml(acta.firmas.coord_tipo||'')})</th></tr>`;
   html += `<tr><td>${escapeHtml(acta.firmas.estudiante||'')}</td><td>${escapeHtml(acta.firmas.docente||'')}</td><td>${escapeHtml(acta.firmas.tutor||'')}</td><td>${escapeHtml(acta.firmas.coordinacion||'')}</td></tr></table></div>`;
   html += `<div class="section"><h3>Observaciones</h3><div>${escapeHtml(acta.observaciones||'').replace(/\n/g,'<br>')}</div></div>`;
   html += `</body></html>`;
   return html;
 }
 function previewActa(actaId){
-  const found = findStudentById(activeStudentId);
-  if(!found) return showToast('Estudiante no encontrado','err');
-  const acta = (found.student.actas||[]).find(a=>a.id===actaId);
-  if(!acta) return showToast('Acta no encontrada','err');
-  const html = buildPrintableActa(acta, db.institution || { appName:'COLEGIO ALFONSO LÓPEZ MICHELSEN IED', logoText:'ALM' });
-  const w = window.open('','_blank','width=900,height=900'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),400);
+  const f = findStudentById(activeStudentId); if(!f) return showToast('No encontrado','err');
+  const acta = (f.student.actas||[]).find(a=>a.id===actaId); if(!acta) return showToast('Acta no encontrada','err');
+  const html = buildPrintableActa(acta, db.institution || {});
+  const w = window.open('','_blank','width=900,height=800'); w.document.write(html); w.document.close(); setTimeout(()=> w.print(),300);
 }
 function downloadActaPDF(actaId){
-  const found = findStudentById(activeStudentId); if(!found) return showToast('Estudiante no encontrado','err');
-  const acta = (found.student.actas||[]).find(a=>a.id===actaId); if(!acta) return showToast('Acta no encontrada','err');
-  const html = buildPrintableActa(acta, db.institution || { appName:'COLEGIO ALFONSO LÓPEZ MICHELSEN IED', logoText:'ALM' });
+  const f = findStudentById(activeStudentId); if(!f) return showToast('No encontrado','err');
+  const acta = (f.student.actas||[]).find(a=>a.id===actaId); if(!acta) return showToast('Acta no encontrada','err');
+  const html = buildPrintableActa(acta, db.institution || {});
   const container = document.createElement('div'); container.innerHTML = html; document.body.appendChild(container);
-  const opt = { margin:0.4, filename:`Acta_${acta.numero||acta.id}.pdf`, html2canvas:{ scale:2 }, jsPDF:{ unit:'in', format:'a4', orientation:'portrait' } };
+  const opt = { margin:0.4, filename: `Acta_${acta.numero||acta.id}.pdf`, html2canvas:{scale:2}, jsPDF:{unit:'in',format:'a4',orientation:'portrait'} };
   html2pdf().set(opt).from(container).save().then(()=> container.remove());
 }
 
-/* ========== Characters / Behavior selects (dedup already) ========== */
+/* ---------- Characters CRUD and behavior selects ---------- */
 function refreshBehaviorSelects(){
   const cfg = [...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji,name:c.name,type:c.type})), ...(db.characters||[])];
-  // dedupe by key again to be safe
   const seen = new Set(); const clean = [];
-  cfg.forEach(c=>{ if(!c) return; const k=c.key||''; if(seen.has(k)) return; seen.add(k); clean.push(c); });
-  const ef2 = document.getElementById('ef2_behavior_select'); if(ef2){ ef2.innerHTML=''; clean.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent = `${c.emoji} ${c.key}`; opt.dataset.type=c.type; ef2.appendChild(opt); }); }
-  const pilar = document.getElementById('class-panel-pilar-select'); if(pilar){ pilar.innerHTML=''; clean.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent=`${c.emoji} ${c.key}`; pilar.appendChild(opt); }); }
+  cfg.forEach(c=>{ if(!c) return; if(seen.has(c.key)) return; seen.add(c.key); clean.push(c); });
+  const sel = document.getElementById('ef2_behavior_select'); if(sel){ sel.innerHTML=''; clean.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent = `${c.emoji||''} ${c.key}`; opt.dataset.type=c.type; sel.appendChild(opt); }); }
+  const cp = document.getElementById('class-panel-pilar-select'); if(cp){ cp.innerHTML=''; clean.forEach(c=>{ const opt=document.createElement('option'); opt.value=c.key; opt.textContent = `${c.emoji||''} ${c.key}`; cp.appendChild(opt); }); }
 }
-
-/* create / delete characters (no duplicates) */
 function createCharacter(){
   const name = (document.getElementById('char-name-input').value||'').trim();
   const emoji = (document.getElementById('char-emoji-input').value||'').trim();
   const type = (document.getElementById('char-type-input').value||'positive');
-  if(!name || !emoji) return showToast('Nombre y emoji son obligatorios','warn');
+  if(!name || !emoji) return showToast('Nombre y emoji obligatorios','warn');
+  // avoid duplicates
+  if(DEFAULT_CHARACTERS.some(c=>c.key===name) || (db.characters||[]).some(c=>c.key===name)) return showToast('Nombre ya existe','warn');
+  if(DEFAULT_CHARACTERS.some(c=>c.emoji===emoji) || (db.characters||[]).some(c=>c.emoji===emoji)) return showToast('Emoji ya usado','warn');
   db.characters = db.characters || [];
-  // avoid duplicate key or emoji
-  if(db.characters.some(c=>c.key===name) || DEFAULT_CHARACTERS.some(c=>c.key===name)) return showToast('Clave ya existe','warn');
-  if(db.characters.some(c=>c.emoji===emoji) || DEFAULT_CHARACTERS.some(c=>c.emoji===emoji)) return showToast('Emoji ya usado','warn');
-  db.characters.push({ id:`char_${Date.now()}`, key:name, emoji, name: name, type });
-  saveDB(); document.getElementById('char-name-input').value=''; document.getElementById('char-emoji-input').value=''; refreshBehaviorSelects(); renderCharactersList(); showToast('Carácter creado','success');
+  db.characters.push({ id:`char_${Date.now()}`, key:name, emoji, name, type });
+  saveDB();
+  document.getElementById('char-name-input').value=''; document.getElementById('char-emoji-input').value='';
+  refreshBehaviorSelects(); renderCharactersList();
+  showToast('Carácter creado','success');
 }
 function renderCharactersList(){
   const list = document.getElementById('characters-list'); if(!list) return; list.innerHTML='';
-  const all = [...DEFAULT_CHARACTERS.map(c=>({id:`def_${c.key}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type})), ...(db.characters||[])];
+  const all = [...DEFAULT_CHARACTERS.map((c,i)=>({ id:`def_${i+1}`, key:c.key, emoji:c.emoji, name:c.name, type:c.type })), ...(db.characters||[])];
   const counts = characterCounts();
   all.forEach(c=>{
-    const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee';
-    row.innerHTML = `<div style="display:flex;align-items:center;gap:8px"><div style="font-size:22px">${c.emoji}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name||''}</div></div></div><div style="display:flex;align-items:center;gap:6px"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${c.id && c.id.startsWith('def_') ? '' : `<button class="action-btn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`;
+    const row = document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee';
+    row.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><div style="font-size:22px">${c.emoji||''}</div><div><strong>${c.key}</strong><div style="color:#666">${c.name||''}</div></div></div><div style="display:flex;gap:8px;align-items:center"><div style="background:#f3f4f6;padding:6px;border-radius:8px">${counts[c.key]||0}</div>${(c.id && c.id.startsWith('def_')) ? '' : `<button class="action-btn warn" onclick="deleteCharacter('${c.id}')">Eliminar</button>`}</div>`;
     list.appendChild(row);
   });
 }
 function deleteCharacter(id){
   if(!id) return;
-  showConfirm('Eliminar carácter', '¿Eliminar este carácter?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id !== id); saveDB(); refreshBehaviorSelects(); renderCharactersList(); showToast('Carácter eliminado','success'); });
+  showConfirm('Eliminar carácter','¿Eliminar este carácter?', ()=>{ db.characters = (db.characters||[]).filter(c=>c.id!==id); saveDB(); refreshBehaviorSelects(); renderCharactersList(); showToast('Carácter eliminado','success'); });
+}
+/* count usage */
+function characterCounts(){ const counts = {}; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar) counts[h.pilar] = (counts[h.pilar]||0)+1; } ))); return counts; }
+
+/* ---------- Apply behavior from ficha (scope student/group/class) ---------- */
+function applyBehaviorFromFicha(){
+  const sel = document.getElementById('ef2_behavior_select'); if(!sel) return;
+  const behavior = sel.value; const points = parseInt(document.getElementById('ef2_behavior_points').value)||1; const scope = document.getElementById('ef2_behavior_scope').value; const type = sel.selectedOptions[0]?.dataset?.type||'positive';
+  if(scope==='student'){ applyBehaviorToStudentById(activeStudentId, behavior, type==='negative'?'negative':'positive', points); showToast('Aplicado','success'); }
+  else applyBehaviorToScope(behavior, type==='negative'?'negative':'positive', points, scope);
 }
 
-/* counts helper */
-function characterCounts(){
-  const counts = {};
-  Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> (s.history||[]).forEach(h=> { if(h.pilar){ counts[h.pilar] = (counts[h.pilar]||0)+1; } } )));
-  return counts;
-}
-
-/* ========== Behavior application helpers ========== */
+/* apply behavior to scope (used by panel) */
 function applyBehaviorToScope(behaviorKey, type, points, scope){
   if(!behaviorKey) return showToast('Selecciona pilar','warn');
-  const grade = currentClass;
-  if(scope === 'student'){
-    const sid = activeStudentId;
-    const s = (db.classes[grade]||[]).find(x=>x.id===sid);
-    if(!s) return showToast('Estudiante no encontrado','err');
-    applyToStudentInternal(s, behaviorKey, type, points);
-    showToast('Aplicado a estudiante','success');
-  } else if(scope === 'group'){
-    const groups = db.groups[grade] || {};
-    let groupName = '';
+  if(scope==='class'){
+    (db.classes[currentClass]||[]).forEach(s=> applyToStudentInternal(s, behaviorKey, type, points));
+    saveDB(); renderStudentGrid(); showToast('Aplicado a todo el curso','success');
+  } else if(scope==='group'){
+    const groups = db.groups[currentClass]||{};
+    // find group of activeStudent
+    let groupName='';
     Object.keys(groups).forEach(g=>{ if(groups[g].includes(activeStudentId)) groupName = g; });
     if(!groupName) return showToast('Estudiante no pertenece a grupo','warn');
-    groups[groupName].forEach(id=>{ const s = (db.classes[grade]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s,behaviorKey,type,points); });
-    showToast(`Aplicado a grupo ${groupName}`,'success');
-  } else if(scope === 'class'){
-    (db.classes[grade]||[]).forEach(s=> applyToStudentInternal(s,behaviorKey,type,points));
-    showToast('Aplicado a todo el curso','success');
+    groups[groupName].forEach(id=>{ const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(s) applyToStudentInternal(s, behaviorKey, type, points); });
+    saveDB(); renderStudentGrid(); showToast('Aplicado a grupo','success');
   }
-  saveDB(); renderStudentGrid(); fillFicha(activeStudentId);
 }
 function applyToStudentInternal(s, behaviorKey, type, points){
   s.history = s.history || [];
-  const isPositive = (type !== 'negative');
-  if(isPositive){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
+  const isPos = (type !== 'negative');
+  if(isPos){ s.xp = (s.xp||0) + points; if(s.hp < HP_MAX) s.hp = Math.min(HP_MAX, s.hp + 1); }
   else s.hp = Math.max(0, (s.hp||HP_MAX) - points);
-  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPositive ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
-  s.level = Math.floor((s.xp||0)/20) + 1;
+  s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: isPos ? 'positive' : 'negative', pilar: behaviorKey, magnitude: points, note: 'Aplicado (pilar)' });
+  s.level = Math.floor((s.xp||0)/20)+1;
 }
-function applyBehaviorFromEF2(){ const sel=document.getElementById('ef2_behavior_select'); if(!sel) return; const behavior=sel.value; const type=sel.selectedOptions[0]?.dataset?.type||'positive'; const points=parseInt(document.getElementById('ef2_behavior_points').value)||1; const scope=document.getElementById('ef2_behavior_scope').value||'student'; applyBehaviorToScope(behavior,type,points,scope); }
 
-/* ========== Groups implementation (improved) ========== */
-function createGroupPrompt(){
-  const name = prompt('Nombre del grupo:'); if(!name) return;
-  if(!db.groups[currentClass]) db.groups[currentClass] = {};
-  db.groups[currentClass][name] = [];
-  saveDB(); renderGroupsColumns(); showToast('Grupo creado','success');
-}
+/* ---------- Groups (improved) ---------- */
+function createGroupPrompt(){ const name=prompt('Nombre del grupo:'); if(!name) return; db.groups[currentClass] = db.groups[currentClass]||{}; db.groups[currentClass][name]=[]; saveDB(); renderGroupsColumns(); showToast('Grupo creado','success'); }
 function renderGroupsColumns(){
   const area = document.getElementById('groups-columns-area'); if(!area) return; area.innerHTML='';
   if(!currentClass) return;
@@ -1140,57 +1001,45 @@ function renderGroupsColumns(){
   const groups = db.groups[currentClass] || {};
   const assigned = new Set(); Object.keys(groups).forEach(g=> (groups[g]||[]).forEach(id=>assigned.add(id)));
   const unassigned = all.filter(s=>!assigned.has(s.id));
-  // pool
-  const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip=document.createElement('div'); chip.className='student-chip'; chip.draggable=true; chip.ondragstart = e => e.dataTransfer.setData('text/plain', s.id); chip.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div>`; pool.appendChild(chip); }); }
-  // groups
+  const pool = document.getElementById('groups-students-pool'); if(pool){ pool.innerHTML=''; unassigned.forEach(s=>{ const chip=document.createElement('div'); chip.className='student-chip'; chip.draggable=true; chip.ondragstart=e=>e.dataTransfer.setData('text/plain', s.id); chip.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div>`; pool.appendChild(chip); }); }
   Object.keys(groups).forEach(g=>{
-    const card = document.createElement('div'); card.className='group-card';
-    const memberCount = (groups[g]||[]).length;
-    card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div style="display:flex;gap:6px;align-items:center"><span style="color:#9aa7b6">${memberCount} miembros</span><button class="action-btn" onclick="exportSubgroup('${currentClass}','${g}')">Export</button> <button class="action-btn" onclick="promptDeleteGroup('${currentClass}','${g}')">Eliminar</button></div></div>`;
-    const list = document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
-    list.ondragover = e => e.preventDefault();
-    list.ondrop = e => { e.preventDefault(); const sid = e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid, g); };
-    (groups[g]||[]).forEach(id=>{
-      const s = (db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return;
-      const chip = document.createElement('div'); chip.className='student-chip'; chip.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div><div style="margin-left:auto"><button class="action-btn" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div>`; list.appendChild(chip);
-    });
+    const card=document.createElement('div'); card.className='group-card';
+    const members=(groups[g]||[]).map(id=> { const s=(db.classes[currentClass]||[]).find(x=>x.id===id); return s? s.name : id; }).join(', ');
+    card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><strong contenteditable="true" onblur="renameGroupPrompt('${g}', this.innerText)">${g}</strong><div><span style="color:#9aa7b6">${(groups[g]||[]).length} miembros</span> <button class="action-btn ghost" onclick="exportSubgroup('${currentClass}','${g}')">Export</button> <button class="action-btn warn" onclick="promptDeleteGroup('${currentClass}','${g}')">Eliminar</button></div></div>`;
+    const list=document.createElement('div'); list.style.minHeight='80px'; list.style.marginTop='8px';
+    list.ondragover=e=>e.preventDefault();
+    list.ondrop=e=>{ e.preventDefault(); const sid=e.dataTransfer.getData('text/plain'); if(sid) moveToGroup(sid,g); };
+    (groups[g]||[]).forEach(id=>{ const s=(db.classes[currentClass]||[]).find(x=>x.id===id); if(!s) return; const chip=document.createElement('div'); chip.className='student-chip'; chip.innerHTML=`<div style="width:28px;height:28px;border-radius:50%;background:#fff;color:#111;display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div style="margin-left:6px">${s.name}</div><div style="margin-left:auto"><button class="action-btn ghost" onclick="moveToGroup('${s.id}','__unassigned')">←</button></div>`; list.appendChild(chip); });
     card.appendChild(list); area.appendChild(card);
   });
 }
-function renameGroupPrompt(oldName, newName){ newName = newName.trim(); if(!newName || newName===oldName) return; if(db.groups[currentClass] && db.groups[currentClass][newName]) return showToast('Ya existe ese nombre','warn'); db.groups[currentClass] = db.groups[currentClass] || {}; db.groups[currentClass][newName] = db.groups[currentClass][oldName] || []; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado','success'); }
-function promptDeleteGroup(course, group){ if(!db.groups[course]||!db.groups[course][group]) return; showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado','success'); }); }
-function moveToGroup(studentId, groupKey){
-  Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId));
-  if(groupKey !== '__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey] || []; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); }
-  saveDB(); renderGroupsColumns(); renderStudentGrid();
-}
+function renameGroupPrompt(oldName,newName){ newName=newName.trim(); if(!newName||newName===oldName) return; if(db.groups[currentClass]&&db.groups[currentClass][newName]) return showToast('Nombre existe','warn'); db.groups[currentClass][newName]=db.groups[currentClass][oldName]||[]; delete db.groups[currentClass][oldName]; saveDB(); renderGroupsColumns(); showToast('Renombrado','success'); }
+function promptDeleteGroup(course,group){ if(!db.groups[course]||!db.groups[course][group]) return; showConfirm('Eliminar grupo', `Eliminar grupo ${group}?`, ()=>{ delete db.groups[course][group]; saveDB(); renderGroupsColumns(); showToast('Grupo eliminado','success'); }); }
+function moveToGroup(studentId, groupKey){ Object.keys(db.groups[currentClass]||{}).forEach(g=> db.groups[currentClass][g] = (db.groups[currentClass][g]||[]).filter(x=>x!==studentId)); if(groupKey!=='__unassigned'){ db.groups[currentClass][groupKey] = db.groups[currentClass][groupKey]||[]; if(!db.groups[currentClass][groupKey].includes(studentId)) db.groups[currentClass][groupKey].push(studentId); } saveDB(); renderGroupsColumns(); renderStudentGrid(); }
 function saveGroups(){ saveDB(); hideModal('manage-groups-modal'); showToast('Grupos guardados','success'); }
-function distributeGroupsByNumber(){ const n = parseInt(prompt('Número de grupos:')) || 0; if(n<1) return showToast('Número inválido','warn'); const ids = (db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass] = {}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${ (i % n)+1 }`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido aleatoriamente','success'); }
-function distributeGroupsBySizePrompt(){ const size = parseInt(prompt('Tamaño por grupo:')) || 0; if(size<1) return showToast('Tamaño inválido','warn'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0; let g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`] = ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño','success'); }
+function distributeGroupsByNumber(){ const n=parseInt(prompt('Número de grupos:'))||0; if(n<1) return showToast('Número inválido','warn'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); if(!ids.length) return showToast('No hay estudiantes','warn'); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; for(let i=1;i<=n;i++) db.groups[currentClass][`Grupo ${i}`]=[]; ids.forEach((id,i)=> db.groups[currentClass][`Grupo ${(i%n)+1}`].push(id)); saveDB(); renderGroupsColumns(); showToast('Distribuido','success'); }
+function distributeGroupsBySizePrompt(){ const size=parseInt(prompt('Tamaño por grupo:'))||0; if(size<1) return showToast('Tamaño inválido','warn'); const ids=(db.classes[currentClass]||[]).map(s=>s.id); for(let i=ids.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [ids[i],ids[j]]=[ids[j],ids[i]]; } db.groups[currentClass]={}; let idx=0; let g=1; while(idx<ids.length){ db.groups[currentClass][`Grupo ${g}`]= ids.slice(idx, idx+size); idx+=size; g++; } saveDB(); renderGroupsColumns(); showToast('Distribuido por tamaño','success'); }
 
-/* ========== Export functions (XLSX) ========== */
+/* ---------- Export / printing ---------- */
 function exportCurrentClassExcel(gradeKey){
   const key = gradeKey || currentClass; if(!key) return showToast('Selecciona grado','warn');
   const students = db.classes[key] || [];
   const rows = students.map((s,i)=>({ 'N°': i+1, 'ID': s.id, 'Nombre': s.name, 'Grado': key, 'Nivel': s.level || 1, 'XP': s.xp || 0, 'HP': s.hp || HP_MAX }));
   const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `Curso_${key}`); XLSX.writeFile(wb, `FantasyClass_Curso_${key}.xlsx`); showToast('Export generado','success');
 }
-function exportSubgroup(grade, subgroup){
-  const groupsFor = db.groups && db.groups[grade] ? db.groups[grade] : {};
-  const members = groupsFor[subgroup] || [];
-  const rows = members.length ? members.map((id,i)=>{ const s = (db.classes[grade]||[]).find(x=>x.id===id); return { 'N°': i+1, 'Nombre': s? s.name:id, 'Grado': grade, 'Grupo': subgroup }; }) : [{ Mensaje: 'Sin miembros' }];
-  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), `${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado','success');
+function exportSubgroup(grade, subgroup){ const groupsFor=db.groups&&db.groups[grade]?db.groups[grade]:{}; const members=groupsFor[subgroup]||[]; const rows= members.length? members.map((id,i)=>{ const s=(db.classes[grade]||[]).find(x=>x.id===id); return {'N°':i+1,'Nombre':s?s.name:id,'Grado':grade,'Grupo':subgroup}; }) : [{Mensaje:'Sin miembros'}]; const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),`${grade}_${subgroup}`); XLSX.writeFile(wb, `Grupo_${grade}_${subgroup}.xlsx`); showToast('Export subgrupo generado','success'); }
+function printClassReport(){
+  const grade = currentClass; if(!grade) return showToast('Selecciona grado','warn');
+  const students = db.classes[grade]||[]; let html = `<!doctype html><html><head><meta charset="utf-8"><title>Reporte curso ${grade}</title><style>body{font-family:Inter,Arial;padding:18px;color:#111}h1{font-size:20px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ddd;padding:6px}</style></head><body><h1>Reporte curso ${grade}</h1><table><tr><th>N°</th><th>Nombre</th><th>XP</th><th>HP</th><th>Actas</th></tr>`; students.forEach((s,i)=>{ html+=`<tr><td>${i+1}</td><td>${escapeHtml(s.name)}</td><td>${s.xp||0}</td><td>${s.hp||HP_MAX}</td><td>${(s.actas||[]).length}</td></tr>`; }); html+='</table></body></html>'; const w=window.open('','_blank','width=900,height=900'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300);
 }
 
-/* ========== Dice / Roulette / Timer (unchanged behavior but timer centered) ========== */
+/* ---------- Dice / roulette / timer ---------- */
 function openDiceModal(){ showModal('dice-modal'); document.getElementById('die').innerText='🎲'; document.getElementById('dice-detail').innerText=''; }
-function rollDice(){ const count=Math.max(1, parseInt(document.getElementById('dice-count').value)||1); const sides=Math.max(2, parseInt(document.getElementById('dice-sides').value)||6); const dieEl=document.getElementById('die'); dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin'); const interim=setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); dieEl.classList.remove('spin'); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; }, 900); }
-
+function rollDice(){ const count=Math.max(1,parseInt(document.getElementById('dice-count').value)||1); const sides=Math.max(2,parseInt(document.getElementById('dice-sides').value)||6); const dieEl=document.getElementById('die'); dieEl.classList.remove('spin'); void dieEl.offsetWidth; dieEl.classList.add('spin'); const interim=setInterval(()=> dieEl.innerText = Math.floor(Math.random()*sides)+1, 80); setTimeout(()=>{ clearInterval(interim); dieEl.classList.remove('spin'); const res=[]; for(let i=0;i<count;i++) res.push(Math.floor(Math.random()*sides)+1); const sum=res.reduce((a,b)=>a+b,0); dieEl.innerText = count===1? res[0] : sum; document.getElementById('dice-detail').innerText = `Individual: ${res.join(', ')} — Suma: ${sum}`; },900); }
 let rouletteInterval=null, rouletteRunning=false;
 function openRouletteModal(){ rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); document.getElementById('roulette-display').innerText = rouletteNames.length? '¡Presiona Girar!':'No hay estudiantes'; showModal('roulette-modal'); }
 function startRoulette(){ if(rouletteRunning) return; rouletteNames=(db.classes[currentClass]||[]).map(s=>s.name); if(!rouletteNames.length) return showToast('No hay estudiantes'); rouletteRunning=true; let idx=Math.floor(Math.random()*rouletteNames.length); let cycles=0; rouletteInterval=setInterval(()=>{ idx=(idx+1)%rouletteNames.length; document.getElementById('roulette-display').innerText = rouletteNames[idx]; cycles++; if(cycles>60){ clearInterval(rouletteInterval); setTimeout(()=>{ rouletteRunning=false; const s=(db.classes[currentClass]||[]).find(x=>x.name===rouletteNames[idx]); if(s) openFicha(s.id); else showToast('Seleccionado: '+rouletteNames[idx]); },200); } },80); }
 function stopRoulette(){ if(rouletteInterval) clearInterval(rouletteInterval); rouletteRunning=false; }
-
 let timerSeconds=300, timerInterval=null;
 function openTimerModal(){ document.getElementById('timer-display').innerText = formatTime(timerSeconds); showModal('timer-modal'); }
 function setTimerMinutes(m){ timerSeconds = m*60; document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
@@ -1198,31 +1047,17 @@ function formatTime(s){ const m=Math.floor(s/60), sec=s%60; return String(m).pad
 function toggleTimer(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } else { timerInterval=setInterval(()=>{ if(timerSeconds>0){ timerSeconds--; document.getElementById('timer-display').innerText = formatTime(timerSeconds); } else { clearInterval(timerInterval); timerInterval=null; showToast('Tiempo terminado','info'); } },1000); } }
 function resetTimer(){ timerSeconds=300; if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } document.getElementById('timer-display').innerText = formatTime(timerSeconds); }
 
-/* ========== Class Panel functions (kept) ========== */
-/* ... (functions applyClassPanelAction, previewClassPanelAction, buildClassPanel taken from prior versions) ... */
+/* ---------- Class panel actions (kept) ---------- */
 function openClassPanel(){ buildClassPanel(); showModal('class-panel-modal'); }
 function buildClassPanel(){
-  const container=document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
+  const container = document.getElementById('class-panel-students'); if(!container) return; container.innerHTML='';
   const students = db.classes[currentClass] || [];
-  students.forEach(s=>{
-    const w = document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)';
-    const left = document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px';
-    const chk = document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id;
-    left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div style="color:var(--muted);font-size:13px">Grado ${currentClass}</div></div>`;
-    const right = document.createElement('div'); right.innerHTML = `<button class="action-btn ficha" onclick="openFicha('${s.id}')">Ficha</button>`;
-    w.appendChild(left); w.appendChild(right); container.appendChild(w);
-  });
-  document.getElementById('class-panel-pilar-select').innerHTML='';
-  const all = [...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji})), ...(db.characters||[])];
-  // dedupe keys
-  const seen = new Set();
-  all.forEach(b=>{ if(seen.has(b.key)) return; seen.add(b.key); const o=document.createElement('option'); o.value=b.key; o.textContent = (b.emoji||'') + ' ' + b.key; document.getElementById('class-panel-pilar-select').appendChild(o); });
+  students.forEach(s=>{ const w=document.createElement('div'); w.style.display='flex'; w.style.alignItems='center'; w.style.justifyContent='space-between'; w.style.padding='8px'; w.style.borderBottom='1px solid rgba(255,255,255,0.03)'; const left=document.createElement('div'); left.style.display='flex'; left.style.alignItems='center'; left.style.gap='12px'; const chk=document.createElement('input'); chk.type='checkbox'; chk.dataset.sid=s.id; left.appendChild(chk); left.innerHTML += `<div style="width:38px;height:38px;border-radius:8px;background:${avatarGradient(s.name)};display:flex;align-items:center;justify-content:center">${(s.name||' ')[0]}</div><div><div style="font-weight:700">${s.name}</div><div style="color:var(--muted);font-size:13px">Grado ${currentClass}</div></div>`; const right=document.createElement('div'); right.innerHTML=`<button class="action-btn ghost" onclick="openFicha('${s.id}')">Ficha</button>`; w.appendChild(left); w.appendChild(right); container.appendChild(w); });
+  document.getElementById('class-panel-pilar-select').innerHTML=''; const all=[...DEFAULT_CHARACTERS.map(c=>({key:c.key,emoji:c.emoji})), ...(db.characters||[])]; const seen=new Set(); all.forEach(b=>{ if(seen.has(b.key)) return; seen.add(b.key); const o=document.createElement('option'); o.value=b.key; o.textContent=(b.emoji||'')+' '+b.key; document.getElementById('class-panel-pilar-select').appendChild(o); });
   document.getElementById('class-panel-action-type').onchange = function(){ document.getElementById('class-panel-pilar-row').style.display = this.value === 'pilar' ? 'block' : 'none'; };
-  document.getElementById('class-preview-empty').style.display = 'block';
-  document.getElementById('class-preview').style.display = 'none';
 }
-function classPanelSelectAll(val){ document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked = !!val); }
-function previewClassPanelAction(){ const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=>groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } document.getElementById('class-panel-preview').innerText = targets.length? `${op==='add'?'Agregar':'Restar'} ${points} ${type} a ${targets.length} estudiantes` : 'No hay estudiantes seleccionados.'; }
+function classPanelSelectAll(val){ document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>cb.checked=!!val); }
+function previewClassPanelAction(){ const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value; let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); }); if(scope==='all') targets=(db.classes[currentClass]||[]).map(s=>s.id); if(scope==='ungrouped'){ const assigned=new Set(); const groups=db.groups[currentClass]||{}; Object.keys(groups).forEach(g=> groups[g].forEach(id=>assigned.add(id))); targets=(db.classes[currentClass]||[]).filter(s=>!assigned.has(s.id)).map(s=>s.id); } if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); } document.getElementById('class-panel-preview').innerText = targets.length? `${op==='add'?'Agregar':'Restar'} ${points} ${type} a ${targets.length} estudiantes` : 'No hay estudiantes seleccionados.'; }
 function applyClassPanelAction(){
   const type=document.getElementById('class-panel-action-type').value; const points=parseInt(document.getElementById('class-panel-points').value)||1; const op=document.getElementById('class-panel-op').value; const scope=document.getElementById('class-panel-scope').value; const pilar=document.getElementById('class-panel-pilar-select').value;
   let targets=[]; document.querySelectorAll('#class-panel-students input[type=checkbox]').forEach(cb=>{ if(cb.checked) targets.push(cb.dataset.sid); });
@@ -1231,146 +1066,85 @@ function applyClassPanelAction(){
   if(scope==='all-courses'){ Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=>targets.push(s.id))); }
   if(!targets.length) return showToast('No hay estudiantes objetivo','warn');
   function findById(id){ for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return s; } return null; }
-  targets.forEach(id=>{ const s=findById(id); if(!s) return; if(type==='xp'){ const delta = (op==='add')? points : -points; s.xp = (s.xp||0) + delta; if(s.xp<0) s.xp=0; s.level = Math.floor((s.xp||0)/20)+1; s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'XP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='gold'){ const delta=(op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'Oro Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='hp'){ const delta=(op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history = s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'HP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel de Clase' }); } else if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:pilar, magnitude:points, note:'Aplicado Panel de Clase' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp = Math.min(HP_MAX, s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else { s.hp = Math.max(0, (s.hp||HP_MAX)-points); } } });
-  saveDB(); renderStudentGrid(); showToast('Acción aplicada a ' + targets.length + ' estudiante(s)','success'); hideModal('class-panel-modal');
+  targets.forEach(id=>{ const s=findById(id); if(!s) return; if(type==='xp'){ const delta=(op==='add')? points:-points; s.xp=(s.xp||0)+delta; if(s.xp<0) s.xp=0; s.level=Math.floor((s.xp||0)/20)+1; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'XP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel' }); } else if(type==='gold'){ const delta=(op==='add')? points:-points; s.gold=(s.gold||0)+delta; if(s.gold<0) s.gold=0; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'Oro Clase', magnitude:Math.abs(delta), note:'Aplicado Panel' }); } else if(type==='hp'){ const delta=(op==='add')? points:-points; s.hp=(s.hp||HP_MAX)+delta; s.hp=Math.max(0, Math.min(HP_MAX, s.hp)); s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type: delta>0?'positive':'negative', pilar:'HP Clase', magnitude:Math.abs(delta), note:'Aplicado Panel' }); } else if(type==='pilar'){ const isPos = op==='add'; s.history=s.history||[]; s.history.unshift({ id:Date.now(), ts:new Date().toLocaleString(), type:isPos?'positive':'negative', pilar:pilar, magnitude:points, note:'Aplicado Panel' }); if(isPos){ s.xp=(s.xp||0)+points; if(s.hp<HP_MAX) s.hp=Math.min(HP_MAX, s.hp+1); s.level=Math.floor((s.xp||0)/20)+1; } else { s.hp=Math.max(0,(s.hp||HP_MAX)-points); } } });
+  saveDB(); renderStudentGrid(); showToast('Acción aplicada','success'); hideModal('class-panel-modal');
 }
 
-/* ========== Print / Export helpers ========== */
-function printStudent(studentId){ const found=findStudentById(studentId); if(!found) return showToast('No encontrado'); const html=buildPrintableHTML([found.student], found.grade); const w=window.open('','_blank','width=900,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300); }
-function printStudentsList(ids){ const grade=currentClass; const students=ids.map(id=> (db.classes[grade]||[]).find(s=>s.id===id)).filter(Boolean); if(!students.length) return showToast('No hay estudiantes'); const html=buildPrintableHTML(students, grade); const w=window.open('','_blank','width=1000,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300); }
-function printCurrentPreviewStudent(){ const modal=document.getElementById('class-panel-modal'); const id=modal.dataset.previewId; if(!id) return showToast('Selecciona estudiante'); printStudent(id); }
-function printSelectedOrClass(){ const container=document.getElementById('class-panel-students'); let ids=[]; container.querySelectorAll('input[type=checkbox]').forEach(cb=>{ if(cb.checked) ids.push(cb.dataset.sid); }); if(!ids.length) ids=(db.classes[currentClass]||[]).map(s=>s.id); printStudentsList(ids); }
-function printCurrentFicha(kind){ const sid=(document.getElementById('ficha-modal')?.dataset?.currentStudent) || activeStudentId; if(!sid) return showToast('Abre ficha'); if(kind==='student') printStudent(sid); else if(kind==='group'){ const grade=currentClass; const groupsFor=db.groups && db.groups[grade] ? db.groups[grade] : {}; let groupName=''; Object.keys(groupsFor).forEach(g=>{ if(groupsFor[g].includes(sid)) groupName=g; }); if(!groupName) return showToast('Estudiante no pertenece a grupo','warn'); printStudentsList(groupsFor[groupName]); } else if(kind==='course') printStudentsList((db.classes[currentClass]||[]).map(s=>s.id)); }
-function buildPrintableHTML(students, grade){ const now=new Date().toLocaleString(); let body=`<!doctype html><html><head><meta charset="utf-8"><title>Reporte</title><style>body{font-family:Inter,system-ui,Arial;color:#111;padding:18px}h1{font-size:20px}</style></head><body>`; body+=`<h1>Reporte convivencial — ${grade||''}</h1><div style="color:#666">Generado: ${now}</div>`; students.forEach(s=>{ body+=`<hr><h2 style="margin:6px 0">${s.name}</h2><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div>`; if(s.actas&&s.actas.length){ body+=`<h3>Actas</h3><ul>`; s.actas.forEach(a=>{ body+=`<li><strong>${a.fecha}</strong> ${a.descripcion||''}</li>`; }); body+=`</ul>`;} if(s.observador&&s.observador.length){ body+=`<h3>Observador</h3><ul>`; s.observador.forEach(o=> body+=`<li>${o.fecha} ${o.tipo}: ${o.desc}</li>`); body+=`</ul>`;} body+=`<h3>Historial</h3><ul>`; (s.history||[]).slice(0,25).forEach(h=> body+=`<li>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</li>`); body+=`</ul>`; }); body+=`</body></html>`; return body; }
-
-/* ========== Leaderboard (per grade / total courses) ========== */
-function populateLeaderboardGradeSelect(){
-  const sel = document.getElementById('leaderboard-grade'); if(!sel) return;
-  sel.innerHTML = '<option value="">--Seleccione grado--</option>';
-  Object.keys(db.classes||{}).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent = `Grado ${k}`; sel.appendChild(opt); });
+/* ---------- Print / Export helpers ---------- */
+function printStudent(studentId){
+  const f=findStudentById(studentId); if(!f) return showToast('No encontrado'); const html=buildPrintableHTML([f.student], f.grade); const w=window.open('','_blank','width=900,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300);
 }
-function openLeaderboard(){ populateLeaderboardGradeSelect(); document.getElementById('leaderboard-top-n').value = db.leaderOptions ? db.leaderOptions.topN || 10 : 10; document.getElementById('leaderboard-scope').value = db.leaderOptions ? db.leaderOptions.scope || 'grade' : 'grade'; renderLeaderboard(); showModal('leaderboard-modal'); }
+function printStudentsList(ids){
+  const grade=currentClass; const students=ids.map(id=> (db.classes[grade]||[]).find(s=>s.id===id)).filter(Boolean); if(!students.length) return showToast('No hay estudiantes','warn'); const html=buildPrintableHTML(students, grade); const w=window.open('','_blank','width=1000,height=800'); w.document.write(html); w.document.close(); setTimeout(()=>w.print(),300);
+}
+function buildPrintableHTML(students, grade){ const now=new Date().toLocaleString(); let body=`<!doctype html><html><head><meta charset="utf-8"><title>Reporte</title><style>body{font-family:Inter,Arial;color:#111;padding:18px}h1{font-size:20px}</style></head><body>`; body+=`<h1>Reporte — ${grade||''}</h1><div style="color:#666">Generado: ${now}</div>`; students.forEach(s=>{ body+=`<hr><h2 style="margin:6px 0">${s.name}</h2><div><strong>XP:</strong> ${s.xp||0} — <strong>HP:</strong> ${s.hp||HP_MAX} — <strong>ORO:</strong> ${s.gold||0}</div>`; if(s.actas&&s.actas.length){ body+=`<h3>Actas</h3><ul>`; s.actas.forEach(a=>{ body+=`<li><strong>${a.fecha}</strong> ${a.descripcion||''}</li>`; }); body+=`</ul>`;} if(s.observador&&s.observador.length){ body+=`<h3>Observador</h3><ul>`; s.observador.forEach(o=> body+=`<li>${o.fecha} ${o.tipo}: ${o.desc}</li>`); body+=`</ul>`;} body+=`<h3>Historial</h3><ul>`; (s.history||[]).slice(0,25).forEach(h=> body+=`<li>${h.ts} — ${h.type==='positive'?'+':'-'}${h.magnitude} • ${h.pilar} — ${h.note||''}</li>`); body+=`</ul>`; }); body+=`</body></html>`; return body; }
+
+/* ---------- Leaderboard (grade / total) ---------- */
+function populateLeaderboardGradeSelect(){ const sel=document.getElementById('leaderboard-grade'); if(!sel) return; sel.innerHTML='<option value="">--Seleccione--</option>'; Object.keys(db.classes||{}).forEach(k=>{ const opt=document.createElement('option'); opt.value=k; opt.textContent=`Grado ${k}`; sel.appendChild(opt); }); }
+function openLeaderboard(){ populateLeaderboardGradeSelect(); document.getElementById('leaderboard-top-n').value = db.leaderOptions ? db.leaderOptions.topN||10 : 10; document.getElementById('leaderboard-scope').value = db.leaderOptions ? db.leaderOptions.scope||'grade' : 'grade'; renderLeaderboard(); showModal('leaderboard-modal'); }
 function renderLeaderboard(){
   const topN = Math.max(1, parseInt(document.getElementById('leaderboard-top-n').value)||10);
   const scope = document.getElementById('leaderboard-scope').value;
   const gradeSel = document.getElementById('leaderboard-grade').value;
   db.leaderOptions = { topN, scope, grade: gradeSel }; saveDB();
-  const list=document.getElementById('leaderboard-area'); list.innerHTML='';
-  if(scope === 'grade'){
-    const grade = gradeSel || currentClass;
-    if(!grade) return list.innerHTML = '<div style="color:#666">Selecciona grado</div>';
-    const arr = (db.classes[grade]||[]).map(s=>({ id:s.id, name:s.name, xp:s.xp||0, grade }));
-    arr.sort((a,b)=>b.xp - a.xp);
-    arr.slice(0, topN).forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML = `<div style="font-weight:800">${i+1}. ${r.name}</div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); });
-  } else {
-    // total: collect all students, sum XP (already per-student), just aggregate and sort
-    const arr=[]; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> arr.push({ id:s.id, name:s.name, xp:s.xp||0, grade:g })));
-    arr.sort((a,b)=>b.xp - a.xp);
-    arr.slice(0, topN).forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML = `<div style="font-weight:800">${i+1}. ${r.name} <small style="color:#666">(${r.grade})</small></div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); });
-  }
+  const list = document.getElementById('leaderboard-area'); list.innerHTML='';
+  if(scope==='grade'){ const grade = gradeSel||currentClass; if(!grade) return list.innerHTML='<div style="color:#666">Selecciona grado</div>'; const arr=(db.classes[grade]||[]).map(s=>({id:s.id,name:s.name,xp:s.xp||0,grade})); arr.sort((a,b)=>b.xp-a.xp); arr.slice(0,topN).forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML=`<div style="font-weight:800">${i+1}. ${r.name}</div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); }); }
+  else { const arr=[]; Object.keys(db.classes||{}).forEach(g=> (db.classes[g]||[]).forEach(s=> arr.push({id:s.id,name:s.name,xp:s.xp||0,grade:g}))); arr.sort((a,b)=>b.xp-a.xp); arr.slice(0,topN).forEach((r,i)=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.padding='8px'; row.style.borderBottom='1px solid #eee'; row.innerHTML=`<div style="font-weight:800">${i+1}. ${r.name} <small style="color:#666">(${r.grade})</small></div><div style="font-weight:800;color:${i<3?'#f59e0b':'#111'}">${r.xp} XP</div>`; list.appendChild(row); }); }
 }
 
-/* ========= Utility functions ========= */
-function findStudentById(id){
-  if(!id) return null;
-  for(const g of Object.keys(db.classes||{})){
-    const s = (db.classes[g]||[]).find(x=>x.id===id);
-    if(s) return { student: s, grade: g };
-  }
-  return null;
-}
+/* ---------- Utility functions ---------- */
+function findStudentById(id){ if(!id) return null; for(const g of Object.keys(db.classes||{})){ const s=(db.classes[g]||[]).find(x=>x.id===id); if(s) return { student:s, grade:g }; } return null; }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
-/* Confirm helper */
-function showConfirm(title, message, cb){
-  document.getElementById('confirm-title').innerText = title;
-  document.getElementById('confirm-message').innerText = message;
-  document.getElementById('confirm-yes').onclick = ()=>{ cb && cb(); hideModal('confirm-modal'); };
-  showModal('confirm-modal');
+/* ---------- Save ficha personal ---------- */
+function saveFichaPersonal(){
+  if(!activeStudentId) return showToast('Abre ficha primero','warn');
+  const f=findStudentById(activeStudentId); if(!f) return;
+  f.student.document = document.getElementById('f_name_doc')?.value || f.student.document;
+  f.student.acudiente = f.student.acudiente||{};
+  f.student.acudiente.name = document.getElementById('f_name_parent')?.value || f.student.acudiente.name;
+  saveDB(); renderStudentGrid(); fillFicha(activeStudentId); showToast('Datos guardados','success');
 }
 
-/* Modal show/hide */
+/* ---------- Export single student ---------- */
+function exportSingleStudentExcel(id){
+  const sid = id || activeStudentId;
+  if(!sid) return showToast('Abre ficha','warn');
+  const f = findStudentById(sid); if(!f) return showToast('No encontrado','err');
+  const s=f.student; const rows = (s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note}));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado: f.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada','success');
+}
+
+/* ---------- Backup / restore ---------- */
+function downloadBackup(){ const data=Object.fromEntries(Object.entries(localStorage)); const a=document.createElement('a'); a.href='data:application/json;charset=utf-8,'+encodeURIComponent(JSON.stringify(data,null,2)); a.download=`localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`; a.click(); showToast('Backup descargado','success'); }
+function openRestore(){ showModal('restore-modal'); }
+function applyRestore(){ const key=document.getElementById('restore-key').value.trim()||STORAGE_KEY; const json=document.getElementById('restore-json').value; if(!json) return showToast('Pega el JSON','warn'); try{ JSON.parse(json); localStorage.setItem(key,json); showToast('Restaurado. Recargando...', 'success'); setTimeout(()=>location.reload(),700); }catch(e){ showToast('JSON inválido','err'); } }
+
+/* ---------- Confirmation / modals ---------- */
+function showConfirm(title,message,cb){ document.getElementById('confirm-title').innerText=title; document.getElementById('confirm-message').innerText=message; document.getElementById('confirm-yes').onclick=()=>{ cb && cb(); hideModal('confirm-modal'); }; showModal('confirm-modal');}
 function showModal(id){ const el=document.getElementById(id); if(el) el.style.display='flex'; }
 function hideModal(id){ const el=document.getElementById(id); if(el) el.style.display='none'; }
 
-/* ========== Grades management ========== */
-function renderGradesList(){
-  const el=document.getElementById('grades-list'); if(!el) return; el.innerHTML='';
-  Object.keys(db.classes||{}).forEach(k=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eef2f7'; row.innerHTML = `<div><strong>${k}</strong> <span style="color:#666">(${(db.classes[k]||[]).length} estudiantes)</span></div><div style="display:flex;gap:6px"><button class="action-btn ficha" onclick="renameGradePrompt('${k}')">Renombrar</button><button class="action-btn red" onclick="deleteGradePrompt('${k}')">Eliminar</button></div>`; el.appendChild(row); });
-}
+/* ---------- Simple helpers ---------- */
+function updateMetrics(){ const students = db.classes[currentClass]||[]; const totals={Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0}; students.forEach(s=> (s.history||[]).forEach(h=>{ if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar]+= (h.magnitude||1); })); Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; }); }
+
+/* ---------- Grades management ---------- */
+function renderGradesList(){ const el=document.getElementById('grades-list'); if(!el) return; el.innerHTML=''; Object.keys(db.classes||{}).forEach(k=>{ const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='space-between'; row.style.alignItems='center'; row.style.padding='8px'; row.style.borderBottom='1px solid #eef2f7'; row.innerHTML = `<div><strong>${k}</strong> <span style="color:#666">(${(db.classes[k]||[]).length} estudiantes)</span></div><div style="display:flex;gap:6px"><button class="action-btn ghost" onclick="renameGradePrompt('${k}')">Renombrar</button><button class="action-btn warn" onclick="deleteGradePrompt('${k}')">Eliminar</button></div>`; el.appendChild(row); }); }
 function openGradesModal(){ renderGradesList(); showModal('grades-modal'); }
-function createGrade(){ const key=document.getElementById('new-grade-key').value.trim(); if(!key) return showToast('Ingresa código de grado','warn'); if(db.classes[key]) return showToast('Ya existe grado','warn'); db.classes[key]=[]; db.groups[key]={}; saveDB(); populateClassSelect(); renderGradesList(); showToast('Grado creado','success'); }
-function deleteGradePrompt(k){ showConfirm('Eliminar grado', `Eliminar grado ${k} y todos sus estudiantes?`, ()=>{ delete db.classes[k]; delete db.groups[k]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Grado eliminado','success'); }); }
-function renameGradePrompt(oldKey, newKeyOptional){ const newKey = typeof newKeyOptional === 'string' ? newKeyOptional.trim() : prompt('Nuevo código de grado', oldKey); if(!newKey) return; if(db.classes[newKey]) return showToast('Ya existe','warn'); db.classes[newKey]=db.classes[oldKey]; db.groups[newKey]=db.groups[oldKey]||{}; delete db.classes[oldKey]; delete db.groups[oldKey]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Renombrado','success'); }
+function createGrade(){ const key=document.getElementById('new-grade-key').value.trim(); if(!key) return showToast('Código requerido','warn'); if(db.classes[key]) return showToast('Ya existe','warn'); db.classes[key]=[]; db.groups[key]={}; saveDB(); populateClassSelect(); renderGradesList(); showToast('Grado creado','success'); }
+function deleteGradePrompt(k){ showConfirm('Eliminar grado', `Eliminar grado ${k} y sus estudiantes?`, ()=>{ delete db.classes[k]; delete db.groups[k]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Grado eliminado','success'); }); }
+function renameGradePrompt(oldKey){ const newKey=prompt('Nuevo código de grado', oldKey); if(!newKey) return; if(db.classes[newKey]) return showToast('Ya existe','warn'); db.classes[newKey]=db.classes[oldKey]; db.groups[newKey]=db.groups[oldKey]||{}; delete db.classes[oldKey]; delete db.groups[oldKey]; saveDB(); populateClassSelect(); renderStudentGrid(); renderGradesList(); showToast('Renombrado','success'); }
 
-/* ========== Institution settings ========== */
-function openInstitutionSettings(){ const inst = db.institution || {}; document.getElementById('inst-app-name').value = inst.appName || document.title || 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = inst.subtitle || ''; document.getElementById('inst-logo-text').value = inst.logoText || 'ALM'; document.getElementById('inst-color-primary').value = inst.colorPrimary || '#0ea5e9'; document.getElementById('inst-font').value = inst.font || 'Inter, system-ui'; showModal('institution-modal'); }
-function saveInstitutionSettings(){ db.institution = db.institution || {}; db.institution.appName = document.getElementById('inst-app-name').value || ''; db.institution.subtitle = document.getElementById('inst-subtitle').value || ''; db.institution.logoText = document.getElementById('inst-logo-text').value || ''; db.institution.colorPrimary = document.getElementById('inst-color-primary').value || '#0ea5e9'; db.institution.font = document.getElementById('inst-font').value || 'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados','success'); }
-function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value = 'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value = 'Aprendiendo Jugando'; document.getElementById('inst-logo-text').value = 'ALM'; document.getElementById('inst-color-primary').value = '#0ea5e9'; document.getElementById('inst-font').value = 'Inter, system-ui'; showToast('Valores restaurados','info'); }
-function renderHeaderFromInstitution(){ const inst = db.institution || {}; if(inst.appName) document.getElementById('header-title').innerText = inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText = inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText = inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--blue', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
+/* ---------- Institution settings ---------- */
+function openInstitutionSettings(){ const inst=db.institution||{}; document.getElementById('inst-app-name').value=inst.appName||document.title||'FantasyClass Convivencial'; document.getElementById('inst-subtitle').value=inst.subtitle||''; document.getElementById('inst-logo-text').value=inst.logoText||'ALM'; document.getElementById('inst-color-primary').value=inst.colorPrimary||'#0ea5e9'; document.getElementById('inst-font').value=inst.font||'Inter, system-ui'; showModal('institution-modal'); }
+function saveInstitutionSettings(){ db.institution=db.institution||{}; db.institution.appName=document.getElementById('inst-app-name').value||''; db.institution.subtitle=document.getElementById('inst-subtitle').value||''; db.institution.logoText=document.getElementById('inst-logo-text').value||''; db.institution.colorPrimary=document.getElementById('inst-color-primary').value||'#0ea5e9'; db.institution.font=document.getElementById('inst-font').value||'Inter, system-ui'; saveDB(); renderHeaderFromInstitution(); hideModal('institution-modal'); showToast('Ajustes guardados','success'); }
+function loadInstitutionDefaults(){ document.getElementById('inst-app-name').value='FantasyClass Convivencial'; document.getElementById('inst-subtitle').value='Aprendiendo Jugando'; document.getElementById('inst-logo-text').value='ALM'; document.getElementById('inst-color-primary').value='#0ea5e9'; document.getElementById('inst-font').value='Inter, system-ui'; showToast('Valores restaurados','info'); }
+function renderHeaderFromInstitution(){ const inst=db.institution||{}; if(inst.appName) document.getElementById('header-title').innerText=inst.appName; if(inst.subtitle) document.getElementById('header-subtitle').innerText=inst.subtitle; if(inst.logoText) document.getElementById('header-logo').innerText=inst.logoText; if(inst.colorPrimary) document.documentElement.style.setProperty('--blue', inst.colorPrimary); if(inst.font) document.body.style.fontFamily = inst.font; }
 
-/* ========== Backup / Restore helpers ========== */
-function downloadBackup(){
-  const data = Object.fromEntries(Object.entries(localStorage));
-  const a = document.createElement('a');
-  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data,null,2));
-  a.download = `localStorage_snapshot_${new Date().toISOString().slice(0,19)}.json`;
-  a.click(); showToast('Backup descargado','success');
-}
-function openRestore(){ showModal('restore-modal'); }
-function applyRestore(){
-  const key = document.getElementById('restore-key').value.trim() || STORAGE_KEY;
-  const json = document.getElementById('restore-json').value;
-  if(!json) return showToast('Pega el JSON del backup','warn');
-  try{
-    JSON.parse(json);
-    localStorage.setItem(key, json);
-    showToast('Restaurado. Recargando...', 'success');
-    setTimeout(()=> location.reload(), 800);
-  }catch(e){ showToast('JSON inválido','err'); }
-}
-
-/* ========== Small init helpers & updates ========= */
-function initUI(){
-  populateClassSelect();
-  renderStudentGrid();
-  refreshBehaviorSelects();
-  renderCharactersList();
-  renderGradesList();
-  updateMetrics();
-}
+/* ---------- small init helpers ---------- */
+function initUI(){ populateClassSelect(); renderStudentGrid(); refreshBehaviorSelects(); renderCharactersList(); renderGradesList(); updateMetrics(); }
 initUI();
 
-/* Expose some functions used inline */
-window.openClassPanel = openClassPanel;
-window.openGroupsModal = ()=>{ renderGroupsColumns(); showModal('manage-groups-modal'); };
-window.openGradesModal = openGradesModal;
-window.openCharactersModal = ()=>{ renderCharactersList(); showModal('characters-modal'); };
-window.openQuick = (k)=> openQuick(k);
-window.applyBehaviorToScope = applyBehaviorToScope;
-window.exportSingleStudentExcel = function(id){
-  const sid = id || activeStudentId;
-  if(!sid) return showToast('Abre ficha'); const found = findStudentById(sid); if(!found) return showToast('No encontrado'); const s = found.student; const rows=(s.history||[]).map(h=>({Fecha:h.ts,Tipo:h.type,Pilar:h.pilar,Puntos:h.magnitude,Nota:h.note})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet([{Nombre:s.name,Grado:found.grade,XP:s.xp||0,HP:s.hp||HP_MAX}]),'Resumen'); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{Info:'Sin registros'}]),'Historial'); XLSX.writeFile(wb,`Ficha_${(s.name||'est').replace(/[^a-z0-9]/gi,'_')}.xlsx`); showToast('Ficha exportada','success');
-};
-
-/* Utility: openQuick (shortcut to add points) */
-function openQuick(type){
-  // open panel and preselect a pilar or op
-  openClassPanel();
-  setTimeout(()=>{ if(type==='positive'){ document.getElementById('class-panel-action-type').value='pilar'; document.getElementById('class-panel-op').value='add'; } else { document.getElementById('class-panel-action-type').value='pilar'; document.getElementById('class-panel-op').value='sub'; } document.getElementById('class-panel-points').value=1; }, 200);
-}
-
-/* update header metrics from pilar totals */
-function updateMetrics(){
-  const students = db.classes[currentClass] || [];
-  const totals = {Responsabilidad:0,Respeto:0,Confianza:0,Empatía:0,Justicia:0,Ciudadanía:0};
-  students.forEach(s => (s.history||[]).forEach(h=>{ if(h.type==='positive' && typeof totals[h.pilar] !== 'undefined') totals[h.pilar] += (h.magnitude||1); }));
-  Object.keys(totals).forEach(k=>{ const el=document.getElementById('badge-'+k); if(el) el.innerText = `${totals[k]} pts`; });
-}
-
-/* small helpers: escapeHtml already defined */
-
-/* End of script */
 </script>
 </body>
 </html>
